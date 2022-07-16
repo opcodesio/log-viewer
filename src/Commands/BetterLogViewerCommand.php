@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Arukompas\BetterLogViewer\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class BetterLogViewerCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'better-log-viewer';
 
     public $description = 'My command';
 
