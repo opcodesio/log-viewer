@@ -2,9 +2,9 @@
 
 namespace Arukompas\BetterLogViewer\Tests;
 
+use Arukompas\BetterLogViewer\BetterLogViewerServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Arukompas\BetterLogViewer\BetterLogViewerServiceProvider;
 
 class TestCase extends Orchestra
 {

@@ -2,9 +2,9 @@
 
 namespace Arukompas\BetterLogViewer;
 
+use Arukompas\BetterLogViewer\Commands\BetterLogViewerCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Arukompas\BetterLogViewer\Commands\BetterLogViewerCommand;
 
 class BetterLogViewerServiceProvider extends PackageServiceProvider
 {
