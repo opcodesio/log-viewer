@@ -19,6 +19,7 @@ class BetterLogViewerServiceProvider extends PackageServiceProvider
             ->name('better-log-viewer')
             ->hasConfigFile()
             ->hasViews()
+            ->hasRoute('web')
             ->hasMigration('create_better-log-viewer_table')
             ->hasCommand(BetterLogViewerCommand::class);
     }
