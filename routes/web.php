@@ -1,24 +1,19 @@
 <?php
 
-use Arukompas\BetterLogViewer\LogReader;
+use Arukompas\BetterLogViewer\FileListReader;
 use Illuminate\Support\Facades\Route;
 
-Route::get('logs', function (LogReader $logReader) {
+Route::get('logs', function (FileListReader $logReader) {
     $files = $logReader->getFiles();
 
-    $logs = [];
-    $file = $files[2];
-    $logs = $file->getLogs();
-    // $logs = [$file->nextLog()];
-
-    // $logs = $file->getLogs();
+    $file = $files[0];
+    $logs = $file->logs()->skip(100)->get(10);
 
     return response()->json([
-        // 'contents' => $contents,
-        // 'files' => $files,
-        // 'logs' => $logs,
+        'files' => $files,
+        'logs' => $logs,
         // 'log' => $log,
-        'count' => count($logs),
+        'count' => count($logs ?? []),
         'success' => true,
     ]);
 });
