@@ -3,6 +3,9 @@
 namespace Arukompas\BetterLogViewer;
 
 use Arukompas\BetterLogViewer\Commands\BetterLogViewerCommand;
+use Arukompas\BetterLogViewer\Http\Livewire\FileList;
+use Closure;
+use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -22,5 +25,12 @@ class BetterLogViewerServiceProvider extends PackageServiceProvider
             ->hasRoute('web')
             ->hasMigration('create_better-log-viewer_table')
             ->hasCommand(BetterLogViewerCommand::class);
+    }
+
+    public function boot()
+    {
+        parent::boot();
+
+        Livewire::component('blv::file-list', FileList::class);
     }
 }
