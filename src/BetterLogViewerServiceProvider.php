@@ -4,6 +4,7 @@ namespace Arukompas\BetterLogViewer;
 
 use Arukompas\BetterLogViewer\Commands\BetterLogViewerCommand;
 use Arukompas\BetterLogViewer\Http\Livewire\FileList;
+use Arukompas\BetterLogViewer\Http\Livewire\LogList;
 use Closure;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
@@ -32,5 +33,6 @@ class BetterLogViewerServiceProvider extends PackageServiceProvider
         parent::boot();
 
         Livewire::component('blv::file-list', FileList::class);
+        Livewire::component('blv::log-list', LogList::class);
     }
 }

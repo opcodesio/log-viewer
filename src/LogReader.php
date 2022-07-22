@@ -143,18 +143,10 @@ class LogReader
 
     public function getDefaultLevels(): array
     {
-        return [
-            'debug',
-            'info',
-            'notice',
-            'warning',
-            'error',
-            'critical',
-            'alert',
-            'emergency',
-            'processed',
-            'failed',
-        ];
+        return array_map(
+            fn (\UnitEnum $case) => $case->value,
+            Level::cases()
+        );
     }
 
     public function isOpen(): bool
@@ -296,8 +288,6 @@ class LogReader
             }
         }
 
-        dump('Scanning '.$this->file->name);
-
         // we don't care about the levels here, we should scan everything
         $levels = $this->getDefaultLevels();
         $currentLog = '';
@@ -335,7 +325,7 @@ class LogReader
 
     /**
      * @param int|null $limit
-     * @return array
+     * @return array|Log[]
      */
     public function get(int $limit = null)
     {
@@ -402,7 +392,7 @@ class LogReader
 
         $log = new Log($this->nextLogIndex, $currentLogLevel, $currentLog, $this->file->name, $currentLogPosition);
 
-        $this->indexLogPosition($log->index, $log->level, $log->filePosition);
+        $this->indexLogPosition($log->index, $log->level->value, $log->filePosition);
 
         $this->nextLogIndex++;
 

@@ -9,7 +9,9 @@
 
     <style>[x-cloak] { display: none !important; }</style>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    @isset($cssPath)
+        <style>{!! file_get_contents($cssPath) !!}</style>
+    @endisset
     @livewireStyles
 </head>
 <body class="h-full px-5">
@@ -27,8 +29,8 @@
         </nav>
     </div>
 
-    <div class="flex-auto max-h-screen">
-
+    <div class="flex-no-shrink flex-auto min-h-screen max-h-screen">
+        @livewire('blv::log-list')
     </div>
 </div>
 
