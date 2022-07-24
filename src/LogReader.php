@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 class LogReader
 {
     const LOG_MATCH_PATTERN = '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?\].*/';
+
     const DIRECTION_FORWARD = 'forward';
     const DIRECTION_BACKWARD = 'backward';
 

@@ -8,7 +8,9 @@
     <title>Logs - {{ config('app.name') }}</title>
 
     <style>[x-cloak] { display: none !important; }</style>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @isset($jsPath)
+        <script>{!! file_get_contents($jsPath) !!}</script>
+    @endisset
     @isset($cssPath)
         <style>{!! file_get_contents($cssPath) !!}</style>
     @endisset
