@@ -14,7 +14,7 @@ class Log
     public Level $level;
     public string $environment;
     public string $text;
-    public string $stack;
+    public string $fullText;
     public string $fileName;
     public int $filePosition;
 
@@ -44,7 +44,7 @@ class Log
 
         $text = $current[4];
         $this->text = mb_convert_encoding(explode("\n", $text)[0], 'UTF-8', 'UTF-8');
-        $this->stack = mb_convert_encoding(str_replace($this->text, '', $text), 'UTF-8', 'UTF-8');
+        $this->fullText = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
 
         // From the old implementation:
 

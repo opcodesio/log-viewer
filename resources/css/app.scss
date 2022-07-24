@@ -7,7 +7,7 @@
 
     &.info {
         &:hover, &.active {
-            @apply bg-sky-50 border-sky-300;
+            @apply bg-sky-50 border-sky-200;
         }
 
         .log-level-indicator {
@@ -54,6 +54,43 @@
         }
         .log-level {
             @apply text-gray-900;
+        }
+    }
+}
+
+/** Level Badges **/
+.badge {
+    @apply inline-block text-sm cursor-pointer px-2 py-0.5 rounded mr-2 mb-2;
+
+    &.info {
+        @apply border border-sky-200 bg-sky-50 text-gray-600;
+
+        &.active {
+            @apply border-sky-700 bg-sky-600 text-white;
+        }
+    }
+
+    &.warning {
+        @apply border border-amber-200 bg-amber-50 text-gray-600;
+
+        &.active {
+            @apply border-amber-700 bg-amber-600 text-white;
+        }
+    }
+
+    &.danger {
+        @apply border border-rose-200 bg-rose-50 text-gray-600;
+
+        &.active {
+            @apply border-rose-700 bg-rose-600 text-white;
+        }
+    }
+
+    &.none {
+        @apply border border-gray-200 bg-gray-50 text-gray-600;
+
+        &.active {
+            @apply border-gray-700 bg-gray-600 text-white;
         }
     }
 }

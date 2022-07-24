@@ -90,7 +90,7 @@ class LogReader
     {
         if (is_array($levels)) {
             $this->levels = [];
-            $defaultLevels = $this->getDefaultLevels();
+            $defaultLevels = self::getDefaultLevels();
             $levels = array_map('strtolower', $levels);
 
             foreach ($levels as $level) {
@@ -101,7 +101,7 @@ class LogReader
         } elseif (is_string($levels)) {
             $level = strtolower($levels);
 
-            if (in_array($level, $this->getDefaultLevels())) {
+            if (in_array($level, self::getDefaultLevels())) {
                 $this->levels = [$level];
             }
         } else {
@@ -121,10 +121,10 @@ class LogReader
     {
         if (is_array($levels)) {
             $levels = array_map('strtolower', $levels);
-            $this->levels = array_diff($this->getDefaultLevels(), $levels);
+            $this->levels = array_diff(self::getDefaultLevels(), $levels);
         } elseif (is_string($levels)) {
             $level = strtolower($levels);
-            $this->levels = array_diff($this->getDefaultLevels(), [$level]);
+            $this->levels = array_diff(self::getDefaultLevels(), [$level]);
         } else {
             $this->levels = null;
         }
@@ -138,10 +138,10 @@ class LogReader
             return $this->levels;
         }
 
-        return $this->getDefaultLevels();
+        return self::getDefaultLevels();
     }
 
-    public function getDefaultLevels(): array
+    public static function getDefaultLevels(): array
     {
         return array_map(
             fn (\UnitEnum $case) => $case->value,
@@ -281,6 +281,11 @@ class LogReader
         if ($this->isClosed()) {
             $this->open();
 
+            if ($this->logIndexFileSize === filesize($this->file->path)) {
+                // was already scanned before
+                $this->scanComplete = true;
+            }
+
             if ($this->scanComplete) {
                 // The scan was run automatically after opening the file.
                 // Let's not duplicate the work.
@@ -289,7 +294,7 @@ class LogReader
         }
 
         // we don't care about the levels here, we should scan everything
-        $levels = $this->getDefaultLevels();
+        $levels = self::getDefaultLevels();
         $currentLog = '';
         $currentLogLevel = '';
         rewind($this->fileHandle);
@@ -399,7 +404,28 @@ class LogReader
         return $log;
     }
 
-    public function getLogIndex(): array
+    /**
+     * @return array|LevelCount[]
+     * @throws \Exception
+     */
+    public function getLevelCounts(): array
+    {
+        $this->scan();
+        $selectedLevels = $this->getSelectedLevels();
+        $counts = [];
+
+        foreach (self::getDefaultLevels() as $level) {
+            $counts[$level] = new LevelCount(
+                Level::from($level),
+                count($this->logIndex[$level] ?? []),
+                in_array($level, $selectedLevels)
+            );
+        }
+
+        return $counts;
+    }
+
+    protected function getLogIndex(): array
     {
         $mergedIndex = [];
 
@@ -416,7 +442,7 @@ class LogReader
         return $mergedIndex;
     }
 
-    public function indexLogPosition(int $index, string $level, int $position): void
+    protected function indexLogPosition(int $index, string $level, int $position): void
     {
         if (!isset($this->logIndex[$level])) {
             $this->logIndex[$level] = [];
@@ -425,7 +451,7 @@ class LogReader
         $this->logIndex[$level][$index] = $position;
     }
 
-    public function getIndexedLogPosition(int $index): ?int
+    protected function getIndexedLogPosition(int $index): ?int
     {
         foreach ($this->logIndex as $levelIndex) {
             if (isset($levelIndex[$index])) return $levelIndex[$index];
@@ -434,17 +460,17 @@ class LogReader
         return null;
     }
 
-    public function shouldUseCache(): bool
+    protected function shouldUseCache(): bool
     {
         return config('better-log-viewer.enable_cache', false);
     }
 
-    public function getIndexCacheKey(): string
+    protected function getIndexCacheKey(): string
     {
         return 'better-log-viewer:log_index:'.$this->file->name;
     }
 
-    public function getDefaultIndexCacheData(): array
+    protected function getDefaultIndexCacheData(): array
     {
         return [
             'log_index' => [],
@@ -452,7 +478,7 @@ class LogReader
         ];
     }
 
-    public function getIndexCacheData(): array
+    protected function getIndexCacheData(): array
     {
         return [
             'log_index' => $this->logIndex,
@@ -460,13 +486,13 @@ class LogReader
         ];
     }
 
-    public function indexOutdated(): bool
+    protected function indexOutdated(): bool
     {
         return $this->file->size() !== $this->logIndexFileSize
             || empty($this->logIndex);
     }
 
-    public function setIndexCacheData(array $data = null): void
+    protected function setIndexCacheData(array $data = null): void
     {
         if (is_null($data)) {
             $data = $this->getDefaultIndexCacheData();
@@ -483,7 +509,7 @@ class LogReader
         }
     }
 
-    public function writeIndexToCache(): void
+    protected function writeIndexToCache(): void
     {
         Cache::put(
             $this->getIndexCacheKey(),
@@ -492,7 +518,7 @@ class LogReader
         );
     }
 
-    public function loadIndexFromCache(): void
+    protected function loadIndexFromCache(): void
     {
         $this->setIndexCacheData(
             Cache::get($this->getIndexCacheKey(), null)
