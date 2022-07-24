@@ -23,7 +23,7 @@ class LogList extends Component
 
         return view('better-log-viewer::livewire.log-list', [
             'file' => $file,
-            'logs' => $file?->logs()->only($selectedLevels),
+            'logs' => $file?->logs()->only($selectedLevels)->reverse(),
         ]);
     }
 
