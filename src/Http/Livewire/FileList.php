@@ -9,7 +9,11 @@ use Livewire\Component;
 class FileList extends Component
 {
     public bool $shouldLoadFiles = false;
-    public string $selectedFileName = '';
+    public string $file = '';
+
+    protected $queryString = [
+        'file' => ['except' => ''],
+    ];
 
     public function render()
     {
@@ -21,11 +25,20 @@ class FileList extends Component
     public function loadFiles()
     {
         $this->shouldLoadFiles = true;
+
+        if (!empty($this->file)) {
+            $this->emit('fileSelected', $this->file);
+        }
     }
 
     public function selectFile(string $fileName)
     {
-        $this->selectedFileName = $fileName;
-        $this->emit('fileSelected', $fileName);
+        if ($fileName === $this->file) {
+            $this->file = '';
+        } else {
+            $this->file = $fileName;
+        }
+
+        $this->emit('fileSelected', $this->file);
     }
 }

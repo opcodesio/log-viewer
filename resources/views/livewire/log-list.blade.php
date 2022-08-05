@@ -10,7 +10,8 @@
         <div class="flex flex-col h-full w-full mx-3 mb-4">
             <div class="px-4 mb-4 flex items-center">
                 <div class="flex-1 mr-6">
-                    @foreach($logs->getLevelCounts() as $levelCount)
+                    <p class="text-xs text-gray-500 mb-2">Memory: <span class="font-semibold">{{ $memoryUsage }}</span>, Duration: <span class="font-semibold">{{ $requestTime }}</span></p>
+                    @foreach($levels as $levelCount)
                         @continue($levelCount->count === 0)
                         <span class="badge {{ $levelCount->level->getClass() }} @if($levelCount->selected) active @endif"
                               wire:click="toggleLevel('{{ $levelCount->level->value }}')"
@@ -22,7 +23,10 @@
                 </div>
                 <div class="flex-1">
                     <label for="query" class="sr-only">Search</label>
-                    <input name="query" id="query" type="text" class="border rounded shadow px-4 py-2 mb-2 w-full" placeholder="Search..." />
+                    <input name="query" id="query" type="text"
+                           class="border rounded-md shadow px-4 py-2 mb-2 w-full" placeholder="Search..."
+                           wire:model.debounce.500ms="query"
+                    />
                 </div>
             </div>
 
@@ -31,8 +35,8 @@
 
                 <div class="log-item-container h-full overflow-y-scroll text-sm py-6 px-4">
                     <div class="rounded-md">
-                        @foreach($logs->get(20) as $log)
-                        <div class="log-item {{ $log->level->getClass() }}" x-data="{ showStack: false }" x-bind:class="showStack ? 'active' : ''">
+                        @forelse($logs as $log)
+                        <div wire:key="log-item-{{ $log->index }}" class="log-item {{ $log->level->getClass() }}" x-data="{ showStack: false }" x-bind:class="showStack ? 'active' : ''">
                             <div class="cursor-pointer pl-2 pr-4 py-3 flex" x-on:click="showStack = !showStack">
                                 <div class="log-level-indicator h-full rounded w-1 mr-2">&nbsp;</div>
                                 <div class="flex overflow-hidden">
@@ -50,7 +54,12 @@
                             </div>
                             <pre class="log-stack px-3 py-2 border-t border-gray-200 text-xs whitespace-pre-wrap break-all" x-show="showStack">{{ $log->fullText }}</pre>
                         </div>
-                        @endforeach
+                        @empty
+                            <div class="text-center font-semibold italic">No results...</div>
+                            <div class="text-center mt-6">
+                                <button class="px-3 py-2 border border-200 bg-white text-gray-800 rounded-md" wire:click="clearQuery">Clear search query</button>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
 

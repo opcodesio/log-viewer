@@ -3,6 +3,7 @@
 namespace Arukompas\BetterLogViewer;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class Log
 {
@@ -30,19 +31,20 @@ class Log
         $this->fileName = $fileName;
         $this->filePosition = $filePosition;
 
-        $current = [];
+        $matches = [];
         $pattern = self::LOG_CONTENT_PATTERN . $level . self::LOG_CONTENT_PATTERN_2;
-        preg_match($pattern, $text, $current);
+        list($firstLine, $theRestOfIt) = explode("\n", $text, 2);
+        preg_match($pattern, $firstLine, $matches);
 
-        $this->environment = $current[3] ?? '';
-        $this->time = Carbon::parse($current[1])->tz(config('app.timezone', 'UTC'));
+        $this->environment = $matches[3] ?? '';
+        $this->time = Carbon::parse($matches[1])->tz(config('app.timezone', 'UTC'));
 
-        if (!empty($current[2])) {
+        if (!empty($matches[2])) {
             // we got microseconds!
-            $this->time = $this->time->micros((int) $current[2]);
+            $this->time = $this->time->micros((int) $matches[2]);
         }
 
-        $text = $current[4];
+        $text = $matches[4] . "\n" . $theRestOfIt;
         $this->text = mb_convert_encoding(explode("\n", $text)[0], 'UTF-8', 'UTF-8');
         $this->fullText = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
 
@@ -58,5 +60,16 @@ class Log
         //     'in_file' => isset($current[5]) ? $current[5] : null,
         //     'stack' => mb_convert_encoding(preg_replace("/^\n*/", '', $log_data[$i]), 'UTF-8', 'UTF-8')
         // );
+    }
+
+    public function fullTextMatches(string $query = null): bool
+    {
+        if (empty($query)) return true;
+
+        if (!Str::endsWith($query, '/i')) {
+            $query = "/" . $query . "/i";
+        }
+
+        return (bool) preg_match($query, $this->fullText);
     }
 }

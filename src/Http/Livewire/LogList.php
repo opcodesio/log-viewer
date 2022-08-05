@@ -10,6 +10,13 @@ use Livewire\Component;
 class LogList extends Component
 {
     public string $selectedFileName = '';
+    public string $query = '';
+    public int $page = 1;
+
+    protected $queryString = [
+        'query' => ['except' => ''],
+        'page' => ['except' => 1],
+    ];
 
     protected $listeners = [
         'fileSelected' => 'selectFile',
@@ -20,11 +27,32 @@ class LogList extends Component
         /** @var LogFile $file */
         $file = (new FileListReader())->getFiles()->firstWhere('name', $this->selectedFileName);
         $selectedLevels = $this->getSelectedLevels();
+        $logs = $file?->logs()
+            ->only($selectedLevels)
+            ->reverse()
+            ->search($this->query);
+        clock()->event('Getting level counts')->begin();
+        $levels = $logs?->getLevelCounts();
+        clock()->event('Getting level counts')->end();
+
+        clock()->event('Getting logs')->begin();
+        $logItems = $logs?->get(20);
+        clock()->event('Getting logs')->end();
+        $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2) . ' MB';
+        $requestTime = number_format((microtime(true) - LARAVEL_START) * 1000, 0) . 'ms';
 
         return view('better-log-viewer::livewire.log-list', [
             'file' => $file,
-            'logs' => $file?->logs()->only($selectedLevels)->reverse(),
+            'levels' => $levels,
+            'logs' => $logItems,
+            'memoryUsage' => $memoryUsage,
+            'requestTime' => $requestTime,
         ]);
+    }
+
+    public function clearQuery()
+    {
+        $this->query = '';
     }
 
     public function selectFile(string $fileName)

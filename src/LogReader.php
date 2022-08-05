@@ -2,10 +2,14 @@
 
 namespace Arukompas\BetterLogViewer;
 
+use Arukompas\BetterLogViewer\Concerns\HasLocalCache;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 
 class LogReader
 {
+    use HasLocalCache;
+
     const LOG_MATCH_PATTERN = '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?\].*/';
 
     const DIRECTION_FORWARD = 'forward';
@@ -40,7 +44,7 @@ class LogReader
      *
      * @var array
      */
-    protected array $logIndex = [];
+    public array $logIndex = [];
 
     /**
      * File size when it was last indexed.
@@ -57,6 +61,8 @@ class LogReader
     protected ?array $levels = null;
 
     protected ?int $limit = null;
+
+    protected ?string $query = null;
 
     /**
      * The index of the next log to be read
@@ -140,6 +146,15 @@ class LogReader
         return $this;
     }
 
+    public function getIndexCacheKey(): string
+    {
+        return 'better-log-viewer:log-index:' . implode(":", [
+            $this->file->name,
+            $this->file->size(),
+            md5($this->query ?? ''),
+        ]);
+    }
+
     public function getSelectedLevels(): array
     {
         if (is_array($this->levels)) {
@@ -197,6 +212,10 @@ class LogReader
     public function close(): self
     {
         if ($this->isClosed()) return $this;
+
+        if ($this->indexChanged) {
+            $this->writeIndexToCache();
+        }
 
         if (fclose($this->fileHandle)) {
             $this->fileHandle = null;
@@ -284,21 +303,14 @@ class LogReader
      * @return $this
      * @throws \Exception
      */
-    public function scan(): self
+    public function scan(bool $force = false): self
     {
         if ($this->isClosed()) {
             $this->open();
+        }
 
-            if (!$this->indexOutdated()) {
-                // was already scanned before
-                $this->scanComplete = true;
-            }
-
-            if ($this->scanComplete) {
-                // The scan was run automatically after opening the file.
-                // Let's not duplicate the work.
-                return $this;
-            }
+        if ($this->scanComplete && !$force) {
+            return $this;
         }
 
         // we don't care about the levels here, we should scan everything
@@ -310,6 +322,15 @@ class LogReader
 
         while (($line = fgets($this->fileHandle)) !== false) {
             if (preg_match(self::LOG_MATCH_PATTERN, $line) === 1) {
+                if ($currentLog !== '') {
+                    if (is_null($this->query) || preg_match($this->query, $currentLog)) {
+                        $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition);
+                    }
+
+                    $this->nextLogIndex++;
+                    $currentLog = '';
+                }
+
                 $currentLogPosition = ftell($this->fileHandle) - strlen($line);
                 $lowercaseLine = strtolower($line);
 
@@ -319,11 +340,18 @@ class LogReader
                         break;
                     }
                 }
-
-                $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition);
-
-                $this->nextLogIndex++;
             }
+
+            $currentLog .= $line;
+        }
+
+        if ($currentLog !== '') {
+            if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
+                $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition);
+            }
+
+            $this->nextLogIndex++;
+            $currentLog = '';
         }
 
         $this->logIndexFileSize = ftell($this->fileHandle);
@@ -333,7 +361,7 @@ class LogReader
 
         $this->scanComplete = true;
 
-        return $this;
+        return $this->reset();
     }
 
     public function reset(): self
@@ -360,10 +388,6 @@ class LogReader
      */
     public function get(int $limit = null)
     {
-        if ($this->isClosed()) {
-            $this->open();
-        }
-
         if (!is_null($limit)) {
             $this->limit($limit);
         }
@@ -381,6 +405,44 @@ class LogReader
     }
 
     public function getLogAtIndex(int $index): ?Log
+    {
+        list($level, $text, $position) = $this->getLogTextAtIndex($index);
+
+        // If we did not find any logs, this means either the file is empty, or
+        // we have already reached the end of file. So we return early.
+        if ($text === '') return null;
+
+        return $this->makeLog($level, $text, $position);
+    }
+
+    public function next(): ?Log
+    {
+        $levels = $this->getSelectedLevels();
+
+        list($level, $text, $position) = $this->getLogTextAtIndex($this->nextLogIndex);
+
+        if (empty($text)) {
+            return null;
+        }
+
+        $nextLog = $this->makeLog($level, $text, $position);
+
+        $this->setNextLogIndex();
+
+        return $nextLog;
+    }
+
+    protected function makeLog(string $level, string $text, int $filePosition, $index = null)
+    {
+        return new Log($index ?? $this->nextLogIndex, $level, $text, $this->file->name, $filePosition);
+    }
+
+    /**
+     * @param int $index
+     * @return array|null Returns an array, [$level, $text, $position]
+     * @throws \Exception
+     */
+    protected function getLogTextAtIndex(int $index): ?array
     {
         if ($this->isClosed()) {
             $this->open();
@@ -415,11 +477,7 @@ class LogReader
             $currentLog .= $line;
         }
 
-        // If we did not find any logs, this means either the file is empty, or
-        // we have already reached the end of file. So we return early.
-        if ($currentLog === '') return null;
-
-        return new Log($this->nextLogIndex, $currentLogLevel, $currentLog, $this->file->name, $position);
+        return [$currentLogLevel, $currentLog, $position];
     }
 
     protected function getLogPositionFromIndex(int $index): ?int
@@ -429,42 +487,33 @@ class LogReader
         return $fullIndex[$index] ?? null;
     }
 
-    public function next(): ?Log
-    {
-        $levels = $this->getSelectedLevels();
-        $nextLog = $this->getLogAtIndex($this->nextLogIndex);
-
-        // If we did not find any logs, this means either the file is empty, or
-        // we have already reached the end of file. So we return early.
-        if (is_null($nextLog)) {
-            return null;
-        }
-
-        $this->setNextLogIndex();
-
-        if (!in_array($nextLog->level->value, $levels)) {
-            // the log we found was not the level we expected to receive.
-            return $this->next();
-        }
-
-        return $nextLog;
-    }
-
     protected function setNextLogIndex(): void
     {
+        $numberSet = false;
+
         if ($this->direction === self::DIRECTION_FORWARD) {
             foreach ($this->getMergedIndexForSelectedLevels() as $logIndex => $logPosition) {
                 if ($logIndex <= $this->nextLogIndex) continue;
 
                 $this->nextLogIndex = $logIndex;
+                $numberSet = true;
                 break;
+            }
+
+            if (!$numberSet) {
+                $this->nextLogIndex++;
             }
         } else {
             foreach ($this->getMergedIndexForSelectedLevels() as $logIndex => $logPosition) {
                 if ($logIndex >= $this->nextLogIndex) continue;
 
                 $this->nextLogIndex = $logIndex;
+                $numberSet = true;
                 break;
+            }
+
+            if (!$numberSet) {
+                $this->nextLogIndex--;
             }
         }
     }
@@ -475,7 +524,10 @@ class LogReader
      */
     public function getLevelCounts(): array
     {
-        $this->scan();
+        if (!$this->isOpen()) {
+            $this->open();
+        }
+
         $selectedLevels = $this->getSelectedLevels();
         $counts = [];
 
@@ -488,6 +540,25 @@ class LogReader
         }
 
         return $counts;
+    }
+
+    public function search(string $query = null): self
+    {
+        $this->close();
+
+        if (!empty($query)) {
+            $this->query = "/" . $query . "/i";
+        } else {
+            $this->query = null;
+        }
+
+        return $this;
+    }
+
+    public function paginate(int $perPage = 15, int $currentPage = null)
+    {
+        // $currentPage = $currentPage ?: request()->
+        // return new LengthAwarePaginator()
     }
 
     protected function getMergedIndexForSelectedLevels(): array
@@ -532,72 +603,22 @@ class LogReader
         return null;
     }
 
-    protected function getIndexCacheKey(): string
-    {
-        return 'better-log-viewer:log_index:'.$this->file->name;
-    }
-
-    protected function getDefaultIndexCacheData(): array
-    {
-        return [
-            'log_index' => [],
-            'log_index_file_size' => $this->logIndexFileSize,
-        ];
-    }
-
-    protected function getIndexCacheData(): array
-    {
-        return [
-            'log_index' => $this->logIndex,
-            'log_index_file_size' => $this->logIndexFileSize,
-        ];
-    }
-
-    protected function indexOutdated(): bool
-    {
-        return $this->file->size() !== $this->logIndexFileSize
-            || empty($this->logIndex);
-    }
-
-    protected function setIndexCacheData(array $data = null): void
-    {
-        if (is_null($data)) {
-            $data = $this->getDefaultIndexCacheData();
-        }
-
-        $this->logIndex = $data['log_index'] ?? [];
-        $this->logIndexFileSize = $data['log_index_file_size'] ?? 0;
-
-        if ($this->indexOutdated()) {
-            // File size has changed, meaning the file should be scanned again.
-            $this->logIndex = [];
-            $this->logIndexFileSize = 0;
-            $this->scan();
-        }
-    }
-
     protected function writeIndexToCache(): void
     {
-        Cache::put(
-            $this->getIndexCacheKey(),
-            $this->getIndexCacheData(),
-            now()->addMonth()
-        );
+        $this->setRemoteCache($this->getIndexCacheKey(), $this->logIndex, now()->addHour());
     }
 
     protected function loadIndexFromCache(): void
     {
-        $this->setIndexCacheData(
-            Cache::get($this->getIndexCacheKey(), null)
-        );
+        $this->logIndex = $this->getRemoteCache($this->getIndexCacheKey(), []);
+
+        if (empty($this->logIndex)) {
+            $this->scan();
+        }
     }
 
     public function __destruct()
     {
         $this->close();
-
-        if ($this->indexChanged) {
-            $this->writeIndexToCache();
-        }
     }
 }
