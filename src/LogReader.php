@@ -3,6 +3,7 @@
 namespace Arukompas\BetterLogViewer;
 
 use Arukompas\BetterLogViewer\Concerns\HasLocalCache;
+use Arukompas\BetterLogViewer\Exceptions\InvalidRegularExpression;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
@@ -301,13 +302,27 @@ class LogReader
     {
         $this->close();
 
+
         if (!empty($query)) {
+            if (!$this->isValidRegex($query)) {
+                throw new InvalidRegularExpression();
+            }
+
             $this->query = "/" . $query . "/i";
         } else {
             $this->query = null;
         }
 
         return $this;
+    }
+
+    protected function isValidRegex(string $regexString): bool
+    {
+        set_error_handler(function() {}, E_WARNING);
+        $isValidRegex = preg_match($regexString, "") !== FALSE;
+        restore_error_handler();
+
+        return $isValidRegex;
     }
 
     /**
@@ -619,7 +634,7 @@ class LogReader
 
     protected function writeIndexToCache(): void
     {
-        $this->setRemoteCache($this->getIndexCacheKey(), $this->logIndex, now()->addHour());
+        $this->setRemoteCache($this->getIndexCacheKey(), $this->logIndex, now()->addMinute());
     }
 
     protected function loadIndexFromCache(): void

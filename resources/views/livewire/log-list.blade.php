@@ -24,7 +24,7 @@
                 <div class="flex-1">
                     <label for="query" class="sr-only">Search</label>
                     <input name="query" id="query" type="text"
-                           class="border rounded-md shadow px-4 py-2 mb-2 w-full" placeholder="Search..."
+                           class="border rounded-md px-4 py-2 mb-2 w-full" placeholder="Search..."
                            wire:model.debounce.500ms="query"
                     />
                 </div>
