@@ -8,18 +8,21 @@
         </div>
     @else
         <div class="flex flex-col h-full w-full mx-3 mb-4">
-            <div class="px-4 mb-4 flex">
+            <div class="px-4 mb-4 flex items-center">
                 <div class="flex-1 mr-6">
                     @foreach($logs->getLevelCounts() as $levelCount)
+                        @continue($levelCount->count === 0)
                         <span class="badge {{ $levelCount->level->getClass() }} @if($levelCount->selected) active @endif"
                               wire:click="toggleLevel('{{ $levelCount->level->value }}')"
                         >
-                            {{ $levelCount->level->name }}: {{ number_format($levelCount->count) }}
+                            <span class="opacity-90">{{ $levelCount->level->name }}:</span>
+                            <span class="font-semibold">{{ number_format($levelCount->count) }}</span>
                         </span>
                     @endforeach
                 </div>
                 <div class="flex-1">
-                    <input type="text" class="border rounded shadow px-4 py-2 w-full" placeholder="Search..." />
+                    <label for="query" class="sr-only">Search</label>
+                    <input name="query" id="query" type="text" class="border rounded shadow px-4 py-2 mb-2 w-full" placeholder="Search..." />
                 </div>
             </div>
 

@@ -14,7 +14,7 @@
             @apply bg-sky-600;
         }
         .log-level {
-            @apply text-sky-900;
+            @apply text-sky-700;
         }
     }
 
@@ -27,7 +27,7 @@
             @apply bg-amber-600;
         }
         .log-level {
-            @apply text-amber-900;
+            @apply text-amber-700;
         }
     }
 
@@ -40,7 +40,7 @@
             @apply bg-rose-600;
         }
         .log-level {
-            @apply text-rose-900;
+            @apply text-rose-700;
         }
     }
 
@@ -53,44 +53,68 @@
             @apply bg-gray-600;
         }
         .log-level {
-            @apply text-gray-900;
+            @apply text-gray-700;
         }
     }
 }
 
 /** Level Badges **/
 .badge {
-    @apply inline-block text-sm cursor-pointer px-2 py-0.5 rounded mr-2 mb-2;
+    @apply inline-block text-sm cursor-pointer px-3 py-1 rounded mr-2 mb-2 transition duration-200;
 
     &.info {
         @apply border border-sky-200 bg-sky-50 text-gray-600;
+        &:hover {
+            @apply bg-sky-100;
+        }
 
         &.active {
-            @apply border-sky-700 bg-sky-600 text-white;
+            @apply border-sky-600 bg-sky-500 text-white;
+            &:hover {
+                @apply bg-sky-600;
+            }
         }
     }
 
     &.warning {
         @apply border border-amber-200 bg-amber-50 text-gray-600;
+        &:hover {
+            @apply bg-amber-100;
+        }
 
         &.active {
-            @apply border-amber-700 bg-amber-600 text-white;
+            @apply border-amber-600 bg-amber-500 text-white;
+            &:hover {
+                @apply bg-amber-600;
+            }
         }
     }
 
     &.danger {
         @apply border border-rose-200 bg-rose-50 text-gray-600;
+        &:hover {
+            @apply bg-rose-100;
+        }
 
         &.active {
-            @apply border-rose-700 bg-rose-600 text-white;
+            @apply border-rose-600 bg-rose-500 text-white;
+            &:hover {
+                @apply bg-rose-600;
+            }
         }
     }
 
     &.none {
         @apply border border-gray-200 bg-gray-50 text-gray-600;
+        &:hover {
+            @apply bg-gray-100;
+        }
 
         &.active {
-            @apply border-gray-700 bg-gray-600 text-white;
+            @apply border-gray-600 bg-gray-500 text-white;
+            &:hover {
+                @apply bg-gray-600;
+            }
         }
     }
 }
