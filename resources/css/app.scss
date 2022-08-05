@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './loader.scss';
 
 .log-item {
     @apply rounded-md border border-transparent mb-2 bg-white transition duration-200;

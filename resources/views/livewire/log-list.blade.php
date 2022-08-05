@@ -55,15 +55,25 @@
                             <pre class="log-stack px-3 py-2 border-t border-gray-200 text-xs whitespace-pre-wrap break-all" x-show="showStack">{{ $log->fullText }}</pre>
                         </div>
                         @empty
-                            <div class="text-center font-semibold italic">No results...</div>
-                            <div class="text-center mt-6">
-                                <button class="px-3 py-2 border border-200 bg-white text-gray-800 rounded-md" wire:click="clearQuery">Clear search query</button>
+                            <div class="my-12">
+                                <div class="text-center font-semibold italic">No results...</div>
+                                @if(!empty($query))
+                                <div class="text-center mt-6">
+                                    <button class="px-3 py-2 border border-200 bg-white text-gray-800 rounded-md" wire:click="clearQuery">Clear search query</button>
+                                </div>
+                                @endif
                             </div>
                         @endforelse
                     </div>
                 </div>
 
                 <div class="absolute bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 to-transparent"></div>
+
+                <div class="absolute hidden inset-0 py-6 px-4" wire:loading.class.remove="hidden">
+                    <div class="rounded-md bg-white opacity-90 w-full h-full flex items-center justify-center">
+                        <div class="loader">Loading...</div>
+                    </div>
+                </div>
             </div>
         </div>
     @endempty
