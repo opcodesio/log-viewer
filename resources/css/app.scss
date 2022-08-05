@@ -61,7 +61,7 @@
 
 /** Level Badges **/
 .badge {
-    @apply inline-block text-sm cursor-pointer px-3 py-1 rounded mr-2 mb-2 transition duration-200;
+    @apply inline-block text-sm cursor-pointer px-3 py-1 rounded-md mr-2 mb-2 transition duration-200;
 
     &.info {
         @apply border border-sky-200 bg-sky-50 text-gray-600;

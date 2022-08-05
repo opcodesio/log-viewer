@@ -4,6 +4,7 @@ namespace Arukompas\BetterLogViewer;
 
 use Arukompas\BetterLogViewer\Concerns\HasLocalCache;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 
 class LogReader
@@ -296,6 +297,19 @@ class LogReader
         return $this;
     }
 
+    public function search(string $query = null): self
+    {
+        $this->close();
+
+        if (!empty($query)) {
+            $this->query = "/" . $query . "/i";
+        } else {
+            $this->query = null;
+        }
+
+        return $this;
+    }
+
     /**
      * This method scans the whole file quickly to index the logs in order to speed up
      * the retrieval of individual logs
@@ -383,6 +397,30 @@ class LogReader
     }
 
     /**
+     * @return array|LevelCount[]
+     * @throws \Exception
+     */
+    public function getLevelCounts(): array
+    {
+        if (!$this->isOpen()) {
+            $this->open();
+        }
+
+        $selectedLevels = $this->getSelectedLevels();
+        $counts = [];
+
+        foreach (self::getDefaultLevels() as $level) {
+            $counts[$level] = new LevelCount(
+                Level::from($level),
+                count($this->logIndex[$level] ?? []),
+                in_array($level, $selectedLevels)
+            );
+        }
+
+        return $counts;
+    }
+
+    /**
      * @param int|null $limit
      * @return array|Log[]
      */
@@ -430,6 +468,25 @@ class LogReader
         $this->setNextLogIndex();
 
         return $nextLog;
+    }
+
+    public function getTotalItemCount(): int
+    {
+        return count($this->getMergedIndexForSelectedLevels());
+    }
+
+    public function paginate(int $perPage = 10, int $page = null)
+    {
+        $page = $page ?: Paginator::resolveCurrentPage('page');
+
+        $this->reset()->skip(max(0, $page - 1) * $perPage);
+
+        return new LengthAwarePaginator(
+            $this->get($perPage),
+            $this->getTotalItemCount(),
+            $perPage,
+            $page
+        );
     }
 
     protected function makeLog(string $level, string $text, int $filePosition, $index = null)
@@ -516,49 +573,6 @@ class LogReader
                 $this->nextLogIndex--;
             }
         }
-    }
-
-    /**
-     * @return array|LevelCount[]
-     * @throws \Exception
-     */
-    public function getLevelCounts(): array
-    {
-        if (!$this->isOpen()) {
-            $this->open();
-        }
-
-        $selectedLevels = $this->getSelectedLevels();
-        $counts = [];
-
-        foreach (self::getDefaultLevels() as $level) {
-            $counts[$level] = new LevelCount(
-                Level::from($level),
-                count($this->logIndex[$level] ?? []),
-                in_array($level, $selectedLevels)
-            );
-        }
-
-        return $counts;
-    }
-
-    public function search(string $query = null): self
-    {
-        $this->close();
-
-        if (!empty($query)) {
-            $this->query = "/" . $query . "/i";
-        } else {
-            $this->query = null;
-        }
-
-        return $this;
-    }
-
-    public function paginate(int $perPage = 15, int $currentPage = null)
-    {
-        // $currentPage = $currentPage ?: request()->
-        // return new LengthAwarePaginator()
     }
 
     protected function getMergedIndexForSelectedLevels(): array

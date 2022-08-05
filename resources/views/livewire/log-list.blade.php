@@ -75,6 +75,12 @@
                     </div>
                 </div>
             </div>
+
+            @if($logs->hasPages())
+            <div class="px-4">
+                {{ $logs->links('better-log-viewer::pagination') }}
+            </div>
+            @endif
         </div>
     @endempty
 </div>
