@@ -537,6 +537,9 @@ video {
 .bottom-0 {
   bottom: 0px;
 }
+.right-0 {
+  right: 0px;
+}
 .mx-3 {
   margin-left: 0.75rem;
   margin-right: 0.75rem;
@@ -588,6 +591,9 @@ video {
 }
 .mt-6 {
   margin-top: 1.5rem;
+}
+.mb-5 {
+  margin-bottom: 1.25rem;
 }
 .flex {
   display: flex;
@@ -749,6 +755,24 @@ video {
 .to-transparent {
   --tw-gradient-to: transparent;
 }
+.p-4 {
+  padding: 1rem;
+}
+.p-3 {
+  padding: 0.75rem;
+}
+.p-2\.5 {
+  padding: 0.625rem;
+}
+.p-2 {
+  padding: 0.5rem;
+}
+.p-1 {
+  padding: 0.25rem;
+}
+.p-1\.5 {
+  padding: 0.375rem;
+}
 .px-5 {
   padding-left: 1.25rem;
   padding-right: 1.25rem;
@@ -781,6 +805,14 @@ video {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+.py-1\.5 {
+  padding-top: 0.375rem;
+  padding-bottom: 0.375rem;
+}
 .pt-4 {
   padding-top: 1rem;
 }
@@ -798,6 +830,12 @@ video {
 }
 .pr-4 {
   padding-right: 1rem;
+}
+.pl-3 {
+  padding-left: 0.75rem;
+}
+.pr-10 {
+  padding-right: 2.5rem;
 }
 .text-center {
   text-align: center;
@@ -1131,6 +1169,14 @@ video {
 .hover\:text-gray-700:hover {
   --tw-text-opacity: 1;
   color: rgb(55 65 81 / var(--tw-text-opacity));
+}
+.hover\:text-gray-600:hover {
+  --tw-text-opacity: 1;
+  color: rgb(75 85 99 / var(--tw-text-opacity));
+}
+.hover\:text-emerald-600:hover {
+  --tw-text-opacity: 1;
+  color: rgb(5 150 105 / var(--tw-text-opacity));
 }
 @media (min-width: 640px) {
 

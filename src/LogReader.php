@@ -31,8 +31,6 @@ class LogReader
      */
     protected LogFile $file;
 
-    protected bool $scanComplete = false;
-
     /**
      * Whether the index has been updated. Used to check whether we should write
      * the new changes to the cache.
@@ -53,7 +51,7 @@ class LogReader
      *
      * @var int
      */
-    protected int $logIndexFileSize = 0;
+    protected int $lastScanFileSize = 0;
 
     /**
      * The log levels that should be read from this file.
@@ -152,7 +150,6 @@ class LogReader
     {
         return 'better-log-viewer:log-index:' . implode(":", [
             $this->file->name,
-            $this->file->size(),
             md5($this->query ?? ''),
         ]);
     }
@@ -304,11 +301,11 @@ class LogReader
 
 
         if (!empty($query)) {
-            if (!$this->isValidRegex($query)) {
+            $this->query = "/" . $query . "/i";
+
+            if (!$this->isValidRegex($this->query)) {
                 throw new InvalidRegularExpression();
             }
-
-            $this->query = "/" . $query . "/i";
         } else {
             $this->query = null;
         }
@@ -338,7 +335,7 @@ class LogReader
             $this->open();
         }
 
-        if ($this->scanComplete && !$force) {
+        if (!$this->requiresScan() && !$force) {
             return $this;
         }
 
@@ -383,12 +380,10 @@ class LogReader
             $currentLog = '';
         }
 
-        $this->logIndexFileSize = ftell($this->fileHandle);
+        $this->lastScanFileSize = ftell($this->fileHandle);
 
         // Let's reset the position in preparation for real log reads.
         rewind($this->fileHandle);
-
-        $this->scanComplete = true;
 
         return $this->reset();
     }
@@ -490,7 +485,7 @@ class LogReader
         return count($this->getMergedIndexForSelectedLevels());
     }
 
-    public function paginate(int $perPage = 10, int $page = null)
+    public function paginate(int $perPage = 15, int $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage('page');
 
@@ -634,16 +629,23 @@ class LogReader
 
     protected function writeIndexToCache(): void
     {
-        $this->setRemoteCache($this->getIndexCacheKey(), $this->logIndex, now()->addMinute());
+        $data = [$this->logIndex, $this->lastScanFileSize];
+
+        $this->setRemoteCache($this->getIndexCacheKey(), $data, now()->addDay());
     }
 
     protected function loadIndexFromCache(): void
     {
-        $this->logIndex = $this->getRemoteCache($this->getIndexCacheKey(), []);
+        list($this->logIndex, $this->lastScanFileSize) = $this->getRemoteCache($this->getIndexCacheKey(), [[], 0]);
 
-        if (empty($this->logIndex)) {
+        if ($this->requiresScan()) {
             $this->scan();
         }
+    }
+
+    protected function requiresScan(): bool
+    {
+        return $this->lastScanFileSize !== $this->file->size();
     }
 
     public function __destruct()
