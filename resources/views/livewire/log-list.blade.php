@@ -44,13 +44,61 @@
             @php
                 $design = 1;
             @endphp
-            <div class="relative overflow-hidden text-sm">
+            <div class="relative overflow-hidden text-sm"
+x-data="{
+    stacksOpen: [],
+    stacksInView: [],
+    stackTops: {},
+    containerTop: 0,
+    isOpen(index) { return this.stacksOpen.includes(index); },
+    toggle(index) {
+        if (this.isOpen(index)) {
+            this.stacksOpen = this.stacksOpen.filter(idx => idx !== index)
+        } else {
+            this.stacksOpen.push(index)
+        }
+        this.onScroll();
+    },
+    shouldBeSticky(index) {
+        return this.isOpen(index) && this.stacksInView.includes(index);
+    },
+    stickTopPosition(index) {
+        var aboveFold = this.pixelsAboveFold(index);
+        if (aboveFold < 0) { return Math.max(0, 36 + aboveFold) + 'px'; }
+        return '36px';
+    },
+    pixelsAboveFold(index) {
+        var tbody = document.getElementById('tbody-'+index);
+        if (!tbody) return false;
+        var row = tbody.getClientRects()[0];
+        return (row.top + row.height - 73) - this.containerTop;
+    },
+    isInViewport(index) {
+        var pixels = this.pixelsAboveFold(index);
+        console.log(pixels);
+        return pixels > -36;
+    },
+    onScroll(event) {
+        var vm = this;
+        this.stacksOpen.forEach(function (index) {
+            if (vm.isInViewport(index)) {
+                if (!vm.stacksInView.includes(index)) { vm.stacksInView.push(index); }
+                vm.stackTops[index] = vm.stickTopPosition(index);
+            } else {
+                vm.stacksInView = vm.stacksInView.filter(idx => idx !== index);
+                delete vm.stackTops[index];
+            }
+        })
+    },
+}"
+x-init="const container = document.getElementById('log-item-container').getBoundingClientRect(); containerTop = container.top;"
+            >
 
                 @if($design === 1)
-                <div class="log-item-container h-full overflow-y-scroll px-4">
+                <div id="log-item-container" class="log-item-container h-full overflow-y-scroll px-4" x-on:scroll="onScroll">
                     <div class="inline-block min-w-full max-w-full align-middle">
                         <div class="">
-                            <table class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
+                            <table wire:key="{{ \Illuminate\Support\Str::random(16) }}" class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th scope="col"
@@ -76,9 +124,13 @@
                                 </tr>
                                 </thead>
 
-                                @forelse($logs as $log)
-                                <tbody class="bg-white" x-data="{ showStack: false }" wire:key="log-item-{{ $log->index }}">
-                                    <tr class="log-item-2 {{ $log->level->getClass() }}" x-on:click="showStack = !showStack" x-bind:class="showStack ? 'active sticky top-9 z-10' : ''">
+                                @forelse($logs as $index => $log)
+                                <tbody id="tbody-{{$index}}" data-index="{{ $index }}" class="bg-white relative">
+                                    <tr class="log-item-2 {{ $log->level->getClass() }}"
+                                        x-on:click="toggle({{$index}})"
+                                        x-bind:class="[isOpen({{$index}}) ? 'active' : '', shouldBeSticky({{$index}}) ? 'sticky z-2' : '']"
+                                        x-bind:style="{ top: stackTops[{{$index}}] || 0 }"
+                                    >
                                         <td class="log-level opacity-80 whitespace-nowrap border-t border-gray-200 py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
                                             @if($log->level->getClass() === 'danger')
                                                 <x-better-log-viewer::icon-danger />
@@ -101,7 +153,7 @@
                                             {{ $log->text }}
                                         </td>
                                     </tr>
-                                    <tr x-show="showStack">
+                                    <tr x-show="isOpen({{$index}})">
                                         <td colspan="5">
                                             <pre class="log-stack px-4 py-2 sm:px-6 lg:px-8 border-gray-200 text-xs whitespace-pre-wrap break-all">{{ $log->fullText }}</pre>
                                         </td>
