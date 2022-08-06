@@ -2,6 +2,7 @@
 
 namespace Arukompas\BetterLogViewer;
 
+use Arukompas\BetterLogViewer\Events\LogFileDeleted;
 use Illuminate\Support\Facades\Cache;
 
 class LogFile
@@ -42,5 +43,16 @@ class LogFile
         }
 
         return $size . ' bytes';
+    }
+
+    public function download()
+    {
+        return response()->download($this->path);
+    }
+
+    public function delete()
+    {
+        unlink($this->path);
+        LogFileDeleted::dispatch($this);
     }
 }

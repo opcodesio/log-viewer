@@ -41,4 +41,14 @@ class FileList extends Component
 
         $this->emit('fileSelected', $this->file);
     }
+
+    public function download(string $fileName)
+    {
+        return FileListReader::findByName($fileName)?->download();
+    }
+
+    public function deleteFile(string $fileName)
+    {
+        FileListReader::findByName($fileName)?->delete();
+    }
 }

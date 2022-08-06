@@ -15,9 +15,9 @@
                         <span class="badge {{ $levelCount->level->getClass() }} @if($levelCount->selected) active @endif"
                               wire:click="toggleLevel('{{ $levelCount->level->value }}')"
                         >
-                            <x-better-log-viewer::checkmark class="checkmark mr-1.5" :checked="$levelCount->selected" />
+                            <x-better-log-viewer::checkmark class="checkmark mr-2.5" :checked="$levelCount->selected" />
                             <span class="opacity-90">{{ $levelCount->level->name }}:</span>
-                            <span class="font-semibold ml-1">{{ number_format($levelCount->count) }}</span>
+                            <span class="font-semibold ml-2">{{ number_format($levelCount->count) }}</span>
                         </span>
                     @endforeach
                 </div>
