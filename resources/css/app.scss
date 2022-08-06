@@ -117,7 +117,7 @@
 
 /** Level Badges **/
 .badge {
-    @apply inline-block text-sm cursor-pointer px-3 py-1 rounded-md mr-2 mb-2 transition duration-200;
+    @apply inline-flex items-center text-sm cursor-pointer px-3 py-1 rounded-md mr-2 transition duration-200;
 
     &.info {
         @apply border border-sky-200 bg-sky-50 text-gray-600;
@@ -125,10 +125,20 @@
             @apply bg-sky-100;
         }
 
+        & .checkmark {
+            @apply border-sky-200;
+        }
+
         &.active {
             @apply border-sky-600 bg-sky-500 text-white;
             &:hover {
                 @apply bg-sky-600;
+            }
+            & .checkmark {
+                @apply border-sky-600;
+            }
+            & .checkmark > svg {
+                @apply text-sky-600;
             }
         }
     }
@@ -139,10 +149,20 @@
             @apply bg-amber-100;
         }
 
+        & .checkmark {
+            @apply border-amber-200;
+        }
+
         &.active {
             @apply border-amber-600 bg-amber-500 text-white;
             &:hover {
                 @apply bg-amber-600;
+            }
+            & .checkmark {
+                @apply border-amber-600;
+            }
+            & .checkmark > svg {
+                @apply text-amber-600;
             }
         }
     }
@@ -153,10 +173,20 @@
             @apply bg-rose-100;
         }
 
+        & .checkmark {
+            @apply border-rose-200;
+        }
+
         &.active {
             @apply border-rose-600 bg-rose-500 text-white;
             &:hover {
                 @apply bg-rose-600;
+            }
+            & .checkmark {
+                @apply border-rose-600;
+            }
+            & .checkmark > svg {
+                @apply text-rose-600;
             }
         }
     }
@@ -167,10 +197,20 @@
             @apply bg-gray-100;
         }
 
+        & .checkmark {
+            @apply border-gray-200;
+        }
+
         &.active {
             @apply border-gray-600 bg-gray-500 text-white;
             &:hover {
                 @apply bg-gray-600;
+            }
+            & .checkmark {
+                @apply border-gray-600;
+            }
+            & .checkmark > svg {
+                @apply text-gray-600;
             }
         }
     }

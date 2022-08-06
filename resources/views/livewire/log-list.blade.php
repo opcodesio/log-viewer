@@ -10,14 +10,14 @@
         <div class="flex flex-col h-full w-full mx-3 mb-4">
             <div class="px-4 mb-4 flex items-center">
                 <div class="flex-1 mr-6">
-                    <p class="text-xs text-gray-500 mb-2">Memory: <span class="font-semibold">{{ $memoryUsage }}</span>, Duration: <span class="font-semibold">{{ $requestTime }}</span></p>
                     @foreach($levels as $levelCount)
                         @continue($levelCount->count === 0)
                         <span class="badge {{ $levelCount->level->getClass() }} @if($levelCount->selected) active @endif"
                               wire:click="toggleLevel('{{ $levelCount->level->value }}')"
                         >
+                            <x-better-log-viewer::checkmark class="checkmark mr-1.5" :checked="$levelCount->selected" />
                             <span class="opacity-90">{{ $levelCount->level->name }}:</span>
-                            <span class="font-semibold">{{ number_format($levelCount->count) }}</span>
+                            <span class="font-semibold ml-1">{{ number_format($levelCount->count) }}</span>
                         </span>
                     @endforeach
                 </div>
@@ -25,7 +25,7 @@
                     <label for="query" class="sr-only">Search</label>
                     <div class="relative">
                         <input name="query" id="query" type="text"
-                               class="border rounded-md pl-3 pr-10 py-2 mb-2 w-full" placeholder="Search..."
+                               class="border rounded-md pl-3 pr-10 py-2 text-sm w-full focus:outline-emerald-500 focus:border-transparent border-gray-300" placeholder="Search..."
                                wire:model.lazy="query"
                         />
                         <div class="absolute top-0 right-0 p-1.5">
@@ -75,7 +75,6 @@ x-data="{
     },
     isInViewport(index) {
         var pixels = this.pixelsAboveFold(index);
-        console.log(pixels);
         return pixels > -36;
     },
     onScroll(event) {
@@ -163,11 +162,11 @@ x-init="const container = document.getElementById('log-item-container').getBound
                                 <tbody>
                                 <tr>
                                     <td colspan="5">
-                                        <div class="my-12">
-                                            <div class="text-center font-semibold italic">No results...</div>
+                                        <div class="bg-white rounded p-6 mb-6">
+                                            <div class="text-center font-semibold">No results</div>
                                             @if(!empty($query))
                                             <div class="text-center mt-6">
-                                                <button class="px-3 py-2 border border-200 bg-white text-gray-800 rounded-md" wire:click="clearQuery">Clear search query</button>
+                                                <button class="px-3 py-2 border-2 bg-white text-gray-800 hover:border-emerald-600 rounded-md" wire:click="clearQuery">Clear search query</button>
                                             </div>
                                             @endif
                                         </div>
@@ -224,10 +223,14 @@ x-init="const container = document.getElementById('log-item-container').getBound
             </div>
 
             @if($logs->hasPages())
-            <div class="px-4 mb-2">
+            <div class="px-4 mb-4">
                 {{ $logs->links('better-log-viewer::pagination') }}
             </div>
             @endif
+
+            <div class="text-right px-4">
+                <p class="text-xs text-gray-400">Memory: <span class="font-semibold">{{ $memoryUsage }}</span>, Duration: <span class="font-semibold">{{ $requestTime }}</span></p>
+            </div>
         </div>
     @endempty
 </div>

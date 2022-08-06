@@ -59,7 +59,9 @@ class LogList extends Component
 
     public function selectFile(string $fileName)
     {
-        $this->resetPage();
+        if ($this->selectedFileName !== '') {
+            $this->resetPage();
+        }
         $this->selectedFileName = $fileName;
     }
 
