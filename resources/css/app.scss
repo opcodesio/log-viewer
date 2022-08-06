@@ -4,7 +4,7 @@
 @import './loader.scss';
 
 .log-item {
-    @apply rounded-md border border-transparent mb-2 bg-white transition duration-200;
+    @apply rounded-md border border-transparent mb-2 bg-white transition duration-200 cursor-pointer;
 
     &.info {
         &:hover, &.active {
@@ -55,6 +55,62 @@
         }
         .log-level {
             @apply text-gray-700;
+        }
+    }
+}
+
+.log-item-2 {
+    @apply bg-white transition duration-200 cursor-pointer;
+
+    &.info {
+        &:hover, &.active {
+            @apply bg-sky-50 border-sky-200;
+        }
+
+        .log-level-indicator {
+            @apply bg-sky-600;
+        }
+        .log-level {
+            @apply text-sky-600;
+        }
+    }
+
+    &.warning {
+        &:hover, &.active {
+            @apply bg-amber-50 border-amber-300;
+        }
+
+        .log-level-indicator {
+            @apply bg-amber-600;
+        }
+        .log-level {
+            @apply text-amber-600;
+        }
+    }
+
+    &.danger {
+        &:hover, &.active {
+            @apply bg-rose-50 border-rose-300;
+        }
+
+        .log-level-indicator {
+            @apply bg-rose-600;
+        }
+        .log-level {
+            @apply text-rose-600;
+        }
+    }
+
+    &.none {
+        &:hover, &.active {
+            @apply bg-gray-50 border-gray-300;
+        }
+
+        .log-level-indicator {
+            @apply bg-gray-600;
+        }
+        .log-level {
+            @apply text-gray-600;
         }
     }
 }

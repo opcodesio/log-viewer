@@ -41,10 +41,95 @@
                 </div>
             </div>
 
-            <div class="relative overflow-hidden">
-                <div class="absolute top-0 h-6 w-full bg-gradient-to-b from-gray-100 to-transparent"></div>
+            @php
+                $design = 1;
+            @endphp
+            <div class="relative overflow-hidden text-sm">
 
-                <div class="log-item-container h-full overflow-y-scroll text-sm py-6 px-4">
+                @if($design === 1)
+                <div class="log-item-container h-full overflow-y-scroll px-4">
+                    <div class="inline-block min-w-full max-w-full align-middle">
+                        <div class="">
+                            <table class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
+                                <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col"
+                                        class="w-[60px] sticky top-0 z-10 bg-gray-100 py-2 pl-4 pr-2 text-left text-sm font-semibold text-gray-500 sm:pl-6 lg:pl-8">
+                                        <span class="sr-only">Level icon</span>
+                                    </th>
+                                    <th scope="col"
+                                        class="w-[90px] sticky top-0 z-10 hidden bg-gray-100 px-2 py-2 text-left text-sm font-semibold text-gray-500 lg:table-cell">
+                                        Level
+                                    </th>
+                                    <th scope="col"
+                                        class="w-[180px] sticky top-0 z-10 bg-gray-100 py-2 px-2 text-left text-sm font-semibold text-gray-500 sm:table-cell">
+                                        Time
+                                    </th>
+                                    <th scope="col"
+                                        class="w-[110px] sticky top-0 z-10 hidden bg-gray-100 px-2 py-2 text-left text-sm font-semibold text-gray-500 lg:table-cell">
+                                        Env
+                                    </th>
+                                    <th scope="col"
+                                        class="sticky top-0 z-10 bg-gray-100 px-2 py-2 text-left text-sm font-semibold text-gray-500 rounded-tr-md">
+                                        Description
+                                    </th>
+                                </tr>
+                                </thead>
+
+                                @forelse($logs as $log)
+                                <tbody class="bg-white" x-data="{ showStack: false }" wire:key="log-item-{{ $log->index }}">
+                                    <tr class="log-item-2 {{ $log->level->getClass() }}" x-on:click="showStack = !showStack" x-bind:class="showStack ? 'active sticky top-9 z-10' : ''">
+                                        <td class="log-level opacity-80 whitespace-nowrap border-t border-gray-200 py-2 pl-4 pr-2 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">
+                                            @if($log->level->getClass() === 'danger')
+                                                <x-better-log-viewer::icon-danger />
+                                            @elseif($log->level->getClass() === 'warning')
+                                                <x-better-log-viewer::icon-warning />
+                                            @else
+                                                <x-better-log-viewer::icon-info />
+                                            @endif
+                                        </td>
+                                        <td class="log-level truncate border-t border-gray-200 px-2 py-2 text-sm text-gray-500 hidden lg:table-cell">
+                                            {{ ucfirst($log->level->value) }}
+                                        </td>
+                                        <td class="whitespace-nowrap border-t border-gray-200 py-2 px-2 text-sm text-gray-900">
+                                            {{ $log->time->toDateTimeString() }}
+                                        </td>
+                                        <td class="whitespace-nowrap border-t border-gray-200 px-2 py-2 text-sm text-gray-500 hidden lg:table-cell">
+                                            {{ $log->environment }}
+                                        </td>
+                                        <td class="max-w-[1px] truncate border-t border-gray-200 px-2 py-2 text-sm text-gray-500">
+                                            {{ $log->text }}
+                                        </td>
+                                    </tr>
+                                    <tr x-show="showStack">
+                                        <td colspan="5">
+                                            <pre class="log-stack px-4 py-2 sm:px-6 lg:px-8 border-gray-200 text-xs whitespace-pre-wrap break-all">{{ $log->fullText }}</pre>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                @empty
+                                <tbody>
+                                <tr>
+                                    <td colspan="5">
+                                        <div class="my-12">
+                                            <div class="text-center font-semibold italic">No results...</div>
+                                            @if(!empty($query))
+                                            <div class="text-center mt-6">
+                                                <button class="px-3 py-2 border border-200 bg-white text-gray-800 rounded-md" wire:click="clearQuery">Clear search query</button>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                                </tbody>
+                                @endforelse
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                @elseif($design === 2)
+                <div class="log-item-container px-4 h-full overflow-y-scroll">
                     <div class="rounded-md">
                         @forelse($logs as $log)
                         <div wire:key="log-item-{{ $log->index }}" class="log-item {{ $log->level->getClass() }}" x-data="{ showStack: false }" x-bind:class="showStack ? 'active' : ''">
@@ -77,10 +162,9 @@
                         @endforelse
                     </div>
                 </div>
+                @endif
 
-                <div class="absolute bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 to-transparent"></div>
-
-                <div class="absolute hidden inset-0 py-6 px-4" wire:loading.class.remove="hidden">
+                <div class="absolute hidden inset-0 top-9 px-4 z-20" wire:loading.class.remove="hidden">
                     <div class="rounded-md bg-white opacity-90 w-full h-full flex items-center justify-center">
                         <div class="loader">Loading...</div>
                     </div>
@@ -88,7 +172,7 @@
             </div>
 
             @if($logs->hasPages())
-            <div class="px-4 mb-5">
+            <div class="px-4 mb-2">
                 {{ $logs->links('better-log-viewer::pagination') }}
             </div>
             @endif

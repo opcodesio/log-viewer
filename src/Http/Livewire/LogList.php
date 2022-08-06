@@ -33,7 +33,7 @@ class LogList extends Component
         $logQuery = $file?->logs()->only($selectedLevels)->reverse()->search($this->query);
 
         $levels = $logQuery?->getLevelCounts();
-        $logs = $logQuery?->paginate();
+        $logs = $logQuery?->paginate(50);
 
         $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2) . ' MB';
         $requestTime = number_format((microtime(true) - LARAVEL_START) * 1000, 0) . 'ms';
