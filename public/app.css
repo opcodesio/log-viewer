@@ -997,6 +997,9 @@ video {
 .opacity-80 {
   opacity: 0.8;
 }
+.opacity-0 {
+  opacity: 0;
+}
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
@@ -1415,6 +1418,13 @@ video {
 .disabled\:text-gray-500:disabled {
   --tw-text-opacity: 1;
   color: rgb(107 114 128 / var(--tw-text-opacity));
+}
+.group:hover .group-hover\:underline {
+  -webkit-text-decoration-line: underline;
+          text-decoration-line: underline;
+}
+.group:hover .group-hover\:opacity-75 {
+  opacity: 0.75;
 }
 @media (min-width: 640px) {
 

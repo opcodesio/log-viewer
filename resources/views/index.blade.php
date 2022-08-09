@@ -8,9 +8,6 @@
     <title>Logs - {{ config('app.name') }}</title>
 
     <style>[x-cloak] { display: none !important; }</style>
-    @isset($jsPath)
-        <script>{!! file_get_contents($jsPath) !!}</script>
-    @endisset
     @isset($cssPath)
         <style>{!! file_get_contents($cssPath) !!}</style>
     @endisset
@@ -37,5 +34,8 @@
 </div>
 
 @livewireScripts
+@isset($jsPath)
+    <script>{!! file_get_contents($jsPath) !!}</script>
+@endisset
 </body>
 </html>

@@ -72,4 +72,9 @@ class Log
 
         return (bool) preg_match($query, $this->fullText);
     }
+
+    public function url(): string
+    {
+        return route('blv.index', ['file' => $this->fileName, 'log' => $this->index]);
+    }
 }

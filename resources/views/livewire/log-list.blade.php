@@ -41,9 +41,6 @@
                 </div>
             </div>
 
-            @php
-                $design = 1;
-            @endphp
             <div class="relative overflow-hidden text-sm"
 x-data="{
     stacksOpen: [],
@@ -89,15 +86,26 @@ x-data="{
             }
         })
     },
+    reset() {
+        this.stacksOpen = [];
+        this.stacksInView = [];
+        this.stackTops = {};
+        const container = document.getElementById('log-item-container');
+        this.containerTop = container.getBoundingClientRect().top;
+        container.scrollTo(0, 0);
+    }
 }"
-x-init="const container = document.getElementById('log-item-container').getBoundingClientRect(); containerTop = container.top;"
+x-init="reset()"
             >
 
-                @if($design === 1)
                 <div id="log-item-container" class="log-item-container h-full overflow-y-scroll px-4" x-on:scroll="onScroll">
                     <div class="inline-block min-w-full max-w-full align-middle">
                         <div class="">
-                            <table wire:key="{{ \Illuminate\Support\Str::random(16) }}" class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
+                            <table wire:key="{{ \Illuminate\Support\Str::random(16) }}"
+                                   class="table-fixed min-w-full max-w-full border-separate"
+                                   style="border-spacing: 0"
+                                   x-init="reset()"
+                            >
                                 <thead class="bg-gray-50">
                                 <tr>
                                     <th scope="col"
@@ -119,6 +127,10 @@ x-init="const container = document.getElementById('log-item-container').getBound
                                     <th scope="col"
                                         class="sticky top-0 z-10 bg-gray-100 px-2 py-2 text-left text-sm font-semibold text-gray-500 rounded-tr-md">
                                         Description
+                                    </th>
+                                    <th scope="col"
+                                        class="sticky top-0 z-10 bg-gray-100 px-2 py-2 text-left text-sm font-semibold text-gray-500 rounded-tr-md">
+                                        <span class="sr-only">Item index</span>
                                     </th>
                                 </tr>
                                 </thead>
@@ -148,12 +160,20 @@ x-init="const container = document.getElementById('log-item-container').getBound
                                         <td class="whitespace-nowrap border-t border-gray-200 px-2 py-2 text-sm text-gray-500 hidden lg:table-cell">
                                             {{ $log->environment }}
                                         </td>
-                                        <td class="max-w-[1px] truncate border-t border-gray-200 px-2 py-2 text-sm text-gray-500">
+                                        <td class="max-w-[1px] w-full truncate border-t border-gray-200 px-2 py-2 text-sm text-gray-500">
                                             {{ $log->text }}
+                                        </td>
+                                        <td class="whitespace-nowrap border-t border-gray-200 px-2 py-2 text-sm text-gray-500 text-xs">
+                                            <a href="{{ $log->url() }}" class="flex items-center group" x-on:click.stop="">
+                                                <span class="group-hover:underline">{{ number_format($log->index) }}</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 opacity-0 group-hover:opacity-75 transition duration-200" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" />
+                                                </svg>
+                                            </a>
                                         </td>
                                     </tr>
                                     <tr x-show="isOpen({{$index}})">
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             <pre class="log-stack px-4 py-2 sm:px-6 lg:px-8 border-gray-200 text-xs whitespace-pre-wrap break-all">{{ $log->fullText }}</pre>
                                         </td>
                                     </tr>
@@ -161,7 +181,7 @@ x-init="const container = document.getElementById('log-item-container').getBound
                                 @empty
                                 <tbody>
                                 <tr>
-                                    <td colspan="5">
+                                    <td colspan="6">
                                         <div class="bg-white rounded p-6 mb-6">
                                             <div class="text-center font-semibold">No results</div>
                                             @if(!empty($query))
@@ -178,42 +198,6 @@ x-init="const container = document.getElementById('log-item-container').getBound
                         </div>
                     </div>
                 </div>
-
-                @elseif($design === 2)
-                <div class="log-item-container px-4 h-full overflow-y-scroll">
-                    <div class="rounded-md">
-                        @forelse($logs as $log)
-                        <div wire:key="log-item-{{ $log->index }}" class="log-item {{ $log->level->getClass() }}" x-data="{ showStack: false }" x-bind:class="showStack ? 'active' : ''">
-                            <div class="cursor-pointer pl-2 pr-4 py-3 flex" x-on:click="showStack = !showStack">
-                                <div class="log-level-indicator h-full rounded w-1 mr-2">&nbsp;</div>
-                                <div class="flex overflow-hidden">
-                                    <div class="whitespace-nowrap">
-                                        <span class="log-time">{{ $log->time->toDateTimeString() }}</span>
-                                        <span class="mx-1.5">·</span>
-                                        <span class="log-level font-semibold">{{ strtoupper($log->level->value) }}</span>
-                                        <span class="log-context text-gray-500">@ {{ $log->environment }}</span>
-                                        <span class="ml-1.5 mr-2">·</span>
-                                    </div>
-                                    <div class="flex-none">
-                                        <p class="text-gray-700">{{ $log->text }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <pre class="log-stack px-3 py-2 border-t border-gray-200 text-xs whitespace-pre-wrap break-all" x-show="showStack">{{ $log->fullText }}</pre>
-                        </div>
-                        @empty
-                            <div class="my-12">
-                                <div class="text-center font-semibold italic">No results...</div>
-                                @if(!empty($query))
-                                <div class="text-center mt-6">
-                                    <button class="px-3 py-2 border border-200 bg-white text-gray-800 rounded-md" wire:click="clearQuery">Clear search query</button>
-                                </div>
-                                @endif
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
-                @endif
 
                 <div class="absolute hidden inset-0 top-9 px-4 z-20" wire:loading.class.remove="hidden">
                     <div class="rounded-md bg-white opacity-90 w-full h-full flex items-center justify-center">
