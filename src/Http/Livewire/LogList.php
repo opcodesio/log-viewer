@@ -6,6 +6,7 @@ use Arukompas\BetterLogViewer\Exceptions\InvalidRegularExpression;
 use Arukompas\BetterLogViewer\FileListReader;
 use Arukompas\BetterLogViewer\LogFile;
 use Arukompas\BetterLogViewer\LogReader;
+use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -21,9 +22,11 @@ class LogList extends Component
     public string $queryError = '';
     public int $perPage = 50;
     public string $direction = self::NEWEST_FIRST;
+    public ?int $log = null;
 
     protected $queryString = [
         'query' => ['except' => ''],
+        'log' => ['except' => ''],
     ];
 
     protected $listeners = [
@@ -38,12 +41,15 @@ class LogList extends Component
     public function render()
     {
         /** @var LogFile $file */
-        $file = (new FileListReader())->getFiles()->firstWhere('name', $this->selectedFileName);
+        $file = FileListReader::findByName($this->selectedFileName);
         $selectedLevels = $this->getSelectedLevels();
         $logQuery = $file?->logs()->only($selectedLevels);
 
         try {
             $logQuery?->search($this->query);
+            if (Str::startsWith($this->query, 'log-index:')) {
+                $expandAutomatically = intval(explode(':', $this->query)[1]);
+            }
         } catch (InvalidRegularExpression $exception) {
             $this->queryError = $exception->getMessage();
         }
@@ -64,6 +70,7 @@ class LogList extends Component
             'logs' => $logs,
             'memoryUsage' => $memoryUsage,
             'requestTime' => $requestTime,
+            'expandAutomatically' => $expandAutomatically ?? false,
         ]);
     }
 

@@ -7,6 +7,7 @@ use Arukompas\BetterLogViewer\Exceptions\InvalidRegularExpression;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 class LogReader
 {
@@ -63,6 +64,8 @@ class LogReader
     protected ?int $limit = null;
 
     protected ?string $query = null;
+
+    protected ?int $onlyShowIndex = null;
 
     /**
      * The index of the next log to be read
@@ -288,6 +291,37 @@ class LogReader
         return $this;
     }
 
+    public function findPageForIndex(int $targetIndex, int $perPage = 25): int
+    {
+        $mergedIndex = $this->getMergedIndexForSelectedLevels();
+        $currentPage = 1;
+        $counter = 1;
+
+        foreach ($mergedIndex as $index => $position) {
+            if ($this->direction === self::DIRECTION_BACKWARD && $index <= $targetIndex) {
+                break;
+            } elseif ($this->direction === self::DIRECTION_FORWARD && $index >= $targetIndex) {
+                break;
+            }
+
+            $counter++;
+
+            if ($counter > $perPage) {
+                $currentPage++;
+                $counter = 1;
+            }
+        }
+
+        return $currentPage;
+    }
+
+    public function onlyShow(int $targetIndex = 0): self
+    {
+        $this->onlyShowIndex = $targetIndex;
+
+        return $this;
+    }
+
     public function limit(int $number): self
     {
         $this->limit = $number;
@@ -299,7 +333,11 @@ class LogReader
     {
         $this->close();
 
-        if (!empty($query)) {
+        if (!empty($query) && Str::startsWith($query, 'log-index:')) {
+            $this->query = null;
+            $this->only(null);
+            $this->onlyShow(intval(explode(':', $query)[1]));
+        } elseif (!empty($query)) {
             $query = "/" . $query . "/i";
 
             if (!$this->isValidRegex($query)) {
@@ -462,7 +500,10 @@ class LogReader
         // we have already reached the end of file. So we return early.
         if ($text === '') return null;
 
-        return $this->makeLog($level, $text, $position);
+        $log = $this->makeLog($level, $text, $position);
+        $log->index = $index;
+
+        return $log;
     }
 
     public function next(): ?Log
@@ -487,9 +528,18 @@ class LogReader
         return count($this->getMergedIndexForSelectedLevels());
     }
 
-    public function paginate(int $perPage = 15, int $page = null)
+    public function paginate(int $perPage = 25, int $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage('page');
+
+        if ($this->onlyShowIndex) {
+            return new LengthAwarePaginator(
+                [$this->getLogAtIndex($this->onlyShowIndex)],
+                1,
+                $perPage,
+                $page
+            );
+        }
 
         $this->reset()->skip(max(0, $page - 1) * $perPage);
 

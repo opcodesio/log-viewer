@@ -21,6 +21,7 @@ stackTops: {},
 containerTop: 0,
 isOpen(index) { return this.stacksOpen.includes(index); },
 toggle(index) {
+    console.log('toggling '+index);
     if (this.isOpen(index)) {
         this.stacksOpen = this.stacksOpen.filter(idx => idx !== index)
     } else {
@@ -59,6 +60,7 @@ onScroll(event) {
     })
 },
 reset() {
+    var vm = this;
     this.stacksOpen = [];
     this.stacksInView = [];
     this.stackTops = {};
@@ -67,7 +69,7 @@ reset() {
     container.scrollTo(0, 0);
 }
 }"
-x-init="reset()"
+x-init="reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false' }}) { stacksOpen.push(0) } })"
         >
 
             <div id="log-item-container" class="log-item-container h-full overflow-y-scroll px-4" x-on:scroll="onScroll">

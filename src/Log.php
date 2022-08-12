@@ -75,6 +75,6 @@ class Log
 
     public function url(): string
     {
-        return route('blv.index', ['file' => $this->fileName, 'log' => $this->index]);
+        return route('blv.index', ['file' => $this->fileName, 'query' => 'log-index:'.$this->index]);
     }
 }
