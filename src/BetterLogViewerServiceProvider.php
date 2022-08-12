@@ -30,6 +30,13 @@ class BetterLogViewerServiceProvider extends PackageServiceProvider
             ->hasCommand(BetterLogViewerCommand::class);
     }
 
+    public function registeringPackage()
+    {
+        $this->publishes([
+            __DIR__.'/../public' => public_path('vendor/better-log-viewer'),
+        ], 'better-log-viewer-assets');
+    }
+
     public function boot()
     {
         parent::boot();
