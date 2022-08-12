@@ -2,6 +2,7 @@
 
 namespace Arukompas\BetterLogViewer\Http\Livewire;
 
+use Arukompas\BetterLogViewer\Exceptions\InvalidRegularExpression;
 use Arukompas\BetterLogViewer\FileListReader;
 use Arukompas\BetterLogViewer\LogFile;
 use Arukompas\BetterLogViewer\LogReader;
@@ -17,6 +18,7 @@ class LogList extends Component
 
     public string $selectedFileName = '';
     public string $query = '';
+    public string $queryError = '';
     public int $perPage = 50;
     public string $direction = self::NEWEST_FIRST;
 
@@ -38,7 +40,13 @@ class LogList extends Component
         /** @var LogFile $file */
         $file = (new FileListReader())->getFiles()->firstWhere('name', $this->selectedFileName);
         $selectedLevels = $this->getSelectedLevels();
-        $logQuery = $file?->logs()->only($selectedLevels)->search($this->query);
+        $logQuery = $file?->logs()->only($selectedLevels);
+
+        try {
+            $logQuery?->search($this->query);
+        } catch (InvalidRegularExpression $exception) {
+            $this->queryError = $exception->getMessage();
+        }
 
         if ($this->direction === self::NEWEST_FIRST) {
             $logQuery?->reverse();
@@ -62,11 +70,13 @@ class LogList extends Component
     public function updatingQuery()
     {
         $this->resetPage();
+        $this->queryError = '';
     }
 
     public function clearQuery()
     {
         $this->query = '';
+        $this->queryError = '';
     }
 
     public function selectFile(string $fileName)

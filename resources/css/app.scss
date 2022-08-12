@@ -10,7 +10,6 @@
         &:hover, &.active {
             @apply bg-sky-50 border-sky-200;
         }
-
         .log-level-indicator {
             @apply bg-sky-600;
         }
@@ -23,7 +22,6 @@
         &:hover, &.active {
             @apply bg-amber-50 border-amber-300;
         }
-
         .log-level-indicator {
             @apply bg-amber-600;
         }
@@ -36,7 +34,6 @@
         &:hover, &.active {
             @apply bg-rose-50 border-rose-300;
         }
-
         .log-level-indicator {
             @apply bg-rose-600;
         }
@@ -49,7 +46,6 @@
         &:hover, &.active {
             @apply bg-gray-50 border-gray-300;
         }
-
         .log-level-indicator {
             @apply bg-gray-600;
         }
@@ -61,15 +57,14 @@
 
 /** Level Badges **/
 .badge {
-    @apply inline-flex items-center text-sm cursor-pointer px-3 py-1 rounded-md mr-2 transition duration-200;
+    @apply inline-flex items-center text-sm cursor-pointer px-3 py-1 rounded-md mr-2 mt-1 transition duration-200;
 
     &.info {
         @apply border border-sky-200 bg-sky-50 text-gray-600;
-        &:hover {
-            @apply bg-sky-100;
-        }
 
-        & .checkmark {
+        &:hover { @apply bg-sky-100; }
+
+        .checkmark {
             @apply border-sky-200;
         }
 
@@ -78,10 +73,10 @@
             &:hover {
                 @apply bg-sky-600;
             }
-            & .checkmark {
+            .checkmark {
                 @apply border-sky-600;
             }
-            & .checkmark > svg {
+            .checkmark > svg {
                 @apply text-sky-600;
             }
         }
@@ -220,9 +215,15 @@
 .search {
     input {
         @apply border rounded-md pl-3 pr-10 py-2 text-sm w-full border-gray-300;
+        &:focus {
+            @apply outline-emerald-500 border-transparent;
+        }
     }
-    input:focus {
-        @apply outline-emerald-500 border-transparent;
+    &.has-error input {
+        @apply border-red-600;
+        &:focus {
+            @apply outline-red-500 border-transparent;
+        }
     }
     .clear-search {
         @apply absolute top-0 right-0 p-1.5;

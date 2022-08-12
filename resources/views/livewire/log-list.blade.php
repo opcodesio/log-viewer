@@ -8,7 +8,7 @@
     </div>
 @else
     <div class="flex flex-col h-full w-full mx-3 mb-4">
-        <div class="px-4 mb-4 flex items-center">
+        <div class="px-4 mb-4 flex items-start">
             <div class="flex-1 mr-6">@include('better-log-viewer::partials.log-list-level-buttons')</div>
             <div class="flex-1">@include('better-log-viewer::partials.search-input')</div>
         </div>

@@ -300,11 +300,13 @@ class LogReader
         $this->close();
 
         if (!empty($query)) {
-            $this->query = "/" . $query . "/i";
+            $query = "/" . $query . "/i";
 
-            if (!$this->isValidRegex($this->query)) {
+            if (!$this->isValidRegex($query)) {
                 throw new InvalidRegularExpression();
             }
+
+            $this->query = $query;
         } else {
             $this->query = null;
         }
