@@ -4,62 +4,6 @@
 @import './loader.scss';
 
 .log-item {
-    @apply rounded-md border border-transparent mb-2 bg-white transition duration-200 cursor-pointer;
-
-    &.info {
-        &:hover, &.active {
-            @apply bg-sky-50 border-sky-200;
-        }
-
-        .log-level-indicator {
-            @apply bg-sky-600;
-        }
-        .log-level {
-            @apply text-sky-700;
-        }
-    }
-
-    &.warning {
-        &:hover, &.active {
-            @apply bg-amber-50 border-amber-300;
-        }
-
-        .log-level-indicator {
-            @apply bg-amber-600;
-        }
-        .log-level {
-            @apply text-amber-700;
-        }
-    }
-
-    &.danger {
-        &:hover, &.active {
-            @apply bg-rose-50 border-rose-300;
-        }
-
-        .log-level-indicator {
-            @apply bg-rose-600;
-        }
-        .log-level {
-            @apply text-rose-700;
-        }
-    }
-
-    &.none {
-        &:hover, &.active {
-            @apply bg-gray-50 border-gray-300;
-        }
-
-        .log-level-indicator {
-            @apply bg-gray-600;
-        }
-        .log-level {
-            @apply text-gray-700;
-        }
-    }
-}
-
-.log-item-2 {
     @apply bg-white transition duration-200 cursor-pointer;
 
     &.info {
@@ -212,6 +156,63 @@
             & .checkmark > svg {
                 @apply text-gray-600;
             }
+        }
+    }
+}
+
+.log-list {
+    table > thead th {
+        @apply sticky top-0 z-10 bg-gray-100 py-2 px-2 text-left text-sm font-semibold text-gray-500;
+    }
+
+    .log-group {
+        @apply bg-white relative;
+
+        .log-item > td {
+            @apply border-t border-gray-200 px-2 py-2 text-sm;
+        }
+
+        .log-item > td.log-level-icon {
+            @apply opacity-80 whitespace-nowrap border-t border-gray-200 py-2 pl-4 pr-2 sm:pl-6 lg:pl-8;
+            & > svg {
+                @apply h-5 w-5;
+            }
+        }
+
+        .log-stack {
+            @apply px-4 py-2 sm:px-6 lg:px-8 border-gray-200 text-xs whitespace-pre-wrap break-all;
+        }
+
+        .log-link {
+            @apply flex items-center;
+
+            & > svg {
+                @apply h-4 w-4 ml-1 transition duration-200;
+            }
+        }
+    }
+}
+
+.pagination {
+    @apply border-gray-200 mt-2 px-4 w-full flex items-center justify-center sm:px-0;
+
+    .previous {
+        @apply -mt-px w-0 flex-1 flex justify-end;
+    }
+
+    .next {
+        @apply -mt-px w-0 flex-1 flex justify-start;
+    }
+
+    .pages {
+        @apply hidden md:-mt-px md:flex;
+
+        span {
+            @apply border-transparent text-gray-500 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium;
+        }
+
+        button {
+            @apply border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium;
         }
     }
 }

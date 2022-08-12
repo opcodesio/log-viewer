@@ -37,5 +37,7 @@
 @isset($jsPath)
     <script>{!! file_get_contents($jsPath) !!}</script>
 @endisset
+
+@include('better-log-viewer::icons')
 </body>
 </html>

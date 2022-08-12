@@ -3,7 +3,7 @@
         "dev": "mix",
         "watch": "mix watch",
         "prod": "npm run production",
-        "production": "mix build"
+        "production": "mix --production"
     },
     "devDependencies": {
         "alpinejs": "^3.10.3",
