@@ -299,7 +299,6 @@ class LogReader
     {
         $this->close();
 
-
         if (!empty($query)) {
             $this->query = "/" . $query . "/i";
 
@@ -381,6 +380,7 @@ class LogReader
         }
 
         $this->lastScanFileSize = ftell($this->fileHandle);
+        $this->indexChanged = true;
 
         // Let's reset the position in preparation for real log reads.
         rewind($this->fileHandle);

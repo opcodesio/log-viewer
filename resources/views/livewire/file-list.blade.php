@@ -29,7 +29,7 @@
                     <button type="button" class="absolute top-0 right-0 bottom-0 w-8 flex items-center justify-center border-l-2 border-transparent text-gray-500 hover:border-emerald-600 hover:bg-emerald-50 transition duration-200"
                             x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-more" /></svg>
                     </button>
                 </div>
 

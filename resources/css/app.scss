@@ -216,3 +216,20 @@
         }
     }
 }
+
+.search {
+    input {
+        @apply border rounded-md pl-3 pr-10 py-2 text-sm w-full border-gray-300;
+    }
+    input:focus {
+        @apply outline-emerald-500 border-transparent;
+    }
+    .clear-search {
+        @apply absolute top-0 right-0 p-1.5;
+        button {
+            @apply text-gray-500 p-1;
+            &:hover { @apply text-gray-600; }
+            & > svg { @apply h-5 w-5; }
+        }
+    }
+}
