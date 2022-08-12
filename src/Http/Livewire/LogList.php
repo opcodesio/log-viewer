@@ -12,8 +12,13 @@ class LogList extends Component
 {
     use WithPagination;
 
+    const OLDEST_FIRST = 'asc';
+    const NEWEST_FIRST = 'desc';
+
     public string $selectedFileName = '';
     public string $query = '';
+    public int $perPage = 50;
+    public string $direction = self::NEWEST_FIRST;
 
     protected $queryString = [
         'query' => ['except' => ''],
@@ -23,17 +28,24 @@ class LogList extends Component
         'fileSelected' => 'selectFile',
     ];
 
+    public function mount()
+    {
+        $this->loadPreferences();
+    }
+
     public function render()
     {
         /** @var LogFile $file */
         $file = (new FileListReader())->getFiles()->firstWhere('name', $this->selectedFileName);
-
         $selectedLevels = $this->getSelectedLevels();
+        $logQuery = $file?->logs()->only($selectedLevels)->search($this->query);
 
-        $logQuery = $file?->logs()->only($selectedLevels)->reverse()->search($this->query);
+        if ($this->direction === self::NEWEST_FIRST) {
+            $logQuery?->reverse();
+        }
 
         $levels = $logQuery?->getLevelCounts();
-        $logs = $logQuery?->paginate(50);
+        $logs = $logQuery?->paginate($this->perPage);
 
         $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2) . ' MB';
         $requestTime = number_format((microtime(true) - LARAVEL_START) * 1000, 0) . 'ms';
@@ -79,6 +91,16 @@ class LogList extends Component
         $this->saveSelectedLevels($selectedLevels);
     }
 
+    public function updatedPerPage($value)
+    {
+        $this->savePreferences();
+    }
+
+    public function updatedDirection($value)
+    {
+        $this->savePreferences();
+    }
+
     public function getSelectedLevels(): array
     {
         $levels = session()->get('selected_levels', []);
@@ -93,5 +115,21 @@ class LogList extends Component
     public function saveSelectedLevels(array $levels): void
     {
         session()->put('selected_levels', $levels);
+    }
+
+    public function savePreferences(): void
+    {
+        session()->put('better-log-viewer:log-list-preferences', [
+            'per_page' => $this->perPage,
+            'direction' => $this->direction,
+        ]);
+    }
+
+    public function loadPreferences(): void
+    {
+        $prefs = session()->get('better-log-viewer:log-list-preferences', []);
+
+        $this->perPage = $prefs['per_page'] ?? $this->perPage;
+        $this->direction = $prefs['direction'] ?? $this->direction;
     }
 }

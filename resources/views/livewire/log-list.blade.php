@@ -84,8 +84,25 @@ x-init="reset()"
     <th scope="col" class="w-[90px] hidden lg:table-cell">Level</th>
     <th scope="col" class="w-[180px] hidden sm:table-cell">Time</th>
     <th scope="col" class="w-[110px] hidden lg:table-cell">Env</th>
-    <th scope="col">Description</th>
-    <th scope="col" class="rounded-tr-md"><span class="sr-only">Item index</span></th>
+    <th scope="col" colspan="2">
+        <div class="flex justify-between">
+            <span>Description</span>
+            <div>
+                <select wire:model="direction" class="bg-gray-100 px-2 font-normal mr-3 outline-emerald-500">
+                    <option value="desc">Newest first</option>
+                    <option value="asc">Oldest first</option>
+                </select>
+                <select wire:model="perPage" class="bg-gray-100 px-2 font-normal outline-emerald-500">
+                    <option value="10">10 items per page</option>
+                    <option value="25">25 items per page</option>
+                    <option value="50">50 items per page</option>
+                    <option value="100">100 items per page</option>
+                    <option value="250">250 items per page</option>
+                    <option value="500">500 items per page</option>
+                </select>
+            </div>
+        </div>
+    </th>
 </tr>
 </thead>
 

@@ -583,6 +583,9 @@ video {
 .top-9 {
   top: 2.25rem;
 }
+.right-5 {
+  right: 1.25rem;
+}
 .z-20 {
   z-index: 20;
 }
@@ -785,6 +788,10 @@ video {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
+.bg-emerald-50 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(236 253 245 / var(--tw-bg-opacity));
+}
 .bg-gradient-to-b {
   background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
 }
@@ -826,6 +833,18 @@ video {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
 }
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.py-0\.5 {
+  padding-top: 0.125rem;
+  padding-bottom: 0.125rem;
+}
+.py-0 {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
 .pt-4 {
   padding-top: 1rem;
 }
@@ -843,6 +862,12 @@ video {
 }
 .pr-2 {
   padding-right: 0.5rem;
+}
+.pr-5 {
+  padding-right: 1.25rem;
+}
+.pr-4 {
+  padding-right: 1rem;
 }
 .text-left {
   text-align: left;
@@ -873,6 +898,9 @@ video {
 }
 .font-medium {
   font-weight: 500;
+}
+.font-normal {
+  font-weight: 400;
 }
 .text-emerald-800 {
   --tw-text-opacity: 1;
@@ -913,6 +941,12 @@ video {
 }
 .opacity-90 {
   opacity: 0.9;
+}
+.outline-emerald-600 {
+  outline-color: #059669;
+}
+.outline-emerald-500 {
+  outline-color: #10b981;
 }
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);

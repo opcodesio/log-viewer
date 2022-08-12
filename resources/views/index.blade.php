@@ -16,7 +16,7 @@
 <body class="h-full px-5">
 <div class="flex h-full max-h-screen max-w-full">
     <div class="hidden md:flex md:w-80 md:flex-col md:fixed md:inset-y-0">
-        <nav class="flex flex-col h-full py-5 mr-5">
+        <nav class="flex flex-col h-full py-5">
             <div class="mx-3 mb-4">
                 <h1 class="font-semibold text-emerald-800 text-2xl">Better Log Viewer</h1>
                 <p class="mt-0 text-gray-500 text-sm">

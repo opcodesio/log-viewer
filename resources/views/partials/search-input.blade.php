@@ -1,6 +1,6 @@
 <label for="query" class="sr-only">Search</label>
 <div class="relative search">
-    <input wire:model.lazy="query" name="query" id="query" type="text" placeholder="Search..." />
+    <input wire:model.lazy="query" name="query" id="query" type="text" placeholder="Search... RegEx welcome!" />
     @if(!empty($query))
     <div class="clear-search">
         <button wire:click="clearQuery">

@@ -1,6 +1,6 @@
 <div class="relative overflow-hidden" wire:init="loadFiles">
     <div class="absolute top-0 h-6 w-full bg-gradient-to-b from-gray-100 to-transparent"></div>
-    <div class="relative h-full overflow-y-scroll py-6">
+    <div class="relative h-full overflow-y-scroll py-6 pr-4">
         @foreach($files as $logFile)
             <div wire:key="log-file-{{$logFile->name}}"
                 wire:click="selectFile('{{ $logFile->name }}')"
@@ -20,7 +20,7 @@
                 x-on:keydown.escape.prevent.stop="close($refs.button)"
                 x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
                 x-id="['dropdown-button']"
-                class="mb-2 text-gray-800 rounded-md bg-white overflow-hidden transition duration-100 border-2 border-transparent hover:border-emerald-600 cursor-pointer @if($file === $logFile->name) border-emerald-500 @endif"
+                class="mb-2 text-gray-800 rounded-md bg-white overflow-hidden transition duration-100 border-2 border-transparent hover:border-emerald-600 cursor-pointer @if($file === $logFile->name) border-emerald-500 bg-emerald-50 @endif"
             >
                 <div
                     class="relative flex justify-between items-center pl-4 pr-10 py-2">
@@ -40,7 +40,7 @@
                     x-on:click.outside="close($refs.button)"
                     :id="$id('dropdown-button')"
                     style="display: none;"
-                    class="absolute z-20 right-1 -mt-1 w-40 overflow-hidden rounded-md bg-white border-2 border-emerald-500"
+                    class="absolute z-20 right-5 -mt-1 w-40 overflow-hidden rounded-md bg-white border-2 border-emerald-500"
                 >
                     <div>
                         <button wire:click.stop="download('{{ $logFile->name }}')" class="block flex items-center w-full px-4 py-2 text-left text-sm hover:bg-gray-50 disabled:text-gray-500" >
