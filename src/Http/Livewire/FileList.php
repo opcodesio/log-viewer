@@ -1,9 +1,9 @@
 <?php
 
-namespace Arukompas\BetterLogViewer\Http\Livewire;
+namespace Opcodes\LogViewer\Http\Livewire;
 
-use Arukompas\BetterLogViewer\Facades\BetterLogViewer;
-use Arukompas\BetterLogViewer\LogFile;
+use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogFile;
 use Livewire\Component;
 
 class FileList extends Component
@@ -17,8 +17,8 @@ class FileList extends Component
 
     public function render()
     {
-        return view('better-log-viewer::livewire.file-list', [
-            'files' => $this->shouldLoadFiles ? BetterLogViewer::getFiles() : [],
+        return view('log-viewer::livewire.file-list', [
+            'files' => $this->shouldLoadFiles ? LogViewer::getFiles() : [],
         ]);
     }
 
@@ -44,17 +44,17 @@ class FileList extends Component
 
     public function download(string $fileName)
     {
-        return BetterLogViewer::getFile($fileName)?->download();
+        return LogViewer::getFile($fileName)?->download();
     }
 
     public function deleteFile(string $fileName)
     {
-        BetterLogViewer::getFile($fileName)?->delete();
+        LogViewer::getFile($fileName)?->delete();
     }
 
     public function clearCache(string $fileName)
     {
-        BetterLogViewer::getFile($fileName)?->clearIndexCache();
+        LogViewer::getFile($fileName)?->clearIndexCache();
 
         if ($this->file === $fileName) {
             $this->emit('fileSelected', $this->file);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Arukompas\BetterLogViewer;
+namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;

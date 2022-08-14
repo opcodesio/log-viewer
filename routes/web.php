@@ -1,13 +1,13 @@
 <?php
 
-use Arukompas\BetterLogViewer\Facades\BetterLogViewer;
+use Opcodes\LogViewer\Facades\LogViewer;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(BetterLogViewer::getRouteMiddleware())
-    ->prefix(BetterLogViewer::getRoutePrefix())
+Route::middleware(LogViewer::getRouteMiddleware())
+    ->prefix(LogViewer::getRoutePrefix())
     ->group(function () {
         Route::get('/', function () {
-            return view('better-log-viewer::index', [
+            return view('log-viewer::index', [
                 'jsPath' => __DIR__.'/../public/app.js',
                 'cssPath' => __DIR__.'/../public/app.css',
             ]);

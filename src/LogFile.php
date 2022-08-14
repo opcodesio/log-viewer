@@ -1,8 +1,8 @@
 <?php
 
-namespace Arukompas\BetterLogViewer;
+namespace Opcodes\LogViewer;
 
-use Arukompas\BetterLogViewer\Events\LogFileDeleted;
+use Opcodes\LogViewer\Events\LogFileDeleted;
 use Illuminate\Support\Facades\Cache;
 
 class LogFile

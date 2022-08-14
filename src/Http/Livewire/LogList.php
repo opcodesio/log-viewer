@@ -1,11 +1,11 @@
 <?php
 
-namespace Arukompas\BetterLogViewer\Http\Livewire;
+namespace Opcodes\LogViewer\Http\Livewire;
 
-use Arukompas\BetterLogViewer\Exceptions\InvalidRegularExpression;
-use Arukompas\BetterLogViewer\Facades\BetterLogViewer;
-use Arukompas\BetterLogViewer\LogFile;
-use Arukompas\BetterLogViewer\LogReader;
+use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
+use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\LogReader;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -40,7 +40,7 @@ class LogList extends Component
 
     public function render()
     {
-        $file = BetterLogViewer::getFile($this->selectedFileName);
+        $file = LogViewer::getFile($this->selectedFileName);
         $selectedLevels = $this->getSelectedLevels();
         $logQuery = $file?->logs()->only($selectedLevels);
 
@@ -63,7 +63,7 @@ class LogList extends Component
         $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2) . ' MB';
         $requestTime = number_format((microtime(true) - LARAVEL_START) * 1000, 0) . 'ms';
 
-        return view('better-log-viewer::livewire.log-list', [
+        return view('log-viewer::livewire.log-list', [
             'file' => $file,
             'levels' => $levels,
             'logs' => $logs,
@@ -135,7 +135,7 @@ class LogList extends Component
 
     public function savePreferences(): void
     {
-        session()->put('better-log-viewer:log-list-preferences', [
+        session()->put('log-viewer:log-list-preferences', [
             'per_page' => $this->perPage,
             'direction' => $this->direction,
         ]);
@@ -143,7 +143,7 @@ class LogList extends Component
 
     public function loadPreferences(): void
     {
-        $prefs = session()->get('better-log-viewer:log-list-preferences', []);
+        $prefs = session()->get('log-viewer:log-list-preferences', []);
 
         $this->perPage = $prefs['per_page'] ?? $this->perPage;
         $this->direction = $prefs['direction'] ?? $this->direction;

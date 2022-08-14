@@ -1,10 +1,10 @@
 <?php
 
-namespace Arukompas\BetterLogViewer;
+namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Collection;
 
-class BetterLogViewer
+class LogViewer
 {
     static ?Collection $_cachedFiles = null;
 
@@ -16,11 +16,11 @@ class BetterLogViewer
         if (!isset(self::$_cachedFiles)) {
             $files = [];
 
-            foreach (config('better-log-viewer.include_files', []) as $pattern) {
+            foreach (config('log-viewer.include_files', []) as $pattern) {
                 $files = array_merge($files, glob(storage_path() . '/logs/' . $pattern));
             }
 
-            foreach (config('better-log-viewer.exclude_files', []) as $pattern) {
+            foreach (config('log-viewer.exclude_files', []) as $pattern) {
                 $files = array_diff($files, glob(storage_path() . '/logs/' . $pattern));
             }
 
@@ -51,13 +51,13 @@ class BetterLogViewer
 
     public function getRoutePrefix(): string
     {
-        return config('better-log-viewer.route_path', 'log-viewer');
+        return config('log-viewer.route_path', 'log-viewer');
     }
 
     public function getRouteMiddleware(): array
     {
         $default = ['web'];
-        $userDefined = config('better-log-viewer.middleware', []) ?: [];
+        $userDefined = config('log-viewer.middleware', []) ?: [];
 
         return array_values(array_unique(array_merge($default, $userDefined)));
     }

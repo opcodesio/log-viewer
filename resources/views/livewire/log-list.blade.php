@@ -1,5 +1,5 @@
 @php
-    /** @var \Arukompas\BetterLogViewer\LogFile $file */
+    /** @var \Opcodes\LogViewer\LogFile $file */
 @endphp
 <div class="h-full w-full py-5 log-list">
 @empty($selectedFileName)
@@ -9,10 +9,10 @@
 @else
     <div class="flex flex-col h-full w-full mx-3 mb-4">
         <div class="px-4 mb-4 flex items-start">
-            <div class="flex-1 mr-6">@include('better-log-viewer::partials.log-list-level-buttons')</div>
+            <div class="flex-1 mr-6">@include('log-viewer::partials.log-list-level-buttons')</div>
             <div class="flex-1 flex items-center">
-                <div class="flex-1">@include('better-log-viewer::partials.search-input')</div>
-                @include('better-log-viewer::partials.log-list-share-page-button')
+                <div class="flex-1">@include('log-viewer::partials.search-input')</div>
+                @include('log-viewer::partials.log-list-share-page-button')
             </div>
         </div>
 
@@ -127,7 +127,7 @@ x-init="reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false
         <td class="whitespace-nowrap text-gray-900">{{ $log->time->toDateTimeString() }}</td>
         <td class="whitespace-nowrap text-gray-500 hidden lg:table-cell">{{ $log->environment }}</td>
         <td class="max-w-[1px] w-full truncate text-gray-500">{{ $log->text }}</td>
-        <td class="whitespace-nowrap text-gray-500 text-xs">@include('better-log-viewer::partials.log-list-link-button')</td>
+        <td class="whitespace-nowrap text-gray-500 text-xs">@include('log-viewer::partials.log-list-link-button')</td>
     </tr>
     <tr x-show="isOpen({{$index}})"><td colspan="6"><pre class="log-stack">{{ $log->fullText }}</pre></td></tr>
 </tbody>
@@ -161,7 +161,7 @@ x-init="reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false
 
         @if($logs->hasPages())
         <div class="px-4 mb-2">
-            {{ $logs->links('better-log-viewer::pagination') }}
+            {{ $logs->links('log-viewer::pagination') }}
         </div>
         @endif
 

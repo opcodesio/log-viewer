@@ -1,9 +1,9 @@
 <?php
 
-namespace Arukompas\BetterLogViewer;
+namespace Opcodes\LogViewer;
 
-use Arukompas\BetterLogViewer\Concerns\HasLocalCache;
-use Arukompas\BetterLogViewer\Exceptions\InvalidRegularExpression;
+use Opcodes\LogViewer\Concerns\HasLocalCache;
+use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
@@ -151,7 +151,7 @@ class LogReader
 
     public function getIndexCacheKey(): string
     {
-        return 'better-log-viewer:log-index:' . implode(":", [
+        return 'log-viewer:log-index:' . implode(":", [
             $this->file->name,
             md5($this->query ?? ''),
         ]);

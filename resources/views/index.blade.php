@@ -19,25 +19,25 @@
         <nav class="flex flex-col h-full py-5">
             <div class="mx-3 mb-4">
                 <h1 class="font-semibold text-emerald-800 text-2xl flex items-center">
-                    Better Log Viewer
-                    <a href="https://www.github.com/arukompas/better-log-viewer" target="_blank" class="ml-3 text-gray-400 hover:text-emerald-800 p-1">
+                    Log Viewer
+                    <a href="https://www.github.com/opcodesio/log-viewer" target="_blank" class="ml-3 text-gray-400 hover:text-emerald-800 p-1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-github" /></svg>
                     </a>
                 </h1>
-                @if($backUrl = config('better-log-viewer.back_to_system_url'))
+                @if($backUrl = config('log-viewer.back_to_system_url'))
                     <a href="{{ $backUrl }}" class="inline-flex items-center text-sm text-gray-400 hover:text-emerald-800 mt-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1.5" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-arrow-left" /></svg>
-                        {{ config('better-log-viewer.back_to_system_label') ?? 'Back to '.config('app.name') }}
+                        {{ config('log-viewer.back_to_system_label') ?? 'Back to '.config('app.name') }}
                     </a>
                 @endif
             </div>
 
-            @livewire('blv::file-list')
+            @livewire('log-viewer::file-list')
         </nav>
     </div>
 
     <div class="md:pl-80 flex flex-col flex-1 min-h-screen max-h-screen max-w-full">
-        @livewire('blv::log-list')
+        @livewire('log-viewer::log-list')
     </div>
 </div>
 
@@ -46,6 +46,6 @@
     <script>{!! file_get_contents($jsPath) !!}</script>
 @endisset
 
-@include('better-log-viewer::icons')
+@include('log-viewer::icons')
 </body>
 </html>

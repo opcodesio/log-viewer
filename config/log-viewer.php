@@ -4,10 +4,11 @@ return [
     /**
      * Log Viewer route path.
      */
-    'route_path' => 'log-viewer',
+    'route_path' => 'logs',
 
     /**
      * When set, displays a link to easily get back to this URL.
+     * Set to `null` to hide this link.
      */
     'back_to_system_url' => config('app.url', null),
 
@@ -30,13 +31,4 @@ return [
      * Exclude file patterns. This will take precedence
      */
     'exclude_files' => [],
-
-    /**
-     * Shorter stack trace filters. Any lines matching these regex patters will be excluded.
-     */
-    'shorter_stack_trace_excludes' => [
-        '/vendor/symfony/',
-        '/vendor/laravel/framework/',
-        '/vendor/barryvdh/laravel-debugbar/'
-    ],
 ];

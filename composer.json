@@ -1,12 +1,15 @@
 {
-    "name": "arukompas/better-log-viewer",
+    "name": "opcodesio/log-viewer",
     "description": "Fast and easy-to-use log viewer for your Laravel application",
     "keywords": [
         "arukompas",
+        "opcodesio",
         "laravel",
+        "logs",
+        "log viewer",
         "better-log-viewer"
     ],
-    "homepage": "https://github.com/arukompas/better-log-viewer",
+    "homepage": "https://github.com/opcodesio/log-viewer",
     "license": "MIT",
     "authors": [
         {
@@ -32,13 +35,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Arukompas\\BetterLogViewer\\": "src",
-            "Arukompas\\BetterLogViewer\\Database\\Factories\\": "database/factories"
+            "Opcodes\\LogViewer\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Arukompas\\BetterLogViewer\\Tests\\": "tests"
+            "Opcodes\\LogViewer\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -56,10 +58,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Arukompas\\BetterLogViewer\\BetterLogViewerServiceProvider"
+                "Opcodes\\LogViewer\\LogViewerServiceProvider"
             ],
             "aliases": {
-                "BetterLogViewer": "Arukompas\\BetterLogViewer\\Facades\\BetterLogViewer"
+                "LogViewer": "Opcodes\\LogViewer\\Facades\\LogViewer"
             }
         }
     },

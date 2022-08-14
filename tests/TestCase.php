@@ -1,8 +1,8 @@
 <?php
 
-namespace Arukompas\BetterLogViewer\Tests;
+namespace Opcodes\LogViewer\Tests;
 
-use Arukompas\BetterLogViewer\BetterLogViewerServiceProvider;
+use Opcodes\LogViewer\LogViewerServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -13,14 +13,14 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Arukompas\\BetterLogViewer\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Opcodes\\LogViewer\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            BetterLogViewerServiceProvider::class,
+            LogViewerServiceProvider::class,
         ];
     }
 
@@ -29,7 +29,7 @@ class TestCase extends Orchestra
         config()->set('database.default', 'testing');
 
         /*
-        $migration = include __DIR__.'/../database/migrations/create_better-log-viewer_table.php.stub';
+        $migration = include __DIR__.'/../database/migrations/create_log-viewer_table.php.stub';
         $migration->up();
         */
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Arukompas\BetterLogViewer\Exceptions;
+namespace Opcodes\LogViewer\Exceptions;
 
 use Exception;
 

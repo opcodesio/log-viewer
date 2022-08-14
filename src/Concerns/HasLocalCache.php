@@ -1,6 +1,6 @@
 <?php
 
-namespace Arukompas\BetterLogViewer\Concerns;
+namespace Opcodes\LogViewer\Concerns;
 
 use Illuminate\Support\Facades\Cache;
 

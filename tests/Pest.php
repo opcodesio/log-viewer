@@ -1,5 +1,5 @@
 <?php
 
-use Arukompas\BetterLogViewer\Tests\TestCase;
+use Opcodes\LogViewer\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);

@@ -1,13 +1,13 @@
 <?php
 
-namespace Arukompas\BetterLogViewer\Facades;
+namespace Opcodes\LogViewer\Facades;
 
-use Arukompas\BetterLogViewer\LogFile;
+use Opcodes\LogViewer\LogFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @see \Arukompas\BetterLogViewer\BetterLogViewer
+ * @see \Opcodes\LogViewer\LogViewer
  *
  * @method static Collection|LogFile[] getFiles()
  * @method static LogFile|null getFile(string $fileName)
@@ -15,10 +15,10 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getRouteMiddleware()
  * @method static string getRoutePrefix()
  */
-class BetterLogViewer extends Facade
+class LogViewer extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return 'better-log-viewer';
+        return 'log-viewer';
     }
 }
