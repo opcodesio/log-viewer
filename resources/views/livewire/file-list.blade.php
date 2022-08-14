@@ -1,6 +1,6 @@
 <div class="relative overflow-hidden" wire:init="loadFiles">
     <div class="absolute top-0 h-6 w-full bg-gradient-to-b from-gray-100 to-transparent"></div>
-    <div class="relative h-full overflow-y-scroll py-6 pr-4">
+    <div class="relative h-full overflow-y-scroll pt-6 pb-28 pr-4">
         @foreach($files as $logFile)
             <div wire:key="log-file-{{$logFile->name}}"
                 wire:click="selectFile('{{ $logFile->name }}')"

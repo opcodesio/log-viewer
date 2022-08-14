@@ -214,7 +214,8 @@
         }
 
         .log-link {
-            @apply flex items-center;
+            @apply flex items-center w-full;
+            min-width: 68px;
 
             & > svg {
                 @apply h-4 w-4 ml-1 transition duration-200;

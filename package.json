@@ -6,6 +6,7 @@
         "production": "mix --production"
     },
     "devDependencies": {
+        "@ryangjchandler/alpine-clipboard": "^2.2.0",
         "alpinejs": "^3.10.3",
         "autoprefixer": "^10.4.7",
         "laravel-mix": "^6.0.49",
