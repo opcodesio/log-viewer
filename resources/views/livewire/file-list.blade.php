@@ -20,7 +20,7 @@
                 x-on:keydown.escape.prevent.stop="close($refs.button)"
                 x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
                 x-id="['dropdown-button']"
-                class="mb-2 text-gray-800 rounded-md bg-white overflow-hidden transition duration-100 border-2 border-transparent hover:border-emerald-600 cursor-pointer @if($file === $logFile->name) border-emerald-500 bg-emerald-50 @endif"
+                class="mb-2 text-gray-800 rounded-md overflow-hidden transition duration-100 border-2 hover:border-emerald-600 cursor-pointer @if($file === $logFile->name) border-emerald-500 bg-emerald-50 @else border-transparent bg-white @endif"
             >
                 <div
                     class="relative flex justify-between items-center pl-4 pr-10 py-2">

@@ -7,6 +7,16 @@ return [
     'route_path' => 'log-viewer',
 
     /**
+     * When set, displays a link to easily get back to this URL.
+     */
+    'back_to_system_url' => config('app.url', null),
+
+    /**
+     * Optional label to display for the above URL. Defaults to "Back to {{ app.name }}"
+     */
+    'back_to_system_label' => null,
+
+    /**
      * Log Viewer route middleware
      */
     'middleware' => [],

@@ -1,8 +1,8 @@
 <nav class="pagination" wire:key="pagination-next-{{ $paginator->currentPage() }}">
     <div class="previous">
         @if(!$paginator->onFirstPage())
-        <button wire:click="previousPage" wire:loading.attr="disabled" rel="prev" class="border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:border-gray-300">
-            <svg class="mx-3 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><use href="#icon-arrow-left" /></svg>
+        <button wire:click="previousPage" wire:loading.attr="disabled" rel="prev">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><use href="#icon-arrow-left" /></svg>
         </button>
         @endif
     </div>
@@ -29,8 +29,8 @@
     </div>
     <div class="next">
         @if($paginator->hasMorePages())
-        <button wire:click="nextPage" wire:loading.attr="disabled" rel="next" class="border-t-2 border-transparent pt-4 pl-1 inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700 hover:border-gray-300">
-            <svg class="mx-3 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><use href="#icon-arrow-right" /></svg>
+        <button wire:click="nextPage" wire:loading.attr="disabled" rel="next">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><use href="#icon-arrow-right" /></svg>
         </button>
         @endif
     </div>

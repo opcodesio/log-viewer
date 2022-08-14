@@ -229,10 +229,30 @@
 
     .previous {
         @apply -mt-px w-0 flex-1 flex justify-end;
+
+        button {
+            @apply border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-500;
+            &:hover {
+                @apply text-gray-700 border-gray-300;
+            }
+            svg {
+                @apply mx-3 h-5 w-5 text-current;
+            }
+        }
     }
 
     .next {
         @apply -mt-px w-0 flex-1 flex justify-start;
+
+        button {
+            @apply border-t-2 border-transparent pt-4 pl-1 inline-flex items-center text-sm font-medium text-gray-500;
+            &:hover {
+                @apply text-gray-700 border-gray-300;
+            }
+            svg {
+                @apply mx-3 h-5 w-5 text-current;
+            }
+        }
     }
 
     .pages {
