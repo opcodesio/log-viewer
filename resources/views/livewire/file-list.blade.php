@@ -43,6 +43,11 @@
                     class="absolute z-20 right-5 -mt-1 w-40 overflow-hidden rounded-md bg-white border-2 border-emerald-500"
                 >
                     <div>
+                        <button wire:click="clearCache('{{ $logFile->name }}')" x-on:click.stop="close($refs.button)" class="block flex items-center w-full px-4 py-2 text-left text-sm hover:bg-gray-50 disabled:text-gray-500" >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-3 opacity-75 inline-block" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-refresh" /></svg>
+                            Clear cache
+                        </button>
+
                         <button wire:click.stop="download('{{ $logFile->name }}')" class="block flex items-center w-full px-4 py-2 text-left text-sm hover:bg-gray-50 disabled:text-gray-500" >
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-3 opacity-75 inline-block" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-download" /></svg>
                             Download

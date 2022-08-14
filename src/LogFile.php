@@ -50,6 +50,11 @@ class LogFile
         return response()->download($this->path);
     }
 
+    public function clearIndexCache(): void
+    {
+        $this->logs()->clearIndexCache();
+    }
+
     public function delete()
     {
         unlink($this->path);

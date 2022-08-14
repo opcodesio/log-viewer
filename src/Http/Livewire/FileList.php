@@ -2,7 +2,7 @@
 
 namespace Arukompas\BetterLogViewer\Http\Livewire;
 
-use Arukompas\BetterLogViewer\FileListReader;
+use Arukompas\BetterLogViewer\Facades\BetterLogViewer;
 use Arukompas\BetterLogViewer\LogFile;
 use Livewire\Component;
 
@@ -18,7 +18,7 @@ class FileList extends Component
     public function render()
     {
         return view('better-log-viewer::livewire.file-list', [
-            'files' => $this->shouldLoadFiles ? (new FileListReader())->getFiles() : [],
+            'files' => $this->shouldLoadFiles ? BetterLogViewer::getFiles() : [],
         ]);
     }
 
@@ -44,11 +44,20 @@ class FileList extends Component
 
     public function download(string $fileName)
     {
-        return FileListReader::findByName($fileName)?->download();
+        return BetterLogViewer::getFile($fileName)?->download();
     }
 
     public function deleteFile(string $fileName)
     {
-        FileListReader::findByName($fileName)?->delete();
+        BetterLogViewer::getFile($fileName)?->delete();
+    }
+
+    public function clearCache(string $fileName)
+    {
+        BetterLogViewer::getFile($fileName)?->clearIndexCache();
+
+        if ($this->file === $fileName) {
+            $this->emit('fileSelected', $this->file);
+        }
     }
 }

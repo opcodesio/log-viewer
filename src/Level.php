@@ -12,16 +12,27 @@ enum Level: string
     case Critical = 'critical';
     case Alert = 'alert';
     case Emergency = 'emergency';
+    case Processing = 'processing';
     case Processed = 'processed';
     case Failed = 'failed';
+    case None = '';
 
     public function getClass(): string
     {
         return match ($this) {
-            self::Debug, self::Info, self::Notice, self::Processed => 'info',
+            self::Processed => 'success',
+            self::Debug, self::Info, self::Notice, self::Processing => 'info',
             self::Warning, self::Failed => 'warning',
             self::Error, self::Critical, self::Alert, self::Emergency => 'danger',
             default => 'none',
         };
+    }
+
+    public static function caseValues(): array
+    {
+        return array_map(
+            fn (\UnitEnum $case) => $case->value,
+            self::cases()
+        );
     }
 }

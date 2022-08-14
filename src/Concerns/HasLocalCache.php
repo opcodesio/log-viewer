@@ -55,6 +55,11 @@ trait HasLocalCache
         Cache::put($key, $value, $ttl);
     }
 
+    protected function clearRemoteCache(string $key): void
+    {
+        Cache::forget($key);
+    }
+
     protected function cacheSet(string $key, mixed $value = null, $ttl = null): void
     {
         $this->setLocalCache($key, $value);

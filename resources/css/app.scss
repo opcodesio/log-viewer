@@ -6,6 +6,18 @@
 .log-item {
     @apply bg-white transition duration-200 cursor-pointer;
 
+    &.success {
+        &:hover, &.active {
+            @apply bg-emerald-50 border-emerald-200;
+        }
+        .log-level-indicator {
+            @apply bg-emerald-600;
+        }
+        .log-level {
+            @apply text-emerald-600;
+        }
+    }
+
     &.info {
         &:hover, &.active {
             @apply bg-sky-50 border-sky-200;
@@ -58,6 +70,29 @@
 /** Level Badges **/
 .badge {
     @apply inline-flex items-center text-sm cursor-pointer px-3 py-1 rounded-md mr-2 mt-1 transition duration-200;
+
+    &.success {
+        @apply border border-emerald-200 bg-emerald-50 text-gray-600;
+
+        &:hover { @apply bg-emerald-100; }
+
+        .checkmark {
+            @apply border-emerald-200;
+        }
+
+        &.active {
+            @apply border-emerald-600 bg-emerald-500 text-white;
+            &:hover {
+                @apply bg-emerald-600;
+            }
+            .checkmark {
+                @apply border-emerald-600;
+            }
+            .checkmark > svg {
+                @apply text-emerald-600;
+            }
+        }
+    }
 
     &.info {
         @apply border border-sky-200 bg-sky-50 text-gray-600;

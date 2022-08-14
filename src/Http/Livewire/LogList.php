@@ -3,7 +3,7 @@
 namespace Arukompas\BetterLogViewer\Http\Livewire;
 
 use Arukompas\BetterLogViewer\Exceptions\InvalidRegularExpression;
-use Arukompas\BetterLogViewer\FileListReader;
+use Arukompas\BetterLogViewer\Facades\BetterLogViewer;
 use Arukompas\BetterLogViewer\LogFile;
 use Arukompas\BetterLogViewer\LogReader;
 use Illuminate\Support\Str;
@@ -40,8 +40,7 @@ class LogList extends Component
 
     public function render()
     {
-        /** @var LogFile $file */
-        $file = FileListReader::findByName($this->selectedFileName);
+        $file = BetterLogViewer::getFile($this->selectedFileName);
         $selectedLevels = $this->getSelectedLevels();
         $logQuery = $file?->logs()->only($selectedLevels);
 

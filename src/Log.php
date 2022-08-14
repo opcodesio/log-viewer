@@ -47,19 +47,6 @@ class Log
         $text = $matches[4] . "\n" . $theRestOfIt;
         $this->text = mb_convert_encoding(explode("\n", $text)[0], 'UTF-8', 'UTF-8');
         $this->fullText = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
-
-        // From the old implementation:
-
-        // $log[] = array(
-        //     'context' => $current[3],
-        //     'level' => $level,
-        //     'level_class' => $this->levelClasses[$level],
-        //     'level_img' => $this->levelIcons[$level],
-        //     'date' => Carbon::parse($current[1])->tz($timezone)->toDateTimeString(),
-        //     'text' => mb_convert_encoding($current[4], 'UTF-8', 'UTF-8'),
-        //     'in_file' => isset($current[5]) ? $current[5] : null,
-        //     'stack' => mb_convert_encoding(preg_replace("/^\n*/", '', $log_data[$i]), 'UTF-8', 'UTF-8')
-        // );
     }
 
     public function fullTextMatches(string $query = null): bool

@@ -8,6 +8,7 @@ use Arukompas\BetterLogViewer\Http\Livewire\FileList;
 use Arukompas\BetterLogViewer\Http\Livewire\LogList;
 use Closure;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -30,6 +31,11 @@ class BetterLogViewerServiceProvider extends PackageServiceProvider
             ->hasCommand(BetterLogViewerCommand::class);
     }
 
+    public function packageRegistered()
+    {
+        $this->app->bind('better-log-viewer', BetterLogViewer::class);
+    }
+
     public function boot()
     {
         parent::boot();
@@ -38,7 +44,7 @@ class BetterLogViewerServiceProvider extends PackageServiceProvider
         Livewire::component('blv::log-list', LogList::class);
 
         Event::listen(LogFileDeleted::class, function () {
-            FileListReader::clearCache();
+            \Arukompas\BetterLogViewer\Facades\BetterLogViewer::clearFileCache();
         });
     }
 }

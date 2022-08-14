@@ -12,11 +12,6 @@ return [
     'middleware' => [],
 
     /**
-     * Log Viewer API middleware
-     */
-    'api_middleware' => [],
-
-    /**
      * Include file patterns
      */
     'include_files' => ['*.log'],
@@ -34,6 +29,4 @@ return [
         '/vendor/laravel/framework/',
         '/vendor/barryvdh/laravel-debugbar/'
     ],
-
-    'enable_cache' => true,
 ];

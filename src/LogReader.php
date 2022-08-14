@@ -168,10 +168,7 @@ class LogReader
 
     public static function getDefaultLevels(): array
     {
-        return array_map(
-            fn (\UnitEnum $case) => $case->value,
-            Level::cases()
-        );
+        return Level::caseValues();
     }
 
     public function isOpen(): bool
@@ -693,6 +690,11 @@ class LogReader
         if ($this->requiresScan()) {
             $this->scan();
         }
+    }
+
+    public function clearIndexCache(): void
+    {
+        $this->clearRemoteCache($this->getIndexCacheKey());
     }
 
     protected function requiresScan(): bool
