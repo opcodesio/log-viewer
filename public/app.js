@@ -3037,6 +3037,76 @@ __webpack_require__.r(__webpack_exports__);
 
 alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"].plugin(_ryangjchandler_alpine_clipboard__WEBPACK_IMPORTED_MODULE_1__["default"]);
 window.Alpine = alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"];
+alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"].store('logViewer', {
+  stacksOpen: [],
+  stacksInView: [],
+  stackTops: {},
+  containerTop: 0,
+  isOpen: function isOpen(index) {
+    return this.stacksOpen.includes(index);
+  },
+  toggle: function toggle(index) {
+    console.log('toggling ' + index);
+
+    if (this.isOpen(index)) {
+      this.stacksOpen = this.stacksOpen.filter(function (idx) {
+        return idx !== index;
+      });
+    } else {
+      this.stacksOpen.push(index);
+    }
+
+    this.onScroll();
+  },
+  shouldBeSticky: function shouldBeSticky(index) {
+    return this.isOpen(index) && this.stacksInView.includes(index);
+  },
+  stickTopPosition: function stickTopPosition(index) {
+    var aboveFold = this.pixelsAboveFold(index);
+
+    if (aboveFold < 0) {
+      return Math.max(0, 36 + aboveFold) + 'px';
+    }
+
+    return '36px';
+  },
+  pixelsAboveFold: function pixelsAboveFold(index) {
+    var tbody = document.getElementById('tbody-' + index);
+    if (!tbody) return false;
+    var row = tbody.getClientRects()[0];
+    return row.top + row.height - 73 - this.containerTop;
+  },
+  isInViewport: function isInViewport(index) {
+    return this.pixelsAboveFold(index) > -36;
+  },
+  onScroll: function onScroll(event) {
+    var vm = this;
+    this.stacksOpen.forEach(function (index) {
+      if (vm.isInViewport(index)) {
+        if (!vm.stacksInView.includes(index)) {
+          vm.stacksInView.push(index);
+        }
+
+        vm.stackTops[index] = vm.stickTopPosition(index);
+      } else {
+        vm.stacksInView = vm.stacksInView.filter(function (idx) {
+          return idx !== index;
+        });
+        delete vm.stackTops[index];
+      }
+    });
+  },
+  reset: function reset() {
+    console.log('resetting...');
+    var vm = this;
+    this.stacksOpen = [];
+    this.stacksInView = [];
+    this.stackTops = {};
+    var container = document.getElementById('log-item-container');
+    this.containerTop = container.getBoundingClientRect().top;
+    container.scrollTo(0, 0);
+  }
+});
 alpinejs__WEBPACK_IMPORTED_MODULE_0__["default"].start();
 
 /***/ }),

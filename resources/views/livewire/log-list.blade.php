@@ -1,6 +1,3 @@
-@php
-    /** @var \Opcodes\LogViewer\LogFile $file */
-@endphp
 <div class="h-full w-full py-5 log-list">
 @empty($selectedFileName)
     <div class="flex h-full items-center justify-center">
@@ -16,72 +13,14 @@
             </div>
         </div>
 
-        <div class="relative overflow-hidden text-sm"
-x-data="{
-stacksOpen: [],
-stacksInView: [],
-stackTops: {},
-containerTop: 0,
-isOpen(index) { return this.stacksOpen.includes(index); },
-toggle(index) {
-    console.log('toggling '+index);
-    if (this.isOpen(index)) {
-        this.stacksOpen = this.stacksOpen.filter(idx => idx !== index)
-    } else {
-        this.stacksOpen.push(index)
-    }
-    this.onScroll();
-},
-shouldBeSticky(index) {
-    return this.isOpen(index) && this.stacksInView.includes(index);
-},
-stickTopPosition(index) {
-    var aboveFold = this.pixelsAboveFold(index);
-    if (aboveFold < 0) { return Math.max(0, 36 + aboveFold) + 'px'; }
-    return '36px';
-},
-pixelsAboveFold(index) {
-    var tbody = document.getElementById('tbody-'+index);
-    if (!tbody) return false;
-    var row = tbody.getClientRects()[0];
-    return (row.top + row.height - 73) - this.containerTop;
-},
-isInViewport(index) {
-    var pixels = this.pixelsAboveFold(index);
-    return pixels > -36;
-},
-onScroll(event) {
-    var vm = this;
-    this.stacksOpen.forEach(function (index) {
-        if (vm.isInViewport(index)) {
-            if (!vm.stacksInView.includes(index)) { vm.stacksInView.push(index); }
-            vm.stackTops[index] = vm.stickTopPosition(index);
-        } else {
-            vm.stacksInView = vm.stacksInView.filter(idx => idx !== index);
-            delete vm.stackTops[index];
-        }
-    })
-},
-reset() {
-    var vm = this;
-    this.stacksOpen = [];
-    this.stacksInView = [];
-    this.stackTops = {};
-    const container = document.getElementById('log-item-container');
-    this.containerTop = container.getBoundingClientRect().top;
-    container.scrollTo(0, 0);
-}
-}"
-x-init="reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false' }}) { stacksOpen.push(0) } })"
-        >
+        <div class="relative overflow-hidden text-sm" x-data x-init="$store.logViewer.reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false' }}) { $store.logViewer.stacksOpen.push(0) } })">
 
-            <div id="log-item-container" class="log-item-container h-full overflow-y-scroll px-4" x-on:scroll="onScroll">
+            <div id="log-item-container" class="log-item-container h-full overflow-y-scroll px-4" x-on:scroll="(event) => $store.logViewer.onScroll(event)">
                 <div class="inline-block min-w-full max-w-full align-middle">
-                    <div class="">
 <table wire:key="{{ \Illuminate\Support\Str::random(16) }}"
-   class="table-fixed min-w-full max-w-full border-separate"
-   style="border-spacing: 0"
-   x-init="reset()"
+       class="table-fixed min-w-full max-w-full border-separate"
+       style="border-spacing: 0"
+       x-init="$store.logViewer.reset()"
 >
 <thead class="bg-gray-50">
 <tr>
@@ -114,9 +53,9 @@ x-init="reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false
 @forelse($logs as $index => $log)
 <tbody class="log-group" id="tbody-{{$index}}" data-index="{{ $index }}">
     <tr class="log-item {{ $log->level->getClass() }}"
-        x-on:click="toggle({{$index}})"
-        x-bind:class="[isOpen({{$index}}) ? 'active' : '', shouldBeSticky({{$index}}) ? 'sticky z-2' : '']"
-        x-bind:style="{ top: stackTops[{{$index}}] || 0 }"
+        x-on:click="$store.logViewer.toggle({{$index}})"
+        x-bind:class="[$store.logViewer.isOpen({{$index}}) ? 'active' : '', $store.logViewer.shouldBeSticky({{$index}}) ? 'sticky z-2' : '']"
+        x-bind:style="{ top: $store.logViewer.stackTops[{{$index}}] || 0 }"
     >
         <td class="log-level log-level-icon">
 @if($log->level->getClass() === 'danger') <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-danger" /></svg>
@@ -129,7 +68,7 @@ x-init="reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false
         <td class="max-w-[1px] w-full truncate text-gray-500">{{ $log->text }}</td>
         <td class="whitespace-nowrap text-gray-500 text-xs">@include('log-viewer::partials.log-list-link-button')</td>
     </tr>
-    <tr x-show="isOpen({{$index}})"><td colspan="6"><pre class="log-stack">{{ $log->fullText }}</pre></td></tr>
+    <tr x-show="$store.logViewer.isOpen({{$index}})"><td colspan="6"><pre class="log-stack">{{ $log->fullText }}</pre></td></tr>
 </tbody>
 @empty
 <tbody>
@@ -148,7 +87,6 @@ x-init="reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false
 </tbody>
 @endforelse
 </table>
-                    </div>
                 </div>
             </div>
 
@@ -160,12 +98,12 @@ x-init="reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false
         </div>
 
         @if($logs->hasPages())
-        <div class="px-4 mb-2">
+        <div class="px-4">
             {{ $logs->links('log-viewer::pagination') }}
         </div>
         @endif
 
-        <div class="text-right px-4">
+        <div class="text-right px-4 mt-2">
             <p class="text-xs text-gray-400">Memory: <span class="font-semibold">{{ $memoryUsage }}</span>, Duration: <span class="font-semibold">{{ $requestTime }}</span></p>
         </div>
     </div>

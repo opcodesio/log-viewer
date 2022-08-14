@@ -199,7 +199,7 @@ class LogReader
 
         $this->loadIndexFromCache();
 
-        return $this->reset();
+        return $this;
     }
 
     /**
