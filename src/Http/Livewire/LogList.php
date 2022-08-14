@@ -47,7 +47,8 @@ class LogList extends Component
         try {
             $logQuery?->search($this->query);
             if (Str::startsWith($this->query, 'log-index:')) {
-                $expandAutomatically = intval(explode(':', $this->query)[1]);
+                $logIndex = explode(':', $this->query)[1];
+                $expandAutomatically = intval($logIndex) || $logIndex === '0';
             }
         } catch (InvalidRegularExpression $exception) {
             $this->queryError = $exception->getMessage();

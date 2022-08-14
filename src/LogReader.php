@@ -529,9 +529,9 @@ class LogReader
     {
         $page = $page ?: Paginator::resolveCurrentPage('page');
 
-        if ($this->onlyShowIndex) {
+        if (!is_null($this->onlyShowIndex)) {
             return new LengthAwarePaginator(
-                [$this->getLogAtIndex($this->onlyShowIndex)],
+                [$this->reset()->getLogAtIndex($this->onlyShowIndex)],
                 1,
                 $perPage,
                 $page
