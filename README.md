@@ -13,6 +13,15 @@ You will no longer need to read the raw Laravel log files trying to find what yo
 
 Log Viewer helps you **search**, **filter**, and make sense of your Laravel logs **fast**. It is free and easy to install
 
+### Features
+- 📂 **View all the Laravel logs** in your `storage/logs` directory,
+- 🔍 **Search** the logs,
+- 🎚 **Filter** by log level (error, info, debug, etc),
+- 🔗 **Sharable links** to individual log entries,
+- 💾 **Download & delete** log files from the UI,
+- ☑️ **Horizon** log support,
+- and more...
+
 ## Requirements
 
 Log Viewer requires:
