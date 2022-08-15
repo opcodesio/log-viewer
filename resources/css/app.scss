@@ -270,9 +270,9 @@
 
 .search {
     input {
-        @apply border rounded-md pl-3 pr-10 py-2 text-sm w-full border-gray-300;
+        @apply border rounded-md pl-3 pr-10 py-2 text-sm w-full border-gray-300 ring-2 ring-transparent transition duration-200;
         &:focus {
-            @apply outline-emerald-500 border-transparent;
+            @apply outline-none ring-emerald-500 border-transparent;
         }
     }
     &.has-error input {
@@ -288,5 +288,34 @@
             &:hover { @apply text-gray-600; }
             & > svg { @apply h-5 w-5; }
         }
+    }
+}
+
+.dropdown {
+    @apply absolute z-40 right-5 -mt-1 overflow-hidden rounded-md bg-white border border-emerald-500 border-opacity-50 shadow-md;
+
+    button, a {
+        @apply block flex items-center w-full px-4 py-2 text-left text-sm outline-emerald-500;
+        & > svg {
+            @apply w-4 h-4 mr-3 text-gray-400;
+        }
+    }
+    button:hover, a:hover {
+        @apply bg-gray-50;
+    }
+
+    .divider {
+        @apply w-full border-t my-2;
+    }
+
+    .label {
+        @apply text-xs font-semibold text-gray-400 ml-4 my-1;
+    }
+}
+
+.file-dropdown-button {
+    @apply absolute top-0 right-0 bottom-0 w-8 flex items-center justify-center border-l-2 border-transparent text-gray-500 outline-emerald-500 transition duration-200;
+    &:hover {
+        @apply border-emerald-600 bg-emerald-50;
     }
 }

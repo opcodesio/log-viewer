@@ -1,4 +1,4 @@
-<div class="h-full w-full py-5 log-list">
+<div class="h-full w-full py-5 log-list" @if($refreshAutomatically) wire:poll @endif>
 @empty($selectedFileName)
     <div class="flex h-full items-center justify-center">
         Please select a file...
@@ -6,10 +6,13 @@
 @else
     <div class="flex flex-col h-full w-full mx-3 mb-4">
         <div class="px-4 mb-4 flex items-start">
-            <div class="flex-1 mr-6">@include('log-viewer::partials.log-list-level-buttons')</div>
+            <div class="flex-1 flex items-center mr-6">
+                <div>@include('log-viewer::partials.log-list-level-buttons')</div>
+            </div>
             <div class="flex-1 flex items-center">
                 <div class="flex-1">@include('log-viewer::partials.search-input')</div>
-                @include('log-viewer::partials.log-list-share-page-button')
+                <div class="ml-5">@include('log-viewer::partials.log-list-share-page-button')</div>
+                <div class="ml-2">@include('log-viewer::partials.site-settings-dropdown')</div>
             </div>
         </div>
 

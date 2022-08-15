@@ -31,4 +31,14 @@ return [
      * Exclude file patterns. This will take precedence
      */
     'exclude_files' => [],
+
+    /**
+     * Shorter stack trace filters. Any lines containing any of the below strings will be excluded from the full log.
+     * Only active when the setting is on, which can be toggled in the user interface.
+     */
+    'shorter_stack_trace_excludes' => [
+        '/vendor/symfony/',
+        '/vendor/laravel/framework/',
+        '/vendor/barryvdh/laravel-debugbar/'
+    ]
 ];

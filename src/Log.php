@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Dotenv\Util\Regex;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
@@ -45,7 +46,31 @@ class Log
         }
 
         $text = $matches[4] . "\n" . $theRestOfIt;
-        $this->text = mb_convert_encoding(explode("\n", $text)[0], 'UTF-8', 'UTF-8');
+        $this->text = mb_convert_encoding(explode("\n", $text, 2)[0], 'UTF-8', 'UTF-8');
+
+        if (session()->get('log-viewer:shorter-stack-traces', false)) {
+            $excludes = config('log-viewer.shorter_stack_trace_excludes', []);
+            $emptyLineCharacter = '    ...';
+            $lines = explode("\n", $text);
+            $filteredLines = [];
+            foreach ($lines as $line) {
+                $shouldExclude = false;
+                foreach ($excludes as $excludePattern) {
+                    if (str_contains($line, $excludePattern)) {
+                        $shouldExclude = true;
+                        break;
+                    }
+                }
+
+                if ($shouldExclude && end($filteredLines) !== $emptyLineCharacter) {
+                    $filteredLines[] = $emptyLineCharacter;
+                } elseif (!$shouldExclude) {
+                    $filteredLines[] = $line;
+                }
+            }
+            $text = implode("\n", $filteredLines);
+        }
+
         $this->fullText = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
     }
 

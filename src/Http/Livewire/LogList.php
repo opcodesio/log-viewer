@@ -23,6 +23,8 @@ class LogList extends Component
     public int $perPage = 50;
     public string $direction = self::NEWEST_FIRST;
     public ?int $log = null;
+    public bool $shorterStackTraces = false;
+    public bool $refreshAutomatically = false;
 
     protected $queryString = [
         'query' => ['except' => ''],
@@ -108,6 +110,16 @@ class LogList extends Component
         $this->saveSelectedLevels($selectedLevels);
     }
 
+    public function reloadResults()
+    {
+        //
+    }
+
+    public function clearCacheAll()
+    {
+        LogViewer::getFiles()->each->clearIndexCache();
+    }
+
     public function updatedPerPage($value)
     {
         $this->savePreferences();
@@ -115,6 +127,18 @@ class LogList extends Component
 
     public function updatedDirection($value)
     {
+        $this->savePreferences();
+    }
+
+    public function toggleShorterStackTraces()
+    {
+        $this->shorterStackTraces = !$this->shorterStackTraces;
+        $this->savePreferences();
+    }
+
+    public function toggleAutomaticRefresh()
+    {
+        $this->refreshAutomatically = !$this->refreshAutomatically;
         $this->savePreferences();
     }
 
@@ -139,7 +163,10 @@ class LogList extends Component
         session()->put('log-viewer:log-list-preferences', [
             'per_page' => $this->perPage,
             'direction' => $this->direction,
+            'shorter_stack_traces' => $this->shorterStackTraces,
+            'refresh_automatically' => $this->refreshAutomatically,
         ]);
+        session()->put('log-viewer:shorter-stack-traces', $this->shorterStackTraces);
     }
 
     public function loadPreferences(): void
@@ -148,5 +175,7 @@ class LogList extends Component
 
         $this->perPage = $prefs['per_page'] ?? $this->perPage;
         $this->direction = $prefs['direction'] ?? $this->direction;
+        $this->shorterStackTraces = $prefs['shorter_stack_traces'] ?? $this->shorterStackTraces;
+        $this->refreshAutomatically = $prefs['refresh_automatically'] ?? $this->refreshAutomatically;
     }
 }
