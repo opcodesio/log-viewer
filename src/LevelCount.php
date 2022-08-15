@@ -8,5 +8,6 @@ class LevelCount
         public Level $level,
         public int $count = 0,
         public bool $selected = false,
-    ) {}
+    ) {
+    }
 }

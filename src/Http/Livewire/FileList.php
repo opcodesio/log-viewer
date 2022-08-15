@@ -2,13 +2,13 @@
 
 namespace Opcodes\LogViewer\Http\Livewire;
 
-use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\LogFile;
 use Livewire\Component;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 class FileList extends Component
 {
     public bool $shouldLoadFiles = false;
+
     public string $file = '';
 
     protected $queryString = [
@@ -26,7 +26,7 @@ class FileList extends Component
     {
         $this->shouldLoadFiles = true;
 
-        if (!empty($this->file)) {
+        if (! empty($this->file)) {
             $this->emit('fileSelected', $this->file);
         }
     }

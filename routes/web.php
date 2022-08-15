@@ -1,7 +1,7 @@
 <?php
 
-use Opcodes\LogViewer\Facades\LogViewer;
 use Illuminate\Support\Facades\Route;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 Route::middleware(LogViewer::getRouteMiddleware())
     ->prefix(LogViewer::getRoutePrefix())

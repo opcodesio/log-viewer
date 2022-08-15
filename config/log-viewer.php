@@ -39,6 +39,6 @@ return [
     'shorter_stack_trace_excludes' => [
         '/vendor/symfony/',
         '/vendor/laravel/framework/',
-        '/vendor/barryvdh/laravel-debugbar/'
-    ]
+        '/vendor/barryvdh/laravel-debugbar/',
+    ],
 ];

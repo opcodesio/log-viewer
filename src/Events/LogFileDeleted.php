@@ -2,8 +2,8 @@
 
 namespace Opcodes\LogViewer\Events;
 
-use Opcodes\LogViewer\LogFile;
 use Illuminate\Foundation\Events\Dispatchable;
+use Opcodes\LogViewer\LogFile;
 
 class LogFileDeleted
 {
@@ -11,5 +11,6 @@ class LogFileDeleted
 
     public function __construct(
         public LogFile $file
-    ) {}
+    ) {
+    }
 }
