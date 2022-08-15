@@ -4,7 +4,7 @@ return [
     /**
      * Log Viewer route path.
      */
-    'route_path' => 'logs',
+    'route_path' => 'log-viewer',
 
     /**
      * When set, displays a link to easily get back to this URL.
@@ -18,7 +18,7 @@ return [
     'back_to_system_label' => null,
 
     /**
-     * Log Viewer route middleware
+     * Log Viewer route middleware. The 'web' middleware is applied by default.
      */
     'middleware' => [],
 

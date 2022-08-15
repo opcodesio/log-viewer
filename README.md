@@ -1,20 +1,23 @@
+![log-viewer-screenshot](https://user-images.githubusercontent.com/8697942/184591230-e6dfb1e6-215e-418b-a61e-58c9cdbb392a.png)
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/support-ukraine.svg?t=1" />](https://supportukrainenow.org)
-
-# Fast and easy-to-use log viewer for your Laravel application
+# Fast and easy-to-use Log Viewer for your Laravel application
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 [![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/opcodesio/log-viewer/run-tests?label=tests)](https://github.com/opcodesio/log-viewer/actions?query=workflow%3Arun-tests+branch%3Amain)
 [![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/opcodesio/log-viewer/Check%20&%20fix%20styling?label=code%20style)](https://github.com/opcodesio/log-viewer/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+[OPcodes's](https://www.opcodes.io/) **Log Viewer** is a perfect companion for your Laravel app.
 
-## Support us
+You will no longer need to read the raw Laravel log files trying to find what you're looking for.
 
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
+Log Viewer helps you **search**, **filter**, and make sense of your Laravel logs **fast**. It is free and easy to install
 
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+## Requirements
+
+Log Viewer requires:
+- **PHP 8.1** or higher
+- **Laravel 9** or higher
 
 ## Installation
 
@@ -22,13 +25,6 @@ You can install the package via composer:
 
 ```bash
 composer require opcodesio/log-viewer
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="log-viewer-migrations"
-php artisan migrate
 ```
 
 You can publish the config file with:
@@ -41,27 +37,54 @@ This is the contents of the published config file:
 
 ```php
 return [
+    /**
+     * Log Viewer route path.
+     */
+    'route_path' => 'log-viewer',
+
+    /**
+     * When set, displays a link to easily get back to this URL.
+     * Set to `null` to hide this link.
+     */
+    'back_to_system_url' => config('app.url', null),
+
+    /**
+     * Optional label to display for the above URL. Defaults to "Back to {{ app.name }}"
+     */
+    'back_to_system_label' => null,
+
+    /**
+     * Log Viewer route middleware. The 'web' middleware is applied by default.
+     */
+    'middleware' => [],
+
+    /**
+     * Include file patterns
+     */
+    'include_files' => ['*.log'],
+
+    /**
+     * Exclude file patterns. This will take precedence
+     */
+    'exclude_files' => [],
+
+    /**
+     * Shorter stack trace filters. Any lines containing any of the below strings will be excluded from the full log.
+     * Only active when the setting is on, which can be toggled in the user interface.
+     */
+    'shorter_stack_trace_excludes' => [
+        '/vendor/symfony/',
+        '/vendor/laravel/framework/',
+        '/vendor/barryvdh/laravel-debugbar/'
+    ]
 ];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="log-viewer-views"
 ```
 
 ## Usage
 
-```php
-$betterLogViewer = new Arukompas\BetterLogViewer();
-echo $betterLogViewer->echoPhrase('Hello, Arukompas!');
-```
+Once installed, you can access it simply by going to `{APP_URL}/log-viewer` in your browser.
 
-## Testing
-
-```bash
-composer test
-```
+You can change the route in the `config/log-viewer.php`.
 
 ## Changelog
 
