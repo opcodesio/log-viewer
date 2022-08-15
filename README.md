@@ -2,10 +2,10 @@
 
 # Fast and easy-to-use Log Viewer for your Laravel application
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
-[![GitHub Tests Action Status](https://img.shields.io/github/workflow/status/opcodesio/log-viewer/run-tests?label=tests)](https://github.com/opcodesio/log-viewer/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/workflow/status/opcodesio/log-viewer/Check%20&%20fix%20styling?label=code%20style)](https://github.com/opcodesio/log-viewer/actions?query=workflow%3A"Check+%26+fix+styling"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
+[![Packagist](https://img.shields.io/packagist/v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
+[![Packagist](https://img.shields.io/packagist/dm/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
+[![PHP from Packagist](https://img.shields.io/packagist/php-v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
+[![Laravel Version](https://img.shields.io/badge/Laravel-9.x-brightgreen.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 
 [OPcodes's](https://www.opcodes.io/) **Log Viewer** is a perfect companion for your Laravel app.
 
