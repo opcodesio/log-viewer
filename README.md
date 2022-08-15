@@ -1,17 +1,17 @@
 ![log-viewer-screenshot](https://user-images.githubusercontent.com/8697942/184591230-e6dfb1e6-215e-418b-a61e-58c9cdbb392a.png)
 
-# Fast and easy-to-use Log Viewer for your Laravel application
+# Fast and easy-to-use Log Viewer for Laravel
 
 [![Packagist](https://img.shields.io/packagist/v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 [![Packagist](https://img.shields.io/packagist/dm/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 [![Laravel Version](https://img.shields.io/badge/Laravel-8.x,%209.x-brightgreen.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 
-[OPcodes's](https://www.opcodes.io/) **Log Viewer** is a perfect companion for your Laravel app.
+[OPcodes's](https://www.opcodes.io/) **Log Viewer** is a perfect companion for your [Laravel](https://laravel.com/) app.
 
 You will no longer need to read the raw Laravel log files trying to find what you're looking for.
 
-Log Viewer helps you **search**, **filter**, and make sense of your Laravel logs **fast**. It is free and easy to install
+Log Viewer helps you quickly and clearly see individual log entries, to **search**, **filter**, and make sense of your Laravel logs **fast**. It is free and easy to install.
 
 ### Features
 - 📂 **View all the Laravel logs** in your `storage/logs` directory,
