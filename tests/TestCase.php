@@ -2,8 +2,8 @@
 
 namespace Opcodes\LogViewer\Tests;
 
-use Opcodes\LogViewer\LogViewerServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Opcodes\LogViewer\LogViewerServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 class TestCase extends Orchestra

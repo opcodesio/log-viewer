@@ -3,14 +3,14 @@
 namespace Opcodes\LogViewer;
 
 use Opcodes\LogViewer\Events\LogFileDeleted;
-use Illuminate\Support\Facades\Cache;
 
 class LogFile
 {
     public function __construct(
         public string $name,
         public string $path,
-    ) {}
+    ) {
+    }
 
     public static function fromPath(string $filePath): LogFile
     {
@@ -35,14 +35,14 @@ class LogFile
         $size = $this->size();
 
         if ($size > ($gb = 1024 * 1024 * 1024)) {
-            return number_format($size / $gb, 2) . ' GB';
+            return number_format($size / $gb, 2).' GB';
         } elseif ($size > ($mb = 1024 * 1024)) {
-            return number_format($size / $mb, 2) . ' MB';
+            return number_format($size / $mb, 2).' MB';
         } elseif ($size > ($kb = 1024)) {
-            return number_format($size / $kb, 2) . ' KB';
+            return number_format($size / $kb, 2).' KB';
         }
 
-        return $size . ' bytes';
+        return $size.' bytes';
     }
 
     public function download()

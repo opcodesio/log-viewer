@@ -2,13 +2,11 @@
 
 namespace Opcodes\LogViewer;
 
+use Illuminate\Support\Facades\Event;
+use Livewire\Livewire;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Http\Livewire\FileList;
 use Opcodes\LogViewer\Http\Livewire\LogList;
-use Closure;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Route;
-use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 

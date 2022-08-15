@@ -77,6 +77,7 @@ trait HasLocalCache
 
         if ($this->hasRemoteCache($key)) {
             $this->setLocalCache($key, $this->getRemoteCache($key));
+
             return $this->getLocalCache($key);
         }
 

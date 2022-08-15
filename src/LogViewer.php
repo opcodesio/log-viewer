@@ -6,22 +6,22 @@ use Illuminate\Support\Collection;
 
 class LogViewer
 {
-    static ?Collection $_cachedFiles = null;
+    public static ?Collection $_cachedFiles = null;
 
     /**
      * @return Collection|LogFile[]
      */
     public function getFiles()
     {
-        if (!isset(self::$_cachedFiles)) {
+        if (! isset(self::$_cachedFiles)) {
             $files = [];
 
             foreach (config('log-viewer.include_files', []) as $pattern) {
-                $files = array_merge($files, glob(storage_path() . '/logs/' . $pattern));
+                $files = array_merge($files, glob(storage_path().'/logs/'.$pattern));
             }
 
             foreach (config('log-viewer.exclude_files', []) as $pattern) {
-                $files = array_diff($files, glob(storage_path() . '/logs/' . $pattern));
+                $files = array_diff($files, glob(storage_path().'/logs/'.$pattern));
             }
 
             $files = array_reverse($files);

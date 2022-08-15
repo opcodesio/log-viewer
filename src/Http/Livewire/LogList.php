@@ -2,28 +2,35 @@
 
 namespace Opcodes\LogViewer\Http\Livewire;
 
-use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
-use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\LogFile;
-use Opcodes\LogViewer\LogReader;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
+use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogReader;
 
 class LogList extends Component
 {
     use WithPagination;
 
     const OLDEST_FIRST = 'asc';
+
     const NEWEST_FIRST = 'desc';
 
     public string $selectedFileName = '';
+
     public string $query = '';
+
     public string $queryError = '';
+
     public int $perPage = 50;
+
     public string $direction = self::NEWEST_FIRST;
+
     public ?int $log = null;
+
     public bool $shorterStackTraces = false;
+
     public bool $refreshAutomatically = false;
 
     protected $queryString = [
@@ -63,8 +70,8 @@ class LogList extends Component
         $levels = $logQuery?->getLevelCounts();
         $logs = $logQuery?->paginate($this->perPage);
 
-        $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2) . ' MB';
-        $requestTime = number_format((microtime(true) - LARAVEL_START) * 1000, 0) . 'ms';
+        $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2).' MB';
+        $requestTime = number_format((microtime(true) - LARAVEL_START) * 1000, 0).'ms';
 
         return view('log-viewer::livewire.log-list', [
             'file' => $file,
@@ -132,13 +139,13 @@ class LogList extends Component
 
     public function toggleShorterStackTraces()
     {
-        $this->shorterStackTraces = !$this->shorterStackTraces;
+        $this->shorterStackTraces = ! $this->shorterStackTraces;
         $this->savePreferences();
     }
 
     public function toggleAutomaticRefresh()
     {
-        $this->refreshAutomatically = !$this->refreshAutomatically;
+        $this->refreshAutomatically = ! $this->refreshAutomatically;
         $this->savePreferences();
     }
 
