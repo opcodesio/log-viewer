@@ -23,7 +23,7 @@ class LogList extends Component
 
     public string $queryError = '';
 
-    public int $perPage = 50;
+    public int $perPage = 25;
 
     public string $direction = self::NEWEST_FIRST;
 

@@ -5,7 +5,7 @@
 [![Packagist](https://img.shields.io/packagist/v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 [![Packagist](https://img.shields.io/packagist/dm/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
-[![Laravel Version](https://img.shields.io/badge/Laravel-9.x-brightgreen.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
+[![Laravel Version](https://img.shields.io/badge/Laravel-8.x,%209.x-brightgreen.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 
 [OPcodes's](https://www.opcodes.io/) **Log Viewer** is a perfect companion for your Laravel app.
 
@@ -17,7 +17,7 @@ Log Viewer helps you **search**, **filter**, and make sense of your Laravel logs
 
 Log Viewer requires:
 - **PHP 8.1** or higher
-- **Laravel 9** or higher
+- **Laravel 8, 9** or higher
 
 ## Installation
 
@@ -26,6 +26,12 @@ You can install the package via composer:
 ```bash
 composer require opcodesio/log-viewer
 ```
+
+**That's it!**
+
+The Log Viewer can now be accessed by visiting `{APP_URL}/log-viewer` in your browser.
+
+## Configuration
 
 You can publish the config file with:
 
@@ -82,9 +88,9 @@ return [
 
 ## Usage
 
-Once installed, you can access it simply by going to `{APP_URL}/log-viewer` in your browser.
+Once installed, simply visit `{APP_URL}/log-viewer` in your browser.
 
-You can change the route in the `config/log-viewer.php`.
+You can change the route and its middleware in the `config/log-viewer.php`.
 
 ## Changelog
 
