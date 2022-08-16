@@ -5,16 +5,27 @@ namespace Opcodes\LogViewer;
 class Level
 {
     const Debug = 'debug';
+
     const Info = 'info';
+
     const Notice = 'notice';
+
     const Warning = 'warning';
+
     const Error = 'error';
+
     const Critical = 'critical';
+
     const Alert = 'alert';
+
     const Emergency = 'emergency';
+
     const Processing = 'processing';
+
     const Processed = 'processed';
+
     const Failed = 'failed';
+
     const None = '';
 
     public string $value;
