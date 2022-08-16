@@ -25,7 +25,7 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 ## Requirements
 
 Log Viewer requires:
-- **PHP 8.1** or higher
+- **PHP 8.0** or higher
 - **Laravel 8, 9** or higher
 
 ## Installation
