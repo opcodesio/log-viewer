@@ -56,7 +56,6 @@ Alpine.store('logViewer', {
         })
     },
     reset() {
-        console.log('resetting...');
         let vm = this;
         this.stacksOpen = [];
         this.stacksInView = [];

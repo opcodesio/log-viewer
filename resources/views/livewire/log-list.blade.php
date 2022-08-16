@@ -65,7 +65,7 @@
 @elseif($log->level->getClass() === 'warning') <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-warning" /></svg>
 @else <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-info" /></svg>@endif
         </td>
-        <td class="log-level truncate text-gray-500 hidden lg:table-cell">{{ ucfirst($log->level->value) }}</td>
+        <td class="log-level truncate text-gray-500 hidden lg:table-cell">{{ $log->level->getName() }}</td>
         <td class="whitespace-nowrap text-gray-900">{{ $log->time->toDateTimeString() }}</td>
         <td class="whitespace-nowrap text-gray-500 hidden lg:table-cell">{{ $log->environment }}</td>
         <td class="max-w-[1px] w-full truncate text-gray-500">{{ $log->text }}</td>
