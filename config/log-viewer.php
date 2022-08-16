@@ -18,9 +18,11 @@ return [
     'back_to_system_label' => null,
 
     /**
-     * Log Viewer route middleware. The 'web' middleware is applied by default.
+     * Log Viewer route middleware.
+     * The middleware should enable session and cookies support in order for the Log Viewer to work.
+     * The 'web' middleware will be applied automatically if empty.
      */
-    'middleware' => [],
+    'middleware' => ['web'],
 
     /**
      * Include file patterns

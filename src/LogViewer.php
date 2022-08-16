@@ -56,9 +56,6 @@ class LogViewer
 
     public function getRouteMiddleware(): array
     {
-        $default = ['web'];
-        $userDefined = config('log-viewer.middleware', []) ?: [];
-
-        return array_values(array_unique(array_merge($default, $userDefined)));
+        return config('log-viewer.middleware', []) ?: ['web'];
     }
 }
