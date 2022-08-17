@@ -34,6 +34,7 @@ class LogList extends Component
     public bool $refreshAutomatically = false;
 
     protected $queryString = [
+        'selectedFileName' => ['except' => '', 'as' => 'file'],
         'query' => ['except' => ''],
         'log' => ['except' => ''],
     ];
