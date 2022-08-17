@@ -4,7 +4,6 @@ namespace Opcodes\LogViewer\Http\Livewire;
 
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\LogFile;
 
 class FileList extends Component
 {
