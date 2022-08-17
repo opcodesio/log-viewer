@@ -13,7 +13,19 @@
     @endisset
     @livewireStyles
 </head>
-<body class="h-full px-5">
+<body class="h-full px-5"
+    x-data="{
+        selectedFileName: '{{ $selectedFileName }}',
+        selectFile(name) {
+            if (name && name === this.selectedFileName) {
+                this.selectedFileName = '';
+            } else {
+                this.selectedFileName = name;
+            }
+            this.$dispatch('file-selected', this.selectedFileName);
+        }
+    }"
+>
 <div class="flex h-full max-h-screen max-w-full">
     <div class="hidden md:flex md:w-80 md:flex-col md:fixed md:inset-y-0">
         <nav class="flex flex-col h-full py-5">
@@ -32,7 +44,7 @@
                 @endif
             </div>
 
-            @livewire('log-viewer::file-list')
+            @livewire('log-viewer::file-list', ['selectedFileName' => $selectedFileName])
         </nav>
     </div>
 

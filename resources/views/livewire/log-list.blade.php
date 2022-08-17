@@ -1,4 +1,8 @@
-<div class="h-full w-full py-5 log-list" @if($refreshAutomatically) wire:poll @endif>
+<div class="h-full w-full py-5 log-list" @if($refreshAutomatically) wire:poll @endif
+    x-cloak
+    x-data
+    x-on:file-selected.window="$wire.call('selectFile', $event.detail)"
+>
 @empty($selectedFileName)
     <div class="flex h-full items-center justify-center">
         Please select a file...

@@ -7,39 +7,23 @@ use Opcodes\LogViewer\Facades\LogViewer;
 
 class FileList extends Component
 {
-    public bool $shouldLoadFiles = false;
+    public string $selectedFileName = '';
 
-    public string $file = '';
-
-    protected $queryString = [
-        'file' => ['except' => ''],
-    ];
+    public function mount(string $selectedFileName)
+    {
+        $this->selectedFileName = $selectedFileName;
+    }
 
     public function render()
     {
         return view('log-viewer::livewire.file-list', [
-            'files' => $this->shouldLoadFiles ? LogViewer::getFiles() : [],
+            'files' => LogViewer::getFiles(),
         ]);
     }
 
-    public function loadFiles()
+    public function selectFile(string $name)
     {
-        $this->shouldLoadFiles = true;
-
-        if (! empty($this->file)) {
-            $this->emit('fileSelected', $this->file);
-        }
-    }
-
-    public function selectFile(string $fileName)
-    {
-        if ($fileName === $this->file) {
-            $this->file = '';
-        } else {
-            $this->file = $fileName;
-        }
-
-        $this->emit('fileSelected', $this->file);
+        $this->selectedFileName = $name;
     }
 
     public function download(string $fileName)
@@ -50,14 +34,19 @@ class FileList extends Component
     public function deleteFile(string $fileName)
     {
         LogViewer::getFile($fileName)?->delete();
+
+        if ($this->selectedFileName === $fileName) {
+            $this->selectedFileName = '';
+            $this->emit('fileSelected', $this->selectedFileName);
+        }
     }
 
     public function clearCache(string $fileName)
     {
         LogViewer::getFile($fileName)?->clearIndexCache();
 
-        if ($this->file === $fileName) {
-            $this->emit('fileSelected', $this->file);
+        if ($this->selectedFileName === $fileName) {
+            $this->emit('fileSelected', $this->selectedFileName);
         }
     }
 }

@@ -10,6 +10,7 @@ Route::middleware(LogViewer::getRouteMiddleware())
             return view('log-viewer::index', [
                 'jsPath' => __DIR__.'/../public/app.js',
                 'cssPath' => __DIR__.'/../public/app.css',
+                'selectedFileName' => request()->query('file', ''),
             ]);
         })->name('blv.index');
     });

@@ -1,12 +1,10 @@
-<div class="relative overflow-hidden" wire:init="loadFiles">
+<div class="relative overflow-hidden" x-cloak>
     <div class="absolute top-0 h-6 w-full bg-gradient-to-b from-gray-100 to-transparent"></div>
     <div class="relative h-full overflow-y-scroll pt-6 pb-28 pr-4">
-        @if(!$shouldLoadFiles)
-            <div class="loader">Loading files...</div>
-        @endif
         @foreach($files as $logFile)
             <div wire:key="log-file-{{$logFile->name}}"
                 wire:click="selectFile('{{ $logFile->name }}')"
+                x-on:click="selectFile('{{ $logFile->name }}')"
                 x-data="{
                     open: false,
                     toggle() {
@@ -23,7 +21,8 @@
                 x-on:keydown.escape.prevent.stop="close($refs.button)"
                 x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
                 x-id="['dropdown-button']"
-                class="mb-2 text-gray-800 rounded-md overflow-hidden transition duration-100 border-2 hover:border-emerald-600 cursor-pointer @if($file === $logFile->name) border-emerald-500 bg-emerald-50 @else border-transparent bg-white @endif"
+                class="mb-2 text-gray-800 rounded-md overflow-hidden transition duration-100 border-2 hover:border-emerald-600 cursor-pointer"
+                x-bind:class="[selectedFileName && selectedFileName === '{{ $logFile->name }}' ? 'border-emerald-500 bg-emerald-50' : 'border-transparent bg-white']"
             >
                 <div class="relative flex justify-between items-center pl-4 pr-10 py-2">
                     <p class="text-sm mr-3 whitespace-nowrap">{{ $logFile->name }}</p>
