@@ -22,6 +22,10 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 - ☑️ **Horizon** log support,
 - and more...
 
+### Screenshots
+
+Read the **[release blog post](https://arunas.dev/log-viewer-for-laravel/)** which discovers some of the features of the Log Viewer:
+
 ## Requirements
 
 Log Viewer requires:
@@ -69,9 +73,11 @@ return [
     'back_to_system_label' => null,
 
     /**
-     * Log Viewer route middleware. The 'web' middleware is applied by default.
+     * Log Viewer route middleware.
+     * The middleware should enable session and cookies support in order for the Log Viewer to work.
+     * The 'web' middleware will be applied automatically if empty.
      */
-    'middleware' => [],
+    'middleware' => ['web'],
 
     /**
      * Include file patterns
@@ -90,8 +96,8 @@ return [
     'shorter_stack_trace_excludes' => [
         '/vendor/symfony/',
         '/vendor/laravel/framework/',
-        '/vendor/barryvdh/laravel-debugbar/'
-    ]
+        '/vendor/barryvdh/laravel-debugbar/',
+    ],
 ];
 ```
 
