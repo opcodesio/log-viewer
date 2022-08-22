@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="h-full bg-gray-100">
+<html lang="en" class="h-full bg-gray-100 {{ session('log-viewer:theme') == 'dark' ? 'dark' : '' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -12,8 +12,13 @@
         <style>{!! file_get_contents($cssPath) !!}</style>
     @endisset
     @livewireStyles
+    @if(session('log-viewer:theme', 'system') == 'system')
+        <script>
+            document.documentElement.classList.add('dark')
+        </script>
+    @endif
 </head>
-<body class="h-full px-5"
+<body class="h-full px-5 dark:bg-gray-800 dark:text-gray-50"
     x-data="{
         selectedFileName: '{{ $selectedFileName }}',
         selectFile(name) {
@@ -30,11 +35,12 @@
     <div class="hidden md:flex md:w-80 md:flex-col md:fixed md:inset-y-0">
         <nav class="flex flex-col h-full py-5">
             <div class="mx-3 mb-4">
-                <h1 class="font-semibold text-emerald-800 text-2xl flex items-center">
-                    Log Viewer
+                <h1 class="font-semibold text-emerald-800 dark:text-emerald-400 text-2xl flex items-center">
+                    <a href="{{ route("blv.index") }}">Log Viewer</a>
                     <a href="https://www.github.com/opcodesio/log-viewer" target="_blank" class="ml-3 text-gray-400 hover:text-emerald-800 p-1">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-github" /></svg>
                     </a>
+                    <div class="text-sm">@livewire('log-viewer::theme-switcher')</div>
                 </h1>
                 @if($backUrl = config('log-viewer.back_to_system_url'))
                     <a href="{{ $backUrl }}" class="inline-flex items-center text-sm text-gray-400 hover:text-emerald-800 mt-3">

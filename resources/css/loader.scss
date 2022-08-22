@@ -21,6 +21,9 @@
   -webkit-animation-delay: -0.16s;
   animation-delay: -0.16s;
 }
+.dark .loader {
+  color: #ffffff;
+}
 .loader:before,
 .loader:after {
   content: '';

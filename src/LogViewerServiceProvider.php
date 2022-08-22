@@ -7,6 +7,7 @@ use Livewire\Livewire;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Http\Livewire\FileList;
 use Opcodes\LogViewer\Http\Livewire\LogList;
+use Opcodes\LogViewer\Http\Livewire\ThemeSwitcher;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -37,6 +38,7 @@ class LogViewerServiceProvider extends PackageServiceProvider
 
         Livewire::component('log-viewer::file-list', FileList::class);
         Livewire::component('log-viewer::log-list', LogList::class);
+        Livewire::component('log-viewer::theme-switcher', ThemeSwitcher::class);
 
         Event::listen(LogFileDeleted::class, function () {
             \Opcodes\LogViewer\Facades\LogViewer::clearFileCache();

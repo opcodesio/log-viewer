@@ -15,7 +15,9 @@
     x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
     x-id="['dropdown-button']"
 >
-    <button type="button" class="relative p-2 text-gray-400 group hover:text-gray-500 rounded-md outline-emerald-500 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 transition duration-200"
+    <button type="button" class="relative p-2 text-gray-400 group hover:text-gray-500 rounded-md outline-emerald-500
+    cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 transition duration-200
+    dark:hover:text-gray-50"
             x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')"
     >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-cog" /></svg>

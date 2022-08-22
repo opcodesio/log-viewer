@@ -29,7 +29,7 @@
        style="border-spacing: 0"
        x-init="$store.logViewer.reset()"
 >
-<thead class="bg-gray-50">
+<thead class="bg-gray-50 dark:bg-gray-800">
 <tr>
     <th scope="col" class="w-[60px] pl-4 pr-2 sm:pl-6 lg:pl-8"><span class="sr-only">Level icon</span></th>
     <th scope="col" class="w-[90px] hidden lg:table-cell">Level</th>
@@ -39,11 +39,11 @@
         <div class="flex justify-between">
             <span>Description</span>
             <div>
-                <select wire:model="direction" class="bg-gray-100 px-2 font-normal mr-3 outline-emerald-500">
+                <select wire:model="direction" class="bg-gray-100 dark:bg-gray-700 px-2 font-normal mr-3 outline-emerald-500">
                     <option value="desc">Newest first</option>
                     <option value="asc">Oldest first</option>
                 </select>
-                <select wire:model="perPage" class="bg-gray-100 px-2 font-normal outline-emerald-500">
+                <select wire:model="perPage" class="bg-gray-100 dark:bg-gray-700 px-2 font-normal outline-emerald-500">
                     <option value="10">10 items per page</option>
                     <option value="25">25 items per page</option>
                     <option value="50">50 items per page</option>
@@ -70,9 +70,9 @@
 @else <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-info" /></svg>@endif
         </td>
         <td class="log-level truncate text-gray-500 hidden lg:table-cell">{{ $log->level->getName() }}</td>
-        <td class="whitespace-nowrap text-gray-900">{{ $log->time->toDateTimeString() }}</td>
-        <td class="whitespace-nowrap text-gray-500 hidden lg:table-cell">{{ $log->environment }}</td>
-        <td class="max-w-[1px] w-full truncate text-gray-500">{{ $log->text }}</td>
+        <td class="whitespace-nowrap text-gray-900 dark:text-gray-500">{{ $log->time->toDateTimeString() }}</td>
+        <td class="whitespace-nowrap text-gray-500 dark:text-gray-500 hidden lg:table-cell">{{ $log->environment }}</td>
+        <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-400 log-text">{{ $log->text }}</td>
         <td class="whitespace-nowrap text-gray-500 text-xs">@include('log-viewer::partials.log-list-link-button')</td>
     </tr>
     <tr x-show="$store.logViewer.isOpen({{$index}})"><td colspan="6"><pre class="log-stack">{{ $log->fullText }}</pre></td></tr>
@@ -81,11 +81,11 @@
 <tbody>
 <tr>
     <td colspan="6">
-        <div class="bg-white rounded p-6 mb-6">
+        <div class="bg-white dark:bg-gray-800 rounded p-6 mb-6">
             <div class="text-center font-semibold">No results</div>
             @if(!empty($query))
             <div class="text-center mt-6">
-                <button class="px-3 py-2 border-2 bg-white text-gray-800 hover:border-emerald-600 rounded-md" wire:click="clearQuery">Clear search query</button>
+                <button class="px-3 py-2 border-2 bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-50 dark:border-transparent hover:border-emerald-600 rounded-md" wire:click="clearQuery">Clear search query</button>
             </div>
             @endif
         </div>
@@ -98,7 +98,7 @@
             </div>
 
             <div class="absolute hidden inset-0 top-9 px-4 z-20" wire:loading.class.remove="hidden">
-                <div class="rounded-md bg-white opacity-90 w-full h-full flex items-center justify-center">
+                <div class="rounded-md bg-white dark:bg-gray-800 opacity-90 w-full h-full flex items-center justify-center">
                     <div class="loader">Loading...</div>
                 </div>
             </div>

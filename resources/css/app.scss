@@ -4,11 +4,22 @@
 @import './loader.scss';
 
 .log-item {
-    @apply bg-white transition duration-200 cursor-pointer;
+    @apply bg-white transition duration-200 cursor-pointer dark:bg-gray-800;
 
     &.success {
         &:hover, &.active {
             @apply bg-emerald-50 border-emerald-200;
+            td {
+                @apply dark:text-gray-300;
+            }
+
+            td.log-text {
+                @apply dark:text-gray-200;
+            }
+
+            .log-level {
+                @apply dark:text-emerald-200;
+            }
         }
         .log-level-indicator {
             @apply bg-emerald-600;
@@ -20,37 +31,72 @@
 
     &.info {
         &:hover, &.active {
-            @apply bg-sky-50 border-sky-200;
+            @apply bg-sky-50 border-sky-200 dark:bg-sky-900 dark:border-sky-200;
+            td {
+                @apply dark:text-gray-300;
+            }
+
+            td.log-text {
+                @apply dark:text-gray-200;
+            }
+
+            .log-level {
+                @apply dark:text-sky-200;
+            }
         }
         .log-level-indicator {
-            @apply bg-sky-600;
+            @apply bg-sky-600 dark:text-sky-400;
         }
         .log-level {
-            @apply text-sky-600;
+            @apply text-sky-600 dark:text-sky-400;
         }
     }
 
     &.warning {
         &:hover, &.active {
-            @apply bg-amber-50 border-amber-300;
+            @apply bg-amber-50 border-amber-300 dark:bg-amber-900 dark:border-amber-200;
+
+            td {
+                @apply dark:text-gray-300;
+            }
+
+            td.log-text {
+                @apply dark:text-gray-200;
+            }
+
+            .log-level {
+                @apply dark:text-amber-200;
+            }
         }
         .log-level-indicator {
-            @apply bg-amber-600;
+            @apply bg-amber-600 dark:text-amber-400;
         }
         .log-level {
-            @apply text-amber-600;
+            @apply text-amber-600 dark:text-amber-400;
         }
     }
 
     &.danger {
         &:hover, &.active {
-            @apply bg-rose-50 border-rose-300;
+            @apply bg-rose-50 border-rose-300 dark:bg-rose-900 dark:border-rose-200;
+
+            td {
+                @apply dark:text-gray-300;
+            }
+
+            td.log-text {
+                @apply dark:text-gray-200;
+            }
+
+            .log-level {
+                @apply dark:text-rose-200;
+            }
         }
         .log-level-indicator {
-            @apply bg-rose-600;
+            @apply bg-rose-600 dark:text-rose-400;
         }
         .log-level {
-            @apply text-rose-600;
+            @apply text-rose-600 dark:text-rose-400;
         }
     }
 
@@ -72,16 +118,18 @@
     @apply inline-flex items-center text-sm cursor-pointer px-3 py-1 rounded-md mr-2 mt-1 transition duration-200;
 
     &.success {
-        @apply border border-emerald-200 bg-emerald-50 text-gray-600;
+        @apply border border-emerald-200 bg-emerald-50 text-gray-600 dark:bg-emerald-800 dark:text-sky-50 dark:border-transparent;
 
-        &:hover { @apply bg-emerald-100; }
+        &:hover {
+            @apply bg-emerald-100 dark:bg-emerald-600;
+        }
 
         .checkmark {
             @apply border-emerald-200;
         }
 
         &.active {
-            @apply border-emerald-600 bg-emerald-500 text-white;
+            @apply border-emerald-600 bg-emerald-500 text-white dark:bg-emerald-700;
             &:hover {
                 @apply bg-emerald-600;
             }
@@ -95,16 +143,18 @@
     }
 
     &.info {
-        @apply border border-sky-200 bg-sky-50 text-gray-600;
+        @apply border border-sky-200 bg-sky-50 text-gray-600 dark:bg-sky-800 dark:text-sky-50 dark:border-transparent;
 
-        &:hover { @apply bg-sky-100; }
+        &:hover {
+            @apply bg-sky-100 dark:bg-sky-600;
+        }
 
         .checkmark {
             @apply border-sky-200;
         }
 
         &.active {
-            @apply border-sky-600 bg-sky-500 text-white;
+            @apply border-sky-600 bg-sky-500 text-white dark:bg-sky-700;
             &:hover {
                 @apply bg-sky-600;
             }
@@ -118,9 +168,9 @@
     }
 
     &.warning {
-        @apply border border-amber-200 bg-amber-50 text-gray-600;
+        @apply border border-amber-200 bg-amber-50 text-gray-600 dark:bg-amber-800 dark:text-gray-50 dark:border-transparent;
         &:hover {
-            @apply bg-amber-100;
+            @apply bg-amber-100 dark:bg-amber-600;
         }
 
         & .checkmark {
@@ -128,7 +178,7 @@
         }
 
         &.active {
-            @apply border-amber-600 bg-amber-500 text-white;
+            @apply border-amber-600 bg-amber-500 text-white dark:bg-amber-700;
             &:hover {
                 @apply bg-amber-600;
             }
@@ -142,9 +192,9 @@
     }
 
     &.danger {
-        @apply border border-rose-200 bg-rose-50 text-gray-600;
+        @apply border border-rose-200 bg-rose-50 text-gray-600 dark:bg-rose-800 dark:text-gray-50 dark:border-transparent;
         &:hover {
-            @apply bg-rose-100;
+            @apply bg-rose-100 dark:bg-rose-600;
         }
 
         & .checkmark {
@@ -152,7 +202,7 @@
         }
 
         &.active {
-            @apply border-rose-600 bg-rose-500 text-white;
+            @apply border-rose-600 bg-rose-500 text-white dark:bg-rose-700;
             &:hover {
                 @apply bg-rose-600;
             }
@@ -192,18 +242,18 @@
 
 .log-list {
     table > thead th {
-        @apply sticky top-0 z-10 bg-gray-100 py-2 px-2 text-left text-sm font-semibold text-gray-500;
+        @apply sticky top-0 z-10 bg-gray-100 py-2 px-2 text-left text-sm font-semibold text-gray-500 dark:bg-gray-800 dark:text-gray-50;
     }
 
     .log-group {
-        @apply bg-white relative;
+        @apply bg-white relative dark:bg-gray-800;
 
         .log-item > td {
-            @apply border-t border-gray-200 px-2 py-2 text-sm;
+            @apply border-t border-gray-200 px-2 py-2 text-sm dark:border-transparent;
         }
 
         .log-item > td.log-level-icon {
-            @apply opacity-80 whitespace-nowrap border-t border-gray-200 py-2 pl-4 pr-2 sm:pl-6 lg:pl-8;
+            @apply opacity-80 whitespace-nowrap border-t border-gray-200 py-2 pl-4 pr-2 sm:pl-6 lg:pl-8 dark:border-transparent;
             & > svg {
                 @apply h-5 w-5;
             }
@@ -270,7 +320,7 @@
 
 .search {
     input {
-        @apply border rounded-md pl-3 pr-10 py-2 text-sm w-full border-gray-300 ring-2 ring-transparent transition duration-200;
+        @apply border rounded-md pl-3 pr-10 py-2 text-sm w-full border-gray-300 ring-2 ring-transparent transition duration-200 dark:bg-transparent dark:border-gray-500;
         &:focus {
             @apply outline-none ring-emerald-500 border-transparent;
         }
@@ -292,7 +342,7 @@
 }
 
 .dropdown {
-    @apply absolute z-40 right-5 -mt-1 overflow-hidden rounded-md bg-white border border-emerald-500 border-opacity-50 shadow-md;
+    @apply absolute z-40 right-5 -mt-1 overflow-hidden rounded-md bg-white border border-emerald-500 border-opacity-50 shadow-md dark:bg-gray-700 dark:border-emerald-700;
 
     button, a {
         @apply block flex items-center w-full px-4 py-2 text-left text-sm outline-emerald-500;
@@ -301,7 +351,7 @@
         }
     }
     button:hover, a:hover {
-        @apply bg-gray-50;
+        @apply bg-gray-50 dark:bg-gray-500;
     }
 
     .divider {
@@ -314,8 +364,23 @@
 }
 
 .file-dropdown-button {
-    @apply absolute top-0 right-0 bottom-0 w-8 flex items-center justify-center border-l-2 border-transparent text-gray-500 outline-emerald-500 transition duration-200;
+    @apply absolute top-0 right-0 bottom-0 w-8 flex items-center justify-center border-l-2 border-transparent text-gray-500 dark:text-gray-400 outline-emerald-500 transition duration-200;
     &:hover {
-        @apply border-emerald-600 bg-emerald-50;
+        @apply border-emerald-600 bg-emerald-50 dark:bg-emerald-700 dark:text-gray-300;
     }
+}
+
+
+/* Customise scrollbars so they fit with the UI in dark mode */
+/* Based on https://css-tricks.com/the-current-state-of-styling-scrollbars-in-css */
+.dark ::-webkit-scrollbar {
+    /* Foreground, Background */
+    scrollbar-color: theme('colors.gray.500') theme('colors.gray.700');
+}
+.dark ::-webkit-scrollbar {
+    background-color: theme('colors.gray.700');
+}
+
+.dark ::-webkit-scrollbar-thumb {  /* Foreground */
+    background-color: theme('colors.gray.500');
 }
