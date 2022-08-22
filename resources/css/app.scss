@@ -9,6 +9,7 @@
     &.success {
         &:hover, &.active {
             @apply bg-emerald-50 border-emerald-200;
+
             td {
                 @apply dark:text-gray-300;
             }
@@ -32,6 +33,7 @@
     &.info {
         &:hover, &.active {
             @apply bg-sky-50 border-sky-200 dark:bg-sky-900 dark:border-sky-200;
+
             td {
                 @apply dark:text-gray-300;
             }
@@ -102,13 +104,25 @@
 
     &.none {
         &:hover, &.active {
-            @apply bg-gray-50 border-gray-300;
+            @apply bg-gray-50 border-gray-300 dark:bg-gray-900 dark:border-gray-200;
+
+            td {
+                @apply dark:text-gray-300;
+            }
+
+            td.log-text {
+                @apply dark:text-gray-200;
+            }
+
+            .log-level {
+                @apply dark:text-gray-200;
+            }
         }
         .log-level-indicator {
-            @apply bg-gray-600;
+            @apply bg-gray-600 dark:text-gray-400;
         }
         .log-level {
-            @apply text-gray-600;
+            @apply text-gray-600 dark:text-gray-400;
         }
     }
 }
@@ -216,9 +230,9 @@
     }
 
     &.none {
-        @apply border border-gray-200 bg-gray-50 text-gray-600;
+        @apply border border-gray-200 bg-gray-50 text-gray-600 dark:bg-gray-800 dark:text-gray-50 dark:border-transparent;
         &:hover {
-            @apply bg-gray-100;
+            @apply bg-gray-100 dark:bg-gray-600;
         }
 
         & .checkmark {
@@ -226,7 +240,7 @@
         }
 
         &.active {
-            @apply border-gray-600 bg-gray-500 text-white;
+            @apply border-gray-600 bg-gray-500 text-white dark:bg-gray-700;
             &:hover {
                 @apply bg-gray-600;
             }
