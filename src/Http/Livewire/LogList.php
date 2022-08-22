@@ -70,9 +70,10 @@ class LogList extends Component
 
         $levels = $logQuery?->getLevelCounts();
         $logs = $logQuery?->paginate($this->perPage);
+        $startTime = defined('LARAVEL_START') ? LARAVEL_START : request()->server('REQUEST_TIME_FLOAT');
 
         $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2).' MB';
-        $requestTime = number_format((microtime(true) - LARAVEL_START) * 1000, 0).'ms';
+        $requestTime = number_format((microtime(true) - $startTime) * 1000, 0).'ms';
 
         return view('log-viewer::livewire.log-list', [
             'file' => $file,
