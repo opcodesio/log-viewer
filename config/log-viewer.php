@@ -1,43 +1,73 @@
 <?php
 
 return [
-    /**
-     * Log Viewer route path.
-     */
+
+    /*
+    |--------------------------------------------------------------------------
+    | Log Viewer Route
+    |--------------------------------------------------------------------------
+    | Log Viewer will be available under this URL.
+    |
+    */
+
     'route_path' => 'log-viewer',
 
-    /**
-     * When set, displays a link to easily get back to this URL.
-     * Set to `null` to hide this link.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Back to system URL
+    |--------------------------------------------------------------------------
+    | When set, displays a link to easily get back to this URL.
+    | Set to `null` to hide this link.
+    |
+    | Optional label to display for the above URL.
+    |
+    */
+
     'back_to_system_url' => config('app.url', null),
 
-    /**
-     * Optional label to display for the above URL. Defaults to "Back to {{ app.name }}"
-     */
-    'back_to_system_label' => null,
+    'back_to_system_label' => null, // Displayed by default: "Back to {{ app.name }}"
 
-    /**
-     * Log Viewer route middleware.
-     * The middleware should enable session and cookies support in order for the Log Viewer to work.
-     * The 'web' middleware will be applied automatically if empty.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Log Viewer route middleware.
+    |--------------------------------------------------------------------------
+    | The middleware should enable session and cookies support in order for the Log Viewer to work.
+    | The 'web' middleware will be applied automatically if empty.
+    |
+    */
+
     'middleware' => ['web'],
 
-    /**
-     * Include file patterns
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Include file patterns
+    |--------------------------------------------------------------------------
+    |
+    */
+
     'include_files' => ['*.log'],
 
-    /**
-     * Exclude file patterns. This will take precedence
-     */
-    'exclude_files' => [],
+    /*
+    |--------------------------------------------------------------------------
+    | Exclude file patterns.
+    |--------------------------------------------------------------------------
+    | This will take precedence over included files.
+    |
+    */
 
-    /**
-     * Shorter stack trace filters. Any lines containing any of the below strings will be excluded from the full log.
-     * Only active when the setting is on, which can be toggled in the user interface.
-     */
+    'exclude_files' => [
+        //'my_secret.log'
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    |  Shorter stack trace filters.
+    |--------------------------------------------------------------------------
+    | Lines containing any of these strings will be excluded from the full log.
+    | This setting is only active when the fuction is enabled via the user interface.
+    |
+    */
+
     'shorter_stack_trace_excludes' => [
         '/vendor/symfony/',
         '/vendor/laravel/framework/',

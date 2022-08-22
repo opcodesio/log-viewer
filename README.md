@@ -1,11 +1,25 @@
+<div align="center">
+    <p>
+        <h1>Log Viewer<br/>Fast and easy-to-use</h1>
+    </p>
+</div>
+
+<p align="center">
+    <a href="#features">Features</a> |
+    <a href="#installation">Installation</a> |
+    <a href="#configuration">Configuration</a> |
+    <a href="#credits">Credits</a>
+</p>
+
+<p align="center">
+<a href="https://packagist.org/packages/opcodesio/log-viewer"><img src="https://img.shields.io/packagist/v/opcodesio/log-viewer.svg?style=flat-square" alt="Packagist"></a>
+<a href="https://packagist.org/packages/opcodesio/log-viewer"><img src="https://img.shields.io/packagist/dm/opcodesio/log-viewer.svg?style=flat-square" alt="Packagist"></a>
+<a href="https://packagist.org/packages/opcodesio/log-viewer"><img src="https://img.shields.io/packagist/php-v/opcodesio/log-viewer.svg?style=flat-square" alt="PHP from Packagist"></a>
+<a href="https://packagist.org/packages/opcodesio/log-viewer"><img src="https://img.shields.io/badge/Laravel-8.x,%209.x-brightgreen.svg?style=flat-square" alt="Laravel Version"></a>
+</p>
+
 ![log-viewer-screenshot](https://user-images.githubusercontent.com/8697942/184591230-e6dfb1e6-215e-418b-a61e-58c9cdbb392a.png)
 
-# Fast and easy-to-use Log Viewer for Laravel
-
-[![Packagist](https://img.shields.io/packagist/v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
-[![Packagist](https://img.shields.io/packagist/dm/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
-[![PHP from Packagist](https://img.shields.io/packagist/php-v/opcodesio/log-viewer.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
-[![Laravel Version](https://img.shields.io/badge/Laravel-8.x,%209.x-brightgreen.svg?style=flat-square)](https://packagist.org/packages/opcodesio/log-viewer)
 
 [OPcodes's](https://www.opcodes.io/) **Log Viewer** is a perfect companion for your [Laravel](https://laravel.com/) app.
 
@@ -14,98 +28,80 @@ You will no longer need to read the raw Laravel log files trying to find what yo
 Log Viewer helps you quickly and clearly see individual log entries, to **search**, **filter**, and make sense of your Laravel logs **fast**. It is free and easy to install.
 
 ### Features
+
 - 📂 **View all the Laravel logs** in your `storage/logs` directory,
 - 🔍 **Search** the logs,
-- 🎚 **Filter** by log level (error, info, debug, etc),
+- 🎚 **Filter** by log level (error, info, debug, etc.),
 - 🔗 **Sharable links** to individual log entries,
 - 💾 **Download & delete** log files from the UI,
 - ☑️ **Horizon** log support,
 - and more...
 
-### Screenshots
+## Get Started
 
-Read the **[release blog post](https://arunas.dev/log-viewer-for-laravel/)** which discovers some of the features of the Log Viewer:
+### Requirements
 
-## Requirements
+- **PHP 8.0+**
+- **Laravel 8+**
 
-Log Viewer requires:
-- **PHP 8.0** or higher
-- **Laravel 8, 9** or higher
+### Installation
 
-## Installation
-
-You can install the package via composer:
+To install the package via composer, Run:
 
 ```bash
 composer require opcodesio/log-viewer
 ```
 
-**That's it!**
+### Usage
 
-The Log Viewer can now be accessed by visiting `{APP_URL}/log-viewer` in your browser.
+Once the installation is complete, you will be able to access **Log Viewer** directly in your browser.
 
-## Configuration
+By default, the application is available at: `{APP_URL}/log-viewer`.
 
-You can publish the config file with:
+(for example: `https://my-app.test/log-viewer`)
+
+### Configuration
+
+#### Config file
+
+To publish the [config file](https://github.com/opcodesio/log-viewer/blob/main/config/log-viewer.php), run:
 
 ```bash
 php artisan vendor:publish --tag="log-viewer-config"
 ```
 
-This is the contents of the published config file:
+### Route & Middleware
+
+You can easily change the default route and its middleware in the config/log-viewer.php.
+
+See the configuration below:
 
 ```php
-return [
-    /**
-     * Log Viewer route path.
-     */
+    /*
+    |--------------------------------------------------------------------------
+    | Log Viewer Route
+    |--------------------------------------------------------------------------
+    | Log Viewer will be available under this URL.
+    |
+    */
+
     'route_path' => 'log-viewer',
 
-    /**
-     * When set, displays a link to easily get back to this URL.
-     * Set to `null` to hide this link.
-     */
-    'back_to_system_url' => config('app.url', null),
+    /*
+    |--------------------------------------------------------------------------
+    | Log Viewer route middleware.
+    |--------------------------------------------------------------------------
+    | The middleware should enable session and cookies support in order for the Log Viewer to work.
+    | The 'web' middleware will be applied automatically if empty.
+    |
+    */
 
-    /**
-     * Optional label to display for the above URL. Defaults to "Back to {{ app.name }}"
-     */
-    'back_to_system_label' => null,
-
-    /**
-     * Log Viewer route middleware.
-     * The middleware should enable session and cookies support in order for the Log Viewer to work.
-     * The 'web' middleware will be applied automatically if empty.
-     */
     'middleware' => ['web'],
-
-    /**
-     * Include file patterns
-     */
-    'include_files' => ['*.log'],
-
-    /**
-     * Exclude file patterns. This will take precedence
-     */
-    'exclude_files' => [],
-
-    /**
-     * Shorter stack trace filters. Any lines containing any of the below strings will be excluded from the full log.
-     * Only active when the setting is on, which can be toggled in the user interface.
-     */
-    'shorter_stack_trace_excludes' => [
-        '/vendor/symfony/',
-        '/vendor/laravel/framework/',
-        '/vendor/barryvdh/laravel-debugbar/',
-    ],
-];
 ```
 
-## Usage
+## Screenshots
 
-Once installed, simply visit `{APP_URL}/log-viewer` in your browser.
-
-You can change the route and its middleware in the `config/log-viewer.php`.
+Read the **[release blog post](https://arunas.dev/log-viewer-for-laravel/)**  for screenshots and more information about Log Viewer's features.
 
 ## Changelog
 
