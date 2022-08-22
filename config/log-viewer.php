@@ -10,7 +10,7 @@ return [
     |
     */
 
-    'route_path' => 'log-viewer',
+    'route_path' => env('LOG_VIEWER_PATH', 'log-viewer'),
 
     /*
     |--------------------------------------------------------------------------
@@ -36,7 +36,7 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    'middleware' => explode(',', env('LOG_VIEWER_MIDDLEWARE', 'web')),
 
     /*
     |--------------------------------------------------------------------------
