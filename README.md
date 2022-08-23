@@ -99,6 +99,30 @@ See the configuration below:
     'middleware' => ['web'],
 ```
 
+## Authentication
+
+You can easily add authentication to log viewing routes using popular `auth` middleware in the `config/log-viewer.php`.
+
+If your application doesn't use the default authentication solutions, you can use the `auth.basic` [HTTP Basic Authentication](https://laravel.com/docs/9.x/authentication#http-basic-authentication) middleware.
+
+Note: By default, the `auth.basic` middleware will assume the email column on your users database table is the user's "username".
+
+See the `auth` middleware configuration below:
+```php
+    /*
+    |--------------------------------------------------------------------------
+    | Log Viewer route middleware.
+    |--------------------------------------------------------------------------
+    | The middleware should enable session and cookies support in order for the Log Viewer to work.
+    | The 'web' middleware will be applied automatically if empty.
+    |
+    */
+
+    'middleware' => ['web', 'auth'],
+```
+
+For authorization using Spatie permissions [see](https://github.com/opcodesio/log-viewer/discussions/16)
+
 ## Screenshots
 
 Read the **[release blog post](https://arunas.dev/log-viewer-for-laravel/)**  for screenshots and more information about Log Viewer's features.
