@@ -65,6 +65,9 @@
             }
         }
     },
+    "conflict": {
+        "arcanedev/log-viewer": "^8.0" 
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
