@@ -101,7 +101,7 @@ See the configuration below:
 
 ## Authentication
 
-You can easily add authentication to log viewing routes using popular `auth` middleware in the `config/log-viewer.php`.
+You can easily add [authentication](https://laravel.com/docs/9.x/authentication#protecting-routes) to log viewing routes using popular `auth` middleware in the `config/log-viewer.php`.
 
 If your application doesn't use the default authentication solutions, you can use the `auth.basic` [HTTP Basic Authentication](https://laravel.com/docs/9.x/authentication#http-basic-authentication) middleware.
 
@@ -121,7 +121,7 @@ See the `auth` middleware configuration below:
     'middleware' => ['web', 'auth'],
 ```
 
-For authorization using Spatie permissions [see](https://github.com/opcodesio/log-viewer/discussions/16)
+For authorization using Spatie permissions [see this discussion](https://github.com/opcodesio/log-viewer/discussions/16)
 
 ## Screenshots
 
