@@ -58,6 +58,7 @@ class LogFile
     public function delete()
     {
         unlink($this->path);
+        $this->clearIndexCache();
         LogFileDeleted::dispatch($this);
     }
 }
