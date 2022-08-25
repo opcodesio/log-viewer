@@ -17,7 +17,7 @@ class LogList extends Component
 
     const NEWEST_FIRST = 'desc';
 
-    public string $selectedFileName = '';
+    public ?string $selectedFileName = null;
 
     public string $query = '';
 
@@ -33,8 +33,10 @@ class LogList extends Component
 
     public bool $refreshAutomatically = false;
 
+    protected bool $cacheRecentlyCleared;
+
     protected $queryString = [
-        'selectedFileName' => ['except' => '', 'as' => 'file'],
+        'selectedFileName' => ['except' => null, 'as' => 'file'],
         'query' => ['except' => ''],
         'log' => ['except' => ''],
     ];
@@ -82,6 +84,7 @@ class LogList extends Component
             'memoryUsage' => $memoryUsage,
             'requestTime' => $requestTime,
             'expandAutomatically' => $expandAutomatically ?? false,
+            'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
         ]);
     }
 
@@ -97,11 +100,12 @@ class LogList extends Component
         $this->queryError = '';
     }
 
-    public function selectFile(string $fileName)
+    public function selectFile(?string $fileName)
     {
-        if ($this->selectedFileName !== '') {
+        if (isset($this->selectedFileName)) {
             $this->resetPage();
         }
+
         $this->selectedFileName = $fileName;
     }
 
@@ -127,6 +131,8 @@ class LogList extends Component
     public function clearCacheAll()
     {
         LogViewer::getFiles()->each->clearIndexCache();
+
+        $this->cacheRecentlyCleared = true;
     }
 
     public function updatedPerPage($value)

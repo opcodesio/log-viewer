@@ -15,10 +15,10 @@
 </head>
 <body class="h-full px-5"
     x-data="{
-        selectedFileName: '{{ $selectedFileName }}',
+        selectedFileName: @isset($selectedFileName) '{{ $selectedFileName }}' @else null @endisset,
         selectFile(name) {
             if (name && name === this.selectedFileName) {
-                this.selectedFileName = '';
+                this.selectedFileName = null;
             } else {
                 this.selectedFileName = name;
             }

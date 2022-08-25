@@ -3,23 +3,23 @@
     x-data
     x-on:file-selected.window="$wire.call('selectFile', $event.detail)"
 >
-@empty($selectedFileName)
-    <div class="flex h-full items-center justify-center">
-        Please select a file...
-    </div>
-@else
     <div class="flex flex-col h-full w-full mx-3 mb-4">
         <div class="px-4 mb-4 flex items-start">
             <div class="flex-1 flex items-center mr-6">
+                @isset($selectedFileName)
                 <div>@include('log-viewer::partials.log-list-level-buttons')</div>
+                @endisset
             </div>
-            <div class="flex-1 flex items-center">
+            <div class="flex-1 flex items-center @empty($selectedFileName) justify-end @endempty">
+                @isset($selectedFileName)
                 <div class="flex-1">@include('log-viewer::partials.search-input')</div>
                 <div class="ml-5">@include('log-viewer::partials.log-list-share-page-button')</div>
+                @endisset
                 <div class="ml-2">@include('log-viewer::partials.site-settings-dropdown')</div>
             </div>
         </div>
 
+        @isset($selectedFileName)
         <div class="relative overflow-hidden text-sm" x-data x-init="$store.logViewer.reset(); $nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false' }}) { $store.logViewer.stacksOpen.push(0) } })">
 
             <div id="log-item-container" class="log-item-container h-full overflow-y-scroll px-4" x-on:scroll="(event) => $store.logViewer.onScroll(event)">
@@ -103,16 +103,20 @@
                 </div>
             </div>
         </div>
+        @else
+        <div class="flex h-full items-center justify-center text-gray-500">
+            Please select a file...
+        </div>
+        @endisset
 
-        @if($logs->hasPages())
+        @if($logs?->hasPages())
         <div class="px-4">
             {{ $logs->links('log-viewer::pagination') }}
         </div>
         @endif
 
-        <div class="text-right px-4 mt-2">
+        <div class="grow flex flex-col justify-end text-right px-4 mt-2">
             <p class="text-xs text-gray-400">Memory: <span class="font-semibold">{{ $memoryUsage }}</span>, Duration: <span class="font-semibold">{{ $requestTime }}</span></p>
         </div>
     </div>
-@endempty
 </div>

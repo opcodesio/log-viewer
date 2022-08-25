@@ -313,9 +313,40 @@
     }
 }
 
-.file-dropdown-button {
-    @apply absolute top-0 right-0 bottom-0 w-8 flex items-center justify-center border-l-2 border-transparent text-gray-500 outline-emerald-500 transition duration-200;
-    &:hover {
-        @apply border-emerald-600 bg-emerald-50;
+.file-list {
+    @apply relative h-full overflow-y-scroll pt-6 pb-28 pr-4;
+
+    .file-item-container {
+        @apply mb-2 text-gray-800 rounded-md overflow-hidden transition duration-100 border-2 cursor-pointer border-transparent bg-white;
+
+        &.active {
+            @apply border-emerald-500 bg-emerald-50;
+        }
+
+        &:hover {
+            @apply border-emerald-600;
+        }
+
+        .file-item {
+            @apply relative flex justify-between items-center pl-4 pr-10 py-2;
+
+            .file-name {
+                @apply text-sm mr-3 whitespace-nowrap;
+            }
+
+            .file-size {
+                @apply text-xs text-gray-500 whitespace-nowrap;
+            }
+        }
+
+        .file-dropdown-toggle {
+            @apply absolute top-0 right-0 bottom-0 w-8 flex items-center justify-center border-l-2 border-transparent text-gray-500 outline-emerald-500 transition duration-200;
+            &:hover {
+                @apply border-emerald-600 bg-emerald-50;
+            }
+            & > svg {
+                @apply h-4 w-4;
+            }
+        }
     }
 }

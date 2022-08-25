@@ -27,7 +27,7 @@
         x-transition.origin.top.right
         x-on:click.outside="close($refs.button)"
         :id="$id('dropdown-button')"
-        style="display: none;"
+        style="min-width: 230px; display: none;"
         class="dropdown"
     >
         <div class="py-2">
@@ -45,9 +45,10 @@
             <div class="divider"></div>
             <div class="label">Actions</div>
 
-            <button wire:click="clearCacheAll">
+            <button wire:click="clearCacheAll" x-data="{ cacheRecentlyCleared: @json($cacheRecentlyCleared) }" x-init="setTimeout(() => cacheRecentlyCleared = false, 1000)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-database" /></svg>
-                Clear cache for all files
+                <span x-show="!cacheRecentlyCleared">Clear cache for all files</span>
+                <span x-show="cacheRecentlyCleared" class="text-emerald-600">Cache cleared!</span>
             </button>
 
             <button x-data="{ copied: false }" x-clipboard="window.location.href" x-on:click.stop="copied = true; setTimeout(() => copied = false, 1000)">
