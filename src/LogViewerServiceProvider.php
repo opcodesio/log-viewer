@@ -4,6 +4,7 @@ namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
+use Opcodes\LogViewer\Console\Commands\GenerateDummyLogsCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Http\Livewire\FileList;
 use Opcodes\LogViewer\Http\Livewire\LogList;
@@ -23,6 +24,7 @@ class LogViewerServiceProvider extends PackageServiceProvider
             ->name('log-viewer')
             ->hasConfigFile()
             ->hasViews()
+            ->hasCommand(GenerateDummyLogsCommand::class)
             ->hasRoute('web');
     }
 
