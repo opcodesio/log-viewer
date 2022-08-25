@@ -10,7 +10,7 @@
                 <div>@include('log-viewer::partials.log-list-level-buttons')</div>
                 @endisset
             </div>
-            <div class="flex-1 flex items-center @empty($selectedFileName) justify-end @endempty">
+            <div class="flex-1 flex items-center @empty($selectedFileName) justify-end @endempty min-h-[38px]">
                 @isset($selectedFileName)
                 <div class="flex-1">@include('log-viewer::partials.search-input')</div>
                 <div class="ml-5">@include('log-viewer::partials.log-list-share-page-button')</div>
@@ -60,7 +60,7 @@
 </thead>
 
 @forelse($logs as $index => $log)
-<tbody class="log-group" id="tbody-{{$index}}" data-index="{{ $index }}">
+<tbody class="log-group @if($index === 0) first @endif" id="tbody-{{$index}}" data-index="{{ $index }}">
     <tr class="log-item {{ $log->level->getClass() }}"
         x-on:click="$store.logViewer.toggle({{$index}})"
         x-bind:class="[$store.logViewer.isOpen({{$index}}) ? 'active' : '', $store.logViewer.shouldBeSticky({{$index}}) ? 'sticky z-2' : '']"
@@ -80,10 +80,10 @@
     <tr x-show="$store.logViewer.isOpen({{$index}})"><td colspan="6"><pre class="log-stack">{{ $log->fullText }}</pre></td></tr>
 </tbody>
 @empty
-<tbody>
+<tbody class="log-group">
 <tr>
     <td colspan="6">
-        <div class="bg-white dark:bg-gray-800 dark:text-gray-200 rounded p-12">
+        <div class="bg-white text-gray-600 dark:bg-gray-800 dark:text-gray-200 p-12">
             <div class="text-center font-semibold">No results</div>
             @if(!empty($query))
             <div class="text-center mt-6">

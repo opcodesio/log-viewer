@@ -11,10 +11,10 @@
             @apply bg-emerald-50 dark:bg-emerald-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
-            @apply bg-emerald-600 dark:bg-emerald-500;
+            @apply bg-emerald-700 dark:bg-emerald-500;
         }
         .log-level {
-            @apply text-emerald-600 dark:text-emerald-500;
+            @apply text-emerald-700 dark:text-emerald-500;
         }
     }
 
@@ -23,10 +23,10 @@
             @apply bg-sky-50 dark:bg-sky-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
-            @apply bg-sky-600 dark:bg-sky-500;
+            @apply bg-sky-700 dark:bg-sky-500;
         }
         .log-level {
-            @apply text-sky-600 dark:text-sky-500;
+            @apply text-sky-700 dark:text-sky-500;
         }
     }
 
@@ -35,10 +35,10 @@
             @apply bg-amber-50 dark:bg-amber-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
-            @apply bg-amber-600 dark:bg-amber-400;
+            @apply bg-amber-700 dark:bg-amber-400;
         }
         .log-level {
-            @apply text-amber-600 dark:text-amber-400;
+            @apply text-amber-700 dark:text-amber-400;
         }
     }
 
@@ -47,10 +47,10 @@
             @apply bg-rose-50 dark:bg-rose-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
-            @apply bg-rose-600 dark:bg-rose-400;
+            @apply bg-rose-700 dark:bg-rose-400;
         }
         .log-level {
-            @apply text-rose-600 dark:text-rose-400;
+            @apply text-rose-700 dark:text-rose-400;
         }
     }
 
@@ -59,10 +59,10 @@
             @apply bg-gray-50 dark:bg-gray-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
-            @apply bg-gray-600 dark:bg-gray-400;
+            @apply bg-gray-700 dark:bg-gray-400;
         }
         .log-level {
-            @apply text-gray-600 dark:text-gray-400;
+            @apply text-gray-700 dark:text-gray-400;
         }
     }
 }
@@ -86,10 +86,10 @@
         }
 
         &.active {
-            @apply border-emerald-600 bg-emerald-500 text-white
+            @apply border-emerald-700 bg-emerald-600 text-white
               dark:border-emerald-600 dark:bg-emerald-700;
             &:hover {
-                @apply bg-emerald-600
+                @apply bg-emerald-500
                   dark:bg-emerald-800;
             }
             .checkmark {
@@ -118,11 +118,11 @@
         }
 
         &.active {
-            @apply border-sky-600 bg-sky-500 text-white
+            @apply border-sky-700 bg-sky-600 text-white
               dark:border-sky-600 dark:bg-sky-700;
 
             &:hover {
-                @apply bg-sky-600
+                @apply bg-sky-500
                   dark:bg-sky-800;
             }
             .checkmark {
@@ -151,11 +151,11 @@
         }
 
         &.active {
-            @apply border-amber-600 bg-amber-500 text-white
+            @apply border-amber-700 bg-amber-600 text-white
               dark:border-amber-600 dark:bg-amber-700;
 
             &:hover {
-                @apply bg-amber-600
+                @apply bg-amber-500
                   dark:bg-amber-800;
             }
             & .checkmark {
@@ -184,11 +184,11 @@
         }
 
         &.active {
-            @apply border-rose-600 bg-rose-500 text-white
+            @apply border-rose-700 bg-rose-600 text-white
               dark:border-rose-600 dark:bg-rose-700;
 
             &:hover {
-                @apply bg-rose-600
+                @apply bg-rose-500
                   dark:bg-rose-800;
             }
             & .checkmark {
@@ -217,11 +217,11 @@
         }
 
         &.active {
-            @apply border-gray-600 bg-gray-500 text-white
+            @apply border-gray-700 bg-gray-600 text-white
               dark:border-gray-600 dark:bg-gray-700;
 
             &:hover {
-                @apply bg-gray-600
+                @apply bg-gray-500
                   dark:bg-gray-800;
             }
             & .checkmark {
@@ -249,9 +249,16 @@
         }
 
         .log-item > td.log-level-icon {
-            @apply opacity-80 whitespace-nowrap border-t border-gray-200 dark:border-gray-700 py-2 pl-4 pr-2 sm:pl-6 lg:pl-8;
+            @apply whitespace-nowrap border-t border-gray-200 dark:border-gray-700 py-2 pl-4 pr-2 sm:pl-6 lg:pl-8;
             & > svg {
-                @apply h-5 w-5;
+                @apply opacity-75 h-5 w-5;
+            }
+        }
+
+        &.first {
+            .log-item > td,
+            .log-item > td.log-level-icon {
+                @apply border-t-transparent;
             }
         }
 
