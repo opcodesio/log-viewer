@@ -4,7 +4,7 @@
 @import './loader.scss';
 
 .log-item {
-    @apply bg-white dark:bg-gray-700 transition duration-200 cursor-pointer;
+    @apply bg-white dark:bg-gray-800 transition duration-200 cursor-pointer;
 
     &.success {
         &:hover > td, &.active > td {
@@ -35,10 +35,10 @@
             @apply bg-amber-50 dark:bg-amber-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
-            @apply bg-amber-600 dark:bg-amber-500;
+            @apply bg-amber-600 dark:bg-amber-400;
         }
         .log-level {
-            @apply text-amber-600 dark:text-amber-500;
+            @apply text-amber-600 dark:text-amber-400;
         }
     }
 
@@ -47,10 +47,10 @@
             @apply bg-rose-50 dark:bg-rose-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
-            @apply bg-rose-600 dark:bg-rose-500;
+            @apply bg-rose-600 dark:bg-rose-400;
         }
         .log-level {
-            @apply text-rose-600 dark:text-rose-500;
+            @apply text-rose-600 dark:text-rose-400;
         }
     }
 
@@ -59,10 +59,10 @@
             @apply bg-gray-50 dark:bg-gray-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
-            @apply bg-gray-600 dark:bg-gray-500;
+            @apply bg-gray-600 dark:bg-gray-400;
         }
         .log-level {
-            @apply text-gray-600 dark:text-gray-500;
+            @apply text-gray-600 dark:text-gray-400;
         }
     }
 }
@@ -238,25 +238,25 @@
 
 .log-list {
     table > thead th {
-        @apply sticky top-0 z-10 bg-gray-100 dark:bg-gray-800 py-2 px-2 text-left text-sm font-semibold text-gray-500 dark:text-gray-400;
+        @apply sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 py-2 px-2 text-left text-sm font-semibold text-gray-500 dark:text-gray-400;
     }
 
     .log-group {
-        @apply bg-white dark:bg-gray-700 dark:text-gray-200 relative;
+        @apply bg-white dark:bg-gray-800 dark:text-gray-200 relative;
 
         .log-item > td {
-            @apply border-t border-gray-200 dark:border-gray-600 px-2 py-2 text-sm;
+            @apply border-t border-gray-200 dark:border-gray-700 px-2 py-2 text-sm;
         }
 
         .log-item > td.log-level-icon {
-            @apply opacity-80 whitespace-nowrap border-t border-gray-200 dark:border-gray-600 py-2 pl-4 pr-2 sm:pl-6 lg:pl-8;
+            @apply opacity-80 whitespace-nowrap border-t border-gray-200 dark:border-gray-700 py-2 pl-4 pr-2 sm:pl-6 lg:pl-8;
             & > svg {
                 @apply h-5 w-5;
             }
         }
 
         .log-stack {
-            @apply px-4 py-2 sm:px-6 lg:px-8 border-gray-200 dark:border-gray-600 text-xs whitespace-pre-wrap break-all;
+            @apply px-4 py-2 sm:px-6 lg:px-8 border-gray-200 dark:border-gray-700 text-xs whitespace-pre-wrap break-all;
         }
 
         .log-link {
@@ -318,9 +318,9 @@
 
 .search {
     input {
-        @apply border rounded-md pl-3 pr-10 py-2 text-sm w-full dark:bg-gray-700 border-gray-300 dark:border-gray-600 dark:text-gray-100 ring-2 ring-transparent transition duration-200;
+        @apply border rounded-md pl-3 pr-10 py-2 text-sm w-full dark:bg-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-100 ring-2 ring-transparent transition duration-200;
         &:focus {
-            @apply outline-none ring-emerald-500 dark:ring-emerald-600 border-transparent;
+            @apply outline-none ring-emerald-500 dark:ring-emerald-700 border-transparent;
         }
     }
     &.has-error input {
@@ -340,7 +340,7 @@
 }
 
 .dropdown {
-    @apply absolute z-40 right-5 -mt-1 overflow-hidden text-gray-900 dark:text-gray-200 rounded-md bg-white dark:bg-gray-700 border border-emerald-500 dark:border-emerald-800 border-opacity-50 shadow-md;
+    @apply absolute z-40 right-5 -mt-1 overflow-hidden text-gray-900 dark:text-gray-200 rounded-md bg-white border-gray-200 dark:bg-gray-800 border dark:border-gray-700 shadow-md;
 
     button, a {
         @apply block flex items-center w-full px-4 py-2 text-left text-sm outline-emerald-500 dark:outline-emerald-800;
@@ -349,11 +349,11 @@
         }
     }
     button:hover, a:hover {
-        @apply bg-gray-50 dark:bg-gray-600;
+        @apply bg-gray-50 dark:bg-gray-700;
     }
 
     .divider {
-        @apply w-full border-t my-2 dark:border-t-gray-600;
+        @apply w-full border-t my-2 dark:border-t-gray-700;
     }
 
     .label {
@@ -368,14 +368,14 @@
     @apply relative h-full overflow-y-scroll pt-6 pb-28 pr-4;
 
     .file-item-container {
-        @apply mb-2 text-gray-800 dark:text-gray-100 rounded-md overflow-hidden transition duration-100 border-2 cursor-pointer border-transparent bg-white dark:bg-gray-700;
+        @apply mb-2 text-gray-800 dark:text-gray-200 rounded-md overflow-hidden transition duration-100 border cursor-pointer border-transparent bg-white dark:bg-gray-800;
 
         &.active {
-            @apply border-emerald-500 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900 dark:bg-opacity-75;
+            @apply border-emerald-500 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-900 dark:bg-opacity-50;
         }
 
         &:hover {
-            @apply border-emerald-600 dark:border-emerald-700;
+            @apply border-emerald-600 dark:border-emerald-800;
         }
 
         .file-item {
@@ -386,14 +386,14 @@
             }
 
             .file-size {
-                @apply text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap;
+                @apply text-xs text-gray-500 dark:text-gray-300 dark:opacity-90 whitespace-nowrap;
             }
         }
 
         .file-dropdown-toggle {
-            @apply absolute top-0 right-0 bottom-0 w-8 flex items-center justify-center border-l-2 border-transparent text-gray-500 dark:text-gray-400 outline-emerald-500 dark:outline-emerald-600 transition duration-200;
+            @apply absolute top-0 right-0 bottom-0 w-8 flex items-center justify-center border-l border-transparent text-gray-500 dark:text-gray-400 outline-emerald-500 dark:outline-emerald-700 transition duration-200;
             &:hover {
-                @apply border-emerald-600 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-800;
+                @apply border-emerald-600 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900;
             }
             & > svg {
                 @apply h-4 w-4;
@@ -410,6 +410,6 @@
     }
 
     &:focus {
-        @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-600;
+        @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-700;
     }
 }

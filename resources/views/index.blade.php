@@ -13,7 +13,7 @@
     @endisset
     @livewireStyles
 </head>
-<body class="h-full px-5 bg-gray-100 dark:bg-gray-800"
+<body class="h-full px-5 bg-gray-100 dark:bg-gray-900"
     x-data="{
         selectedFileName: @isset($selectedFileName) '{{ $selectedFileName }}' @else null @endisset,
         selectFile(name) {

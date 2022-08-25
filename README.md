@@ -33,6 +33,7 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 - 🔍 **Search** the logs,
 - 🎚 **Filter** by log level (error, info, debug, etc.),
 - 🔗 **Sharable links** to individual log entries,
+- 🌑 **Dark mode**
 - 💾 **Download & delete** log files from the UI,
 - ☑️ **Horizon** log support,
 - and more...
@@ -105,7 +106,7 @@ You can easily add [authentication](https://laravel.com/docs/9.x/authentication#
 
 If your application doesn't use the default authentication solutions, you can use the `auth.basic` [HTTP Basic Authentication](https://laravel.com/docs/9.x/authentication#http-basic-authentication) middleware.
 
-Note: By default, the `auth.basic` middleware will assume the email column on your users database table is the user's "username".
+_**Note:** By default, the `auth.basic` middleware will assume the email column on your users database table is the user's "username"._
 
 See the `auth` middleware configuration below:
 ```php

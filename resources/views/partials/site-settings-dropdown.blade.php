@@ -49,13 +49,13 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-database" /></svg>
                 <span x-show="!cacheRecentlyCleared" wire:loading.class="hidden" wire:target="clearCacheAll">Clear cache for all files</span>
                 <span x-show="!cacheRecentlyCleared" wire:loading wire:target="clearCacheAll">Please wait...</span>
-                <span x-show="cacheRecentlyCleared" class="text-emerald-600">Cache cleared!</span>
+                <span x-show="cacheRecentlyCleared" class="text-emerald-500">Cache cleared!</span>
             </button>
 
             <button x-data="{ copied: false }" x-clipboard="window.location.href" x-on:click.stop="copied = true; setTimeout(() => copied = false, 2000)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-share" /></svg>
                 <span x-show="!copied">Share this page</span>
-                <span x-show="copied" class="text-emerald-600">Link copied!</span>
+                <span x-show="copied" class="text-emerald-500">Link copied!</span>
             </button>
 
             <div class="divider"></div>

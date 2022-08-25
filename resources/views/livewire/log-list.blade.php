@@ -20,14 +20,14 @@
         </div>
 
         @isset($selectedFileName)
-        <div class="relative overflow-hidden text-sm" x-data x-init="$nextTick(() => { if ({{ $expandAutomatically ? 'true' : 'false' }}) { $store.logViewer.stacksOpen.push(0) } })">
+        <div class="relative overflow-hidden text-sm" x-data x-init="$nextTick(() => {  })">
 
             <div id="log-item-container" class="log-item-container h-full overflow-y-scroll px-4" x-on:scroll="(event) => $store.logViewer.onScroll(event)">
                 <div class="inline-block min-w-full max-w-full align-middle">
 <table wire:key="{{ \Illuminate\Support\Str::random(16) }}"
        class="table-fixed min-w-full max-w-full border-separate"
        style="border-spacing: 0"
-       x-init="$nextTick(() => $store.logViewer.reset())"
+       x-init="$nextTick(() => { $store.logViewer.reset(); if ({{ $expandAutomatically ? 'true' : 'false' }}) { $store.logViewer.stacksOpen.push(0) } })"
 >
 <thead class="bg-gray-50">
 <tr>
@@ -40,12 +40,12 @@
             <span>Description</span>
             <div>
                 <label for="sort-direction" class="sr-only">Sort direction</label>
-                <select id="sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-800 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
+                <select id="sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
                     <option value="desc">Newest first</option>
                     <option value="asc">Oldest first</option>
                 </select>
                 <label for="items-per-page" class="sr-only">Items per page</label>
-                <select id="items-per-page" wire:model="perPage" class="bg-gray-100 dark:bg-gray-800 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
+                <select id="items-per-page" wire:model="perPage" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
                     <option value="10">10 items per page</option>
                     <option value="25">25 items per page</option>
                     <option value="50">50 items per page</option>
@@ -73,9 +73,9 @@
         </td>
         <td class="log-level truncate hidden lg:table-cell">{{ $log->level->getName() }}</td>
         <td class="whitespace-nowrap text-gray-900 dark:text-gray-200">{{ $log->time->toDateTimeString() }}</td>
-        <td class="whitespace-nowrap text-gray-500 dark:text-gray-400 hidden lg:table-cell">{{ $log->environment }}</td>
-        <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-400">{{ $log->text }}</td>
-        <td class="whitespace-nowrap text-gray-500 dark:text-gray-400 text-xs">@include('log-viewer::partials.log-list-link-button')</td>
+        <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 hidden lg:table-cell">{{ $log->environment }}</td>
+        <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90">{{ $log->text }}</td>
+        <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs">@include('log-viewer::partials.log-list-link-button')</td>
     </tr>
     <tr x-show="$store.logViewer.isOpen({{$index}})"><td colspan="6"><pre class="log-stack">{{ $log->fullText }}</pre></td></tr>
 </tbody>
@@ -106,7 +106,7 @@
             </div>
         </div>
         @else
-        <div class="flex h-full items-center justify-center text-gray-500">
+        <div class="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
             Please select a file...
         </div>
         @endisset
@@ -118,7 +118,11 @@
         @endif
 
         <div class="grow flex flex-col justify-end text-right px-4 mt-2">
-            <p class="text-xs text-gray-400">Memory: <span class="font-semibold">{{ $memoryUsage }}</span>, Duration: <span class="font-semibold">{{ $requestTime }}</span></p>
+            <p class="text-xs text-gray-400 dark:text-gray-500">
+                <span>Memory: <span class="font-semibold">{{ $memoryUsage }}</span></span><span class="mx-1.5">&middot;</span>
+                <span>Duration: <span class="font-semibold">{{ $requestTime }}</span></span><span class="mx-1.5">&middot;</span>
+                <span>Version: <span class="font-semibold">{{ $version }}</span></span>
+            </p>
         </div>
     </div>
 </div>

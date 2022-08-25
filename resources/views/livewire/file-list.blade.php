@@ -1,5 +1,5 @@
 <div class="relative overflow-hidden" x-cloak>
-    <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-800 to-transparent"></div>
+    <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
     <div class="file-list">
         @foreach($files as $logFile)
             <div class="file-item-container"
@@ -65,5 +65,5 @@
             </div>
         @endforeach
     </div>
-    <div class="absolute z-10 bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 dark:from-gray-800 to-transparent"></div>
+    <div class="absolute z-10 bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
 </div>

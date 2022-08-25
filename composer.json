@@ -1,5 +1,6 @@
 {
     "name": "opcodesio/log-viewer",
+    "version": "v1.1.0",
     "description": "Fast and easy-to-use log viewer for your Laravel application",
     "keywords": [
         "arukompas",
@@ -66,7 +67,7 @@
         }
     },
     "conflict": {
-        "arcanedev/log-viewer": "^8.0" 
+        "arcanedev/log-viewer": "^8.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

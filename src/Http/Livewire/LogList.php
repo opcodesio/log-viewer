@@ -76,6 +76,12 @@ class LogList extends Component
 
         $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2).' MB';
         $requestTime = number_format((microtime(true) - $startTime) * 1000, 0).'ms';
+        try {
+            $version = json_decode(file_get_contents(__DIR__.'/../../../composer.json'))?->version ?? null;
+        } catch (\Exception $e) {
+            // Could not get the version from the composer file for some reason. Let's ignore that and move on.
+            $version = null;
+        }
 
         return view('log-viewer::livewire.log-list', [
             'file' => $file,
@@ -83,6 +89,7 @@ class LogList extends Component
             'logs' => $logs,
             'memoryUsage' => $memoryUsage,
             'requestTime' => $requestTime,
+            'version' => $version,
             'expandAutomatically' => $expandAutomatically ?? false,
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
         ]);
