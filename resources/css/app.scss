@@ -332,8 +332,8 @@
     .clear-search {
         @apply absolute top-0 right-0 p-1.5;
         button {
-            @apply text-gray-500 p-1;
-            &:hover { @apply text-gray-600; }
+            @apply text-gray-500 dark:text-gray-400 p-1;
+            &:hover { @apply text-gray-600 dark:text-gray-300; }
             & > svg { @apply h-5 w-5; }
         }
     }

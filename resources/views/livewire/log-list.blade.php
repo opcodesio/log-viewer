@@ -83,11 +83,11 @@
 <tbody>
 <tr>
     <td colspan="6">
-        <div class="bg-white dark:bg-gray-700 dark:text-gray-200 rounded p-12">
+        <div class="bg-white dark:bg-gray-800 dark:text-gray-200 rounded p-12">
             <div class="text-center font-semibold">No results</div>
             @if(!empty($query))
             <div class="text-center mt-6">
-                <button class="px-3 py-2 border-2 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-600 rounded-md" wire:click="clearQuery">Clear search query</button>
+                <button class="px-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md" wire:click="clearQuery">Clear search query</button>
             </div>
             @endif
         </div>
