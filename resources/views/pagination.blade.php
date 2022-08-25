@@ -15,13 +15,13 @@
         @endphp
         @foreach($links as $link)
             @if($link['active'])
-                <button class="border-emerald-500 text-emerald-600" aria-current="page">
+                <button class="border-emerald-500 text-emerald-600 dark:border-emerald-600 dark:text-emerald-500" aria-current="page">
                     {{ number_format($link['label']) }}
                 </button>
             @elseif($link['label'] === '...')
                 <span>{{ $link['label'] }}</span>
             @else
-                <button wire:click="gotoPage({{ intval($link['label']) }})" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                <button wire:click="gotoPage({{ intval($link['label']) }})" class="border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300 dark:hover:text-gray-300 dark:hover:border-gray-400">
                     {{ number_format($link['label']) }}
                 </button>
             @endif

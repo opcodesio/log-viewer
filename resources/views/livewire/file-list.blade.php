@@ -1,5 +1,5 @@
 <div class="relative overflow-hidden" x-cloak>
-    <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 to-transparent"></div>
+    <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-800 to-transparent"></div>
     <div class="file-list">
         @foreach($files as $logFile)
             <div class="file-item-container"
@@ -54,7 +54,7 @@
                             Download
                         </button>
 
-                        <div class="w-full border-t my-2"></div>
+                        <div class="divider"></div>
 
                         <button x-on:click.stop="if (confirm('Are you sure you want to delete the log file \'{{ $logFile->name }}\'')) { $wire.call('deleteFile', '{{ $logFile->name }}') }">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-trashcan" /></svg>
@@ -65,5 +65,5 @@
             </div>
         @endforeach
     </div>
-    <div class="absolute z-10 bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 to-transparent"></div>
+    <div class="absolute z-10 bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 dark:from-gray-800 to-transparent"></div>
 </div>
