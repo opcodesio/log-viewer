@@ -119,8 +119,10 @@
 
         <div class="grow flex flex-col justify-end text-right px-4 mt-2">
             <p class="text-xs text-gray-400 dark:text-gray-500">
-                <span>Memory: <span class="font-semibold">{{ $memoryUsage }}</span></span><span class="mx-1.5">&middot;</span>
-                <span>Duration: <span class="font-semibold">{{ $requestTime }}</span></span><span class="mx-1.5">&middot;</span>
+                <span>Memory: <span class="font-semibold">{{ $memoryUsage }}</span></span>
+                <span class="mx-1.5">&middot;</span>
+                <span>Duration: <span class="font-semibold">{{ $requestTime }}</span></span>
+                <span class="mx-1.5">&middot;</span>
                 <span>Version: <span class="font-semibold">{{ $version }}</span></span>
             </p>
         </div>

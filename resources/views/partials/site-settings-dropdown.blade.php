@@ -61,7 +61,7 @@
             <div class="divider"></div>
 
             <button x-on:click="$store.logViewer.toggleTheme()">
-                <svg x-show="$store.logViewer.theme === 'Auto'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-theme-auto" /></svg>
+                <svg x-show="$store.logViewer.theme === 'System'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-theme-auto" /></svg>
                 <svg x-show="$store.logViewer.theme === 'Light'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-theme-light" /></svg>
                 <svg x-show="$store.logViewer.theme === 'Dark'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-theme-dark" /></svg>
                 <span>Theme: <span x-html="$store.logViewer.theme" class="font-semibold"></span></span>

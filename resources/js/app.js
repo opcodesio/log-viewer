@@ -3,7 +3,7 @@ import Clipboard from '@ryangjchandler/alpine-clipboard'
 import Persist from '@alpinejs/persist'
 
 const Theme = {
-    Auto: 'Auto',
+    System: 'System',
     Light: 'Light',
     Dark: 'Dark',
 }
@@ -14,16 +14,16 @@ Alpine.plugin(Persist)
 window.Alpine = Alpine
 
 Alpine.store('logViewer', {
-    theme: Alpine.$persist(Theme.Auto).as('logViewer_theme'),
+    theme: Alpine.$persist(Theme.System).as('logViewer_theme'),
     stacksOpen: [],
     stacksInView: [],
     stackTops: {},
     containerTop: 0,
     toggleTheme() {
         switch (this.theme) {
-            case Theme.Auto: return this.theme = Theme.Light;
+            case Theme.System: return this.theme = Theme.Light;
             case Theme.Light: return this.theme = Theme.Dark;
-            default: return this.theme = Theme.Auto;
+            default: return this.theme = Theme.System;
         }
     },
     isOpen(index) {
@@ -58,7 +58,7 @@ Alpine.store('logViewer', {
     isInViewport(index) {
         return this.pixelsAboveFold(index) > -36;
     },
-    onScroll(event) {
+    onScroll() {
         let vm = this;
         this.stacksOpen.forEach(function (index) {
             if (vm.isInViewport(index)) {
@@ -71,7 +71,6 @@ Alpine.store('logViewer', {
         })
     },
     reset() {
-        let vm = this;
         this.stacksOpen = [];
         this.stacksInView = [];
         this.stackTops = {};
@@ -86,7 +85,7 @@ Alpine.start()
 const syncTheme = () => {
     const theme = Alpine.store('logViewer').theme;
 
-    if (theme === Theme.Dark || (theme === Theme.Auto && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (theme === Theme.Dark || (theme === Theme.System && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark')
     } else {
         document.documentElement.classList.remove('dark')
