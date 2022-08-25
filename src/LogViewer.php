@@ -37,8 +37,12 @@ class LogViewer
         return static::$_cachedFiles;
     }
 
-    public function getFile(string $fileName): ?LogFile
+    public function getFile(?string $fileName): ?LogFile
     {
+        if (empty($fileName)) {
+            return null;
+        }
+
         return $this->getFiles()
             ->where('name', $fileName)
             ->first();

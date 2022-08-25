@@ -1,3 +1,5 @@
+const colors = require('tailwindcss/colors')
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
     content: [
@@ -5,8 +7,13 @@ module.exports = {
         './resources/**/*.js',
         './resources/**/*.vue',
     ],
+    darkMode: 'class',
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                gray: colors.zinc,
+            }
+        },
     },
     plugins: [],
 }

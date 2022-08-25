@@ -63,7 +63,7 @@ class Log
             foreach ($lines as $line) {
                 $shouldExclude = false;
                 foreach ($excludes as $excludePattern) {
-                    if (str_contains($line, $excludePattern)) {
+                    if (str_starts_with($line, '#') && str_contains($line, $excludePattern)) {
                         $shouldExclude = true;
                         break;
                     }

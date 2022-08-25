@@ -7,7 +7,7 @@ use Opcodes\LogViewer\Facades\LogViewer;
 
 class FileList extends Component
 {
-    public string $selectedFileName = '';
+    public ?string $selectedFileName = null;
 
     public function mount(string $selectedFileName)
     {
@@ -36,7 +36,7 @@ class FileList extends Component
         LogViewer::getFile($fileName)?->delete();
 
         if ($this->selectedFileName === $fileName) {
-            $this->selectedFileName = '';
+            $this->selectedFileName = null;
             $this->emit('fileSelected', $this->selectedFileName);
         }
     }

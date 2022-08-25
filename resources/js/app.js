@@ -1,20 +1,35 @@
 import Alpine from 'alpinejs'
 import Clipboard from '@ryangjchandler/alpine-clipboard'
+import Persist from '@alpinejs/persist'
+
+const Theme = {
+    System: 'System',
+    Light: 'Light',
+    Dark: 'Dark',
+}
 
 Alpine.plugin(Clipboard)
+Alpine.plugin(Persist)
 
 window.Alpine = Alpine
 
 Alpine.store('logViewer', {
+    theme: Alpine.$persist(Theme.System).as('logViewer_theme'),
     stacksOpen: [],
     stacksInView: [],
     stackTops: {},
     containerTop: 0,
+    toggleTheme() {
+        switch (this.theme) {
+            case Theme.System: return this.theme = Theme.Light;
+            case Theme.Light: return this.theme = Theme.Dark;
+            default: return this.theme = Theme.System;
+        }
+    },
     isOpen(index) {
         return this.stacksOpen.includes(index);
     },
     toggle(index) {
-        console.log('toggling '+index);
         if (this.isOpen(index)) {
             this.stacksOpen = this.stacksOpen.filter(idx => idx !== index)
         } else {
@@ -43,7 +58,7 @@ Alpine.store('logViewer', {
     isInViewport(index) {
         return this.pixelsAboveFold(index) > -36;
     },
-    onScroll(event) {
+    onScroll() {
         let vm = this;
         this.stacksOpen.forEach(function (index) {
             if (vm.isInViewport(index)) {
@@ -56,7 +71,6 @@ Alpine.store('logViewer', {
         })
     },
     reset() {
-        let vm = this;
         this.stacksOpen = [];
         this.stacksInView = [];
         this.stackTops = {};
@@ -67,3 +81,18 @@ Alpine.store('logViewer', {
 })
 
 Alpine.start()
+
+const syncTheme = () => {
+    const theme = Alpine.store('logViewer').theme;
+
+    if (theme === Theme.Dark || (theme === Theme.System && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark')
+    } else {
+        document.documentElement.classList.remove('dark')
+    }
+};
+
+Alpine.effect(syncTheme)
+
+// This makes sure we react to device's dark mode changes
+setInterval(syncTheme, 1000);

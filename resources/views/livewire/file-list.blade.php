@@ -1,8 +1,10 @@
 <div class="relative overflow-hidden" x-cloak>
-    <div class="absolute top-0 h-6 w-full bg-gradient-to-b from-gray-100 to-transparent"></div>
-    <div class="relative h-full overflow-y-scroll pt-6 pb-28 pr-4">
+    <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
+    <div class="file-list">
         @foreach($files as $logFile)
-            <div wire:key="log-file-{{$logFile->name}}"
+            <div class="file-item-container"
+                x-bind:class="[selectedFileName && selectedFileName === '{{ $logFile->name }}' ? 'active' : '']"
+                wire:key="log-file-{{$logFile->name}}"
                 wire:click="selectFile('{{ $logFile->name }}')"
                 x-on:click="selectFile('{{ $logFile->name }}')"
                 x-data="{
@@ -21,16 +23,14 @@
                 x-on:keydown.escape.prevent.stop="close($refs.button)"
                 x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
                 x-id="['dropdown-button']"
-                class="mb-2 text-gray-800 rounded-md overflow-hidden transition duration-100 border-2 hover:border-emerald-600 cursor-pointer"
-                x-bind:class="[selectedFileName && selectedFileName === '{{ $logFile->name }}' ? 'border-emerald-500 bg-emerald-50' : 'border-transparent bg-white']"
             >
-                <div class="relative flex justify-between items-center pl-4 pr-10 py-2">
-                    <p class="text-sm mr-3 whitespace-nowrap">{{ $logFile->name }}</p>
-                    <span class="text-xs text-gray-500 whitespace-nowrap">{{ $logFile->sizeFormatted() }}</span>
-                    <button type="button" class="file-dropdown-button"
+                <div class="file-item">
+                    <p class="file-name">{{ $logFile->name }}</p>
+                    <span class="file-size">{{ $logFile->sizeFormatted() }}</span>
+                    <button type="button" class="file-dropdown-toggle"
                             x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-more" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-more" /></svg>
                     </button>
                 </div>
 
@@ -54,7 +54,7 @@
                             Download
                         </button>
 
-                        <div class="w-full border-t my-2"></div>
+                        <div class="divider"></div>
 
                         <button x-on:click.stop="if (confirm('Are you sure you want to delete the log file \'{{ $logFile->name }}\'')) { $wire.call('deleteFile', '{{ $logFile->name }}') }">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-trashcan" /></svg>
@@ -65,5 +65,5 @@
             </div>
         @endforeach
     </div>
-    <div class="absolute bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 to-transparent"></div>
+    <div class="absolute z-10 bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
 </div>
