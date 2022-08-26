@@ -72,7 +72,7 @@ class LogViewerService
         if (is_null($callback) && isset($this->authCallback)) {
             $canViewLogViewer = call_user_func($this->authCallback, request());
 
-            if (!$canViewLogViewer) {
+            if (! $canViewLogViewer) {
                 throw new AuthorizationException('Unauthorized.');
             }
         } elseif (is_null($callback) && Gate::has('viewLogViewer')) {
