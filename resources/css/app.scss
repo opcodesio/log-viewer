@@ -274,6 +274,11 @@
                 @apply h-4 w-4 ml-1 transition duration-200;
             }
         }
+
+        code, mark {
+            @apply bg-amber-200 text-gray-900 px-1 py-0.5 rounded
+              dark:bg-yellow-800 dark:text-white;
+        }
     }
 }
 

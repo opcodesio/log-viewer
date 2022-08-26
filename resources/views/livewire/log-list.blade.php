@@ -72,12 +72,12 @@
 @else <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-info" /></svg>@endif
         </td>
         <td class="log-level truncate hidden lg:table-cell">{{ $log->level->getName() }}</td>
-        <td class="whitespace-nowrap text-gray-900 dark:text-gray-200">{{ $log->time->toDateTimeString() }}</td>
-        <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 hidden lg:table-cell">{{ $log->environment }}</td>
-        <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90">{{ $log->text }}</td>
+        <td class="whitespace-nowrap text-gray-900 dark:text-gray-200">{!! highlight_search_result($log->time->toDateTimeString(), $query) !!}</td>
+        <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 hidden lg:table-cell">{!! highlight_search_result($log->environment, $query) !!}</td>
+        <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90">{!! highlight_search_result($log->text, $query) !!}</td>
         <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs">@include('log-viewer::partials.log-list-link-button')</td>
     </tr>
-    <tr x-show="$store.logViewer.isOpen({{$index}})"><td colspan="6"><pre class="log-stack">{{ $log->fullText }}</pre></td></tr>
+    <tr x-show="$store.logViewer.isOpen({{$index}})"><td colspan="6"><pre class="log-stack">{!! highlight_search_result($log->fullText, $query) !!}</pre></td></tr>
 </tbody>
 @empty
 <tbody class="log-group">
