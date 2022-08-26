@@ -100,7 +100,36 @@ See the configuration below:
     'middleware' => ['web'],
 ```
 
-## Authentication
+## Authorization
+
+### Via "auth" callback
+You can limit access to the Log Viewer by providing a custom authorization callback to the `LogViewer::auth()` method within your `AppServiceProvider`, like so:
+
+```php
+use Opcodes\LogViewer\Facades\LogViewer;
+
+/**
+ * Bootstrap any application services.
+ *
+ * @return void
+ */
+public function boot()
+{
+    LogViewer::auth(function ($request) {
+        // return true to allow viewing the Log Viewer.
+    });
+
+    // Here's an example:
+    LogViewer::auth(function ($request) {
+        return $request->user()
+            && in_array($request->user()->email, [
+                // 'john@example.com',
+            ]);
+    });
+}
+```
+
+### Via middleware
 
 You can easily add [authentication](https://laravel.com/docs/9.x/authentication#protecting-routes) to log viewing routes using popular `auth` middleware in the `config/log-viewer.php`.
 

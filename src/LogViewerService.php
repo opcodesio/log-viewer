@@ -2,11 +2,14 @@
 
 namespace Opcodes\LogViewer;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
 
-class LogViewer
+class LogViewerService
 {
     public static ?Collection $_cachedFiles = null;
+
+    protected static mixed $_authCallback;
 
     /**
      * @return Collection|LogFile[]
@@ -61,5 +64,18 @@ class LogViewer
     public function getRouteMiddleware(): array
     {
         return config('log-viewer.middleware', []) ?: ['web'];
+    }
+
+    public function auth($callback = null): void
+    {
+        if (is_null($callback) && isset(self::$_authCallback)) {
+            $canViewLogViewer = call_user_func(self::$_authCallback, request());
+
+            if (!$canViewLogViewer) {
+                throw new AuthorizationException('Unauthorized.');
+            }
+        } elseif (!is_null($callback) && is_callable($callback)) {
+            self::$_authCallback = $callback;
+        }
     }
 }
