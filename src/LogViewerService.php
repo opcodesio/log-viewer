@@ -4,12 +4,13 @@ namespace Opcodes\LogViewer;
 
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 
 class LogViewerService
 {
     public static ?Collection $_cachedFiles = null;
 
-    protected static mixed $_authCallback;
+    protected mixed $authCallback;
 
     /**
      * @return Collection|LogFile[]
@@ -68,14 +69,16 @@ class LogViewerService
 
     public function auth($callback = null): void
     {
-        if (is_null($callback) && isset(self::$_authCallback)) {
-            $canViewLogViewer = call_user_func(self::$_authCallback, request());
+        if (is_null($callback) && isset($this->authCallback)) {
+            $canViewLogViewer = call_user_func($this->authCallback, request());
 
-            if (! $canViewLogViewer) {
+            if (!$canViewLogViewer) {
                 throw new AuthorizationException('Unauthorized.');
             }
+        } elseif (is_null($callback) && Gate::has('viewLogViewer')) {
+            Gate::authorize('viewLogViewer');
         } elseif (! is_null($callback) && is_callable($callback)) {
-            self::$_authCallback = $callback;
+            $this->authCallback = $callback;
         }
     }
 }

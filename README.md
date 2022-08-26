@@ -8,6 +8,7 @@
     <a href="#features">Features</a> |
     <a href="#installation">Installation</a> |
     <a href="#configuration">Configuration</a> |
+    <a href="#authorization">Authorization</a> |
     <a href="#credits">Credits</a>
 </p>
 
@@ -61,9 +62,9 @@ By default, the application is available at: `{APP_URL}/log-viewer`.
 
 (for example: `https://my-app.test/log-viewer`)
 
-### Configuration
+## Configuration
 
-#### Config file
+### Config file
 
 To publish the [config file](https://github.com/opcodesio/log-viewer/blob/main/config/log-viewer.php), run:
 
@@ -125,6 +126,28 @@ public function boot()
             && in_array($request->user()->email, [
                 // 'john@example.com',
             ]);
+    });
+}
+```
+
+### Via "viewLogViewer" gate
+
+Another easy way to limit access to the Log Viewer is via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `viewLogViewer` authorization gate in your `App\Providers\AuthServiceProvider` class:
+
+```php
+use Illuminate\Support\Facades\Gate;
+ 
+/**
+ * Register any authentication / authorization services.
+ *
+ * @return void
+ */
+public function boot()
+{
+    $this->registerPolicies();
+ 
+    Gate::define('viewLogViewer', function ($user = null) {
+        // return true if the user is allowed access to the Log Viewer
     });
 }
 ```
