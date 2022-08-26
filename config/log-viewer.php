@@ -64,7 +64,7 @@ return [
     |  Shorter stack trace filters.
     |--------------------------------------------------------------------------
     | Lines containing any of these strings will be excluded from the full log.
-    | This setting is only active when the fuction is enabled via the user interface.
+    | This setting is only active when the function is enabled via the user interface.
     |
     */
 
