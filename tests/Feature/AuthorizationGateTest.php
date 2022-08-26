@@ -1,7 +1,7 @@
 <?php
 
-use Opcodes\LogViewer\Facades\LogViewer;
 use Illuminate\Support\Facades\Gate;
+use Opcodes\LogViewer\Facades\LogViewer;
 use function Pest\Laravel\get;
 
 test('can define "viewLogViewer" gate', function () {
@@ -19,6 +19,7 @@ test('can define "viewLogViewer" gate', function () {
 test('auth callback is provided with a Request object', function () {
     LogViewer::auth(function ($request) {
         expect($request)->toBeInstanceOf(\Illuminate\Http\Request::class);
+
         return true;
     });
 

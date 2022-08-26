@@ -71,10 +71,10 @@ class LogViewerService
         if (is_null($callback) && isset(self::$_authCallback)) {
             $canViewLogViewer = call_user_func(self::$_authCallback, request());
 
-            if (!$canViewLogViewer) {
+            if (! $canViewLogViewer) {
                 throw new AuthorizationException('Unauthorized.');
             }
-        } elseif (!is_null($callback) && is_callable($callback)) {
+        } elseif (! is_null($callback) && is_callable($callback)) {
             self::$_authCallback = $callback;
         }
     }
