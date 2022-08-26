@@ -27,6 +27,7 @@ class GenerateDummyLogsCommand extends Command
     {
         if (app()->environment('production')) {
             $this->error('You should not be generating dummy logs in production. Exiting...');
+
             return;
         }
 
@@ -41,7 +42,7 @@ class GenerateDummyLogsCommand extends Command
             if ($level === 'error') {
                 Log::channel($channel)->error(new \Exception('Example exception being logged'));
             } else {
-                Log::channel($channel)->log($level, 'Example log entry for the level '. $level, [
+                Log::channel($channel)->log($level, 'Example log entry for the level '.$level, [
                     'one' => 1,
                     'two' => 'two',
                     'three' => [1, 2, 3],

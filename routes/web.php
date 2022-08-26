@@ -7,6 +7,8 @@ Route::middleware(LogViewer::getRouteMiddleware())
     ->prefix(LogViewer::getRoutePrefix())
     ->group(function () {
         Route::get('/', function () {
+            LogViewer::auth();
+
             return view('log-viewer::index', [
                 'jsPath' => __DIR__.'/../public/app.js',
                 'cssPath' => __DIR__.'/../public/app.css',

@@ -30,7 +30,7 @@ class LogViewerServiceProvider extends PackageServiceProvider
 
     public function packageRegistered()
     {
-        $this->app->bind('log-viewer', LogViewer::class);
+        $this->app->bind('log-viewer', LogViewerService::class);
     }
 
     public function boot()
