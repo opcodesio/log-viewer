@@ -31,3 +31,8 @@ function generateLogFiles(array $files): void
         test()->assertFileExists($file);
     }
 }
+
+function clearGeneratedLogFiles(): void
+{
+    File::cleanDirectory(storage_path('logs'));
+}
