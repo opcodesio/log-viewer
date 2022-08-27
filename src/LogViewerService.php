@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Gate;
 
 class LogViewerService
 {
-    public static ?Collection $_cachedFiles = null;
+    protected ?Collection $_cachedFiles = null;
 
     protected mixed $authCallback;
 
@@ -17,7 +17,7 @@ class LogViewerService
      */
     public function getFiles()
     {
-        if (! isset(self::$_cachedFiles)) {
+        if (! isset($this->_cachedFiles)) {
             $files = [];
 
             foreach (config('log-viewer.include_files', []) as $pattern) {
@@ -31,14 +31,14 @@ class LogViewerService
             $files = array_reverse($files);
             $files = array_filter($files, 'is_file');
 
-            static::$_cachedFiles = collect($files ?? [])
+            $this->_cachedFiles = collect($files ?? [])
                 ->unique()
                 ->map(fn ($file) => LogFile::fromPath($file))
                 ->sortByDesc('name')
                 ->values();
         }
 
-        return static::$_cachedFiles;
+        return $this->_cachedFiles;
     }
 
     public function getFile(?string $fileName): ?LogFile
@@ -52,9 +52,9 @@ class LogViewerService
             ->first();
     }
 
-    public static function clearFileCache(): void
+    public function clearFileCache(): void
     {
-        self::$_cachedFiles = null;
+        $this->_cachedFiles = null;
     }
 
     public function getRoutePrefix(): string

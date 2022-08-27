@@ -4,9 +4,10 @@ use Opcodes\LogViewer\Facades\LogViewer;
 use function Pest\Laravel\get;
 
 beforeEach(function () {
-    LogViewer::clearFileCache();
     generateLogFiles(['laravel.log', 'other.log']);
 });
+
+afterEach(fn () => clearGeneratedLogFiles());
 
 it('properly includes log files', function () {
     get(route('blv.index'))->assertSeeText('laravel.log')

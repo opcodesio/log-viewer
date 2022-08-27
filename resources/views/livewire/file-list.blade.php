@@ -54,12 +54,13 @@
                             Download
                         </button>
 
+                        @can('deleteLogFile', $logFile)
                         <div class="divider"></div>
-
                         <button x-on:click.stop="if (confirm('Are you sure you want to delete the log file \'{{ $logFile->name }}\'')) { $wire.call('deleteFile', '{{ $logFile->name }}') }">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-trashcan" /></svg>
                             Delete
                         </button>
+                        @endcan
                     </div>
                 </div>
             </div>
