@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\LogFile;
 use function Pest\Laravel\get;
 
+afterEach(fn () => clearGeneratedLogFiles());
+
 test('can download every file by default', function () {
     generateLogFiles([$fileName = 'laravel.log']);
 
@@ -13,28 +15,29 @@ test('can download every file by default', function () {
 });
 
 test('cannot download a file that\'s not found', function () {
-    get(route('blv.download-file', 'notfound.log'))->assertNotFound();
+    get(route('blv.download-file', 'notfound.log'))
+        ->assertNotFound();
 });
 
 test('"downloadLogFile" gate can prevent file download', function () {
     generateLogFiles([$fileName = 'laravel.log']);
-    Gate::define('downloadLogFile', fn ($user = null) => false);
+    Gate::define('downloadLogFile', fn (mixed $user) => false);
 
     get(route('blv.download-file', $fileName))
         ->assertForbidden();
 
     // now let's allow access again
-    Gate::define('downloadLogFile', fn ($user = null) => true);
+    Gate::define('downloadLogFile', fn (mixed $user) => true);
 
     get(route('blv.download-file', $fileName))
-        ->assertOk()->assertDownload($fileName);
+        ->assertOk()
+        ->assertDownload($fileName);
 });
 
 test('"downloadLogFile" gate is supplied with a log file object', function () {
     generateLogFiles([$fileName = 'laravel.log']);
     $gateChecked = false;
 
-    //                                              we use "mixed" here because we don't have a real User object in our tests
     Gate::define('downloadLogFile', function (mixed $user, LogFile $file) use ($fileName, &$gateChecked) {
         expect($file)->toBeInstanceOf(LogFile::class)
             ->name->toBe($fileName);
@@ -44,7 +47,8 @@ test('"downloadLogFile" gate is supplied with a log file object', function () {
     });
 
     get(route('blv.download-file', $fileName))
-        ->assertOk()->assertDownload($fileName);
+        ->assertOk()
+        ->assertDownload($fileName);
 
     expect($gateChecked)->toBeTrue();
 });

@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer\Http\Livewire;
 
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
 
@@ -9,7 +10,7 @@ class FileList extends Component
 {
     public ?string $selectedFileName = null;
 
-    public function mount(string $selectedFileName)
+    public function mount(string $selectedFileName = null)
     {
         $this->selectedFileName = $selectedFileName;
     }
@@ -28,7 +29,12 @@ class FileList extends Component
 
     public function deleteFile(string $fileName)
     {
-        LogViewer::getFile($fileName)?->delete();
+        $file = LogViewer::getFile($fileName);
+
+        if ($file) {
+            Gate::authorize('deleteLogFile', $file);
+            $file->delete();
+        }
 
         if ($this->selectedFileName === $fileName) {
             $this->selectedFileName = null;

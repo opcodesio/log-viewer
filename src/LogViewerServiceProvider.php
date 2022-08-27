@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
 use Opcodes\LogViewer\Console\Commands\GenerateDummyLogsCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
+use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Livewire\FileList;
 use Opcodes\LogViewer\Http\Livewire\LogList;
 use Spatie\LaravelPackageTools\Package;
@@ -42,11 +43,15 @@ class LogViewerServiceProvider extends PackageServiceProvider
         Livewire::component('log-viewer::log-list', LogList::class);
 
         Event::listen(LogFileDeleted::class, function () {
-            \Opcodes\LogViewer\Facades\LogViewer::clearFileCache();
+            LogViewer::clearFileCache();
         });
 
         if (! Gate::has('downloadLogFile')) {
-            Gate::define('downloadLogFile', fn ($user = null) => true);
+            Gate::define('downloadLogFile', fn (mixed $user) => true);
+        }
+
+        if (! Gate::has('deleteLogFile')) {
+            Gate::define('deleteLogFile', fn (mixed $user, LogFile $file) => true);
         }
     }
 }
