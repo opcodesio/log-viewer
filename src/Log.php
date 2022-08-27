@@ -42,7 +42,11 @@ class Log
         $matches = [];
         $pattern = self::LOG_CONTENT_PATTERN.$level.self::LOG_CONTENT_PATTERN_2;
         [$firstLine, $theRestOfIt] = explode("\n", $text, 2);
-        preg_match($pattern, $firstLine, $matches);
+
+        // sometimes, even the first line will have a HUGE exception with tons of debug data all in one line,
+        // so in order to properly match, we must have a smaller first line...
+        $firstLineSplit = str_split($firstLine, 1000);
+        preg_match($pattern, array_shift($firstLineSplit), $matches);
 
         $this->environment = $matches[3] ?? '';
         $this->time = Carbon::parse($matches[1])->tz(config('app.timezone', 'UTC'));
@@ -52,7 +56,8 @@ class Log
             $this->time = $this->time->micros((int) $matches[2]);
         }
 
-        $text = $matches[4]."\n".$theRestOfIt;
+        $firstLineText = $matches[4].implode('', $firstLineSplit);
+        $text = $firstLineText."\n".$theRestOfIt;
         $this->text = mb_convert_encoding(explode("\n", $text, 2)[0], 'UTF-8', 'UTF-8');
 
         if (session()->get('log-viewer:shorter-stack-traces', false)) {
