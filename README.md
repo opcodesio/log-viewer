@@ -185,7 +185,7 @@ See the `auth` middleware configuration below:
 
 For authorization using Spatie permissions [see this discussion](https://github.com/opcodesio/log-viewer/discussions/16)
 
-### Authorizing log file downloads
+### Authorizing log file download
 
 You can limit the ability to download log files via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `downloadLogFile` authorization gate in your `App\Providers\AuthServiceProvider` class:
 
@@ -205,6 +205,30 @@ public function boot()
  
     Gate::define('downloadLogFile', function (?User $user, LogFile $file) {
         // return true if the user is allowed to download the specific log file.
+    });
+}
+```
+
+### Authorizing log file deletion
+
+You can limit the ability to delete log files via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `deleteLogFile` authorization gate in your `App\Providers\AuthServiceProvider` class:
+
+```php
+use App\Models\User;
+use Opcodes\LogViewer\LogFile;
+use Illuminate\Support\Facades\Gate;
+
+/**
+ * Register any authentication / authorization services.
+ *
+ * @return void
+ */
+public function boot()
+{
+    $this->registerPolicies();
+ 
+    Gate::define('deleteLogFile', function (?User $user, LogFile $file) {
+        // return true if the user is allowed to delete the specific log file.
     });
 }
 ```
