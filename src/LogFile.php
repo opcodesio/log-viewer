@@ -45,6 +45,11 @@ class LogFile
         return $size.' bytes';
     }
 
+    public function downloadUrl(): string
+    {
+        return route('blv.download-file', $this->name);
+    }
+
     public function download()
     {
         return response()->download($this->path);

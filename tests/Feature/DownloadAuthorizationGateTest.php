@@ -1,0 +1,50 @@
+<?php
+
+use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogFile;
+use function Pest\Laravel\get;
+use Illuminate\Support\Facades\Gate;
+
+test('can download every file by default', function () {
+    generateLogFiles([$fileName = 'laravel.log']);
+
+    get(route('blv.download-file', $fileName))
+        ->assertOk()
+        ->assertDownload($fileName);
+});
+
+test('cannot download a file that\'s not found', function () {
+    get(route('blv.download-file', 'notfound.log'))->assertNotFound();
+});
+
+test('"downloadLogFile" gate can prevent file download', function () {
+    generateLogFiles([$fileName = 'laravel.log']);
+    Gate::define('downloadLogFile', fn ($user = null) => false);
+
+    get(route('blv.download-file', $fileName))
+        ->assertForbidden();
+
+    // now let's allow access again
+    Gate::define('downloadLogFile', fn ($user = null) => true);
+
+    get(route('blv.download-file', $fileName))
+        ->assertOk()->assertDownload($fileName);
+});
+
+test('"downloadLogFile" gate is supplied with a log file object', function () {
+    generateLogFiles([$fileName = 'laravel.log']);
+    $gateChecked = false;
+
+    //                                              we use "mixed" here because we don't have a real User object in our tests
+    Gate::define('downloadLogFile', function (mixed $user, LogFile $file) use ($fileName, &$gateChecked) {
+        expect($file)->toBeInstanceOf(LogFile::class)
+            ->name->toBe($fileName);
+        $gateChecked = true;
+        return true;
+    });
+
+    get(route('blv.download-file', $fileName))
+        ->assertOk()->assertDownload($fileName);
+
+    expect($gateChecked)->toBeTrue();
+});

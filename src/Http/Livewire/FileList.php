@@ -26,11 +26,6 @@ class FileList extends Component
         $this->selectedFileName = $name;
     }
 
-    public function download(string $fileName)
-    {
-        return LogViewer::getFile($fileName)?->download();
-    }
-
     public function deleteFile(string $fileName)
     {
         LogViewer::getFile($fileName)?->delete();

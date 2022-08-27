@@ -49,10 +49,12 @@
                             Clear cache
                         </button>
 
-                        <button wire:click.stop="download('{{ $logFile->name }}')">
+                        @can('downloadLogFile', $logFile)
+                        <a href="{{ $logFile->downloadUrl() }}" x-on:click.stop="">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-download" /></svg>
                             Download
-                        </button>
+                        </a>
+                        @endcan
 
                         <div class="divider"></div>
 

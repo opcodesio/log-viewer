@@ -3,6 +3,7 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
 use Opcodes\LogViewer\Console\Commands\GenerateDummyLogsCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
@@ -43,5 +44,9 @@ class LogViewerServiceProvider extends PackageServiceProvider
         Event::listen(LogFileDeleted::class, function () {
             \Opcodes\LogViewer\Facades\LogViewer::clearFileCache();
         });
+
+        if (!Gate::has('downloadLogFile')) {
+            Gate::define('downloadLogFile', fn ($user = null) => true);
+        }
     }
 }

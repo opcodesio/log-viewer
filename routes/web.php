@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
 
 Route::middleware(LogViewer::getRouteMiddleware())
@@ -15,4 +16,14 @@ Route::middleware(LogViewer::getRouteMiddleware())
                 'selectedFileName' => request()->query('file', ''),
             ]);
         })->name('blv.index');
+
+        Route::get('file/{fileName}/download', function (string $fileName) {
+            $file = LogViewer::getFile($fileName);
+
+            abort_if(is_null($file), 404);
+
+            Gate::authorize('downloadLogFile', $file);
+
+            return $file->download();
+        })->name('blv.download-file');
     });
