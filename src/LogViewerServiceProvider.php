@@ -46,6 +46,10 @@ class LogViewerServiceProvider extends PackageServiceProvider
             LogViewer::clearFileCache();
         });
 
+        if (! Gate::has('downloadLogFile')) {
+            Gate::define('downloadLogFile', fn (mixed $user) => true);
+        }
+
         if (! Gate::has('deleteLogFile')) {
             Gate::define('deleteLogFile', fn (mixed $user, LogFile $file) => true);
         }

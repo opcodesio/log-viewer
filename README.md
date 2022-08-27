@@ -103,7 +103,15 @@ See the configuration below:
 
 ## Authorization
 
-### Via "auth" callback
+Several things can be configured to have different access based on the user logged in, or the log file in action.
+
+Here are the permissions and how to set them up.
+
+### Authorizing Log Viewer access
+
+You can limit who has access to the Log Viewer in several ways.
+
+#### Via "auth" callback
 You can limit access to the Log Viewer by providing a custom authorization callback to the `LogViewer::auth()` method within your `AppServiceProvider`, like so:
 
 ```php
@@ -130,11 +138,12 @@ public function boot()
 }
 ```
 
-### Via "viewLogViewer" gate
+#### Via "viewLogViewer" gate
 
 Another easy way to limit access to the Log Viewer is via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `viewLogViewer` authorization gate in your `App\Providers\AuthServiceProvider` class:
 
 ```php
+use App\Models\User;
 use Illuminate\Support\Facades\Gate;
  
 /**
@@ -146,13 +155,13 @@ public function boot()
 {
     $this->registerPolicies();
  
-    Gate::define('viewLogViewer', function ($user = null) {
+    Gate::define('viewLogViewer', function (?User $user) {
         // return true if the user is allowed access to the Log Viewer
     });
 }
 ```
 
-### Via middleware
+#### Via middleware
 
 You can easily add [authentication](https://laravel.com/docs/9.x/authentication#protecting-routes) to log viewing routes using popular `auth` middleware in the `config/log-viewer.php`.
 
@@ -175,6 +184,54 @@ See the `auth` middleware configuration below:
 ```
 
 For authorization using Spatie permissions [see this discussion](https://github.com/opcodesio/log-viewer/discussions/16)
+
+### Authorizing log file download
+
+You can limit the ability to download log files via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `downloadLogFile` authorization gate in your `App\Providers\AuthServiceProvider` class:
+
+```php
+use App\Models\User;
+use Opcodes\LogViewer\LogFile;
+use Illuminate\Support\Facades\Gate;
+
+/**
+ * Register any authentication / authorization services.
+ *
+ * @return void
+ */
+public function boot()
+{
+    $this->registerPolicies();
+ 
+    Gate::define('downloadLogFile', function (?User $user, LogFile $file) {
+        // return true if the user is allowed to download the specific log file.
+    });
+}
+```
+
+### Authorizing log file deletion
+
+You can limit the ability to delete log files via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `deleteLogFile` authorization gate in your `App\Providers\AuthServiceProvider` class:
+
+```php
+use App\Models\User;
+use Opcodes\LogViewer\LogFile;
+use Illuminate\Support\Facades\Gate;
+
+/**
+ * Register any authentication / authorization services.
+ *
+ * @return void
+ */
+public function boot()
+{
+    $this->registerPolicies();
+ 
+    Gate::define('deleteLogFile', function (?User $user, LogFile $file) {
+        // return true if the user is allowed to delete the specific log file.
+    });
+}
+```
 
 ## Screenshots
 
