@@ -1,6 +1,5 @@
 <?php
 
-use Opcodes\LogViewer\Facades\LogViewer;
 use function Pest\Laravel\get;
 
 beforeEach(function () {
