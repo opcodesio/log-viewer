@@ -1,9 +1,8 @@
 <?php
 
-use Opcodes\LogViewer\Facades\LogViewer;
+use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\LogFile;
 use function Pest\Laravel\get;
-use Illuminate\Support\Facades\Gate;
 
 test('can download every file by default', function () {
     generateLogFiles([$fileName = 'laravel.log']);
@@ -40,6 +39,7 @@ test('"downloadLogFile" gate is supplied with a log file object', function () {
         expect($file)->toBeInstanceOf(LogFile::class)
             ->name->toBe($fileName);
         $gateChecked = true;
+
         return true;
     });
 

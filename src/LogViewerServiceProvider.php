@@ -45,7 +45,7 @@ class LogViewerServiceProvider extends PackageServiceProvider
             \Opcodes\LogViewer\Facades\LogViewer::clearFileCache();
         });
 
-        if (!Gate::has('downloadLogFile')) {
+        if (! Gate::has('downloadLogFile')) {
             Gate::define('downloadLogFile', fn ($user = null) => true);
         }
     }
