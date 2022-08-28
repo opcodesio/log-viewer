@@ -4,8 +4,6 @@ use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\LogFile;
 use function Pest\Laravel\get;
 
-afterEach(fn () => clearGeneratedLogFiles());
-
 test('can download every file by default', function () {
     generateLogFiles([$fileName = 'laravel.log']);
 

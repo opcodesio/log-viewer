@@ -84,6 +84,29 @@ class LogFile
         return Cache::get($this->relatedCacheKeysKey(), []);
     }
 
+    protected function indexCacheKeyForQuery(string $query = ''): string
+    {
+        return $this->cacheKey().':'.md5($query).':index';
+    }
+
+    public function saveIndexForQuery(array $indexData, string $query = ''): void
+    {
+        $key = $this->indexCacheKeyForQuery($query);
+
+        Cache::put(
+            $key,
+            $indexData,
+            now()->addDay(),
+        );
+
+        $this->addRelatedCacheKey($key);
+    }
+
+    public function getIndexForQuery(string $query = '', $default = []): array
+    {
+        return Cache::get($this->indexCacheKeyForQuery($query), $default);
+    }
+
     public function clearCache(): void
     {
         foreach ($this->getRelatedCacheKeys() as $relatedCacheKey) {

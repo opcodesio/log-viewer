@@ -6,8 +6,6 @@ beforeEach(function () {
     generateLogFiles(['laravel.log', 'other.log']);
 });
 
-afterEach(fn () => clearGeneratedLogFiles());
-
 it('properly includes log files', function () {
     get(route('blv.index'))->assertSeeText('laravel.log')
         ->assertSeeText('other.log');
