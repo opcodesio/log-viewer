@@ -107,7 +107,8 @@
         </div>
         @else
         <div class="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
-            Please select a file...
+            <span wire:loading.remove>Please select a file...</span>
+            <span wire:loading>Loading...</span>
         </div>
         @endisset
 

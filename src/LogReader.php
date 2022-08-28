@@ -4,15 +4,11 @@ namespace Opcodes\LogViewer;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Opcodes\LogViewer\Concerns\HasLocalCache;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 
 class LogReader
 {
-    use HasLocalCache;
-
     const LOG_MATCH_PATTERN = '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?\].*/';
 
     const DIRECTION_FORWARD = 'forward';
@@ -150,14 +146,6 @@ class LogReader
         return $this;
     }
 
-    public function getIndexCacheKey(): string
-    {
-        return 'log-viewer:log-index:'.implode(':', [
-            $this->file->name,
-            md5($this->query ?? ''),
-        ]);
-    }
-
     public function getSelectedLevels(): array
     {
         if (is_array($this->levels)) {
@@ -201,7 +189,11 @@ class LogReader
             throw new \Exception('Could not open "'.$this->file->path.'" for reading.');
         }
 
-        $this->loadIndexFromCache();
+        [$this->logIndex, $this->lastScanFileSize] = $this->file->getIndexForQuery($this->query ?? '', [[], 0]);
+
+        if ($this->requiresScan()) {
+            $this->scan();
+        }
 
         return $this;
     }
@@ -220,7 +212,10 @@ class LogReader
         }
 
         if ($this->indexChanged) {
-            $this->writeIndexToCache();
+            $this->file->saveIndexForQuery(
+                [$this->logIndex, $this->lastScanFileSize],
+                $this->query ?? ''
+            );
         }
 
         if (fclose($this->fileHandle)) {
@@ -708,27 +703,6 @@ class LogReader
         }
 
         return null;
-    }
-
-    protected function writeIndexToCache(): void
-    {
-        $data = [$this->logIndex, $this->lastScanFileSize];
-
-        $this->setRemoteCache($this->getIndexCacheKey(), $data, now()->addDay());
-    }
-
-    protected function loadIndexFromCache(): void
-    {
-        [$this->logIndex, $this->lastScanFileSize] = $this->getRemoteCache($this->getIndexCacheKey(), [[], 0]);
-
-        if ($this->requiresScan()) {
-            $this->scan();
-        }
-    }
-
-    public function clearIndexCache(): void
-    {
-        $this->clearRemoteCache($this->getIndexCacheKey());
     }
 
     protected function requiresScan(): bool

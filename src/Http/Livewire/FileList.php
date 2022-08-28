@@ -44,7 +44,7 @@ class FileList extends Component
 
     public function clearCache(string $fileName)
     {
-        LogViewer::getFile($fileName)?->clearIndexCache();
+        LogViewer::getFile($fileName)?->clearCache();
 
         if ($this->selectedFileName === $fileName) {
             $this->emit('fileSelected', $this->selectedFileName);

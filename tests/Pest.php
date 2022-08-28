@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\File;
 use Opcodes\LogViewer\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);
+uses()
+    ->afterEach(fn () => clearGeneratedLogFiles())
+    ->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

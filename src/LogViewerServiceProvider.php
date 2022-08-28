@@ -25,20 +25,15 @@ class LogViewerServiceProvider extends ServiceProvider
 
     private function basePath(string $path): string
     {
-        return __DIR__ . '/..' . $path;
+        return __DIR__.'/..'.$path;
     }
 
     public function boot()
     {
         if ($this->app->runningInConsole()) {
-            // publishing the views
-            $this->publishes([
-                $this->basePath('/resources/views') => base_path("resources/views/vendor/{$this->name}"),
-            ], "{$this->name}-views");
-
             // publishing the config
             $this->publishes([
-                $this->basePath("/config/{$this->name}.php") => config_path("{$this->name}.php")
+                $this->basePath("/config/{$this->name}.php") => config_path("{$this->name}.php"),
             ], "{$this->name}-config");
 
             // registering the command
@@ -54,14 +49,16 @@ class LogViewerServiceProvider extends ServiceProvider
         Livewire::component('log-viewer::file-list', FileList::class);
         Livewire::component('log-viewer::log-list', LogList::class);
 
-        Event::listen(LogFileDeleted::class, fn() => LogViewer::clearFileCache());
+        Event::listen(LogFileDeleted::class, function (LogFileDeleted $event) {
+            LogViewer::clearFileCache();
+        });
 
-        if (!Gate::has('downloadLogFile')) {
-            Gate::define('downloadLogFile', fn(mixed $user) => true);
+        if (! Gate::has('downloadLogFile')) {
+            Gate::define('downloadLogFile', fn (mixed $user) => true);
         }
 
-        if (!Gate::has('deleteLogFile')) {
-            Gate::define('deleteLogFile', fn(mixed $user, LogFile $file) => true);
+        if (! Gate::has('deleteLogFile')) {
+            Gate::define('deleteLogFile', fn (mixed $user, LogFile $file) => true);
         }
     }
 }
