@@ -31,11 +31,6 @@ class LogViewerServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
-            // publishing the views
-            $this->publishes([
-                $this->basePath('/resources/views') => base_path("resources/views/vendor/{$this->name}"),
-            ], "{$this->name}-views");
-
             // publishing the config
             $this->publishes([
                 $this->basePath("/config/{$this->name}.php") => config_path("{$this->name}.php"),
