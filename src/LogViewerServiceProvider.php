@@ -25,7 +25,7 @@ class LogViewerServiceProvider extends ServiceProvider
 
     private function basePath(string $path): string
     {
-        return __DIR__ . '/..' . $path;
+        return __DIR__.'/..'.$path;
     }
 
     public function boot()
@@ -38,7 +38,7 @@ class LogViewerServiceProvider extends ServiceProvider
 
             // publishing the config
             $this->publishes([
-                $this->basePath("/config/{$this->name}.php") => config_path("{$this->name}.php")
+                $this->basePath("/config/{$this->name}.php") => config_path("{$this->name}.php"),
             ], "{$this->name}-config");
 
             // registering the command
@@ -58,12 +58,12 @@ class LogViewerServiceProvider extends ServiceProvider
             LogViewer::clearFileCache();
         });
 
-        if (!Gate::has('downloadLogFile')) {
-            Gate::define('downloadLogFile', fn(mixed $user) => true);
+        if (! Gate::has('downloadLogFile')) {
+            Gate::define('downloadLogFile', fn (mixed $user) => true);
         }
 
-        if (!Gate::has('deleteLogFile')) {
-            Gate::define('deleteLogFile', fn(mixed $user, LogFile $file) => true);
+        if (! Gate::has('deleteLogFile')) {
+            Gate::define('deleteLogFile', fn (mixed $user, LogFile $file) => true);
         }
     }
 }
