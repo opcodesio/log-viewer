@@ -42,7 +42,7 @@ class LogViewerServiceProvider extends PackageServiceProvider
         Livewire::component('log-viewer::file-list', FileList::class);
         Livewire::component('log-viewer::log-list', LogList::class);
 
-        Event::listen(LogFileDeleted::class, function () {
+        Event::listen(LogFileDeleted::class, function (LogFileDeleted $event) {
             LogViewer::clearFileCache();
         });
 
