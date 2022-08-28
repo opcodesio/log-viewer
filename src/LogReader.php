@@ -715,6 +715,7 @@ class LogReader
         $data = [$this->logIndex, $this->lastScanFileSize];
 
         $this->setRemoteCache($this->getIndexCacheKey(), $data, now()->addDay());
+        $this->file->addRelatedCacheKey($this->getIndexCacheKey());
     }
 
     protected function loadIndexFromCache(): void
@@ -724,11 +725,6 @@ class LogReader
         if ($this->requiresScan()) {
             $this->scan();
         }
-    }
-
-    public function clearIndexCache(): void
-    {
-        $this->clearRemoteCache($this->getIndexCacheKey());
     }
 
     protected function requiresScan(): bool
