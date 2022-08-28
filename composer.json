@@ -22,8 +22,7 @@
     "require": {
         "php": "^8.0",
         "illuminate/contracts": "^8.0|^9.0",
-        "livewire/livewire": "^2.10",
-        "spatie/laravel-package-tools": "^1.9.2"
+        "livewire/livewire": "^2.10"
     },
     "require-dev": {
         "itsgoingd/clockwork": "^5.1",
