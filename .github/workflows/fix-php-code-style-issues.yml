@@ -1,6 +1,9 @@
 name: Fix PHP code style issues
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - 'main'
 
 jobs:
   php-code-styling:
