@@ -7,6 +7,8 @@ use Opcodes\LogViewer\Events\LogFileDeleted;
 
 class LogFile
 {
+    protected array $metaData;
+
     public function __construct(
         public string $name,
         public string $path,
@@ -113,7 +115,43 @@ class LogFile
             Cache::forget($relatedCacheKey);
         }
 
+        Cache::forget($this->metaDataCacheKey());
         Cache::forget($this->relatedCacheKeysKey());
+    }
+
+    protected function metaDataCacheKey(): string
+    {
+        return $this->cacheKey().':metadata';
+    }
+
+    public function setMetaData(string $attribute, $value): void
+    {
+        $this->metaData[$attribute] = $value;
+        Cache::put($this->metaDataCacheKey(), $this->metaData, now()->addWeek());
+    }
+
+    public function getMetaData(string $attribute = null, $default = null): mixed
+    {
+        if (! isset($this->metaData)) {
+            $this->metaData = Cache::get($this->metaDataCacheKey(), []);
+            $this->metaDataChanged = false;
+        }
+
+        if (isset($attribute)) {
+            return $this->metaData[$attribute] ?? $default;
+        }
+
+        return $this->metaData;
+    }
+
+    public function earliestTimestamp(): int
+    {
+        return $this->getMetaData('earliest_timestamp', 0);
+    }
+
+    public function latestTimestamp(): int
+    {
+        return $this->getMetaData('latest_timestamp', 0);
     }
 
     public function delete(): void

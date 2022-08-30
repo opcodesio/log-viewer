@@ -10,6 +10,8 @@ class FileList extends Component
 {
     public ?string $selectedFileName = null;
 
+    public bool $shouldLoadFiles = false;
+
     public function mount(string $selectedFileName = null)
     {
         $this->selectedFileName = $selectedFileName;
@@ -17,9 +19,24 @@ class FileList extends Component
 
     public function render()
     {
+        if ($this->shouldLoadFiles) {
+            $files = LogViewer::getFiles();
+
+            foreach ($files as $file) {
+                $file->logs()->scan();
+            }
+
+            $files = $files->sortByDesc->latestTimestamp();
+        }
+
         return view('log-viewer::livewire.file-list', [
-            'files' => LogViewer::getFiles(),
+            'files' => $files ?? [],
         ]);
+    }
+
+    public function loadFiles()
+    {
+        $this->shouldLoadFiles = true;
     }
 
     public function selectFile(string $name)

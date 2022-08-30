@@ -9,7 +9,7 @@ use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 
 class LogReader
 {
-    const LOG_MATCH_PATTERN = '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?\].*/';
+    const LOG_MATCH_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?)\].*/';
 
     const DIRECTION_FORWARD = 'forward';
 
@@ -391,24 +391,31 @@ class LogReader
             return $this;
         }
 
-        // we don't care about the levels here, we should scan everything
+        // we don't care about the selected levels here, we should scan everything
         $levels = self::getDefaultLevels();
+        $earliest_timestamp = null;
+        $latest_timestamp = null;
         $currentLog = '';
         $currentLogLevel = '';
+        $currentTimestamp = null;
         rewind($this->fileHandle);
         $currentLogPosition = ftell($this->fileHandle);
 
         while (($line = fgets($this->fileHandle)) !== false) {
-            if (preg_match(self::LOG_MATCH_PATTERN, $line) === 1) {
+            $matches = [];
+            if (preg_match(self::LOG_MATCH_PATTERN, $line, $matches) === 1) {
                 if ($currentLog !== '') {
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
-                        $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition);
+                        $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
                     }
 
                     $this->nextLogIndex++;
                     $currentLog = '';
                 }
 
+                $currentTimestamp = strtotime($matches[1] ?? '');
+                $earliest_timestamp = min($earliest_timestamp ?? $currentTimestamp, $currentTimestamp);
+                $latest_timestamp = max($latest_timestamp ?? $currentTimestamp, $currentTimestamp);
                 $currentLogPosition = ftell($this->fileHandle) - strlen($line);
                 $lowercaseLine = strtolower($line);
 
@@ -425,7 +432,7 @@ class LogReader
 
         if ($currentLog !== '') {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
-                $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition);
+                $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
             }
 
             $this->nextLogIndex++;
@@ -437,6 +444,9 @@ class LogReader
 
         // Let's reset the position in preparation for real log reads.
         rewind($this->fileHandle);
+
+        $this->file->setMetaData('earliest_timestamp', $earliest_timestamp);
+        $this->file->setMetaData('latest_timestamp', $latest_timestamp);
 
         return $this->reset();
     }
@@ -474,9 +484,17 @@ class LogReader
         $counts = [];
 
         foreach (self::getDefaultLevels() as $level) {
+            $countForThisLevel = 0;
+
+            if (isset($this->logIndex[$level])) {
+                foreach ($this->logIndex[$level] as $timestamp => $timestampIndex) {
+                    $countForThisLevel += count($timestampIndex ?? []);
+                }
+            }
+
             $counts[$level] = new LevelCount(
                 Level::from($level),
-                count($this->logIndex[$level] ?? []),
+                $countForThisLevel,
                 in_array($level, $selectedLevels)
             );
         }
@@ -669,8 +687,10 @@ class LogReader
                     continue;
                 }
 
-                foreach ($this->logIndex[$level] as $logIndex => $logPosition) {
-                    $this->_mergedIndex[$logIndex] = $logPosition;
+                foreach ($this->logIndex[$level] as $timestamp => $timestampIndex) {
+                    foreach ($timestampIndex as $logIndex => $logPosition) {
+                        $this->_mergedIndex[$logIndex] = $logPosition;
+                    }
                 }
             }
 
@@ -684,21 +704,27 @@ class LogReader
         return $this->_mergedIndex ?? [];
     }
 
-    protected function indexLogPosition(int $index, string $level, int $position): void
+    protected function indexLogPosition(int $index, string $level, int $position, ?int $timestamp = 0): void
     {
         if (! isset($this->logIndex[$level])) {
             $this->logIndex[$level] = [];
         }
 
-        $this->logIndex[$level][$index] = $position;
+        if (! isset($this->logIndex[$level][$timestamp])) {
+            $this->logIndex[$level][$timestamp] = [];
+        }
+
+        $this->logIndex[$level][$timestamp][$index] = $position;
         $this->indexChanged = true;
     }
 
     protected function getIndexedLogPosition(int $index): ?int
     {
         foreach ($this->logIndex as $levelIndex) {
-            if (isset($levelIndex[$index])) {
-                return $levelIndex[$index];
+            foreach ($levelIndex as $timestampIndex) {
+                if (isset($timestampIndex[$index])) {
+                    return $timestampIndex[$index];
+                }
             }
         }
 
@@ -707,7 +733,21 @@ class LogReader
 
     protected function requiresScan(): bool
     {
-        return $this->lastScanFileSize !== $this->file->size();
+        $usesOldIndexScheme = false;
+
+        foreach ($this->logIndex as $level => $levelIndex) {
+            foreach ($levelIndex as $potentialLogIndex => $potentialLogPosition) {
+                if (is_numeric($potentialLogPosition)) {
+                    // still uses old index scheme, so we should re-generate the index.
+                    $usesOldIndexScheme = true;
+                }
+
+                // we don't need to look at the other elements, because the index only follows one structure.
+                break 2;
+            }
+        }
+
+        return $usesOldIndexScheme || $this->lastScanFileSize !== $this->file->size();
     }
 
     public function __destruct()

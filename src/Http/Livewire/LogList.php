@@ -72,27 +72,14 @@ class LogList extends Component
 
         $levels = $logQuery?->getLevelCounts();
         $logs = $logQuery?->paginate($this->perPage);
-        $startTime = defined('LARAVEL_START') ? LARAVEL_START : request()->server('REQUEST_TIME_FLOAT');
 
-        $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2).' MB';
-        $requestTime = number_format((microtime(true) - $startTime) * 1000, 0).'ms';
-        try {
-            $version = json_decode(file_get_contents(__DIR__.'/../../../composer.json'))?->version ?? null;
-        } catch (\Exception $e) {
-            // Could not get the version from the composer file for some reason. Let's ignore that and move on.
-            $version = null;
-        }
-
-        return view('log-viewer::livewire.log-list', [
+        return view('log-viewer::livewire.log-list', array_merge([
             'file' => $file,
             'levels' => $levels,
             'logs' => $logs,
-            'memoryUsage' => $memoryUsage,
-            'requestTime' => $requestTime,
-            'version' => $version,
             'expandAutomatically' => $expandAutomatically ?? false,
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
-        ]);
+        ], $this->getRequestPerformanceInfo()));
     }
 
     public function updatingQuery()
@@ -199,5 +186,24 @@ class LogList extends Component
         $this->direction = $prefs['direction'] ?? $this->direction;
         $this->shorterStackTraces = $prefs['shorter_stack_traces'] ?? $this->shorterStackTraces;
         $this->refreshAutomatically = $prefs['refresh_automatically'] ?? $this->refreshAutomatically;
+    }
+
+    protected function getRequestPerformanceInfo(): array
+    {
+        $startTime = defined('LARAVEL_START') ? LARAVEL_START : request()->server('REQUEST_TIME_FLOAT');
+        $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2).' MB';
+        $requestTime = number_format((microtime(true) - $startTime) * 1000, 0).'ms';
+        try {
+            $version = json_decode(file_get_contents(__DIR__.'/../../../composer.json'))?->version ?? null;
+        } catch (\Exception $e) {
+            // Could not get the version from the composer file for some reason. Let's ignore that and move on.
+            $version = null;
+        }
+
+        return [
+            'memoryUsage' => $memoryUsage,
+            'requestTime' => $requestTime,
+            'version' => $version,
+        ];
     }
 }

@@ -9,7 +9,7 @@ use Opcodes\LogViewer\LogFile;
 /**
  * @see \Opcodes\LogViewer\LogViewerService
  *
- * @method static Collection|LogFile[] getFiles()
+ * @method static LogFile[]|Collection getFiles()
  * @method static LogFile|null getFile(string $fileName)
  * @method static void clearFileCache()
  * @method static array getRouteMiddleware()

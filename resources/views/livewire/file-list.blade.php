@@ -1,6 +1,12 @@
-<div class="relative overflow-hidden" x-cloak>
+<div class="relative overflow-hidden" x-cloak wire:init="loadFiles">
     <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
     <div class="file-list">
+        @if(!$shouldLoadFiles)
+            <div class="w-full h-full flex flex-col items-center justify-center text-gray-600 dark:text-gray-400">
+                <div class="loader">Loading...</div>
+                Scanning & indexing files...
+            </div>
+        @endif
         @foreach($files as $logFile)
             <div class="file-item-container"
                 x-bind:class="[selectedFileName && selectedFileName === '{{ $logFile->name }}' ? 'active' : '']"
