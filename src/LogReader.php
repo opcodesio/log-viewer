@@ -430,7 +430,7 @@ class LogReader
             $currentLog .= $line;
         }
 
-        if ($currentLog !== '') {
+        if ($currentLog !== '' && preg_match(self::LOG_MATCH_PATTERN, $line) === 1) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
                 $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
             }
