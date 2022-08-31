@@ -13,6 +13,10 @@ class FileList extends Component
     public function mount(string $selectedFileName = null)
     {
         $this->selectedFileName = $selectedFileName;
+
+        if (! LogViewer::getFile($this->selectedFileName)) {
+            $this->selectedFileName = null;
+        }
     }
 
     public function render()
