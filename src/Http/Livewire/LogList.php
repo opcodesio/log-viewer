@@ -48,6 +48,10 @@ class LogList extends Component
     public function mount()
     {
         $this->loadPreferences();
+
+        if (! LogViewer::getFile($this->selectedFileName)) {
+            $this->selectedFileName = null;
+        }
     }
 
     public function render()
