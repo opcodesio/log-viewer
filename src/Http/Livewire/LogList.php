@@ -51,7 +51,7 @@ class LogList extends Component
 
         $file = LogViewer::getFile($this->selectedFileName);
 
-        if (!$file) {
+        if (! $file) {
             $this->selectedFileName = null;
         }
     }
