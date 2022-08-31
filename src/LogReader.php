@@ -191,6 +191,12 @@ class LogReader
 
         [$this->logIndex, $this->lastScanFileSize] = $this->file->getIndexForQuery($this->query ?? '', [[], 0]);
 
+        if ($this->usesOldIndexScheme()) {
+            // clear out the old index, so we can re-build it instead of building on top of the existing one.
+            $this->logIndex = [];
+            $this->lastScanFileSize = 0;
+        }
+
         if ($this->requiresScan()) {
             $this->scan();
         }
@@ -430,7 +436,7 @@ class LogReader
             $currentLog .= $line;
         }
 
-        if ($currentLog !== '' && preg_match(self::LOG_MATCH_PATTERN, $line) === 1) {
+        if ($currentLog !== '' && preg_match(self::LOG_MATCH_PATTERN, $currentLog) === 1) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
                 $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
             }
@@ -445,6 +451,9 @@ class LogReader
         // Let's reset the position in preparation for real log reads.
         rewind($this->fileHandle);
 
+        $this->file->setMetaData('name', $this->file->name);
+        $this->file->setMetaData('path', $this->file->path);
+        $this->file->setMetaData('size', $this->file->size());
         $this->file->setMetaData('earliest_timestamp', $earliest_timestamp);
         $this->file->setMetaData('latest_timestamp', $latest_timestamp);
 
@@ -731,7 +740,7 @@ class LogReader
         return null;
     }
 
-    protected function requiresScan(): bool
+    protected function usesOldIndexScheme(): bool
     {
         $usesOldIndexScheme = false;
 
@@ -747,7 +756,12 @@ class LogReader
             }
         }
 
-        return $usesOldIndexScheme || $this->lastScanFileSize !== $this->file->size();
+        return $usesOldIndexScheme;
+    }
+
+    protected function requiresScan(): bool
+    {
+        return $this->lastScanFileSize !== $this->file->size();
     }
 
     public function __destruct()
