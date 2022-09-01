@@ -3,6 +3,10 @@
 @tailwind utilities;
 @import './loader.scss';
 
+html.dark {
+    color-scheme: dark
+}
+
 .log-item {
     @apply bg-white dark:bg-gray-800 transition duration-200 cursor-pointer;
 
