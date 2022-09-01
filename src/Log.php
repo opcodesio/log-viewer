@@ -74,8 +74,8 @@ class Log
 
         $firstLineText = $matches[6];
 
-        if (!empty($middle)) {
-            $firstLineText = $middle . ' ' . $firstLineText;
+        if (! empty($middle)) {
+            $firstLineText = $middle.' '.$firstLineText;
         }
 
         $this->text = mb_convert_encoding($firstLineText, 'UTF-8', 'UTF-8');
