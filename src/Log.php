@@ -4,12 +4,13 @@ namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 class Log
 {
     const LOG_CONTENT_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?)\](?:.*?(\w+)\.|.*?)';
 
-    const LOG_CONTENT_PATTERN_2 = ': (.*?)( in .*?:[0-9]+)?$/is';
+    const LOG_CONTENT_PATTERN_2 = ': (.*?)( in [\/].*?:[0-9]+)?$/is';
 
     public int $index;
 
@@ -22,6 +23,10 @@ class Log
     public string $text;
 
     public string $fullText;
+
+    public bool $fullTextIncomplete = false;
+
+    public int $fullTextLength;
 
     public string $fileName;
 
@@ -38,6 +43,7 @@ class Log
         $this->level = Level::from(strtolower($level));
         $this->fileName = $fileName;
         $this->filePosition = $filePosition;
+        $this->fullTextLength = strlen($text);
 
         $matches = [];
         $pattern = self::LOG_CONTENT_PATTERN.$level.self::LOG_CONTENT_PATTERN_2;
@@ -56,9 +62,9 @@ class Log
             $this->time = $this->time->micros((int) $matches[2]);
         }
 
-        $firstLineText = $matches[4].implode('', $firstLineSplit);
-        $text = $firstLineText."\n".$theRestOfIt;
-        $this->text = mb_convert_encoding(explode("\n", $text, 2)[0], 'UTF-8', 'UTF-8');
+        $firstLineText = $matches[4];
+        $this->text = mb_convert_encoding($firstLineText, 'UTF-8', 'UTF-8');
+        $text = $firstLineText.($matches[5] ?? '').implode('', $firstLineSplit)."\n".$theRestOfIt;
 
         if (session()->get('log-viewer:shorter-stack-traces', false)) {
             $excludes = config('log-viewer.shorter_stack_trace_excludes', []);
@@ -83,6 +89,11 @@ class Log
             $text = implode("\n", $filteredLines);
         }
 
+        if (strlen($text) > LogViewer::maxLogSize()) {
+            $text = Str::limit($text, LogViewer::maxLogSize());
+            $this->fullTextIncomplete = true;
+        }
+
         $this->fullText = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
     }
 
@@ -97,6 +108,11 @@ class Log
         }
 
         return (bool) preg_match($query, $this->fullText);
+    }
+
+    public function fullTextLengthFormatted(): string
+    {
+        return bytes_formatted($this->fullTextLength);
     }
 
     public function url(): string

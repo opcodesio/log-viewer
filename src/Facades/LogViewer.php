@@ -15,6 +15,8 @@ use Opcodes\LogViewer\LogFile;
  * @method static array getRouteMiddleware()
  * @method static string getRoutePrefix()
  * @method static void auth($callback = null)
+ * @method static void setMaxLogSize(int $bytes)
+ * @method static int maxLogSize()
  */
 class LogViewer extends Facade
 {
