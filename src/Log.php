@@ -8,7 +8,7 @@ use Opcodes\LogViewer\Facades\LogViewer;
 
 class Log
 {
-    const LOG_CONTENT_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?)\](?:.*?(\w+)\.|.*?)';
+    const LOG_CONTENT_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\](.*?(\w+)\.|.*?)';
 
     const LOG_CONTENT_PATTERN_2 = ': (.*?)( in [\/].*?:[0-9]+)?$/is';
 
@@ -54,7 +54,6 @@ class Log
         $firstLineSplit = str_split($firstLine, 1000);
         preg_match($pattern, array_shift($firstLineSplit), $matches);
 
-        $this->environment = $matches[3] ?? '';
         $this->time = Carbon::parse($matches[1])->tz(config('app.timezone', 'UTC'));
 
         if (! empty($matches[2])) {
@@ -62,9 +61,25 @@ class Log
             $this->time = $this->time->micros((int) $matches[2]);
         }
 
-        $firstLineText = $matches[4];
+        if (! empty($matches[3])) {
+            // we have a time offset!
+            // TODO: handle the offset provided here, which is provided as a string like "+03:00" or "-02:30"
+        }
+
+        $this->environment = $matches[5] ?? '';
+
+        // There might be something in the middle between the timestamp
+        // and the environment/level. Let's put that at the beginning of the first line.
+        $middle = trim(rtrim($matches[4] ?? '', $this->environment.'.'));
+
+        $firstLineText = $matches[6];
+
+        if (!empty($middle)) {
+            $firstLineText = $middle . ' ' . $firstLineText;
+        }
+
         $this->text = mb_convert_encoding($firstLineText, 'UTF-8', 'UTF-8');
-        $text = $firstLineText.($matches[5] ?? '').implode('', $firstLineSplit)."\n".$theRestOfIt;
+        $text = $firstLineText.($matches[7] ?? '').implode('', $firstLineSplit)."\n".$theRestOfIt;
 
         if (session()->get('log-viewer:shorter-stack-traces', false)) {
             $excludes = config('log-viewer.shorter_stack_trace_excludes', []);

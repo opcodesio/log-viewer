@@ -9,7 +9,7 @@ use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 
 class LogReader
 {
-    const LOG_MATCH_PATTERN = '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?\].*/';
+    const LOG_MATCH_PATTERN = '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}([\+-]\d\d:\d\d)?)?\].*/';
 
     const DIRECTION_FORWARD = 'forward';
 
