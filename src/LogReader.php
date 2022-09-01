@@ -9,8 +9,6 @@ use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 
 class LogReader
 {
-    const LOG_MATCH_PATTERN = '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?\].*/';
-
     const DIRECTION_FORWARD = 'forward';
 
     const DIRECTION_BACKWARD = 'backward';
@@ -399,7 +397,7 @@ class LogReader
         $currentLogPosition = ftell($this->fileHandle);
 
         while (($line = fgets($this->fileHandle)) !== false) {
-            if (preg_match(self::LOG_MATCH_PATTERN, $line) === 1) {
+            if (preg_match($this->getLogMatchPattern(), $line) === 1) {
                 if ($currentLog !== '') {
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
                         $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition);
@@ -423,7 +421,7 @@ class LogReader
             $currentLog .= $line;
         }
 
-        if ($currentLog !== '' && preg_match(self::LOG_MATCH_PATTERN, $currentLog) === 1) {
+        if ($currentLog !== '' && preg_match($this->getLogMatchPattern(), $currentLog) === 1) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
                 $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition);
             }
@@ -596,7 +594,7 @@ class LogReader
         $currentLogLevel = '';
 
         while (($line = fgets($this->fileHandle)) !== false) {
-            if (preg_match(self::LOG_MATCH_PATTERN, $line) === 1) {
+            if (preg_match($this->getLogMatchPattern(), $line) === 1) {
                 if ($currentLog !== '') {
                     // found the next log, so let's stop the loop and return the log we found
                     break;
@@ -708,6 +706,11 @@ class LogReader
     protected function requiresScan(): bool
     {
         return $this->lastScanFileSize !== $this->file->size();
+    }
+
+    protected function getLogMatchPattern(): string
+    {
+        return config('log-viewer.patterns.match');
     }
 
     public function __destruct()
