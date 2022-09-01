@@ -8,9 +8,13 @@ use Illuminate\Support\Facades\Gate;
 
 class LogViewerService
 {
+    const DEFAULT_MAX_LOG_SIZE_TO_DISPLAY = 131_072;    // 128 KB
+
     protected ?Collection $_cachedFiles = null;
 
     protected mixed $authCallback;
+
+    protected int $maxLogSizeToDisplay = self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
 
     /**
      * @return Collection|LogFile[]
@@ -80,5 +84,20 @@ class LogViewerService
         } elseif (! is_null($callback) && is_callable($callback)) {
             $this->authCallback = $callback;
         }
+    }
+
+    /**
+     * Get the maximum number of bytes of the log that we should display.
+     *
+     * @return int
+     */
+    public function maxLogSize(): int
+    {
+        return $this->maxLogSizeToDisplay;
+    }
+
+    public function setMaxLogSize(int $bytes): void
+    {
+        $this->maxLogSizeToDisplay = $bytes > 0 ? $bytes : self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
     }
 }

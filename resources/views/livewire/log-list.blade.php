@@ -77,7 +77,15 @@
         <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90">{!! highlight_search_result($log->text, $query) !!}</td>
         <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs">@include('log-viewer::partials.log-list-link-button')</td>
     </tr>
-    <tr x-show="$store.logViewer.isOpen({{$index}})"><td colspan="6"><pre class="log-stack">{!! highlight_search_result($log->fullText, $query) !!}</pre></td></tr>
+    <tr x-show="$store.logViewer.isOpen({{$index}})"><td colspan="6">
+        <pre class="log-stack">{!! highlight_search_result($log->fullText, $query) !!}</pre>
+        @if($log->fullTextIncomplete)
+        <div class="py-4 px-8 text-gray-500 italic">
+            The contents of this log have been cut short to the first {{ bytes_formatted(\Opcodes\LogViewer\Facades\LogViewer::maxLogSize()) }}.
+            The full size of this log entry is <strong>{{ $log->fullTextLengthFormatted() }}</strong>
+        </div>
+        @endif
+    </td></tr>
 </tbody>
 @empty
 <tbody class="log-group">
