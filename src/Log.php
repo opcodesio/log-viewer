@@ -8,10 +8,6 @@ use Opcodes\LogViewer\Facades\LogViewer;
 
 class Log
 {
-    const LOG_CONTENT_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?)\](?:.*?(\w+)\.|.*?)';
-
-    const LOG_CONTENT_PATTERN_2 = ': (.*?)( in [\/].*?:[0-9]+)?$/is';
-
     public int $index;
 
     public Carbon $time;
@@ -46,7 +42,7 @@ class Log
         $this->fullTextLength = strlen($text);
 
         $matches = [];
-        $pattern = self::LOG_CONTENT_PATTERN.$level.self::LOG_CONTENT_PATTERN_2;
+        $pattern = $this->getLogContentPattern($level);
         [$firstLine, $theRestOfIt] = explode("\n", $text, 2);
 
         // sometimes, even the first line will have a HUGE exception with tons of debug data all in one line,
@@ -95,6 +91,14 @@ class Log
         }
 
         $this->fullText = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+    }
+
+    protected function getLogContentPattern($level): string
+    {
+        $pattern = config('log-viewer.patterns.content');
+        $pattern2 = config('log-viewer.patterns.content_2');
+
+        return $pattern.$level.$pattern2;
     }
 
     public function fullTextMatches(string $query = null): bool
