@@ -20,7 +20,7 @@ class LogFile
 
         // by default, we load all logs from the storage/logs folder, so we can
         // safely disregard that part because it's always going to be the same.
-        $folder = str_replace(Str::finish(storage_path('logs'), '/'), '', $path);
+        $folder = str_replace(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR), '', $path);
 
         // now we're left with something like `folderA/laravel.log`. Let's remove the file name because we already know it.
         $this->subFolder = str_replace($name, '', $folder);
