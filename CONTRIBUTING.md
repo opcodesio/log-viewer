@@ -69,10 +69,12 @@ Please follow the steps below to contribute with code.
 
 ### 📌 Step 1
 
-Fork this repository and enter its directory. Run the command:
+Fork this repository and enter its directory.
+
+Replace the placeholder `<YOUR-USERNAME>` with your GitHub username and run the command:
 
 ```shell
-git clone https://github.com/opcodesio/log-viewer.git && cd log-viewer
+git clone https://github.com/<YOUR-USERNAME>/log-viewer.git && cd log-viewer
 ```
 
 ### 📌 Step 2
@@ -99,7 +101,10 @@ For example:
 git checkout -b feature/feature-new_about_page
 ```
 
-Please consider to write tests to cover your code. Tests are helpful for the code reviewers, and it reduces bugs and improves software quality.
+Now, you can work on this newly created branch.
+
+> 💡 Tip: While developing, you may run the command `npm run watch` to automatically rebuild any CSS and JavaScript files.
+
 
 ### 📌 Step 4
 
@@ -109,19 +114,51 @@ After you are done coding, please run Laravel Pint for code formatting:
 composer format
 ```
 
-Then, run Larastan for static analysis:
-
-```Shell
-composer analyse
-```
-
-And finally, run the Pest PHP for tests:
+Finally, run the Pest PHP for tests:
 
 ```Shell
 composer test
 ```
 
 ### 📌 Step 5
+
+You may want to install your modified version of Log Viewer inside a Laravel application, and test if it performs as expected.
+
+In your Laravel application, modify the `composer.json` adding a `repositories` key with the `path` of Log-Viewer on your machine.
+
+This will instruct composer to install Log Viewer from your local folder instead of using the version on the official repository.
+
+Example:
+
+```json
+// File: composer.json
+
+{
+  "scripts": { ... },
+
+  "repositories": [
+    {
+      "type": "path",
+      "url": "/home/myuser/projects/log-viewer"
+
+    }
+  ]
+}
+```
+
+Proceed with `composer require opcodesio/log-viewer`.
+
+### 📌 Step 6
+
+If you changed any CSS or JavaScript files, you must build the assets for production before committing.
+
+Run the command:
+
+```shell
+npm run production
+```
+
+### 📌 Step 7
 
 Commit your changes. Please send short and descriptive commits.
 
@@ -131,9 +168,9 @@ For example:
 git commit -m "adds route for about page"
 ```
 
-### 📌 Step 6
+### 📌 Step 8
 
-If all tests are passing ✅, you may push your code and submit a Pull Request.
+If all tests are ✅ passing, you may push your code and submit a Pull Request.
 
 Please write a summary of your contribution, detailing what you are changing/fixing/proposing.
 
