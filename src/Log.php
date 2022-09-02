@@ -24,18 +24,18 @@ class Log
 
     public int $fullTextLength;
 
-    public string $fileName;
+    public string $fileIdentifier;
 
     public int $filePosition;
 
     public function __construct(
         int $index,
         string $text,
-        string $fileName,
+        string $fileIdentifier,
         int $filePosition,
     ) {
         $this->index = $index;
-        $this->fileName = $fileName;
+        $this->fileIdentifier = $fileIdentifier;
         $this->filePosition = $filePosition;
         $this->fullTextLength = strlen($text);
 
@@ -120,6 +120,6 @@ class Log
 
     public function url(): string
     {
-        return route('blv.index', ['file' => $this->fileName, 'query' => 'log-index:'.$this->index]);
+        return route('blv.index', ['file' => $this->fileIdentifier, 'query' => 'log-index:'.$this->index]);
     }
 }

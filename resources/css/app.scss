@@ -398,7 +398,7 @@ html.dark {
             @apply relative flex justify-between items-center pl-4 pr-10 py-2;
 
             .file-name {
-                @apply text-sm mr-3 whitespace-nowrap;
+                @apply text-sm mr-3;
             }
 
             .file-size {

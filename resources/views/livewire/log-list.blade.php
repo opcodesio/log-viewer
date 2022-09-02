@@ -6,12 +6,12 @@
     <div class="flex flex-col h-full w-full mx-3 mb-4">
         <div class="px-4 mb-4 flex items-start">
             <div class="flex-1 flex items-center mr-6">
-                @isset($selectedFileName)
+                @isset($selectedFileIdentifier)
                 <div>@include('log-viewer::partials.log-list-level-buttons')</div>
                 @endisset
             </div>
-            <div class="flex-1 flex items-center @empty($selectedFileName) justify-end @endempty min-h-[38px]">
-                @isset($selectedFileName)
+            <div class="flex-1 flex items-center @empty($selectedFileIdentifier) justify-end @endempty min-h-[38px]">
+                @isset($selectedFileIdentifier)
                 <div class="flex-1">@include('log-viewer::partials.search-input')</div>
                 <div class="ml-5">@include('log-viewer::partials.log-list-share-page-button')</div>
                 @endisset
@@ -19,7 +19,7 @@
             </div>
         </div>
 
-        @isset($selectedFileName)
+        @isset($selectedFileIdentifier)
         <div class="relative overflow-hidden text-sm" x-data x-init="$nextTick(() => {  })">
 
             <div id="log-item-container" class="log-item-container h-full overflow-y-scroll px-4" x-on:scroll="(event) => $store.logViewer.onScroll(event)">
