@@ -8,14 +8,14 @@ use Opcodes\LogViewer\Facades\LogViewer;
 
 class FileList extends Component
 {
-    public ?string $selectedFileName = null;
+    public ?string $selectedFileIdentifier = null;
 
-    public function mount(string $selectedFileName = null)
+    public function mount(string $selectedFileIdentifier = null)
     {
-        $this->selectedFileName = $selectedFileName;
+        $this->selectedFileIdentifier = $selectedFileIdentifier;
 
-        if (! LogViewer::getFile($this->selectedFileName)) {
-            $this->selectedFileName = null;
+        if (! LogViewer::getFile($this->selectedFileIdentifier)) {
+            $this->selectedFileIdentifier = null;
         }
     }
 
@@ -28,30 +28,30 @@ class FileList extends Component
 
     public function selectFile(string $name)
     {
-        $this->selectedFileName = $name;
+        $this->selectedFileIdentifier = $name;
     }
 
-    public function deleteFile(string $fileName)
+    public function deleteFile(string $fileIdentifier)
     {
-        $file = LogViewer::getFile($fileName);
+        $file = LogViewer::getFile($fileIdentifier);
 
         if ($file) {
             Gate::authorize('deleteLogFile', $file);
             $file->delete();
         }
 
-        if ($this->selectedFileName === $fileName) {
-            $this->selectedFileName = null;
-            $this->emit('fileSelected', $this->selectedFileName);
+        if ($this->selectedFileIdentifier === $fileIdentifier) {
+            $this->selectedFileIdentifier = null;
+            $this->emit('fileSelected', $this->selectedFileIdentifier);
         }
     }
 
-    public function clearCache(string $fileName)
+    public function clearCache(string $fileIdentifier)
     {
-        LogViewer::getFile($fileName)?->clearCache();
+        LogViewer::getFile($fileIdentifier)?->clearCache();
 
-        if ($this->selectedFileName === $fileName) {
-            $this->emit('fileSelected', $this->selectedFileName);
+        if ($this->selectedFileIdentifier === $fileIdentifier) {
+            $this->emit('fileSelected', $this->selectedFileIdentifier);
         }
     }
 }

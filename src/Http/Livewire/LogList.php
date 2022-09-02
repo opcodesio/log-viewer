@@ -17,7 +17,7 @@ class LogList extends Component
 
     const NEWEST_FIRST = 'desc';
 
-    public ?string $selectedFileName = null;
+    public ?string $selectedFileIdentifier = null;
 
     public string $query = '';
 
@@ -36,7 +36,7 @@ class LogList extends Component
     protected bool $cacheRecentlyCleared;
 
     protected $queryString = [
-        'selectedFileName' => ['except' => null, 'as' => 'file'],
+        'selectedFileIdentifier' => ['except' => null, 'as' => 'file'],
         'query' => ['except' => ''],
         'log' => ['except' => ''],
     ];
@@ -49,14 +49,14 @@ class LogList extends Component
     {
         $this->loadPreferences();
 
-        if (! LogViewer::getFile($this->selectedFileName)) {
-            $this->selectedFileName = null;
+        if (! LogViewer::getFile($this->selectedFileIdentifier)) {
+            $this->selectedFileIdentifier = null;
         }
     }
 
     public function render()
     {
-        $file = LogViewer::getFile($this->selectedFileName);
+        $file = LogViewer::getFile($this->selectedFileIdentifier);
         $selectedLevels = $this->getSelectedLevels();
         $logQuery = $file?->logs()->only($selectedLevels);
 
@@ -111,13 +111,13 @@ class LogList extends Component
         $this->queryError = '';
     }
 
-    public function selectFile(?string $fileName)
+    public function selectFile(?string $fileIdentifier)
     {
-        if (isset($this->selectedFileName)) {
+        if (isset($this->selectedFileIdentifier)) {
             $this->resetPage();
         }
 
-        $this->selectedFileName = $fileName;
+        $this->selectedFileIdentifier = $fileIdentifier;
     }
 
     public function toggleLevel(string $level)

@@ -16,44 +16,62 @@ class LogViewerService
 
     protected int $maxLogSizeToDisplay = self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
 
+    protected function getFilePaths(): array
+    {
+        $files = [];
+
+        foreach (config('log-viewer.include_files', []) as $pattern) {
+            $files = array_merge($files, glob(storage_path().'/logs/'.$pattern));
+        }
+
+        foreach (config('log-viewer.exclude_files', []) as $pattern) {
+            $files = array_diff($files, glob(storage_path().'/logs/'.$pattern));
+        }
+
+        $files = array_reverse($files);
+
+        return array_filter($files, 'is_file');
+    }
+
     /**
      * @return Collection|LogFile[]
      */
     public function getFiles()
     {
         if (! isset($this->_cachedFiles)) {
-            $files = [];
-
-            foreach (config('log-viewer.include_files', []) as $pattern) {
-                $files = array_merge($files, glob(storage_path().'/logs/'.$pattern));
-            }
-
-            foreach (config('log-viewer.exclude_files', []) as $pattern) {
-                $files = array_diff($files, glob(storage_path().'/logs/'.$pattern));
-            }
-
-            $files = array_reverse($files);
-            $files = array_filter($files, 'is_file');
-
-            $this->_cachedFiles = collect($files ?? [])
+            $this->_cachedFiles = collect($this->getFilePaths())
                 ->unique()
                 ->map(fn ($file) => LogFile::fromPath($file))
-                ->sortByDesc('name')
+                ->sortByDesc('path')
                 ->values();
         }
 
         return $this->_cachedFiles;
     }
 
-    public function getFile(?string $fileName): ?LogFile
+    /**
+     * Find the file with the given identifier or file name.
+     *
+     * @param string|null $fileIdentifier
+     * @return LogFile|null
+     */
+    public function getFile(?string $fileIdentifier): ?LogFile
     {
-        if (empty($fileName)) {
+        if (empty($fileIdentifier)) {
             return null;
         }
 
-        return $this->getFiles()
-            ->where('name', $fileName)
+        $file = $this->getFiles()
+            ->where('identifier', $fileIdentifier)
             ->first();
+
+        if (!$file) {
+            $file = $this->getFiles()
+                ->where('name', $fileIdentifier)
+                ->first();
+        }
+
+        return $file;
     }
 
     public function clearFileCache(): void

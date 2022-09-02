@@ -7,7 +7,7 @@ use function PHPUnit\Framework\assertEquals;
 it('can understand the default Laravel log format', function () {
     $text = '[2022-08-25 11:16:17] local.DEBUG: Example log entry for the level debug';
 
-    $log = new Log($index = 10, $text, $fileName = 'laravel.log', $filePosition = 5200);
+    $log = new Log($index = 10, $text, $fileIdentifier = 'laravel.log', $filePosition = 5200);
 
     assertEquals($index, $log->index);
     assertEquals(Level::Debug, $log->level->value);
@@ -15,7 +15,7 @@ it('can understand the default Laravel log format', function () {
     assertEquals('2022-08-25 11:16:17', $log->time->toDateTimeString());
     assertEquals('Example log entry for the level debug', $log->text);
     assertEquals('Example log entry for the level debug', $log->fullText);
-    assertEquals($fileName, $log->fileName);
+    assertEquals($fileIdentifier, $log->fileIdentifier);
     assertEquals($filePosition, $log->filePosition);
 });
 
