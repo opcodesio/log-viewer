@@ -381,7 +381,7 @@ html.dark {
 // Dark border (hover): border-emerald-700
 
 .file-list {
-    @apply relative h-full overflow-y-scroll pt-6 pb-28 pr-4;
+    @apply relative h-full overflow-y-auto pt-6 pb-32 pr-4;
 
     .file-item-container {
         @apply mb-2 text-gray-800 dark:text-gray-200 rounded-md overflow-hidden transition duration-100 border cursor-pointer border-transparent bg-white dark:bg-gray-800;

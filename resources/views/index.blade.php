@@ -2,8 +2,10 @@
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    >
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Logs - {{ config('app.name') }}</title>
 
@@ -13,7 +15,8 @@
     @endisset
     @livewireStyles
 </head>
-<body class="h-full px-5 bg-gray-100 dark:bg-gray-900"
+<body
+    class="h-full px-5 bg-gray-100 dark:bg-gray-900"
     x-data="{
         selectedFileIdentifier: @isset($selectedFileIdentifier) '{{ $selectedFileIdentifier }}' @else null @endisset,
         selectFile(name) {
@@ -32,13 +35,29 @@
             <div class="mx-3 mb-4">
                 <h1 class="font-semibold text-emerald-800 dark:text-emerald-600 text-2xl flex items-center">
                     Log Viewer
-                    <a href="https://www.github.com/opcodesio/log-viewer" target="_blank" class="ml-3 text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 p-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-github" /></svg>
+                    <a
+                        href="https://www.github.com/opcodesio/log-viewer"
+                        target="_blank"
+                        class="ml-3 text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 p-1"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                            <use href="#icon-github" />
+                        </svg>
                     </a>
                 </h1>
                 @if($backUrl = config('log-viewer.back_to_system_url'))
-                    <a href="{{ $backUrl }}" class="inline-flex items-center text-sm text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 mt-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1.5" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-arrow-left" /></svg>
+                    <a
+                        href="{{ $backUrl }}"
+                        class="inline-flex items-center text-sm text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 mt-3"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-3 w-3 mr-1.5"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                        >
+                            <use href="#icon-arrow-left" />
+                        </svg>
                         {{ config('log-viewer.back_to_system_label') ?? 'Back to '.config('app.name') }}
                     </a>
                 @endif
