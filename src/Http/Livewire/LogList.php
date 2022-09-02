@@ -49,9 +49,9 @@ class LogList extends Component
     {
         $this->loadPreferences();
 
-        if (! LogViewer::getFile($this->selectedFileIdentifier)) {
-            $this->selectedFileIdentifier = null;
-        }
+        $file = LogViewer::getFile($this->selectedFileIdentifier);
+
+        $this->selectedFileIdentifier = $file?->identifier;
     }
 
     public function render()
