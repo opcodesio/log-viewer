@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 
 class LogViewerService
 {
@@ -21,11 +22,11 @@ class LogViewerService
         $files = [];
 
         foreach (config('log-viewer.include_files', []) as $pattern) {
-            $files = array_merge($files, glob(storage_path().'/logs/'.$pattern));
+            $files = array_merge($files, glob(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR).$pattern));
         }
 
         foreach (config('log-viewer.exclude_files', []) as $pattern) {
-            $files = array_diff($files, glob(storage_path().'/logs/'.$pattern));
+            $files = array_diff($files, glob(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR).$pattern));
         }
 
         $files = array_reverse($files);
