@@ -516,7 +516,7 @@ class LogReader
             return null;
         }
 
-        $log = $this->makeLog($level, $text, $position);
+        $log = $this->makeLog($text, $position);
         $log->index = $index;
 
         return $log;
@@ -532,7 +532,7 @@ class LogReader
             return null;
         }
 
-        $nextLog = $this->makeLog($level, $text, $position);
+        $nextLog = $this->makeLog($text, $position);
 
         $this->setNextLogIndex();
 
@@ -567,9 +567,9 @@ class LogReader
         );
     }
 
-    protected function makeLog(string $level, string $text, int $filePosition, $index = null)
+    protected function makeLog(string $text, int $filePosition, $index = null)
     {
-        return new Log($index ?? $this->nextLogIndex, $level, $text, $this->file->name, $filePosition);
+        return new Log($index ?? $this->nextLogIndex, $text, $this->file->name, $filePosition);
     }
 
     /**
