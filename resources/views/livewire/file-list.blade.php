@@ -1,6 +1,6 @@
 <div class="relative h-full overflow-hidden" x-cloak>
-    <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
-    <div class="file-list">
+    <div class="pointer-events-none absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
+    <div class="file-list" x-ref="list">
         @foreach($files as $logFile)
             <div class="file-item-container"
                 x-bind:class="[selectedFileIdentifier && selectedFileIdentifier === '{{ $logFile->identifier }}' ? 'active' : '']"
@@ -13,6 +13,8 @@
                         if (this.open) { return this.close() }
                         this.$refs.button.focus()
                         this.open = true
+                        const p = this.$refs.list.getBoundingClientRect()
+                        this.direction = this.$refs.button.getBoundingClientRect().bottom - p.top + 140 > p.height ? 'up' : 'down';
                     },
                     close(focusAfter) {
                         if (! this.open) { return }
@@ -37,7 +39,7 @@
                 <div
                     x-ref="panel"
                     x-show="open"
-                    x-transition.origin.top.right
+                    x-transition
                     x-on:click.outside="close($refs.button)"
                     :id="$id('dropdown-button')"
                     style="display: none;"
@@ -68,5 +70,5 @@
             </div>
         @endforeach
     </div>
-    <div class="absolute z-10 bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
+    <div class="pointer-events-none absolute z-10 bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
 </div>
