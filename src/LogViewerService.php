@@ -52,7 +52,7 @@ class LogViewerService
     /**
      * Find the file with the given identifier or file name.
      *
-     * @param string|null $fileIdentifier
+     * @param  string|null  $fileIdentifier
      * @return LogFile|null
      */
     public function getFile(?string $fileIdentifier): ?LogFile
@@ -65,7 +65,7 @@ class LogViewerService
             ->where('identifier', $fileIdentifier)
             ->first();
 
-        if (!$file) {
+        if (! $file) {
             $file = $this->getFiles()
                 ->where('name', $fileIdentifier)
                 ->first();
