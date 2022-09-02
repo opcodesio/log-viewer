@@ -10,10 +10,12 @@ Route::middleware(LogViewer::getRouteMiddleware())
         Route::get('/', function () {
             LogViewer::auth();
 
+            $selectedFile = LogViewer::getFile(request()->query('file', ''));
+
             return view('log-viewer::index', [
                 'jsPath' => __DIR__.'/../public/app.js',
                 'cssPath' => __DIR__.'/../public/app.css',
-                'selectedFileIdentifier' => request()->query('file', ''),
+                'selectedFileIdentifier' => $selectedFile?->identifier,
             ]);
         })->name('blv.index');
 
