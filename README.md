@@ -1,6 +1,6 @@
 <div align="center">
     <p>
-        <h1>Log Viewer<br/>Fast and easy-to-use</h1>
+        <h1>Log Viewer<br/>Easy-to-use, fast, and beautiful</h1>
     </p>
 </div>
 
@@ -9,6 +9,7 @@
     <a href="#installation">Installation</a> |
     <a href="#configuration">Configuration</a> |
     <a href="#authorization">Authorization</a> |
+    <a href="#troubleshooting">Troubleshooting</a> |
     <a href="#credits">Credits</a>
 </p>
 
