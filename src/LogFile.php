@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogFile
 {
@@ -54,7 +55,7 @@ class LogFile
         return route('blv.download-file', $this->identifier);
     }
 
-    public function download()
+    public function download(): BinaryFileResponse
     {
         return response()->download($this->path);
     }
