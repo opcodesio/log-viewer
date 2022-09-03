@@ -750,7 +750,7 @@ class LogReader
 
     public function requiresScan(): bool
     {
-        if (!isset($this->lastScanFileSize)) {
+        if (! isset($this->lastScanFileSize)) {
             $this->lastScanFileSize = $this->file->getLastScanFileSizeForQuery($this->query ?? '');
         }
 
