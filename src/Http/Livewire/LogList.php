@@ -17,7 +17,7 @@ class LogList extends Component
 
     const NEWEST_FIRST = 'desc';
 
-    public ?string $selectedFileName = null;
+    public ?string $selectedFileIdentifier = null;
 
     public string $query = '';
 
@@ -36,7 +36,7 @@ class LogList extends Component
     protected bool $cacheRecentlyCleared;
 
     protected $queryString = [
-        'selectedFileName' => ['except' => null, 'as' => 'file'],
+        'selectedFileIdentifier' => ['except' => null, 'as' => 'file'],
         'query' => ['except' => ''],
         'log' => ['except' => ''],
     ];
@@ -49,14 +49,14 @@ class LogList extends Component
     {
         $this->loadPreferences();
 
-        if (! LogViewer::getFile($this->selectedFileName)) {
-            $this->selectedFileName = null;
-        }
+        $file = LogViewer::getFile($this->selectedFileIdentifier);
+
+        $this->selectedFileIdentifier = $file?->identifier;
     }
 
     public function render()
     {
-        $file = LogViewer::getFile($this->selectedFileName);
+        $file = LogViewer::getFile($this->selectedFileIdentifier);
         $selectedLevels = $this->getSelectedLevels();
         $logQuery = $file?->logs()->only($selectedLevels);
 
@@ -98,13 +98,13 @@ class LogList extends Component
         $this->queryError = '';
     }
 
-    public function selectFile(?string $fileName)
+    public function selectFile(?string $fileIdentifier)
     {
-        if (isset($this->selectedFileName)) {
+        if (isset($this->selectedFileIdentifier)) {
             $this->resetPage();
         }
 
-        $this->selectedFileName = $fileName;
+        $this->selectedFileIdentifier = $fileIdentifier;
     }
 
     public function toggleLevel(string $level)
@@ -197,17 +197,11 @@ class LogList extends Component
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : request()->server('REQUEST_TIME_FLOAT');
         $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2).' MB';
         $requestTime = number_format((microtime(true) - $startTime) * 1000, 0).'ms';
-        try {
-            $version = json_decode(file_get_contents(__DIR__.'/../../../composer.json'))?->version ?? null;
-        } catch (\Exception $e) {
-            // Could not get the version from the composer file for some reason. Let's ignore that and move on.
-            $version = null;
-        }
 
         return [
             'memoryUsage' => $memoryUsage,
             'requestTime' => $requestTime,
-            'version' => $version,
+            'version' => LogViewer::version(),
         ];
     }
 }

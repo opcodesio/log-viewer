@@ -9,10 +9,10 @@
         @endif
         @foreach($files as $logFile)
             <div class="file-item-container"
-                x-bind:class="[selectedFileName && selectedFileName === '{{ $logFile->name }}' ? 'active' : '']"
-                wire:key="log-file-{{$logFile->name}}"
-                wire:click="selectFile('{{ $logFile->name }}')"
-                x-on:click="selectFile('{{ $logFile->name }}')"
+                x-bind:class="[selectedFileIdentifier && selectedFileIdentifier === '{{ $logFile->identifier }}' ? 'active' : '']"
+                wire:key="log-file-{{$logFile->identifier}}"
+                wire:click="selectFile('{{ $logFile->identifier }}')"
+                x-on:click="selectFile('{{ $logFile->identifier }}')"
                 x-data="{
                     open: false,
                     toggle() {
@@ -31,7 +31,7 @@
                 x-id="['dropdown-button']"
             >
                 <div class="file-item">
-                    <p class="file-name">{{ $logFile->name }}</p>
+                    <p class="file-name"><span class="text-gray-400 dark:text-gray-500">{{ str_replace(DIRECTORY_SEPARATOR, ' '.DIRECTORY_SEPARATOR.' ', $logFile->subFolder) }}</span> {{ $logFile->name }}</p>
                     <span class="file-size">{{ $logFile->sizeFormatted() }}</span>
                     <button type="button" class="file-dropdown-toggle"
                             x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')"
@@ -50,7 +50,7 @@
                     class="dropdown w-48"
                 >
                     <div class="py-2">
-                        <button wire:click="clearCache('{{ $logFile->name }}')" x-on:click.stop="close($refs.button)">
+                        <button wire:click="clearCache('{{ $logFile->identifier }}')" x-on:click.stop="close($refs.button)">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-database" /></svg>
                             Clear cache
                         </button>
@@ -64,7 +64,7 @@
 
                         @can('deleteLogFile', $logFile)
                         <div class="divider"></div>
-                        <button x-on:click.stop="if (confirm('Are you sure you want to delete the log file \'{{ $logFile->name }}\'')) { $wire.call('deleteFile', '{{ $logFile->name }}') }">
+                        <button x-on:click.stop="if (confirm('Are you sure you want to delete the log file \'{{ $logFile->name }}\'')) { $wire.call('deleteFile', '{{ $logFile->identifier }}') }">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-trashcan" /></svg>
                             Delete
                         </button>

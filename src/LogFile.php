@@ -3,16 +3,29 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 
 class LogFile
 {
+    public string $identifier;
+
+    public string $subFolder = '';
+
     protected array $metaData;
 
     public function __construct(
         public string $name,
         public string $path,
     ) {
+        $this->identifier = Str::substr(md5($path), -8, 8).'-'.$name;
+
+        // by default, we load all logs from the storage/logs folder, so we can
+        // safely disregard that part because it's always going to be the same.
+        $folder = str_replace(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR), '', $path);
+
+        // now we're left with something like `folderA/laravel.log`. Let's remove the file name because we already know it.
+        $this->subFolder = str_replace($name, '', $folder);
     }
 
     public static function fromPath(string $filePath): LogFile
@@ -35,22 +48,12 @@ class LogFile
 
     public function sizeFormatted(): string
     {
-        $size = $this->size();
-
-        if ($size > ($gb = 1024 * 1024 * 1024)) {
-            return number_format($size / $gb, 2).' GB';
-        } elseif ($size > ($mb = 1024 * 1024)) {
-            return number_format($size / $mb, 2).' MB';
-        } elseif ($size > ($kb = 1024)) {
-            return number_format($size / $kb, 2).' KB';
-        }
-
-        return $size.' bytes';
+        return bytes_formatted($this->size());
     }
 
     public function downloadUrl(): string
     {
-        return route('blv.download-file', $this->name);
+        return route('blv.download-file', $this->identifier);
     }
 
     public function download()

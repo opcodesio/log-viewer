@@ -1,6 +1,6 @@
 <div align="center">
     <p>
-        <h1>Log Viewer<br/>Fast and easy-to-use</h1>
+        <h1>Log Viewer<br/>Easy-to-use, fast, and beautiful</h1>
     </p>
 </div>
 
@@ -9,6 +9,7 @@
     <a href="#installation">Installation</a> |
     <a href="#configuration">Configuration</a> |
     <a href="#authorization">Authorization</a> |
+    <a href="#troubleshooting">Troubleshooting</a> |
     <a href="#credits">Credits</a>
 </p>
 
@@ -27,6 +28,8 @@
 You will no longer need to read the raw Laravel log files trying to find what you're looking for.
 
 Log Viewer helps you quickly and clearly see individual log entries, to **search**, **filter**, and make sense of your Laravel logs **fast**. It is free and easy to install.
+
+> 📺 **[Watch a quick 4-minute video](https://www.youtube.com/watch?v=q7SnF2vubRE)** showcasing some Log Viewer features.
 
 ### Features
 
@@ -233,6 +236,40 @@ public function boot()
 }
 ```
 
+## Troubleshooting
+
+Here are some common problems and solutions.
+
+### Problem: "Livewire not defined" or other errors in the browser's console
+
+This is most often caused by your project being served from a sub-folder, like `example.com/your-laravel-project/log-viewer`.
+
+Livewire by default tries to load its resources from the root of the domain, like `example.com/livewire/livewire.js`, but if that's outside your project's sub-folder, then you need to set a different asset_url. You can [read more about it here](https://laravel-livewire.com/docs/2.x/installation#configuring-the-asset-base-url).
+
+Fortunately, the fix is easy:
+
+1. Publish the Livewire config:
+```shell
+php artisan livewire:publish --config
+```
+2. Set the `asset_url` option in the `config/livewire.php` file to your app's subdomain:
+```php
+    'asset_url' => '/your-laravel-project',
+```
+
+### Problem: Logs not loading
+
+At the moment, Log Viewer is only able to process [Laravel logs](https://laravel.com/docs/9.x/logging) that look something like this:
+
+```
+[2022-08-25 11:16:17] local.DEBUG: Example log entry for the level debug {"one":1,"two":"two","three":[1,2,3]}
+Multiple lines are allowed
+and will be picked up as contents
+of the same log entry.
+```
+
+If your logs are structured differently, then you'll have to wait until we ship support for custom log formats. Otherwise, please adjust your log format to Laravel's default.
+
 ## Screenshots
 
 Read the **[release blog post](https://arunas.dev/log-viewer-for-laravel/)**  for screenshots and more information about Log Viewer's features.
@@ -243,7 +280,7 @@ Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed re
 
 ## Contributing
 
-Please see [CONTRIBUTING](https://github.com/arukompas/.github/blob/main/CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
 ## Security Vulnerabilities
 
