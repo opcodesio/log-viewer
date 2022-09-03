@@ -221,6 +221,7 @@ class LogReader
         if ($this->indexChanged) {
             $this->file->saveIndexDataForQuery($this->logIndex, $this->query ?? '');
             $this->file->saveLastScanFileSizeForQuery($this->lastScanFileSize, $this->query ?? '');
+            $this->file->saveMetaData();
         }
 
         if (fclose($this->fileHandle)) {

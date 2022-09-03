@@ -27,6 +27,8 @@ class LogFile
 
         // now we're left with something like `folderA/laravel.log`. Let's remove the file name because we already know it.
         $this->subFolder = str_replace($name, '', $folder);
+
+        $this->metaData = Cache::get($this->metaDataCacheKey(), []);
     }
 
     public static function fromPath(string $filePath): LogFile
@@ -140,7 +142,6 @@ class LogFile
     public function setMetaData(string $attribute, $value): void
     {
         $this->metaData[$attribute] = $value;
-        Cache::put($this->metaDataCacheKey(), $this->metaData, $this->cacheTtl());
     }
 
     public function getMetaData(string $attribute = null, $default = null): mixed
@@ -154,6 +155,11 @@ class LogFile
         }
 
         return $this->metaData;
+    }
+
+    public function saveMetaData(): void
+    {
+        Cache::put($this->metaDataCacheKey(), $this->metaData, $this->cacheTtl());
     }
 
     public function earliestTimestamp(): int
