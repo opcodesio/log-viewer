@@ -9,6 +9,7 @@ use Opcodes\LogViewer\LogFile;
 /**
  * @see \Opcodes\LogViewer\LogViewerService
  *
+ * @method static string version()
  * @method static Collection|LogFile[] getFiles()
  * @method static LogFile|null getFile(string $fileIdentifier)
  * @method static void clearFileCache()

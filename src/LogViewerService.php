@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Composer\InstalledVersions;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -136,5 +137,13 @@ class LogViewerService
         return '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\](.*?(\w+)\.|.*?)('
             .implode('|', array_filter(Level::caseValues()))
             .')?: (.*?)( in [\/].*?:[0-9]+)?$/is';
+    }
+
+    /**
+     * Get the current version of the Log Viewer
+     */
+    public function version(): string
+    {
+        return InstalledVersions::getPrettyVersion('opcodesio/log-viewer');
     }
 }
