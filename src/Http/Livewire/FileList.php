@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer\Http\Livewire;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
@@ -11,6 +12,13 @@ class FileList extends Component
     public ?string $selectedFileIdentifier = null;
 
     public bool $shouldLoadFiles = false;
+
+    protected bool $cacheRecentlyCleared;
+
+    protected $listeners = [
+        'fullCacheCleared' => 'rescanAllFiles',
+        'loadFiles' => 'loadFiles',
+    ];
 
     public function mount(string $selectedFileIdentifier = null)
     {
@@ -30,17 +38,33 @@ class FileList extends Component
                 $file->logs()->scan();
             }
 
-            $files = $files->sortByDesc->latestTimestamp();
+            $files = $files->groupBy('subFolder')
+
+                // sort by sub-folder name ASCENDING
+                ->sortKeys()
+
+                // Then individual log files by their latest timestamp DESCENDING
+                ->map(fn (Collection $group) => $group->sortByDesc->latestTimestamp())
+
+                // And then bring back into a flat view after everything's sorted
+                ->flatten();
         }
 
         return view('log-viewer::livewire.file-list', [
             'files' => $files ?? [],
+            'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
         ]);
     }
 
     public function loadFiles()
     {
         $this->shouldLoadFiles = true;
+    }
+
+    public function rescanAllFiles()
+    {
+        $this->shouldLoadFiles = false;
+        $this->emit('loadFiles');
     }
 
     public function selectFile(string $name)
@@ -70,5 +94,7 @@ class FileList extends Component
         if ($this->selectedFileIdentifier === $fileIdentifier) {
             $this->emit('fileSelected', $this->selectedFileIdentifier);
         }
+
+        $this->cacheRecentlyCleared = true;
     }
 }

@@ -9,7 +9,7 @@ use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 
 class LogReader
 {
-    const LOG_MATCH_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}([\+-]\d\d:\d\d)?)?)\].*/';
+    const LOG_MATCH_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\].*/';
 
     const DIRECTION_FORWARD = 'forward';
 
@@ -407,7 +407,14 @@ class LogReader
         rewind($this->fileHandle);
         $currentLogPosition = ftell($this->fileHandle);
 
-        while (($line = fgets($this->fileHandle)) !== false) {
+        while (($line = fgets($this->fileHandle, 1024)) !== false) {
+            /**
+             * $matches[0] - the full line being checked
+             * $matches[1] - the full timestamp in-between the square brackets, including the optional microseconds
+             *               and the optional timezone offset
+             * $matches[2] - the optional microseconds
+             * $matches[3] - the optional timezone offset, like `+02:00` or `-05:30`
+             */
             $matches = [];
             if (preg_match(self::LOG_MATCH_PATTERN, $line, $matches) === 1) {
                 if ($currentLog !== '') {

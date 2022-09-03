@@ -131,6 +131,8 @@ class LogList extends Component
         LogViewer::getFiles()->each->clearCache();
 
         $this->cacheRecentlyCleared = true;
+
+        $this->emit('fullCacheCleared');
     }
 
     public function updatedPerPage($value)

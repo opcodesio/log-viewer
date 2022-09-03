@@ -20,14 +20,15 @@ class LogViewerService
 
     protected function getFilePaths(): array
     {
+        $baseDir = Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR);
         $files = [];
 
         foreach (config('log-viewer.include_files', []) as $pattern) {
-            $files = array_merge($files, glob(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR).$pattern));
+            $files = array_merge($files, glob($baseDir.$pattern));
         }
 
         foreach (config('log-viewer.exclude_files', []) as $pattern) {
-            $files = array_diff($files, glob(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR).$pattern));
+            $files = array_diff($files, glob($baseDir.$pattern));
         }
 
         $files = array_reverse($files);
@@ -44,7 +45,6 @@ class LogViewerService
             $this->_cachedFiles = collect($this->getFilePaths())
                 ->unique()
                 ->map(fn ($file) => LogFile::fromPath($file))
-                ->sortByDesc('path')
                 ->values();
         }
 
