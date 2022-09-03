@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogReader;
 
 class FileList extends Component
 {
@@ -36,6 +37,11 @@ class FileList extends Component
 
             foreach ($files as $file) {
                 $file->logs()->scan();
+
+                // We clear it so that PHP destroys that LogReader instance
+                // with a big index variable in it. This is to reduce memory
+                // usage for this request.
+                LogReader::clearInstance($file);
             }
 
             $files = $files->groupBy('subFolder')

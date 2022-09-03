@@ -4,7 +4,7 @@
         @if(!$shouldLoadFiles)
             <div class="w-full h-full flex flex-col items-center justify-center text-gray-500 text-sm text-center">
                 <div class="loader opacity-30">Loading...</div>
-                <p>Scanning for files & indexing log entries.</p>
+                <p>Scanning files & building log indices.</p>
                 <p class="mt-5">This might take a bit longer on the first run.</p>
             </div>
         @endif

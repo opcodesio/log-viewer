@@ -92,6 +92,13 @@ class LogReader
         return self::$_instances[$file->path];
     }
 
+    public static function clearInstance(LogFile $file): void
+    {
+        if (isset(self::$_instances[$file->path])) {
+            unset(self::$_instances[$file->path]);
+        }
+    }
+
     /**
      * Load only the provided log levels
      *
