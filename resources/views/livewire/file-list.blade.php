@@ -1,11 +1,12 @@
-<div class="relative overflow-hidden" x-cloak wire:init="loadFiles">
+<div class="relative overflow-hidden" x-cloak @if(!$shouldLoadFiles) wire:init="loadFiles" @endif>
     <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
     <div class="file-list">
         @if(!$shouldLoadFiles)
-            <div class="w-full h-full flex flex-col items-center justify-center text-gray-500 text-sm text-center">
+            <div class="w-full h-full flex flex-col items-center justify-center text-gray-600 dark:text-gray-400 text-center">
                 <div class="loader opacity-30">Loading...</div>
-                <p>Scanning files & building log indices.</p>
-                <p class="mt-5">This might take a bit longer on the first run.</p>
+                <p>Scanning <strong>{{ bytes_formatted($totalFileSize) }}</strong> worth of log files.</p>
+                <p class="mt-5 text-sm">We are indexing these files to improve performance later on.</p>
+                <p class="mt-5 text-sm">This might take a bit longer on the first run.</p>
             </div>
         @endif
 

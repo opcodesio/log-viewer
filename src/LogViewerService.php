@@ -144,6 +144,6 @@ class LogViewerService
      */
     public function version(): string
     {
-        return InstalledVersions::getPrettyVersion('opcodesio/log-viewer');
+        return InstalledVersions::getPrettyVersion('opcodesio/log-viewer') ?? 'dev-main';
     }
 }

@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 class LogFile
 {
@@ -61,9 +62,14 @@ class LogFile
         return response()->download($this->path);
     }
 
+    protected function cacheTtl()
+    {
+        return now()->addWeek();
+    }
+
     protected function cacheKey(): string
     {
-        return 'log-viewer:file:'.md5($this->path);
+        return 'log-viewer:'.LogViewer::version().':file:'.md5($this->path);
     }
 
     protected function relatedCacheKeysKey(): string
@@ -78,9 +84,7 @@ class LogFile
         Cache::put(
             $this->relatedCacheKeysKey(),
             array_unique($keys),
-            // because all individual cache keys will expire far quicker than one week, it's OK for us to
-            // expire this overarching key, because all dependent keys will have expired by that time.
-            now()->addWeek()
+            $this->cacheTtl()
         );
     }
 
@@ -94,22 +98,28 @@ class LogFile
         return $this->cacheKey().':'.md5($query).':index';
     }
 
-    public function saveIndexForQuery(array $indexData, string $query = ''): void
+    public function saveIndexDataForQuery(array $indexData, string $query = ''): void
     {
         $key = $this->indexCacheKeyForQuery($query);
-
-        Cache::put(
-            $key,
-            $indexData,
-            now()->addDay(),
-        );
-
+        Cache::put($key, $indexData, $this->cacheTtl());
         $this->addRelatedCacheKey($key);
     }
 
-    public function getIndexForQuery(string $query = '', $default = []): array
+    public function getIndexDataForQuery(string $query = '', $default = []): array
     {
         return Cache::get($this->indexCacheKeyForQuery($query), $default);
+    }
+
+    public function saveLastScanFileSizeForQuery(int $lastScanFileSize, string $query = ''): void
+    {
+        $fileSizeKey = $this->indexCacheKeyForQuery($query).':filesize';
+        Cache::put($fileSizeKey, $lastScanFileSize, $this->cacheTtl());
+        $this->addRelatedCacheKey($fileSizeKey);
+    }
+
+    public function getLastScanFileSizeForQuery(string $query = '', $default = 0): int
+    {
+        return Cache::get($this->indexCacheKeyForQuery($query).':filesize', $default);
     }
 
     public function clearCache(): void
@@ -130,14 +140,13 @@ class LogFile
     public function setMetaData(string $attribute, $value): void
     {
         $this->metaData[$attribute] = $value;
-        Cache::put($this->metaDataCacheKey(), $this->metaData, now()->addWeek());
+        Cache::put($this->metaDataCacheKey(), $this->metaData, $this->cacheTtl());
     }
 
     public function getMetaData(string $attribute = null, $default = null): mixed
     {
         if (! isset($this->metaData)) {
             $this->metaData = Cache::get($this->metaDataCacheKey(), []);
-            $this->metaDataChanged = false;
         }
 
         if (isset($attribute)) {

@@ -49,7 +49,7 @@ class LogReader
      *
      * @var int
      */
-    protected int $lastScanFileSize = 0;
+    protected int $lastScanFileSize;
 
     /**
      * The log levels that should be read from this file.
@@ -196,13 +196,7 @@ class LogReader
             throw new \Exception('Could not open "'.$this->file->path.'" for reading.');
         }
 
-        [$this->logIndex, $this->lastScanFileSize] = $this->file->getIndexForQuery($this->query ?? '', [[], 0]);
-
-        if ($this->usesOldIndexScheme()) {
-            // clear out the old index, so we can re-build it instead of building on top of the existing one.
-            $this->logIndex = [];
-            $this->lastScanFileSize = 0;
-        }
+        $this->logIndex = $this->file->getIndexDataForQuery($this->query ?? '');
 
         if ($this->requiresScan()) {
             $this->scan();
@@ -225,10 +219,8 @@ class LogReader
         }
 
         if ($this->indexChanged) {
-            $this->file->saveIndexForQuery(
-                [$this->logIndex, $this->lastScanFileSize],
-                $this->query ?? ''
-            );
+            $this->file->saveIndexDataForQuery($this->logIndex, $this->query ?? '');
+            $this->file->saveLastScanFileSizeForQuery($this->lastScanFileSize, $this->query ?? '');
         }
 
         if (fclose($this->fileHandle)) {
@@ -372,6 +364,8 @@ class LogReader
         } else {
             $this->query = null;
         }
+
+        unset($this->lastScanFileSize);
 
         return $this;
     }
@@ -754,27 +748,12 @@ class LogReader
         return null;
     }
 
-    protected function usesOldIndexScheme(): bool
+    public function requiresScan(): bool
     {
-        $usesOldIndexScheme = false;
-
-        foreach ($this->logIndex as $level => $levelIndex) {
-            foreach ($levelIndex as $potentialLogIndex => $potentialLogPosition) {
-                if (is_numeric($potentialLogPosition)) {
-                    // still uses old index scheme, so we should re-generate the index.
-                    $usesOldIndexScheme = true;
-                }
-
-                // we don't need to look at the other elements, because the index only follows one structure.
-                break 2;
-            }
+        if (!isset($this->lastScanFileSize)) {
+            $this->lastScanFileSize = $this->file->getLastScanFileSizeForQuery($this->query ?? '');
         }
 
-        return $usesOldIndexScheme;
-    }
-
-    protected function requiresScan(): bool
-    {
         return $this->lastScanFileSize !== $this->file->size();
     }
 

@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogReader;
 
 class FileList extends Component
@@ -32,15 +33,26 @@ class FileList extends Component
 
     public function render()
     {
+        $files = LogViewer::getFiles();
+
+        $filesRequiringScans = $files->filter(fn (LogFile $file) => $file->logs()->requiresScan());
+        $totalFileSize = $filesRequiringScans->sum->size();
+
+        if ($filesRequiringScans->isEmpty() || $totalFileSize < (10 * 1024 * 1024)) {   // 10 MB
+            $this->shouldLoadFiles = true;
+        }
+
         if ($this->shouldLoadFiles) {
             $files = LogViewer::getFiles();
 
             foreach ($files as $file) {
-                $file->logs()->scan();
+                if ($file->logs()->requiresScan()) {
+                    $file->logs()->scan();
+                }
 
-                // We clear it so that PHP destroys that LogReader instance
-                // with a big index variable in it. This is to reduce memory
-                // usage for this request.
+                // If there was a scan, it most likely loaded a big index array into memory,
+                // so we should clear the instance before checking the next file
+                // in order to save some memory.
                 LogReader::clearInstance($file);
             }
 
@@ -57,7 +69,8 @@ class FileList extends Component
         }
 
         return view('log-viewer::livewire.file-list', [
-            'files' => $files ?? [],
+            'files' => $this->shouldLoadFiles && $files ? $files : [],
+            'totalFileSize' => $totalFileSize,
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
         ]);
     }

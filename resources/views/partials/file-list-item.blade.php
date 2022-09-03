@@ -32,7 +32,7 @@
 
     <div :id="$id('dropdown-button')" x-ref="panel" x-show="open" x-transition.origin.top.right x-on:click.outside="close($refs.button)" style="display: none;" class="dropdown w-48">
         <div class="py-2">
-            <button wire:click="clearCache('{{ $logFile->identifier }}')" x-data="{ cacheRecentlyCleared: @json($cacheRecentlyCleared) }" x-init="setTimeout(() => cacheRecentlyCleared = false, 2000)">
+            <button wire:click="clearCache('{{ $logFile->identifier }}')" x-on:click.stop x-data="{ cacheRecentlyCleared: @json($cacheRecentlyCleared) }" x-init="setTimeout(() => cacheRecentlyCleared = false, 2000)">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-database" /></svg>
                 <span x-show="!cacheRecentlyCleared" wire:loading.class="hidden">Rebuild index</span>
                 <span x-show="!cacheRecentlyCleared" wire:loading wire:target="clearCache('{{ $logFile->identifier }}')">Rebuilding...</span>
