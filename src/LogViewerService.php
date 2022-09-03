@@ -36,9 +36,9 @@ class LogViewerService
     }
 
     /**
-     * @return Collection|LogFile[]
+     * @return array|Collection|LogFile[]|null
      */
-    public function getFiles()
+    public function getFiles(): array|Collection|null
     {
         if (! isset($this->_cachedFiles)) {
             $this->_cachedFiles = collect($this->getFilePaths())
