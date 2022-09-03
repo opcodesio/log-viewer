@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer\Http\Livewire;
 
+use Composer\InstalledVersions;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -79,13 +80,8 @@ class LogList extends Component
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : request()->server('REQUEST_TIME_FLOAT');
 
         $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2).' MB';
+        $version = InstalledVersions::getPrettyVersion('opcodesio/log-viewer');
         $requestTime = number_format((microtime(true) - $startTime) * 1000, 0).'ms';
-        try {
-            $version = json_decode(file_get_contents(__DIR__.'/../../../composer.json'))?->version ?? null;
-        } catch (\Exception $e) {
-            // Could not get the version from the composer file for some reason. Let's ignore that and move on.
-            $version = null;
-        }
 
         return view('log-viewer::livewire.log-list', [
             'file' => $file,
