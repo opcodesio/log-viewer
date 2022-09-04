@@ -24,18 +24,19 @@
     <div
         x-ref="panel"
         x-show="open"
-        x-transition.origin.top.right
+        x-transition:enter="transition ease-out duration-100"
+        x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-100"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-90"
         x-on:click.outside="close($refs.button)"
         :id="$id('dropdown-button')"
-        style="min-width: 230px; display: none;"
+        style="min-width: 230px;"
         class="dropdown"
     >
         <div class="py-2">
             <div class="label">Settings</div>
-{{--            <button wire:click="toggleAutomaticRefresh">--}}
-{{--                <x-log-viewer::checkmark :checked="$refreshAutomatically" />--}}
-{{--                <span class="ml-3">Refresh every 2 seconds</span>--}}
-{{--            </button>--}}
 
             <button wire:click="toggleShorterStackTraces">
                 <x-log-viewer::checkmark :checked="$shorterStackTraces" />
