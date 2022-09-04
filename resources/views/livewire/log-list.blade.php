@@ -108,8 +108,8 @@
             </div>
 
             <div class="absolute hidden inset-0 top-9 px-4 z-20" wire:loading.class.remove="hidden">
-                <div class="rounded-md bg-white dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
-                    <div class="loader">Loading...</div>
+                <div class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 spin" fill="currentColor"><use href="#icon-spinner" /></svg>
                 </div>
             </div>
         </div>
