@@ -9,6 +9,7 @@
                 x-on:click="selectFile('{{ $logFile->identifier }}')"
                 x-data="{
                     open: false,
+                    direction: 'down',
                     toggle() {
                         if (this.open) { return this.close() }
                         this.$refs.button.focus()
@@ -19,7 +20,7 @@
                     close(focusAfter) {
                         if (! this.open) { return }
                         this.open = false
-                        focusAfter && focusAfter.focus()
+                        focusAfter?.focus()
                     }
                 }"
                 x-on:keydown.escape.prevent.stop="close($refs.button)"
@@ -44,6 +45,7 @@
                     :id="$id('dropdown-button')"
                     style="display: none;"
                     class="dropdown w-48"
+                    :class="direction"
                 >
                     <div class="py-2">
                         <button wire:click="clearCache('{{ $logFile->identifier }}')" x-on:click.stop="close($refs.button)">

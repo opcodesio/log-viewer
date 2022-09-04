@@ -356,7 +356,11 @@ html.dark {
 }
 
 .dropdown {
-    @apply absolute z-40 right-5 -mt-1 overflow-hidden text-gray-900 dark:text-gray-200 rounded-md bg-white border-gray-200 dark:bg-gray-800 border dark:border-gray-700 shadow-md;
+    @apply absolute top-full z-40 right-1 -mt-1 overflow-hidden text-gray-900 dark:text-gray-200 rounded-md bg-white border-gray-200 dark:bg-gray-800 border dark:border-gray-700 shadow-md;
+
+    &.up {
+        @apply top-auto bottom-full mt-0 -mb-1;
+    }
 
     button, a {
         @apply block flex items-center w-full px-4 py-2 text-left text-sm outline-emerald-500 dark:outline-emerald-800;
@@ -381,10 +385,10 @@ html.dark {
 // Dark border (hover): border-emerald-700
 
 .file-list {
-    @apply relative h-full overflow-y-scroll pt-6 pb-28 pr-4;
+    @apply relative h-full overflow-y-auto pt-6 pb-6 pr-4;
 
     .file-item-container {
-        @apply mb-2 text-gray-800 dark:text-gray-200 rounded-md overflow-hidden transition duration-100 border cursor-pointer border-transparent bg-white dark:bg-gray-800;
+        @apply relative mb-2 text-gray-800 dark:text-gray-200 rounded-md transition duration-100 border cursor-pointer border-transparent bg-white dark:bg-gray-800;
 
         &.active {
             @apply border-emerald-500 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-900 dark:bg-opacity-50;
@@ -407,7 +411,7 @@ html.dark {
         }
 
         .file-dropdown-toggle {
-            @apply absolute top-0 right-0 bottom-0 w-8 flex items-center justify-center border-l border-transparent text-gray-500 dark:text-gray-400 outline-emerald-500 dark:outline-emerald-700 transition duration-200;
+            @apply absolute top-0 right-0 bottom-0 w-8 flex rounded-r-md items-center justify-center border-l border-transparent text-gray-500 dark:text-gray-400 outline-emerald-500 dark:outline-emerald-700 transition duration-200;
             &:hover {
                 @apply border-emerald-600 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900;
             }
