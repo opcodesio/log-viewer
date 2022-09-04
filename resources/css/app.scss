@@ -358,6 +358,12 @@ html.dark {
 .dropdown {
     @apply absolute top-full z-40 right-1 -mt-1 overflow-hidden text-gray-900 dark:text-gray-200 rounded-md bg-white border-gray-200 dark:bg-gray-800 border dark:border-gray-700 shadow-md;
 
+    transform-origin: top right !important;
+
+    &.up {
+        transform-origin: bottom right !important;
+    }
+
     &.up {
         @apply top-auto bottom-full mt-0 -mb-1;
     }
