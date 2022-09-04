@@ -36,7 +36,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-github" /></svg>
                     </a>
                 </h1>
-                @if($backUrl = config('log-viewer.back_to_system_url'))
+                @if($backUrl = config('log-viewer.back_to_system_url').':'.$_SERVER['SERVER_PORT'])
                     <a href="{{ $backUrl }}" class="inline-flex items-center text-sm text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 mt-3">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1.5" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-arrow-left" /></svg>
                         {{ config('log-viewer.back_to_system_label') ?? 'Back to '.config('app.name') }}
