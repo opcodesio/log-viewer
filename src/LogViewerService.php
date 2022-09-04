@@ -36,7 +36,7 @@ class LogViewerService
     }
 
     /**
-     * @return Collection
+     * @return Collection|LogFile[]
      */
     public function getFiles(): Collection
     {
