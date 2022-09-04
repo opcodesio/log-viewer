@@ -1,6 +1,6 @@
 <div class="relative h-full overflow-hidden" x-cloak>
-    <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
-    <div class="file-list">
+    <div class="pointer-events-none absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
+    <div class="file-list" x-ref="list">
         @foreach($files as $logFile)
             <div class="file-item-container"
                 x-bind:class="[selectedFileIdentifier && selectedFileIdentifier === '{{ $logFile->identifier }}' ? 'active' : '']"
@@ -9,15 +9,18 @@
                 x-on:click="selectFile('{{ $logFile->identifier }}')"
                 x-data="{
                     open: false,
+                    direction: 'down',
                     toggle() {
                         if (this.open) { return this.close() }
                         this.$refs.button.focus()
                         this.open = true
+                        const p = this.$refs.list.getBoundingClientRect()
+                        this.direction = this.$refs.button.getBoundingClientRect().bottom - p.top + 140 > p.height ? 'up' : 'down';
                     },
                     close(focusAfter) {
                         if (! this.open) { return }
                         this.open = false
-                        focusAfter && focusAfter.focus()
+                        focusAfter?.focus()
                     }
                 }"
                 x-on:keydown.escape.prevent.stop="close($refs.button)"
@@ -37,11 +40,12 @@
                 <div
                     x-ref="panel"
                     x-show="open"
-                    x-transition.origin.top.right
+                    x-transition
                     x-on:click.outside="close($refs.button)"
                     :id="$id('dropdown-button')"
                     style="display: none;"
                     class="dropdown w-48"
+                    :class="direction"
                 >
                     <div class="py-2">
                         <button wire:click="clearCache('{{ $logFile->identifier }}')" x-on:click.stop="close($refs.button)">
@@ -68,5 +72,5 @@
             </div>
         @endforeach
     </div>
-    <div class="absolute z-10 bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
+    <div class="pointer-events-none absolute z-10 bottom-0 h-8 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
 </div>

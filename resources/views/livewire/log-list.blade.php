@@ -20,9 +20,8 @@
         </div>
 
         @isset($selectedFileIdentifier)
-        <div class="relative overflow-hidden text-sm" x-data x-init="$nextTick(() => {  })">
-
-            <div id="log-item-container" class="log-item-container h-full overflow-y-scroll px-4" x-on:scroll="(event) => $store.logViewer.onScroll(event)">
+        <div class="relative overflow-hidden text-sm h-full" x-data x-init="$nextTick(() => {  })">
+            <div id="log-item-container" class="log-item-container h-full overflow-y-auto px-4" x-on:scroll="(event) => $store.logViewer.onScroll(event)">
                 <div class="inline-block min-w-full max-w-full align-middle">
 <table wire:key="{{ \Illuminate\Support\Str::random(16) }}"
        class="table-fixed min-w-full max-w-full border-separate"
