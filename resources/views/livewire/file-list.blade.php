@@ -1,4 +1,4 @@
-<div class="relative overflow-hidden" x-cloak @if(!$shouldLoadFiles) wire:init="loadFiles" @endif>
+<div class="relative h-full overflow-hidden" x-cloak @if(!$shouldLoadFiles) wire:init="loadFiles" @endif>
     <div class="absolute z-10 top-0 h-6 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
     <div class="file-list">
         @if(!$shouldLoadFiles)
