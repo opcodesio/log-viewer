@@ -15,14 +15,14 @@
 </head>
 <body class="h-full px-5 bg-gray-100 dark:bg-gray-900"
     x-data="{
-        selectedFileName: @isset($selectedFileName) '{{ $selectedFileName }}' @else null @endisset,
+        selectedFileIdentifier: @isset($selectedFileIdentifier) '{{ $selectedFileIdentifier }}' @else null @endisset,
         selectFile(name) {
-            if (name && name === this.selectedFileName) {
-                this.selectedFileName = null;
+            if (name && name === this.selectedFileIdentifier) {
+                this.selectedFileIdentifier = null;
             } else {
-                this.selectedFileName = name;
+                this.selectedFileIdentifier = name;
             }
-            this.$dispatch('file-selected', this.selectedFileName);
+            this.$dispatch('file-selected', this.selectedFileIdentifier);
         }
     }"
 >
@@ -44,7 +44,7 @@
                 @endif
             </div>
 
-            @livewire('log-viewer::file-list', ['selectedFileName' => $selectedFileName])
+            @livewire('log-viewer::file-list', ['selectedFileIdentifier' => $selectedFileIdentifier])
         </nav>
     </div>
 

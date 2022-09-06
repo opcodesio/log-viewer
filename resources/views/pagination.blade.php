@@ -8,7 +8,7 @@
     </div>
     <div class="pages">
         @php
-            $links = $paginator->linkCollection()->toArray();
+            $links = $paginator->toArray()['links'];
             // To get rid of the "previous" and "next" links
             array_shift($links);
             array_pop($links);

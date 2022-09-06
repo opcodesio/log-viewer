@@ -14,28 +14,29 @@
     x-on:keydown.escape.prevent.stop="close($refs.button)"
     x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
     x-id="['dropdown-button']"
+    class="relative"
 >
     <button type="button" class="menu-button"
-            x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')"
-    >
+            x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-cog" /></svg>
     </button>
 
     <div
         x-ref="panel"
         x-show="open"
-        x-transition.origin.top.right
+        x-transition:enter="transition ease-out duration-100"
+        x-transition:enter-start="opacity-0 scale-90"
+        x-transition:enter-end="opacity-100 scale-100"
+        x-transition:leave="transition ease-in duration-100"
+        x-transition:leave-start="opacity-100 scale-100"
+        x-transition:leave-end="opacity-0 scale-90"
         x-on:click.outside="close($refs.button)"
         :id="$id('dropdown-button')"
-        style="min-width: 230px; display: none;"
+        style="min-width: 230px;"
         class="dropdown"
     >
         <div class="py-2">
             <div class="label">Settings</div>
-{{--            <button wire:click="toggleAutomaticRefresh">--}}
-{{--                <x-log-viewer::checkmark :checked="$refreshAutomatically" />--}}
-{{--                <span class="ml-3">Refresh every 2 seconds</span>--}}
-{{--            </button>--}}
 
             <button wire:click="toggleShorterStackTraces">
                 <x-log-viewer::checkmark :checked="$shorterStackTraces" />

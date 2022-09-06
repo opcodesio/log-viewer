@@ -10,15 +10,19 @@ Route::middleware(LogViewer::getRouteMiddleware())
         Route::get('/', function () {
             LogViewer::auth();
 
+            $selectedFile = LogViewer::getFile(request()->query('file', ''));
+
             return view('log-viewer::index', [
                 'jsPath' => __DIR__.'/../public/app.js',
                 'cssPath' => __DIR__.'/../public/app.css',
-                'selectedFileName' => request()->query('file', ''),
+                'selectedFileIdentifier' => $selectedFile?->identifier,
             ]);
         })->name('blv.index');
 
-        Route::get('file/{fileName}/download', function (string $fileName) {
-            $file = LogViewer::getFile($fileName);
+        Route::get('file/{fileIdentifier}/download', function (string $fileIdentifier) {
+            LogViewer::auth();
+            
+            $file = LogViewer::getFile($fileIdentifier);
 
             abort_if(is_null($file), 404);
 
