@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer\Http\Livewire;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogFile;
 
 class FileList extends Component
 {
@@ -22,7 +23,15 @@ class FileList extends Component
     public function render()
     {
         return view('log-viewer::livewire.file-list', [
-            'files' => LogViewer::getFiles(),
+            'files' => LogViewer::getFiles()->mapToGroups(function (LogFile $file) {
+                if (config('log-viewer.group_by_subfolder')) {
+                    $group = $file->subFolder ?: '_root';
+                } else {
+                    $group = '_root';
+                }
+
+                return [$group => $file];
+            })->sortKeys(),
         ]);
     }
 
