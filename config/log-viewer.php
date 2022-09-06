@@ -47,6 +47,8 @@ return [
 
     'include_files' => ['*.log'],
 
+    'include_recursively' => false,
+
     /*
     |--------------------------------------------------------------------------
     | File list grouping

@@ -6,7 +6,7 @@ use Composer\InstalledVersions;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
+use Symfony\Component\Finder\Finder;
 
 class LogViewerService
 {
@@ -20,19 +20,18 @@ class LogViewerService
 
     protected function getFilePaths(): array
     {
-        $files = [];
+        $finder = Finder::create()->in(storage_path('logs'))
+            ->files()
+            ->name(config('log-viewer.include_files', []))
+            ->notName(config('log-viewer.exclude_files', []))
+            ->sortByModifiedTime()
+            ->reverseSorting();
 
-        foreach (config('log-viewer.include_files', []) as $pattern) {
-            $files = array_merge($files, glob(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR).$pattern));
+        if (! config('log-viewer.include_recursively', false)) {
+            $finder->depth('== 0');
         }
 
-        foreach (config('log-viewer.exclude_files', []) as $pattern) {
-            $files = array_diff($files, glob(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR).$pattern));
-        }
-
-        $files = array_reverse($files);
-
-        return array_filter($files, 'is_file');
+        return array_keys(iterator_to_array($finder));
     }
 
     /**
