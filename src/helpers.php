@@ -1,5 +1,8 @@
 <?php
 
+const DECIMAL_LENGTH = 2,
+      PACKET_SIZE = 1024;
+
 if (! function_exists('highlight_search_result')) {
     /**
      * Highlights search query results and escapes HTML.
@@ -41,15 +44,11 @@ if (! function_exists('bytes_formatted')) {
      */
     function bytes_formatted(int $bytes): string
     {
-        if ($bytes > ($gb = 1024 * 1024 * 1024)) {
-            return number_format($bytes / $gb, 2).' GB';
-        } elseif ($bytes > ($mb = 1024 * 1024)) {
-            return number_format($bytes / $mb, 2).' MB';
-        } elseif ($bytes > ($kb = 1024)) {
-            return number_format($bytes / $kb, 2).' KB';
-        }
-
-        return $bytes.' bytes';
+        $formatTypeForFileSize = floor(log($bytes) / log(PACKET_SIZE));
+        
+        return 0 === $bytes ? '0 bytes' :
+        number_format($bytes / pow(PACKET_SIZE, $formatTypeForFileSize), max(0, DECIMAL_LENGTH)) . ' ' .
+            ['Bytes', 'KB', 'MB', 'GB'][$formatTypeForFileSize];
     }
 }
 
