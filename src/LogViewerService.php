@@ -121,22 +121,14 @@ class LogViewerService
         $this->maxLogSizeToDisplay = $bytes > 0 ? $bytes : self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
     }
 
-    /**
-     * This pattern, used for processing Laravel logs, returns these results:
-     * $matches[0] - the full log line being tested.
-     * $matches[1] - full timestamp between the square brackets (includes microseconds and timezone offset)
-     * $matches[2] - timestamp microseconds, if available
-     * $matches[3] - timestamp timezone offset, if available
-     * $matches[4] - contents between timestamp and the severity level
-     * $matches[5] - environment (local, production, etc)
-     * $matches[6] - log severity (info, debug, error, etc)
-     * $matches[7] - the log text, the rest of the text.
-     */
     public function laravelRegexPattern(): string
     {
-        return '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\](.*?(\w+)\.|.*?)('
-            .implode('|', array_filter(Level::caseValues()))
-            .')?: (.*?)( in [\/].*?:[0-9]+)?$/is';
+        return config('log-viewer.patterns.laravel.log_parsing_regex');
+    }
+
+    public function logMatchPattern(): string
+    {
+        return config('log-viewer.patterns.laravel.log_matching_regex');
     }
 
     /**
