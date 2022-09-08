@@ -67,9 +67,15 @@ class FileList extends Component
                 // And then bring back into a flat view after everything's sorted
                 ->flatten();
         } else {
-            // otherwise, let's estimate the scan duration by sampling the speed of the first scan.
-            $scanStart = microtime(true);
+            // Otherwise, let's estimate the scan duration by sampling the speed of the first scan.
+            // For more accurate results, let's scan a file that's more than 10 MB in size.
             $file = $filesRequiringScans->filter(fn ($file) => $file->sizeInMB() > 10)->first();
+
+            if (is_null($file)) {
+                $file = $filesRequiringScans->sortByDesc(fn ($file) => $file->size())->first();
+            }
+
+            $scanStart = microtime(true);
             $file->logs()->scan();
             $scanEnd = microtime(true);
 
