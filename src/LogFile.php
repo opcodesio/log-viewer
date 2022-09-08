@@ -50,6 +50,11 @@ class LogFile
         return filesize($this->path);
     }
 
+    public function sizeInMB(): float
+    {
+        return $this->size() / 1024 / 1024;
+    }
+
     public function sizeFormatted(): string
     {
         return bytes_formatted($this->size());

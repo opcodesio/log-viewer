@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer\Http\Livewire;
 
+use Carbon\CarbonInterval;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
@@ -11,9 +12,11 @@ use Opcodes\LogViewer\LogReader;
 
 class FileList extends Component
 {
+    const MIN_LOGS_FILE_SIZE_FOR_SCAN_STATE = 50 * 1024 * 1024; // 50 MB
+
     public ?string $selectedFileIdentifier = null;
 
-    public bool $shouldLoadFiles = false;
+    public bool $shouldLoadFilesImmediately = false;
 
     protected bool $cacheRecentlyCleared;
 
@@ -37,18 +40,15 @@ class FileList extends Component
 
         $filesRequiringScans = $files->filter(fn (LogFile $file) => $file->logs()->requiresScan());
         $totalFileSize = $filesRequiringScans->sum->size();
+        $estimatedSecondsToScan = 0;
 
-        if ($filesRequiringScans->isEmpty() || $totalFileSize < (10 * 1024 * 1024)) {   // 10 MB
-            $this->shouldLoadFiles = true;
+        if ($filesRequiringScans->isEmpty() || $totalFileSize < self::MIN_LOGS_FILE_SIZE_FOR_SCAN_STATE) {
+            $this->shouldLoadFilesImmediately = true;
         }
 
-        if ($this->shouldLoadFiles) {
-            $files = LogViewer::getFiles();
-
-            foreach ($files as $file) {
-                if ($file->logs()->requiresScan()) {
-                    $file->logs()->scan();
-                }
+        if ($this->shouldLoadFilesImmediately) {
+            foreach ($filesRequiringScans as $file) {
+                $file->logs()->scan();
 
                 // If there was a scan, it most likely loaded a big index array into memory,
                 // so we should clear the instance before checking the next file
@@ -66,23 +66,39 @@ class FileList extends Component
 
                 // And then bring back into a flat view after everything's sorted
                 ->flatten();
+        } else {
+            // otherwise, let's estimate the scan duration by sampling the speed of the first scan.
+            $scanStart = microtime(true);
+            $file = $filesRequiringScans->filter(fn ($file) => $file->sizeInMB() > 10)->first();
+            $file->logs()->scan();
+            $scanEnd = microtime(true);
+
+            // because we already scanned it here, it won't need to be scanned later.
+            $totalFileSize -= $file->size();
+
+            $durationInMicroseconds = ($scanEnd - $scanStart) * 1000_000;
+            $microsecondsPerMB = $durationInMicroseconds / $file->sizeInMB() * 1.10; // 10% buffer just in case
+            $totalFileSizeInMB = $totalFileSize / 1024 / 1024;
+
+            $estimatedSecondsToScan = ceil($totalFileSizeInMB * $microsecondsPerMB / 1000_000);
         }
 
         return view('log-viewer::livewire.file-list', [
-            'files' => $this->shouldLoadFiles && $files ? $files : [],
+            'files' => $this->shouldLoadFilesImmediately && $files ? $files : [],
             'totalFileSize' => $totalFileSize,
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
+            'estimatedTimeToScan' => CarbonInterval::seconds($estimatedSecondsToScan)->cascade()->forHumans(),
         ]);
     }
 
     public function loadFiles()
     {
-        $this->shouldLoadFiles = true;
+        $this->shouldLoadFilesImmediately = true;
     }
 
     public function rescanAllFiles()
     {
-        $this->shouldLoadFiles = false;
+        $this->shouldLoadFilesImmediately = false;
         $this->emit('loadFiles');
     }
 

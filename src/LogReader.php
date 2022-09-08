@@ -400,6 +400,7 @@ class LogReader
 
         // we don't care about the selected levels here, we should scan everything
         $levels = self::getDefaultLevels();
+        $logMatchPattern = LogViewer::logMatchPattern();
         $earliest_timestamp = null;
         $latest_timestamp = null;
         $currentLog = '';
@@ -417,7 +418,7 @@ class LogReader
              * $matches[3] - the optional timezone offset, like `+02:00` or `-05:30`
              */
             $matches = [];
-            if (preg_match(LogViewer::logMatchPattern(), $line, $matches) === 1) {
+            if (preg_match($logMatchPattern, $line, $matches) === 1) {
                 if ($currentLog !== '') {
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
                         $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
@@ -444,7 +445,7 @@ class LogReader
             $currentLog .= $line;
         }
 
-        if ($currentLog !== '' && preg_match(LogViewer::logMatchPattern(), $currentLog) === 1) {
+        if ($currentLog !== '' && preg_match($logMatchPattern, $currentLog) === 1) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
                 $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
             }
