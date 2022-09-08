@@ -19,6 +19,7 @@ use Opcodes\LogViewer\LogFile;
  * @method static void setMaxLogSize(int $bytes)
  * @method static int maxLogSize()
  * @method static string laravelRegexPattern()
+ * @method static string logMatchPattern()
  */
 class LogViewer extends Facade
 {

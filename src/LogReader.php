@@ -6,11 +6,10 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 class LogReader
 {
-    const LOG_MATCH_PATTERN = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\].*/';
-
     const DIRECTION_FORWARD = 'forward';
 
     const DIRECTION_BACKWARD = 'backward';
@@ -418,7 +417,7 @@ class LogReader
              * $matches[3] - the optional timezone offset, like `+02:00` or `-05:30`
              */
             $matches = [];
-            if (preg_match(self::LOG_MATCH_PATTERN, $line, $matches) === 1) {
+            if (preg_match(LogViewer::logMatchPattern(), $line, $matches) === 1) {
                 if ($currentLog !== '') {
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
                         $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
@@ -445,7 +444,7 @@ class LogReader
             $currentLog .= $line;
         }
 
-        if ($currentLog !== '' && preg_match(self::LOG_MATCH_PATTERN, $currentLog) === 1) {
+        if ($currentLog !== '' && preg_match(LogViewer::logMatchPattern(), $currentLog) === 1) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
                 $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
             }
@@ -632,7 +631,7 @@ class LogReader
         $currentLogLevel = '';
 
         while (($line = fgets($this->fileHandle)) !== false) {
-            if (preg_match(self::LOG_MATCH_PATTERN, $line) === 1) {
+            if (preg_match(LogViewer::logMatchPattern(), $line) === 1) {
                 if ($currentLog !== '') {
                     // found the next log, so let's stop the loop and return the log we found
                     break;

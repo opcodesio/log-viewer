@@ -20,6 +20,8 @@ Route::middleware(LogViewer::getRouteMiddleware())
         })->name('blv.index');
 
         Route::get('file/{fileIdentifier}/download', function (string $fileIdentifier) {
+            LogViewer::auth();
+            
             $file = LogViewer::getFile($fileIdentifier);
 
             abort_if(is_null($file), 404);
