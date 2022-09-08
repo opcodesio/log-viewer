@@ -47,7 +47,9 @@ return [
     |
     */
 
-    'include_files' => ['*.log'],
+    'include_files' => [
+        '*.log',
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -86,7 +88,7 @@ return [
 
     'patterns' => [
         'laravel' => [
-            'log_matching_regex' => '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}[\+-]\d\d:\d\d)?\].*/',
+            'log_matching_regex' => '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}([\+-]\d\d:\d\d)?)?\].*/',
 
             /**
              * This pattern, used for processing Laravel logs, returns these results:
