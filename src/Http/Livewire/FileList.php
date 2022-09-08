@@ -12,11 +12,17 @@ use Opcodes\LogViewer\LogReader;
 
 class FileList extends Component
 {
+    const OLDEST_FIRST = 'asc';
+
+    const NEWEST_FIRST = 'desc';
+
     const MIN_LOGS_FILE_SIZE_FOR_SCAN_STATE = 50 * 1024 * 1024; // 50 MB
 
     public ?string $selectedFileIdentifier = null;
 
     public bool $shouldLoadFilesImmediately = false;
+
+    public string $direction = self::NEWEST_FIRST;
 
     protected bool $cacheRecentlyCleared;
 
@@ -58,11 +64,24 @@ class FileList extends Component
 
             $files = $files->groupBy('subFolder')
 
-                // sort by sub-folder name ASCENDING
-                ->sortKeys()
+                ->when($this->direction === self::OLDEST_FIRST, function ($groupedFiles) {
+                    return $groupedFiles->sortBy(function ($group) {
+                        return $group->min->earliestTimestamp();
+                    });
+                }, function ($groupedFiles) {
+                    return $groupedFiles->sortByDesc(function ($group) {
+                        return $group->max->latestTimestamp();
+                    });
+                })
 
-                // Then individual log files by their latest timestamp DESCENDING
-                ->map(fn (Collection $group) => $group->sortByDesc->latestTimestamp())
+                // Then individual log files by their latest or earliest timestamps
+                ->map(function (Collection $group) {
+                    if ($this->direction === self::OLDEST_FIRST) {
+                        return $group->sortBy->earliestTimestamp();
+                    }
+
+                    return $group->sortByDesc->latestTimestamp();
+                })
 
                 // And then bring back into a flat view after everything's sorted
                 ->flatten();

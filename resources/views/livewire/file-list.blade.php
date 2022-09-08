@@ -10,6 +10,14 @@
             </div>
         @endif
 
+        <div class="text-sm text-gray-600 mb-4 ml-1">
+            <label for="file-sort-direction" class="sr-only">Sort direction</label>
+            <select id="file-sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
+                <option value="desc">Newest first</option>
+                <option value="asc">Oldest first</option>
+            </select>
+        </div>
+
         @foreach($files as $logFile)
             @include('log-viewer::partials.file-list-item', ['logFile' => $logFile])
         @endforeach

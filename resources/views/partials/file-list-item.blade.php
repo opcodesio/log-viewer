@@ -24,7 +24,7 @@
     x-id="['dropdown-button']"
 >
     <div class="file-item">
-        <p class="file-name"><span class="text-gray-400 dark:text-gray-500">{{ str_replace(DIRECTORY_SEPARATOR, ' '.DIRECTORY_SEPARATOR.' ', $logFile->subFolder) }}</span> {{ $logFile->name }}</p>
+        <p class="file-name"><span class="text-gray-400 dark:text-gray-500">{{ $logFile->subFolderFormatted() }}</span> {{ $logFile->name }}</p>
         <span class="file-size">{{ $logFile->sizeFormatted() }}</span>
         <button type="button" class="file-dropdown-toggle"
                 x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')"

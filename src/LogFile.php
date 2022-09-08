@@ -60,6 +60,11 @@ class LogFile
         return bytes_formatted($this->size());
     }
 
+    public function subFolderFormatted(): string
+    {
+        return str_replace(DIRECTORY_SEPARATOR, ' '.DIRECTORY_SEPARATOR.' ', $this->subFolder);
+    }
+
     public function downloadUrl(): string
     {
         return route('blv.download-file', $this->identifier);
