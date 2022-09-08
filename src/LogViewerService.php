@@ -123,12 +123,12 @@ class LogViewerService
 
     public function laravelRegexPattern(): string
     {
-        return config('log-viewer.patterns.laravel_regex');
+        return config('log-viewer.patterns.laravel.log_parsing_regex');
     }
 
     public function logMatchPattern(): string
     {
-        return config('log-viewer.patterns.log_match');
+        return config('log-viewer.patterns.laravel.log_matching_regex');
     }
 
     /**
