@@ -96,6 +96,11 @@ class LogViewerService
         $this->_cachedFiles = null;
     }
 
+    public function getRouteDomain(): ?string
+    {
+        return config('log-viewer.route_domain');
+    }
+
     public function getRoutePrefix(): string
     {
         return config('log-viewer.route_path', 'log-viewer');

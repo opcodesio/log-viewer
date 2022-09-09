@@ -6,6 +6,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Log Viewer Domain
+    |--------------------------------------------------------------------------
+    | You may change the domain where Log Viewer should be active.
+    | If the domain is empty, all domains will be valid.
+    |
+    */
+
+    'route_domain' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Log Viewer Route
     |--------------------------------------------------------------------------
     | Log Viewer will be available under this URL.

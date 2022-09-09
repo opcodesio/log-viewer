@@ -20,6 +20,18 @@ test('the default url can be changed', function () {
     get(route('blv.index'))->assertOK();
 });
 
+test('a domain can be set', function () {
+    config()->set('log-viewer.route_domain', 'logs.domain.test');
+    config()->set('log-viewer.route_path', '/');
+
+    reloadRoutes();
+
+    expect(route('blv.index'))->toBe('http://logs.domain.test');
+
+    get(route('blv.index'))->assertOK();
+});
+
+
 /*
 |--------------------------------------------------------------------------
 | HELPERS

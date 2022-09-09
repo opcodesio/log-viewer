@@ -13,6 +13,7 @@ use Opcodes\LogViewer\LogFile;
  * @method static LogFile[]|Collection getFiles()
  * @method static LogFile|null getFile(string $fileIdentifier)
  * @method static void clearFileCache()
+ * @method static string|null getRouteDomain()
  * @method static array getRouteMiddleware()
  * @method static string getRoutePrefix()
  * @method static void auth($callback = null)
