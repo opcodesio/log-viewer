@@ -34,6 +34,8 @@ class FileList extends Component
 
     public function mount(string $selectedFileIdentifier = null)
     {
+        $this->loadPreferences();
+
         $this->selectedFileIdentifier = $selectedFileIdentifier;
 
         if (! LogViewer::getFile($this->selectedFileIdentifier)) {
@@ -82,9 +84,9 @@ class FileList extends Component
                 ->map(function (LogFolder $folder) {
                     if ($this->direction === self::OLDEST_FIRST) {
                         $folder->files = $folder->files->sortBy->earliestTimestamp();
+                    } else {
+                        $folder->files = $folder->files->sortByDesc->latestTimestamp();
                     }
-
-                    $folder->files = $folder->files->sortByDesc->latestTimestamp();
 
                     return $folder;
                 });
@@ -159,5 +161,24 @@ class FileList extends Component
         }
 
         $this->cacheRecentlyCleared = true;
+    }
+
+    public function updatedDirection($value)
+    {
+        $this->savePreferences();
+    }
+
+    public function savePreferences(): void
+    {
+        session()->put('log-viewer:file-list-preferences', [
+            'direction' => $this->direction,
+        ]);
+    }
+
+    public function loadPreferences(): void
+    {
+        $prefs = session()->get('log-viewer:file-list-preferences', []);
+
+        $this->direction = $prefs['direction'] ?? $this->direction;
     }
 }
