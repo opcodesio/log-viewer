@@ -27,7 +27,8 @@ class LogFile
         $folder = str_replace(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR), '', $path);
 
         // now we're left with something like `folderA/laravel.log`. Let's remove the file name because we already know it.
-        $this->subFolder = str_replace($name, '', $folder);
+        $this->subFolder = str_replace([LogViewer::basePathForLogs(), $name], ['', ''], $folder);
+        $this->subFolder = rtrim($this->subFolder, DIRECTORY_SEPARATOR);
 
         $this->metaData = Cache::get($this->metaDataCacheKey(), []);
     }
@@ -60,9 +61,9 @@ class LogFile
         return bytes_formatted($this->size());
     }
 
-    public function subFolderFormatted(): string
+    public function subFolderIdentifier(): string
     {
-        return str_replace(DIRECTORY_SEPARATOR, ' '.DIRECTORY_SEPARATOR.' ', $this->subFolder);
+        return Str::substr(md5($this->subFolder), -8, 8);
     }
 
     public function downloadUrl(): string

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\LogReader;
 
 class FileList extends Component
@@ -62,29 +63,31 @@ class FileList extends Component
                 LogReader::clearInstance($file);
             }
 
-            $files = $files->groupBy('subFolder')
+            $filesGrouped = $files->groupBy(fn ($file) => $file->subFolder)
 
-                ->when($this->direction === self::OLDEST_FIRST, function ($groupedFiles) {
-                    return $groupedFiles->sortBy(function ($group) {
-                        return $group->min->earliestTimestamp();
+                ->map(fn ($files, $subFolder) => new LogFolder($subFolder, $files))
+
+                // sort the folders
+                ->when($this->direction === self::OLDEST_FIRST, function (Collection $folders) {
+                    return $folders->sortBy(function (LogFolder $folder) {
+                        return $folder->files->min->earliestTimestamp();
                     });
-                }, function ($groupedFiles) {
-                    return $groupedFiles->sortByDesc(function ($group) {
-                        return $group->max->latestTimestamp();
+                }, function (Collection $folders) {
+                    return $folders->sortByDesc(function (LogFolder $folder) {
+                        return $folder->files->max->latestTimestamp();
                     });
                 })
 
                 // Then individual log files by their latest or earliest timestamps
-                ->map(function (Collection $group) {
+                ->map(function (LogFolder $folder) {
                     if ($this->direction === self::OLDEST_FIRST) {
-                        return $group->sortBy->earliestTimestamp();
+                        $folder->files = $folder->files->sortBy->earliestTimestamp();
                     }
 
-                    return $group->sortByDesc->latestTimestamp();
-                })
+                    $folder->files = $folder->files->sortByDesc->latestTimestamp();
 
-                // And then bring back into a flat view after everything's sorted
-                ->flatten();
+                    return $folder;
+                });
         } else {
             // Otherwise, let's estimate the scan duration by sampling the speed of the first scan.
             // For more accurate results, let's scan a file that's more than 10 MB in size.
@@ -102,14 +105,14 @@ class FileList extends Component
             $totalFileSize -= $file->size();
 
             $durationInMicroseconds = ($scanEnd - $scanStart) * 1000_000;
-            $microsecondsPerMB = $durationInMicroseconds / $file->sizeInMB() * 1.10; // 10% buffer just in case
+            $microsecondsPerMB = $durationInMicroseconds / $file->sizeInMB() * 1.20; // 20% buffer just in case
             $totalFileSizeInMB = $totalFileSize / 1024 / 1024;
 
             $estimatedSecondsToScan = ceil($totalFileSizeInMB * $microsecondsPerMB / 1000_000);
         }
 
         return view('log-viewer::livewire.file-list', [
-            'files' => $this->shouldLoadFilesImmediately && $files ? $files : [],
+            'filesGrouped' => $this->shouldLoadFilesImmediately && isset($filesGrouped) ? $filesGrouped : [],
             'totalFileSize' => $totalFileSize,
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
             'estimatedTimeToScan' => CarbonInterval::seconds($estimatedSecondsToScan)->cascade()->forHumans(),

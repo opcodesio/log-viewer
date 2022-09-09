@@ -13,6 +13,65 @@ Alpine.plugin(Persist)
 
 window.Alpine = Alpine
 
+Alpine.store('fileViewer', {
+    foldersOpen: [],
+    foldersInView: [],
+    folderTops: {},
+    containerTop: 0,
+    isOpen(folder) {
+        return this.foldersOpen.includes(folder);
+    },
+    toggle(folder) {
+        if (this.isOpen(folder)) {
+            this.foldersOpen = this.foldersOpen.filter(f => f !== folder);
+        } else {
+            this.foldersOpen.push(folder);
+        }
+        this.onScroll();
+    },
+    shouldBeSticky(folder) {
+        return this.isOpen(folder) && this.foldersInView.includes(folder);
+    },
+    stickTopPosition(folder) {
+        let aboveFold = this.pixelsAboveFold(folder);
+
+        if (aboveFold < 0) {
+            return Math.max(0, -24 + aboveFold) + 'px';
+        }
+
+        return '-24px';
+    },
+    pixelsAboveFold(folder) {
+        let folderContainer = document.getElementById('folder-'+folder);
+        if (!folderContainer) return false;
+        let row = folderContainer.getClientRects()[0];
+        return (row.top + row.height) - this.containerTop;
+    },
+    isInViewport(index) {
+        return this.pixelsAboveFold(index) > -36;
+    },
+    onScroll() {
+        let vm = this;
+        this.foldersOpen.forEach(function (folder) {
+            if (vm.isInViewport(folder)) {
+                if (!vm.foldersInView.includes(folder)) { vm.foldersInView.push(folder); }
+                vm.folderTops[folder] = vm.stickTopPosition(folder);
+            } else {
+                vm.foldersInView = vm.foldersInView.filter(f => f !== folder);
+                delete vm.folderTops[folder];
+            }
+        })
+    },
+    reset() {
+        this.foldersOpen = [];
+        this.foldersInView = [];
+        this.folderTops = {};
+        const container = document.getElementById('file-list-container');
+        this.containerTop = container.getBoundingClientRect().top;
+        container.scrollTo(0, 0);
+    }
+});
+
 Alpine.store('logViewer', {
     theme: Alpine.$persist(Theme.System).as('logViewer_theme'),
     stacksOpen: [],

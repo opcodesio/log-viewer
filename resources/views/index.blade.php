@@ -15,7 +15,7 @@
 </head>
 <body class="h-full px-5 bg-gray-100 dark:bg-gray-900"
     x-data="{
-        selectedFileIdentifier: @isset($selectedFileIdentifier) '{{ $selectedFileIdentifier }}' @else null @endisset,
+        selectedFileIdentifier: @isset($selectedFile) '{{ $selectedFile->identifier }}' @else null @endisset,
         selectFile(name) {
             if (name && name === this.selectedFileIdentifier) {
                 this.selectedFileIdentifier = null;
@@ -25,9 +25,10 @@
             this.$dispatch('file-selected', this.selectedFileIdentifier);
         }
     }"
+    x-init="$nextTick(() => { $store.fileViewer.reset(); @if(isset($selectedFile)) $store.fileViewer.foldersOpen.push('{{ $selectedFile->subFolderIdentifier() }}') @endif })"
 >
 <div class="flex h-full max-h-screen max-w-full">
-    <div class="hidden md:flex md:w-80 md:flex-col md:fixed md:inset-y-0">
+    <div class="hidden md:flex md:w-88 md:flex-col md:fixed md:inset-y-0">
         <nav class="flex flex-col h-full py-5">
             <div class="mx-3 mb-4">
                 <h1 class="font-semibold text-emerald-800 dark:text-emerald-600 text-2xl flex items-center">
@@ -44,11 +45,11 @@
                 @endif
             </div>
 
-            @livewire('log-viewer::file-list', ['selectedFileIdentifier' => $selectedFileIdentifier])
+            @livewire('log-viewer::file-list', ['selectedFileIdentifier' => $selectedFile?->identifier])
         </nav>
     </div>
 
-    <div class="md:pl-80 flex flex-col flex-1 min-h-screen max-h-screen max-w-full">
+    <div class="md:pl-88 flex flex-col flex-1 min-h-screen max-h-screen max-w-full">
         @livewire('log-viewer::log-list')
     </div>
 </div>

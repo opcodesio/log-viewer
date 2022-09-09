@@ -398,27 +398,35 @@ html.dark {
 .file-list {
     @apply relative h-full overflow-y-auto pt-6 pb-6 pr-4;
 
-    .file-item-container {
-        @apply relative mb-2 text-gray-800 dark:text-gray-200 rounded-md transition duration-100 border cursor-pointer border-transparent bg-white dark:bg-gray-800;
-
-        &.active {
-            @apply border-emerald-500 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-900 dark:bg-opacity-50;
-        }
-
-        &:hover {
-            @apply border-emerald-600 dark:border-emerald-800;
-        }
+    .file-item-container,
+    .folder-item-container {
+        @apply relative mt-2 text-gray-800 dark:text-gray-200 rounded-md bg-white dark:bg-gray-800;
 
         .file-item {
-            @apply relative flex justify-between items-center pl-4 pr-10 py-2;
+            @apply relative flex justify-between items-center pl-4 pr-10 py-2 rounded-md border cursor-pointer border-transparent transition duration-100;
+
+            .file-icon {
+                @apply mr-2 text-gray-400 dark:text-gray-500;
+                &>svg {
+                    @apply w-4 h-4;
+                }
+            }
 
             .file-name {
-                @apply text-sm mr-3;
+                @apply text-sm mr-3 w-full;
             }
 
             .file-size {
                 @apply text-xs text-gray-500 dark:text-gray-300 dark:opacity-90 whitespace-nowrap;
             }
+        }
+
+        &.active .file-item {
+            @apply border-emerald-500 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900 dark:bg-opacity-40;
+        }
+
+        &:hover .file-item {
+            @apply border-emerald-600 dark:border-emerald-800;
         }
 
         .file-dropdown-toggle {
@@ -428,6 +436,19 @@ html.dark {
             }
             & > svg {
                 @apply h-4 w-4;
+            }
+        }
+    }
+
+    .folder-container {
+        .folder-item-container {
+            &.sticky {
+                position: -webkit-sticky;
+                position: sticky;
+            }
+
+            & > .file-item {
+                @apply pr-4;
             }
         }
     }
