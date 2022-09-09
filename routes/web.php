@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Opcodes\LogViewer\Facades\LogViewer;
 
-Route::middleware(LogViewer::getRouteMiddleware())
+Route::domain(LogViewer::getRouteDomain())
+    ->middleware(LogViewer::getRouteMiddleware())
     ->prefix(LogViewer::getRoutePrefix())
     ->group(function () {
         Route::get('/', function () {
