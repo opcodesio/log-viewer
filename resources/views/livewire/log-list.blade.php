@@ -38,8 +38,8 @@
         <div class="flex justify-between">
             <span>Description</span>
             <div>
-                <label for="sort-direction" class="sr-only">Sort direction</label>
-                <select id="sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
+                <label for="log-sort-direction" class="sr-only">Sort direction</label>
+                <select id="log-sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
                     <option value="desc">Newest first</option>
                     <option value="asc">Oldest first</option>
                 </select>
@@ -107,8 +107,8 @@
             </div>
 
             <div class="absolute hidden inset-0 top-9 px-4 z-20" wire:loading.class.remove="hidden">
-                <div class="rounded-md bg-white dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
-                    <div class="loader">Loading...</div>
+                <div class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 spin" fill="currentColor"><use href="#icon-spinner" /></svg>
                 </div>
             </div>
         </div>

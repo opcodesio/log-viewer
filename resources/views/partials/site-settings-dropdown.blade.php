@@ -1,16 +1,4 @@
-<div x-data="{
-        open: false,
-        toggle() {
-            if (this.open) { return this.close() }
-            this.$refs.button.focus()
-            this.open = true
-        },
-        close(focusAfter) {
-            if (! this.open) { return }
-            this.open = false
-            focusAfter && focusAfter.focus()
-        }
-    }"
+<div x-data="dropdown"
     x-on:keydown.escape.prevent.stop="close($refs.button)"
     x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
     x-id="['dropdown-button']"
@@ -24,15 +12,10 @@
     <div
         x-ref="panel"
         x-show="open"
-        x-transition:enter="transition ease-out duration-100"
-        x-transition:enter-start="opacity-0 scale-90"
-        x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-100"
-        x-transition:leave-start="opacity-100 scale-100"
-        x-transition:leave-end="opacity-0 scale-90"
+        x-bind="transitions"
         x-on:click.outside="close($refs.button)"
         :id="$id('dropdown-button')"
-        style="min-width: 230px;"
+        style="min-width: 250px;"
         class="dropdown"
     >
         <div class="py-2">
@@ -47,10 +30,11 @@
             <div class="label">Actions</div>
 
             <button wire:click="clearCacheAll" x-data="{ cacheRecentlyCleared: @json($cacheRecentlyCleared) }" x-init="setTimeout(() => cacheRecentlyCleared = false, 2000)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-database" /></svg>
-                <span x-show="!cacheRecentlyCleared" wire:loading.class="hidden" wire:target="clearCacheAll">Clear cache for all files</span>
+                <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class="hidden" wire:target="clearCacheAll" fill="currentColor"><use href="#icon-database" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class.remove="hidden" wire:target="clearCacheAll" class="hidden spin" fill="currentColor"><use href="#icon-spinner" /></svg>
+                <span x-show="!cacheRecentlyCleared" wire:loading.class="hidden" wire:target="clearCacheAll">Rebuild indices for all files</span>
                 <span x-show="!cacheRecentlyCleared" wire:loading wire:target="clearCacheAll">Please wait...</span>
-                <span x-show="cacheRecentlyCleared" class="text-emerald-500">Cache cleared!</span>
+                <span x-show="cacheRecentlyCleared" class="text-emerald-500">File indices cleared</span>
             </button>
 
             <button x-data="{ copied: false }" x-clipboard="window.location.href" x-on:click.stop="copied = true; setTimeout(() => copied = false, 2000)">

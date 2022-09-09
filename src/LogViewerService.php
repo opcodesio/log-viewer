@@ -20,19 +20,35 @@ class LogViewerService
 
     protected function getFilePaths(): array
     {
+        $baseDir = $this->basePathForLogs();
         $files = [];
 
         foreach (config('log-viewer.include_files', []) as $pattern) {
-            $files = array_merge($files, glob(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR).$pattern));
+            if (! str_starts_with($pattern, DIRECTORY_SEPARATOR)) {
+                $pattern = $baseDir.$pattern;
+            }
+
+            $files = array_merge($files, glob($pattern));
         }
 
         foreach (config('log-viewer.exclude_files', []) as $pattern) {
-            $files = array_diff($files, glob(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR).$pattern));
+            if (! str_starts_with($pattern, DIRECTORY_SEPARATOR)) {
+                $pattern = $baseDir.$pattern;
+            }
+
+            $files = array_diff($files, glob($pattern));
         }
 
-        $files = array_reverse($files);
+        $files = array_map('realpath', $files);
 
-        return array_filter($files, 'is_file');
+        $files = array_filter($files, 'is_file');
+
+        return array_values(array_reverse($files));
+    }
+
+    public function basePathForLogs(): string
+    {
+        return Str::finish(realpath(storage_path('logs')), DIRECTORY_SEPARATOR);
     }
 
     /**
@@ -44,7 +60,6 @@ class LogViewerService
             $this->_cachedFiles = collect($this->getFilePaths())
                 ->unique()
                 ->map(fn ($file) => LogFile::fromPath($file))
-                ->sortByDesc('path')
                 ->values();
         }
 
@@ -136,6 +151,6 @@ class LogViewerService
      */
     public function version(): string
     {
-        return InstalledVersions::getPrettyVersion('opcodesio/log-viewer');
+        return InstalledVersions::getPrettyVersion('opcodesio/log-viewer') ?? 'dev-main';
     }
 }

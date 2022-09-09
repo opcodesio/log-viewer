@@ -12,6 +12,12 @@ module.exports = {
         extend: {
             colors: {
                 gray: colors.zinc,
+            },
+            width: {
+                '88': '22rem',
+            },
+            padding: {
+                '88': '22rem',
             }
         },
     },

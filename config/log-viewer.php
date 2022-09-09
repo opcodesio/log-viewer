@@ -88,7 +88,7 @@ return [
 
     'patterns' => [
         'laravel' => [
-            'log_matching_regex' => '/\[\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d{6}([\+-]\d\d:\d\d)?)?\].*/',
+            'log_matching_regex' => '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\].*/',
 
             /**
              * This pattern, used for processing Laravel logs, returns these results:
@@ -102,8 +102,8 @@ return [
              * $matches[7] - the log text, the rest of the text.
              */
             'log_parsing_regex' => '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\](.*?(\w+)\.|.*?)('
-                . implode('|', array_filter(Level::caseValues()))
-                . ')?: (.*?)( in [\/].*?:[0-9]+)?$/is',
+                .implode('|', array_filter(Level::caseValues()))
+                .')?: (.*?)( in [\/].*?:[0-9]+)?$/is',
         ],
     ],
 ];

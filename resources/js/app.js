@@ -13,6 +13,90 @@ Alpine.plugin(Persist)
 
 window.Alpine = Alpine
 
+Alpine.data('dropdown', () => ({
+    open: false,
+    direction: 'down',
+    toggle() {
+        if (this.open) { return this.close() }
+        this.$refs.button.focus()
+        this.open = true
+        const p = this.$refs.list.getBoundingClientRect()
+        this.direction = this.$refs.button.getBoundingClientRect().bottom - p.top + 140 > p.height ? 'up' : 'down';
+    },
+    close(focusAfter) {
+        if (! this.open) { return }
+        this.open = false
+        focusAfter?.focus()
+    },
+    transitions: {
+        'x-transition:enter': "transition ease-out duration-100",
+        'x-transition:enter-start': "opacity-0 scale-90",
+        'x-transition:enter-end': "opacity-100 scale-100",
+        'x-transition:leave': "transition ease-in duration-100",
+        'x-transition:leave-start': "opacity-100 scale-100",
+        'x-transition:leave-end': "opacity-0 scale-90",
+    }
+}));
+
+Alpine.store('fileViewer', {
+    foldersOpen: [],
+    foldersInView: [],
+    folderTops: {},
+    containerTop: 0,
+    isOpen(folder) {
+        return this.foldersOpen.includes(folder);
+    },
+    toggle(folder) {
+        if (this.isOpen(folder)) {
+            this.foldersOpen = this.foldersOpen.filter(f => f !== folder);
+        } else {
+            this.foldersOpen.push(folder);
+        }
+        this.onScroll();
+    },
+    shouldBeSticky(folder) {
+        return this.isOpen(folder) && this.foldersInView.includes(folder);
+    },
+    stickTopPosition(folder) {
+        let aboveFold = this.pixelsAboveFold(folder);
+
+        if (aboveFold < 0) {
+            return Math.max(0, -24 + aboveFold) + 'px';
+        }
+
+        return '-24px';
+    },
+    pixelsAboveFold(folder) {
+        let folderContainer = document.getElementById('folder-'+folder);
+        if (!folderContainer) return false;
+        let row = folderContainer.getClientRects()[0];
+        return (row.top + row.height) - this.containerTop;
+    },
+    isInViewport(index) {
+        return this.pixelsAboveFold(index) > -36;
+    },
+    onScroll() {
+        let vm = this;
+        this.foldersOpen.forEach(function (folder) {
+            if (vm.isInViewport(folder)) {
+                if (!vm.foldersInView.includes(folder)) { vm.foldersInView.push(folder); }
+                vm.folderTops[folder] = vm.stickTopPosition(folder);
+            } else {
+                vm.foldersInView = vm.foldersInView.filter(f => f !== folder);
+                delete vm.folderTops[folder];
+            }
+        })
+    },
+    reset() {
+        this.foldersOpen = [];
+        this.foldersInView = [];
+        this.folderTops = {};
+        const container = document.getElementById('file-list-container');
+        this.containerTop = container.getBoundingClientRect().top;
+        container.scrollTo(0, 0);
+    }
+});
+
 Alpine.store('logViewer', {
     theme: Alpine.$persist(Theme.System).as('logViewer_theme'),
     stacksOpen: [],

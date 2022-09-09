@@ -83,7 +83,7 @@ class LogList extends Component
             'logs' => $logs,
             'expandAutomatically' => $expandAutomatically ?? false,
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
-        ], $this->getRequestPerformanceData()));
+        ], $this->getRequestPerformanceInfo()));
     }
 
     public function updatingQuery()
@@ -131,6 +131,8 @@ class LogList extends Component
         LogViewer::getFiles()->each->clearCache();
 
         $this->cacheRecentlyCleared = true;
+
+        $this->emit('fullCacheCleared');
     }
 
     public function updatedPerPage($value)
@@ -192,7 +194,7 @@ class LogList extends Component
         $this->refreshAutomatically = $prefs['refresh_automatically'] ?? $this->refreshAutomatically;
     }
 
-    protected function getRequestPerformanceData(): array
+    protected function getRequestPerformanceInfo(): array
     {
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : request()->server('REQUEST_TIME_FLOAT');
         $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2).' MB';
