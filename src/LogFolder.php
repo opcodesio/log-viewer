@@ -25,7 +25,7 @@ class LogFolder
     {
         $folder = $this->path;
 
-        if (str_contains($folder, $storageLogsFolder = DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'logs')) {
+        if (str_contains($folder, $storageLogsFolder = DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.'logs')) {
             // If we have /something/storage/logs, then we can remove it to make the string cleaner.
             // storage/logs is implied on Laravel environments.
             $folder = str_replace($storageLogsFolder, '', $folder);
@@ -42,7 +42,9 @@ class LogFolder
     {
         $folder = $this->cleanPath();
 
-        if (empty($folder)) return [];
+        if (empty($folder)) {
+            return [];
+        }
 
         return explode(DIRECTORY_SEPARATOR, $folder);
     }
@@ -51,7 +53,9 @@ class LogFolder
     {
         $folder = $this->cleanPath();
 
-        if (empty($folder)) return $folder;
+        if (empty($folder)) {
+            return $folder;
+        }
 
         return str_replace(DIRECTORY_SEPARATOR, ' '.DIRECTORY_SEPARATOR.' ', $folder);
     }
