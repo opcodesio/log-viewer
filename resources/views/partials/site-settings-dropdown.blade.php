@@ -1,16 +1,4 @@
-<div x-data="{
-        open: false,
-        toggle() {
-            if (this.open) { return this.close() }
-            this.$refs.button.focus()
-            this.open = true
-        },
-        close(focusAfter) {
-            if (! this.open) { return }
-            this.open = false
-            focusAfter && focusAfter.focus()
-        }
-    }"
+<div x-data="dropdown"
     x-on:keydown.escape.prevent.stop="close($refs.button)"
     x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
     x-id="['dropdown-button']"
@@ -24,12 +12,7 @@
     <div
         x-ref="panel"
         x-show="open"
-        x-transition:enter="transition ease-out duration-100"
-        x-transition:enter-start="opacity-0 scale-90"
-        x-transition:enter-end="opacity-100 scale-100"
-        x-transition:leave="transition ease-in duration-100"
-        x-transition:leave-start="opacity-100 scale-100"
-        x-transition:leave-end="opacity-0 scale-90"
+        x-bind="transitions"
         x-on:click.outside="close($refs.button)"
         :id="$id('dropdown-button')"
         style="min-width: 250px;"

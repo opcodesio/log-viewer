@@ -13,6 +13,31 @@ Alpine.plugin(Persist)
 
 window.Alpine = Alpine
 
+Alpine.data('dropdown', () => ({
+    open: false,
+    direction: 'down',
+    toggle() {
+        if (this.open) { return this.close() }
+        this.$refs.button.focus()
+        this.open = true
+        const p = this.$refs.list.getBoundingClientRect()
+        this.direction = this.$refs.button.getBoundingClientRect().bottom - p.top + 140 > p.height ? 'up' : 'down';
+    },
+    close(focusAfter) {
+        if (! this.open) { return }
+        this.open = false
+        focusAfter?.focus()
+    },
+    transitions: {
+        'x-transition:enter': "transition ease-out duration-100",
+        'x-transition:enter-start': "opacity-0 scale-90",
+        'x-transition:enter-end': "opacity-100 scale-100",
+        'x-transition:leave': "transition ease-in duration-100",
+        'x-transition:leave-start': "opacity-100 scale-100",
+        'x-transition:leave-end': "opacity-0 scale-90",
+    }
+}));
+
 Alpine.store('fileViewer', {
     foldersOpen: [],
     foldersInView: [],
