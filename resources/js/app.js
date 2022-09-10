@@ -61,10 +61,10 @@ Alpine.store('fileViewer', {
         let aboveFold = this.pixelsAboveFold(folder);
 
         if (aboveFold < 0) {
-            return Math.max(0, -24 + aboveFold) + 'px';
+            return Math.max(0, -8 + aboveFold) + 'px';
         }
 
-        return '-24px';
+        return '-8px';
     },
     pixelsAboveFold(folder) {
         let folderContainer = document.getElementById('folder-'+folder);

@@ -272,7 +272,7 @@ html.dark {
 
         .log-link {
             @apply flex items-center w-full;
-            min-width: 68px;
+            min-width: 40px;
 
             & > svg {
                 @apply h-4 w-4 ml-1 transition duration-200;
@@ -396,7 +396,7 @@ html.dark {
 // Dark border (hover): border-emerald-700
 
 .file-list {
-    @apply relative h-full overflow-y-auto pt-6 pb-6 pr-4;
+    @apply relative h-full overflow-y-auto pt-2 pb-4 pr-4;
 
     .file-item-container,
     .folder-item-container {

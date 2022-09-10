@@ -104,7 +104,13 @@ class LogFile
 
     public function getRelatedCacheKeys(): array
     {
-        return Cache::get($this->relatedCacheKeysKey(), []);
+        return array_merge(
+            Cache::get($this->relatedCacheKeysKey(), []),
+            [
+                $this->indexCacheKeyForQuery(),
+                $this->indexCacheKeyForQuery().':last-scan',
+            ]
+        );
     }
 
     protected function indexCacheKeyForQuery(string $query = ''): string
@@ -124,16 +130,16 @@ class LogFile
         return Cache::get($this->indexCacheKeyForQuery($query), $default);
     }
 
-    public function saveLastScanFileSizeForQuery(int $lastScanFileSize, string $query = ''): void
+    public function saveLastScanDataForQuery(array $data, string $query = ''): void
     {
-        $fileSizeKey = $this->indexCacheKeyForQuery($query).':filesize';
-        Cache::put($fileSizeKey, $lastScanFileSize, $this->cacheTtl());
-        $this->addRelatedCacheKey($fileSizeKey);
+        $lastScanKey = $this->indexCacheKeyForQuery($query).':last-scan';
+        Cache::put($lastScanKey, $data, $this->cacheTtl());
+        $this->addRelatedCacheKey($lastScanKey);
     }
 
-    public function getLastScanFileSizeForQuery(string $query = '', $default = 0): int
+    public function getLastScanDataForQuery(string $query = '', array $default = [0, 0]): array
     {
-        return Cache::get($this->indexCacheKeyForQuery($query).':filesize', $default);
+        return Cache::get($this->indexCacheKeyForQuery($query).':last-scan', $default);
     }
 
     public function clearCache(): void

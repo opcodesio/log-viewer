@@ -34,7 +34,7 @@
     <th scope="col" class="w-[90px] hidden lg:table-cell">Level</th>
     <th scope="col" class="w-[180px] hidden sm:table-cell">Time</th>
     <th scope="col" class="w-[110px] hidden lg:table-cell">Env</th>
-    <th scope="col" colspan="2">
+    <th scope="col">
         <div class="flex justify-between">
             <span>Description</span>
             <div>
@@ -55,6 +55,7 @@
             </div>
         </div>
     </th>
+    <th scope="col"><span class="sr-only">Log index</span></th>
 </tr>
 </thead>
 
@@ -125,7 +126,7 @@
         </div>
         @endif
 
-        <div class="grow flex flex-col justify-end text-right px-4 mt-2">
+        <div class="grow flex flex-col justify-end text-right px-4 mt-3">
             <p class="text-xs text-gray-400 dark:text-gray-500">
                 <span>Memory: <span class="font-semibold">{{ $memoryUsage }}</span></span>
                 <span class="mx-1.5">&middot;</span>

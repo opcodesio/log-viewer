@@ -31,6 +31,15 @@ test('a domain can be set', function () {
     get(route('blv.index'))->assertOK();
 });
 
+test('a domain is optional', function () {
+    config()->set('log-viewer.route_path', '/');
+
+    reloadRoutes();
+
+    expect(route('blv.index'))->toBe('http://localhost');
+
+    get(route('blv.index'))->assertOk();
+});
 
 /*
 |--------------------------------------------------------------------------

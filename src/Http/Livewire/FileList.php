@@ -48,7 +48,7 @@ class FileList extends Component
         $files = LogViewer::getFiles();
 
         $filesRequiringScans = $files->filter(fn (LogFile $file) => $file->logs()->requiresScan());
-        $totalFileSize = $filesRequiringScans->sum->size();
+        $totalFileSize = $filesRequiringScans->sum(fn (LogFile $file) => $file->logs()->numberOfNewBytes());
         $estimatedSecondsToScan = 0;
 
         if ($filesRequiringScans->isEmpty() || $totalFileSize < self::MIN_LOGS_FILE_SIZE_FOR_SCAN_STATE) {
