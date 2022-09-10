@@ -196,6 +196,7 @@ class LogReader
         }
 
         $this->logIndex = $this->file->getIndexDataForQuery($this->query ?? '');
+        [$this->lastScanFileSize, $this->nextLogIndex] = $this->file->getLastScanDataForQuery($this->query ?? '');
 
         if ($this->requiresScan()) {
             $this->scan();
@@ -217,15 +218,10 @@ class LogReader
             return $this;
         }
 
-        if ($this->indexChanged) {
-            $this->file->saveIndexDataForQuery($this->logIndex, $this->query ?? '');
-            $this->file->saveLastScanFileSizeForQuery($this->lastScanFileSize, $this->query ?? '');
-            $this->file->saveMetaData();
-        }
-
         if (fclose($this->fileHandle)) {
             $this->fileHandle = null;
             $this->nextLogIndex = 0;
+            unset($this->lastScanFileSize);
         } else {
             throw new \Exception('Could not close the file "'.$this->file->path.'".');
         }
@@ -398,15 +394,22 @@ class LogReader
             return $this;
         }
 
+        if ($force) {
+            // when forcing, make sure we start from scratch and reset everything.
+            $this->logIndex = [];
+            $this->nextLogIndex = 0;
+            $this->lastScanFileSize = 0;
+        }
+
         // we don't care about the selected levels here, we should scan everything
         $levels = self::getDefaultLevels();
         $logMatchPattern = LogViewer::logMatchPattern();
-        $earliest_timestamp = null;
-        $latest_timestamp = null;
+        $earliest_timestamp = $this->file->getMetaData('earliest_timestamp');
+        $latest_timestamp = $this->file->getMetaData('latest_timestamp');
         $currentLog = '';
         $currentLogLevel = '';
         $currentTimestamp = null;
-        rewind($this->fileHandle);
+        fseek($this->fileHandle, $this->lastScanFileSize ?? 0);
         $currentLogPosition = ftell($this->fileHandle);
 
         while (($line = fgets($this->fileHandle, 1024)) !== false) {
@@ -457,14 +460,18 @@ class LogReader
         $this->lastScanFileSize = ftell($this->fileHandle);
         $this->indexChanged = true;
 
-        // Let's reset the position in preparation for real log reads.
-        rewind($this->fileHandle);
-
         $this->file->setMetaData('name', $this->file->name);
         $this->file->setMetaData('path', $this->file->path);
         $this->file->setMetaData('size', $this->file->size());
         $this->file->setMetaData('earliest_timestamp', $earliest_timestamp);
         $this->file->setMetaData('latest_timestamp', $latest_timestamp);
+
+        $this->file->saveMetaData();
+        $this->file->saveIndexDataForQuery($this->logIndex, $this->query ?? '');
+        $this->file->saveLastScanDataForQuery([$this->lastScanFileSize, $this->nextLogIndex], $this->query ?? '');
+
+        // Let's reset the position in preparation for real log reads.
+        rewind($this->fileHandle);
 
         return $this->reset();
     }
@@ -752,10 +759,15 @@ class LogReader
     public function requiresScan(): bool
     {
         if (! isset($this->lastScanFileSize)) {
-            $this->lastScanFileSize = $this->file->getLastScanFileSizeForQuery($this->query ?? '');
+            [$this->lastScanFileSize, $this->nextLogIndex] = $this->file->getLastScanDataForQuery($this->query ?? '');
         }
 
         return $this->lastScanFileSize !== $this->file->size();
+    }
+
+    public function numberOfNewBytes(): int
+    {
+        return $this->file->size() - ($this->lastScanFileSize ?? 0);
     }
 
     public function __destruct()
