@@ -104,7 +104,13 @@ class LogFile
 
     public function getRelatedCacheKeys(): array
     {
-        return Cache::get($this->relatedCacheKeysKey(), []);
+        return array_merge(
+            Cache::get($this->relatedCacheKeysKey(), []),
+            [
+                $this->indexCacheKeyForQuery(),
+                $this->indexCacheKeyForQuery().':last-scan',
+            ]
+        );
     }
 
     protected function indexCacheKeyForQuery(string $query = ''): string

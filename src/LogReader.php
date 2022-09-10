@@ -394,6 +394,12 @@ class LogReader
             return $this;
         }
 
+        if ($this->numberOfNewBytes() < 0) {
+            // the file reduced in size... something must've gone wrong, so let's
+            // for a full re-index.
+            $force = true;
+        }
+
         if ($force) {
             // when forcing, make sure we start from scratch and reset everything.
             $this->logIndex = [];
@@ -758,15 +764,15 @@ class LogReader
 
     public function requiresScan(): bool
     {
-        if (! isset($this->lastScanFileSize)) {
-            [$this->lastScanFileSize, $this->nextLogIndex] = $this->file->getLastScanDataForQuery($this->query ?? '');
-        }
-
-        return $this->lastScanFileSize !== $this->file->size();
+        return $this->numberOfNewBytes() !== 0;
     }
 
     public function numberOfNewBytes(): int
     {
+        if (! isset($this->lastScanFileSize)) {
+            [$this->lastScanFileSize, $this->nextLogIndex] = $this->file->getLastScanDataForQuery($this->query ?? '');
+        }
+
         return $this->file->size() - ($this->lastScanFileSize ?? 0);
     }
 
