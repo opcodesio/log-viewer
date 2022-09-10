@@ -41,7 +41,6 @@ test('a domain is optional', function () {
     get(route('blv.index'))->assertOk();
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | HELPERS
