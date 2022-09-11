@@ -7,6 +7,44 @@ html.dark {
     color-scheme: dark
 }
 
+.log-levels-selector {
+    .dropdown-toggle {
+        @apply whitespace-nowrap;
+
+        & > svg {
+            @apply w-4 h-4 ml-1 opacity-75;
+        }
+    }
+
+    .dropdown {
+        .log-level {
+            @apply font-semibold;
+
+            &.success {
+                @apply text-emerald-700 dark:text-emerald-500;
+            }
+            &.info {
+                @apply text-sky-700 dark:text-sky-500;
+            }
+            &.warning {
+                @apply text-amber-700 dark:text-amber-400;
+            }
+            &.danger {
+                @apply text-rose-700 dark:text-rose-400;
+            }
+            &.none {
+                @apply text-gray-700 dark:text-gray-400;
+            }
+        }
+        .log-count {
+            @apply text-gray-500 dark:text-gray-400 ml-8 whitespace-nowrap;
+        }
+        .no-results {
+            @apply text-xs text-gray-500 dark:text-gray-400 text-center px-4 py-1;
+        }
+    }
+}
+
 .log-item {
     @apply bg-white dark:bg-gray-800 transition duration-200 cursor-pointer;
 
@@ -207,11 +245,11 @@ html.dark {
     }
 
     &.none {
-        @apply border border-gray-200 bg-gray-50 text-gray-600
+        @apply border border-gray-200 bg-gray-100 text-gray-600
           dark:border-gray-800 dark:bg-gray-900 dark:bg-opacity-40 dark:text-gray-400;
 
         &:hover {
-            @apply bg-gray-100
+            @apply bg-gray-50
               dark:bg-gray-900 dark:bg-opacity-75;
         }
 
@@ -221,12 +259,12 @@ html.dark {
         }
 
         &.active {
-            @apply border-gray-700 bg-gray-600 text-white
-              dark:border-gray-600 dark:bg-gray-700;
+            @apply bg-white text-gray-800
+              dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600;
 
             &:hover {
-                @apply bg-gray-500
-                  dark:bg-gray-800;
+                @apply bg-gray-50
+                  dark:bg-gray-900;
             }
             & .checkmark {
                 @apply border-gray-600
@@ -368,6 +406,15 @@ html.dark {
         @apply top-auto bottom-full mt-0 -mb-1;
     }
 
+    &.left {
+        @apply left-1 right-auto;
+        transform-origin: top left !important;
+
+        &.up {
+            transform-origin: bottom left !important;
+        }
+    }
+
     button, a {
         @apply block flex items-center w-full px-4 py-2 text-left text-sm outline-emerald-500 dark:outline-emerald-800;
         & > svg {
@@ -388,7 +435,7 @@ html.dark {
     }
 
     .label {
-        @apply text-xs font-semibold text-gray-400 ml-4 my-1;
+        @apply text-xs font-semibold text-gray-400 mx-4 my-1;
     }
 }
 
