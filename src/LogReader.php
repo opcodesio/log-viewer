@@ -200,6 +200,8 @@ class LogReader
 
         if ($this->requiresScan()) {
             $this->scan();
+        } else {
+            $this->reset();
         }
 
         return $this;
@@ -588,9 +590,25 @@ class LogReader
         return $nextLog;
     }
 
-    public function getTotalItemCount(): int
+    public function total(): int
     {
         return count($this->getMergedIndexForSelectedLevels());
+    }
+
+    /**
+     * Alias for total()
+     */
+    public function count(): int
+    {
+        return $this->total();
+    }
+
+    /**
+     * @deprecated Will be removed in v2.0.0
+     */
+    public function getTotalItemCount(): int
+    {
+        return $this->total();
     }
 
     public function paginate(int $perPage = 25, int $page = null)
@@ -610,7 +628,7 @@ class LogReader
 
         return new LengthAwarePaginator(
             $this->get($perPage),
-            $this->getTotalItemCount(),
+            $this->total(),
             $perPage,
             $page
         );
@@ -708,10 +726,14 @@ class LogReader
         }
     }
 
-    protected function getMergedIndexForSelectedLevels(): array
+    public function getMergedIndexForSelectedLevels(): array
     {
         if (! isset($this->_mergedIndex)) {
             $this->_mergedIndex = [];
+
+            if (empty($this->logIndex)) {
+                $this->open();
+            }
 
             foreach ($this->getSelectedLevels() as $level) {
                 if (! isset($this->logIndex[$level])) {
