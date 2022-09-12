@@ -19,4 +19,14 @@ class LogFileCollection extends Collection
 
         return $this;
     }
+
+    public function latest(): ?LogFile
+    {
+        return $this->sortByDesc->latestTimestamp()->first();
+    }
+
+    public function earliest(): ?LogFile
+    {
+        return $this->sortBy->earliestTimestamp()->first();
+    }
 }
