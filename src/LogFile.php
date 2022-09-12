@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
+use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -182,12 +183,30 @@ class LogFile
 
     public function earliestTimestamp(): int
     {
-        return $this->getMetaData('earliest_timestamp', 0);
+        return $this->getMetaData('earliest_timestamp', filemtime($this->path) ?? 0);
     }
 
     public function latestTimestamp(): int
     {
-        return $this->getMetaData('latest_timestamp', 0);
+        return $this->getMetaData('latest_timestamp', filemtime($this->path) ?? 0);
+    }
+
+    public function scan(bool $force = false): void
+    {
+        $this->logs()->scan($force);
+    }
+
+    public function requiresScan(): bool
+    {
+        return $this->logs()->requiresScan();
+    }
+
+    /**
+     * @throws InvalidRegularExpression
+     */
+    public function search(string $query = null): LogReader
+    {
+        return $this->logs()->search($query);
     }
 
     public function delete(): void
