@@ -183,12 +183,14 @@ class LogFile
 
     public function earliestTimestamp(): int
     {
-        return $this->getMetaData('earliest_timestamp', filemtime($this->path) ?? 0);
+        return $this->getMetaData('earliest_timestamp')
+            ?? (is_file($this->path) ? filemtime($this->path) : 0);
     }
 
     public function latestTimestamp(): int
     {
-        return $this->getMetaData('latest_timestamp', filemtime($this->path) ?? 0);
+        return $this->getMetaData('latest_timestamp')
+            ?? (is_file($this->path) ? filemtime($this->path) : 0);
     }
 
     public function scan(bool $force = false): void

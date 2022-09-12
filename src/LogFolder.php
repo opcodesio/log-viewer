@@ -76,11 +76,11 @@ class LogFolder
 
     public function earliestTimestamp(): int
     {
-        return $this->files()->min->earliestTimestamp();
+        return $this->files()->min->earliestTimestamp() ?? 0;
     }
 
     public function latestTimestamp(): int
     {
-        return $this->files()->max->latestTimestamp();
+        return $this->files()->max->latestTimestamp() ?? 0;
     }
 }
