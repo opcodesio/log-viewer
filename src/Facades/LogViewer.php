@@ -2,7 +2,6 @@
 
 namespace Opcodes\LogViewer\Facades;
 
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFileCollection;
