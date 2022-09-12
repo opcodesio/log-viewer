@@ -3,12 +3,12 @@
 namespace Opcodes\LogViewer\Http\Livewire;
 
 use Carbon\CarbonInterval;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFolder;
+use Opcodes\LogViewer\LogFolderCollection;
 use Opcodes\LogViewer\LogReader;
 
 class FileList extends Component
@@ -65,30 +65,16 @@ class FileList extends Component
                 LogReader::clearInstance($file);
             }
 
-            $filesGrouped = $files->groupBy(fn ($file) => $file->subFolder)
+            $folderCollection = LogViewer::getFilesGroupedByFolder()
+                // sort the folders and their files
+                ->when($this->direction === self::OLDEST_FIRST, function (LogFolderCollection $folders) {
+                    $folders->sortByEarliestFirst();
 
-                ->map(fn ($files, $subFolder) => new LogFolder($subFolder, $files))
+                    return $folders->each(fn (LogFolder $folder) => $folder->files()->sortByEarliestFirst());
+                }, function (LogFolderCollection $folders) {
+                    $folders->sortByLatestFirst();
 
-                // sort the folders
-                ->when($this->direction === self::OLDEST_FIRST, function (Collection $folders) {
-                    return $folders->sortBy(function (LogFolder $folder) {
-                        return $folder->files->min->earliestTimestamp();
-                    });
-                }, function (Collection $folders) {
-                    return $folders->sortByDesc(function (LogFolder $folder) {
-                        return $folder->files->max->latestTimestamp();
-                    });
-                })
-
-                // Then individual log files by their latest or earliest timestamps
-                ->map(function (LogFolder $folder) {
-                    if ($this->direction === self::OLDEST_FIRST) {
-                        $folder->files = $folder->files->sortBy->earliestTimestamp();
-                    } else {
-                        $folder->files = $folder->files->sortByDesc->latestTimestamp();
-                    }
-
-                    return $folder;
+                    return $folders->each(fn (LogFolder $folder) => $folder->files()->sortByLatestFirst());
                 });
         } else {
             // Otherwise, let's estimate the scan duration by sampling the speed of the first scan.
@@ -114,7 +100,7 @@ class FileList extends Component
         }
 
         return view('log-viewer::livewire.file-list', [
-            'filesGrouped' => $this->shouldLoadFilesImmediately && isset($filesGrouped) ? $filesGrouped : [],
+            'folderCollection' => $this->shouldLoadFilesImmediately && isset($folderCollection) ? $folderCollection : [],
             'totalFileSize' => $totalFileSize,
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
             'estimatedTimeToScan' => CarbonInterval::seconds($estimatedSecondsToScan)->cascade()->forHumans(),

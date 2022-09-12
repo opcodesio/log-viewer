@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Level;
 use Opcodes\LogViewer\LogReader;
 
 class LogList extends Component
@@ -121,6 +122,16 @@ class LogList extends Component
         $this->saveSelectedLevels($selectedLevels);
     }
 
+    public function selectAllLevels()
+    {
+        $this->saveSelectedLevels(Level::caseValues());
+    }
+
+    public function deselectAllLevels()
+    {
+        $this->saveSelectedLevels([]);
+    }
+
     public function reloadResults()
     {
         //
@@ -159,9 +170,9 @@ class LogList extends Component
 
     public function getSelectedLevels(): array
     {
-        $levels = session()->get('selected_levels', []);
+        $levels = session()->get('selected_levels', null);
 
-        if (empty($levels)) {
+        if (is_null($levels)) {
             $levels = LogReader::getDefaultLevels();
         }
 
