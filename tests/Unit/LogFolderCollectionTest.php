@@ -42,9 +42,9 @@ test('Can be made from a LogFileCollection and grouped automatically', function 
 
 test('LogFolderCollection can sort its folders by earliest logs first', function () {
     $firstFolder = mock(new LogFolder('folder', []))
-        ->shouldReceive('earliestTimestamp')->andReturn(now()->subDay()->timestamp)->getMock();
+        ->allows(['earliestTimestamp' => now()->subDay()->timestamp]);
     $secondFolder = mock(new LogFolder('folder2', []))
-        ->shouldReceive('earliestTimestamp')->andReturn(now()->subDays(2)->timestamp)->getMock();
+        ->allows(['earliestTimestamp' => now()->subDays(2)->timestamp]);
     $collection = new LogFolderCollection([$firstFolder, $secondFolder]);
 
     $collection->sortByEarliestFirst();
@@ -55,9 +55,9 @@ test('LogFolderCollection can sort its folders by earliest logs first', function
 
 test('LogFolderCollection can sort its folders by latest logs first', function () {
     $firstFolder = mock(new LogFolder('folder', []))
-        ->shouldReceive('latestTimestamp')->andReturn(now()->subDays(2)->timestamp)->getMock();
+        ->allows(['latestTimestamp' => now()->subDays(2)->timestamp]);
     $secondFolder = mock(new LogFolder('folder2', []))
-        ->shouldReceive('latestTimestamp')->andReturn(now()->subDay()->timestamp)->getMock();
+        ->allows(['latestTimestamp' => now()->subDay()->timestamp]);
     $collection = new LogFolderCollection([$firstFolder, $secondFolder]);
 
     $collection->sortByLatestFirst();

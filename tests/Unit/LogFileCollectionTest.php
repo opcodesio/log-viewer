@@ -12,9 +12,9 @@ test('LogViewer::getFiles() returns a LogFileCollection', function () {
 
 test('LogFileCollection can sort its files by earliest logs first', function () {
     $firstFile = mock(new LogFile('test.log', realpath(storage_path('test.log'))))
-        ->shouldReceive('earliestTimestamp')->andReturn(now()->subDay()->timestamp)->getMock();
+        ->allows(['earliestTimestamp' => now()->subDay()->timestamp]);
     $secondFile = mock(new LogFile('test2.log', realpath(storage_path('test2.log'))))
-        ->shouldReceive('earliestTimestamp')->andReturn(now()->subDays(2)->timestamp)->getMock();
+        ->allows(['earliestTimestamp' => now()->subDays(2)->timestamp]);
     $collection = new LogFileCollection([$firstFile, $secondFile]);
 
     $collection->sortByEarliestFirst();
@@ -25,9 +25,9 @@ test('LogFileCollection can sort its files by earliest logs first', function () 
 
 test('LogFileCollection can sort its files by latest logs first', function () {
     $firstFile = mock(new LogFile('test.log', realpath(storage_path('test.log'))))
-        ->shouldReceive('latestTimestamp')->andReturn(now()->subDays(2)->timestamp)->getMock();
+        ->allows(['latestTimestamp' => now()->subDays(2)->timestamp]);
     $secondFile = mock(new LogFile('test2.log', realpath(storage_path('test2.log'))))
-        ->shouldReceive('latestTimestamp')->andReturn(now()->subDay()->timestamp)->getMock();
+        ->allows(['latestTimestamp' => now()->subDay()->timestamp]);
     $collection = new LogFileCollection([$firstFile, $secondFile]);
 
     $collection->sortByLatestFirst();
@@ -44,9 +44,9 @@ test('LogFolder::files() returns a LogFileCollection', function () {
 
 test('LogFileCollection can return the latest log file', function () {
     $firstFile = mock(new LogFile('test.log', realpath(storage_path('test.log'))))
-        ->shouldReceive('latestTimestamp')->andReturn(now()->subDays(2)->timestamp)->getMock();
+        ->allows(['latestTimestamp' => now()->subDays(2)->timestamp]);
     $secondFile = mock(new LogFile('test2.log', realpath(storage_path('test2.log'))))
-        ->shouldReceive('latestTimestamp')->andReturn(now()->subDay()->timestamp)->getMock();
+        ->allows(['latestTimestamp' => now()->subDay()->timestamp]);
     $collection = new LogFileCollection([$firstFile, $secondFile]);
 
     $logFile = $collection->latest();
@@ -56,9 +56,9 @@ test('LogFileCollection can return the latest log file', function () {
 
 test('LogFileCollection can return the earliest log file', function () {
     $firstFile = mock(new LogFile('test.log', realpath(storage_path('test.log'))))
-        ->shouldReceive('earliestTimestamp')->andReturn(now()->subDay()->timestamp)->getMock();
+        ->allows(['earliestTimestamp' => now()->subDay()->timestamp]);
     $secondFile = mock(new LogFile('test2.log', realpath(storage_path('test2.log'))))
-        ->shouldReceive('earliestTimestamp')->andReturn(now()->subDays(2)->timestamp)->getMock();
+        ->allows(['earliestTimestamp' => now()->subDays(2)->timestamp]);
     $collection = new LogFileCollection([$firstFile, $secondFile]);
 
     $logFile = $collection->earliest();
