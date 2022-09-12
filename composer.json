@@ -31,6 +31,7 @@
         "orchestra/testbench": "^7.6",
         "pestphp/pest": "^1.21",
         "pestphp/pest-plugin-laravel": "^1.1",
+        "pestphp/pest-plugin-mock": "^1.0",
         "phpunit/phpunit": "^9.5",
         "spatie/test-time": "^1.3"
     },

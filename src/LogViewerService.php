@@ -52,18 +52,23 @@ class LogViewerService
     }
 
     /**
-     * @return Collection|LogFile[]
+     * @return LogFileCollection|LogFile[]
      */
-    public function getFiles(): Collection
+    public function getFiles(): LogFileCollection
     {
         if (! isset($this->_cachedFiles)) {
-            $this->_cachedFiles = collect($this->getFilePaths())
+            $this->_cachedFiles = (new LogFileCollection($this->getFilePaths()))
                 ->unique()
                 ->map(fn ($file) => LogFile::fromPath($file))
                 ->values();
         }
 
         return $this->_cachedFiles;
+    }
+
+    public function getFilesGroupedByFolder(): LogFolderCollection
+    {
+        return LogFolderCollection::fromFiles($this->getFiles());
     }
 
     /**

@@ -5,12 +5,16 @@ namespace Opcodes\LogViewer\Facades;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\LogFileCollection;
+use Opcodes\LogViewer\LogFolder;
+use Opcodes\LogViewer\LogFolderCollection;
 
 /**
  * @see \Opcodes\LogViewer\LogViewerService
  *
  * @method static string version()
- * @method static LogFile[]|Collection getFiles()
+ * @method static LogFolder[]|LogFolderCollection getFilesGroupedByFolder()
+ * @method static LogFile[]|LogFileCollection getFiles()
  * @method static LogFile|null getFile(string $fileIdentifier)
  * @method static void clearFileCache()
  * @method static string|null getRouteDomain()

@@ -9,11 +9,26 @@ class LogFolder
 {
     public string $identifier;
 
+    protected mixed $files;
+
     public function __construct(
         public string $path,
-        public Collection $files,
+        mixed $files,
     ) {
         $this->identifier = Str::substr(md5($path), -8, 8);
+        $this->files = new LogFileCollection($files);
+    }
+
+    public function setFiles(array $files): self
+    {
+        $this->files = new LogFileCollection($files);
+
+        return $this;
+    }
+
+    public function files(): LogFileCollection
+    {
+        return $this->files;
     }
 
     public function isRoot(): bool
@@ -58,5 +73,15 @@ class LogFolder
         }
 
         return str_replace(DIRECTORY_SEPARATOR, ' '.DIRECTORY_SEPARATOR.' ', $folder);
+    }
+
+    public function earliestTimestamp(): int
+    {
+        return $this->files()->min->earliestTimestamp();
+    }
+
+    public function latestTimestamp(): int
+    {
+        return $this->files()->max->latestTimestamp();
     }
 }

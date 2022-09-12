@@ -39,7 +39,7 @@
             @endif
 
     @php /** @var \Opcodes\LogViewer\LogFolder $folder */ @endphp
-    @foreach($filesGrouped as $folder)
+    @foreach($folderCollection as $folder)
         <div x-data="{ folder: '{{ $folder->identifier }}' }" :id="'folder-'+folder"
              class="relative @if(!$folder->isRoot()) folder-container @endif"
         >
@@ -57,7 +57,7 @@
             @endif
 
             <div class="folder-files @if(!$folder->isRoot()) pl-3 ml-1 border-l border-gray-200 dark:border-gray-800 @endif" @if(!$folder->isRoot()) x-show="$store.fileViewer.isOpen(folder)" @endif>
-            @foreach($folder->files as $logFile)
+            @foreach($folder->files() as $logFile)
                 @include('log-viewer::partials.file-list-item', ['logFile' => $logFile])
             @endforeach
             </div>
