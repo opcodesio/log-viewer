@@ -1,6 +1,6 @@
 {
     "name": "opcodesio/log-viewer",
-    "version": "v1.4.0",
+    "version": "v1.4.1",
     "description": "Fast and easy-to-use log viewer for your Laravel application",
     "keywords": [
         "arukompas",
@@ -31,7 +31,6 @@
         "orchestra/testbench": "^7.6",
         "pestphp/pest": "^1.21",
         "pestphp/pest-plugin-laravel": "^1.1",
-        "pestphp/pest-plugin-mock": "^1.0",
         "phpunit/phpunit": "^9.5",
         "spatie/test-time": "^1.3"
     },
