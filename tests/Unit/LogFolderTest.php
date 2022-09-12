@@ -4,9 +4,9 @@ use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFolder;
 
 test('LogFolder can get the earliest timestamp of the files it contains', function () {
-    $firstFile = mock(new LogFile('test.log', 'folder'))
+    $firstFile = Mockery::mock(new LogFile('test.log', 'folder'))
         ->allows(['earliestTimestamp' => now()->subDay()->timestamp]);
-    $secondFile = mock(new LogFile('test2.log', 'folder'))
+    $secondFile = Mockery::mock(new LogFile('test2.log', 'folder'))
         ->allows(['earliestTimestamp' => now()->subDays(2)->timestamp]);
     $folder = new LogFolder('folder', [$firstFile, $secondFile]);
 
@@ -14,9 +14,9 @@ test('LogFolder can get the earliest timestamp of the files it contains', functi
 });
 
 test('LogFolder can get the latest timestamp of the files it contains', function () {
-    $firstFile = mock(new LogFile('test.log', 'folder'))
+    $firstFile = Mockery::mock(new LogFile('test.log', 'folder'))
         ->allows(['latestTimestamp' => now()->subDay()->timestamp]);
-    $secondFile = mock(new LogFile('test2.log', 'folder'))
+    $secondFile = Mockery::mock(new LogFile('test2.log', 'folder'))
         ->allows(['latestTimestamp' => now()->subDays(2)->timestamp]);
     $folder = new LogFolder('folder', [$firstFile, $secondFile]);
 
