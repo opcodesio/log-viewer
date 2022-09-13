@@ -21,6 +21,7 @@ class LogViewerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom($this->basePath("/config/{$this->name}.php"), $this->name);
 
         $this->app->bind('log-viewer', LogViewerService::class);
+        $this->app->singleton(PreferenceStore::class, PreferenceStore::class);
     }
 
     private function basePath(string $path): string

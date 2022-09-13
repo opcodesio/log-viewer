@@ -9,6 +9,7 @@ use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Level;
 use Opcodes\LogViewer\LogReader;
+use Opcodes\LogViewer\PreferenceStore;
 
 class LogList extends Component
 {
@@ -48,7 +49,12 @@ class LogList extends Component
 
     public function mount()
     {
-        $this->loadPreferences();
+        $preferenceStore = app(PreferenceStore::class);
+
+        $this->perPage = $preferenceStore->get('per_page', $this->perPage);
+        $this->direction = $preferenceStore->get('log_sort_direction', $this->direction);
+        $this->shorterStackTraces = $preferenceStore->get('shorter_stack_traces', $this->shorterStackTraces);
+        $this->refreshAutomatically = $preferenceStore->get('refresh_automatically', $this->refreshAutomatically);
 
         $file = LogViewer::getFile($this->selectedFileIdentifier);
 
@@ -148,29 +154,29 @@ class LogList extends Component
 
     public function updatedPerPage($value)
     {
-        $this->savePreferences();
+        app(PreferenceStore::class)->put('per_page', $value);
     }
 
     public function updatedDirection($value)
     {
-        $this->savePreferences();
+        app(PreferenceStore::class)->put('log_sort_direction', $value);
     }
 
     public function toggleShorterStackTraces()
     {
         $this->shorterStackTraces = ! $this->shorterStackTraces;
-        $this->savePreferences();
+        app(PreferenceStore::class)->put('shorter_stack_traces', $this->shorterStackTraces);
     }
 
     public function toggleAutomaticRefresh()
     {
         $this->refreshAutomatically = ! $this->refreshAutomatically;
-        $this->savePreferences();
+        app(PreferenceStore::class)->put('refresh_automatically', $this->refreshAutomatically);
     }
 
     public function getSelectedLevels(): array
     {
-        $levels = session()->get('selected_levels', null);
+        $levels = app(PreferenceStore::class)->get('selected_levels');
 
         if (is_null($levels)) {
             $levels = LogReader::getDefaultLevels();
@@ -181,28 +187,7 @@ class LogList extends Component
 
     public function saveSelectedLevels(array $levels): void
     {
-        session()->put('selected_levels', $levels);
-    }
-
-    public function savePreferences(): void
-    {
-        session()->put('log-viewer:log-list-preferences', [
-            'per_page' => $this->perPage,
-            'direction' => $this->direction,
-            'shorter_stack_traces' => $this->shorterStackTraces,
-            'refresh_automatically' => $this->refreshAutomatically,
-        ]);
-        session()->put('log-viewer:shorter-stack-traces', $this->shorterStackTraces);
-    }
-
-    public function loadPreferences(): void
-    {
-        $prefs = session()->get('log-viewer:log-list-preferences', []);
-
-        $this->perPage = $prefs['per_page'] ?? $this->perPage;
-        $this->direction = $prefs['direction'] ?? $this->direction;
-        $this->shorterStackTraces = $prefs['shorter_stack_traces'] ?? $this->shorterStackTraces;
-        $this->refreshAutomatically = $prefs['refresh_automatically'] ?? $this->refreshAutomatically;
+        app(PreferenceStore::class)->put('selected_levels', $levels);
     }
 
     protected function getRequestPerformanceInfo(): array

@@ -10,6 +10,7 @@ use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\LogFolderCollection;
 use Opcodes\LogViewer\LogReader;
+use Opcodes\LogViewer\PreferenceStore;
 
 class FileList extends Component
 {
@@ -34,7 +35,8 @@ class FileList extends Component
 
     public function mount(string $selectedFileIdentifier = null)
     {
-        $this->loadPreferences();
+        $preferenceStore = app(PreferenceStore::class);
+        $this->direction = $preferenceStore->get('file_sort_direction', self::NEWEST_FIRST);
 
         $this->selectedFileIdentifier = $selectedFileIdentifier;
 
@@ -151,20 +153,6 @@ class FileList extends Component
 
     public function updatedDirection($value)
     {
-        $this->savePreferences();
-    }
-
-    public function savePreferences(): void
-    {
-        session()->put('log-viewer:file-list-preferences', [
-            'direction' => $this->direction,
-        ]);
-    }
-
-    public function loadPreferences(): void
-    {
-        $prefs = session()->get('log-viewer:file-list-preferences', []);
-
-        $this->direction = $prefs['direction'] ?? $this->direction;
+        app(PreferenceStore::class)->put('file_sort_direction', $value);
     }
 }
