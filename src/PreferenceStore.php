@@ -30,7 +30,7 @@ class PreferenceStore
 
     public function put(string $key, mixed $value): void
     {
-        if (!isset($this->preferences)) {
+        if (! isset($this->preferences)) {
             $this->preferences = [];
         }
 
