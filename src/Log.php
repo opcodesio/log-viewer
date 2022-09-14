@@ -38,6 +38,7 @@ class Log
         $this->fileIdentifier = $fileIdentifier;
         $this->filePosition = $filePosition;
         $this->fullTextLength = strlen($text);
+        $text = mb_convert_encoding(trim($text), 'UTF-8', 'UTF-8');
 
         $matches = [];
         [$firstLine, $theRestOfIt] = explode("\n", Str::finish($text, "\n"), 2);
@@ -66,7 +67,7 @@ class Log
             $firstLineText = $middle.' '.$firstLineText;
         }
 
-        $this->text = mb_convert_encoding(trim($firstLineText), 'UTF-8', 'UTF-8');
+        $this->text = trim($firstLineText);
         $text = $firstLineText.($matches[8] ?? '').implode('', $firstLineSplit)."\n".$theRestOfIt;
 
         if (session()->get('log-viewer:shorter-stack-traces', false)) {
@@ -97,7 +98,7 @@ class Log
             $this->fullTextIncomplete = true;
         }
 
-        $this->fullText = mb_convert_encoding(trim($text), 'UTF-8', 'UTF-8');
+        $this->fullText = trim($text);
     }
 
     public function fullTextMatches(string $query = null): bool
