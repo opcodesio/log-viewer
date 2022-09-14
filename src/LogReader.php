@@ -451,9 +451,18 @@ class LogReader
                         break;
                     }
                 }
-            }
 
-            $currentLog .= $line;
+                // Because we matched this line as the beginning of a new log,
+                // and we have already processed the previously set $currentLog variable,
+                // we can safely set this to the current line we scanned.
+                $currentLog = $line;
+            } elseif ($currentLog !== '') {
+                // This check makes sure we don't keep adding rubbish content to the log
+                // if we haven't found a proper matching beginning of a log entry yet.
+                // So any content (empty lines, unrelated text) at the beginning of the log file
+                // will be ignored until the first matching log entry comes up.
+                $currentLog .= $line;
+            }
         }
 
         if ($currentLog !== '' && preg_match($logMatchPattern, $currentLog) === 1) {
