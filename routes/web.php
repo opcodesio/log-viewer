@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Http\Controllers\IsScanRequiredController;
+use Opcodes\LogViewer\Http\Controllers\ScanFilesController;
 
 Route::domain(LogViewer::getRouteDomain())
     ->middleware(LogViewer::getRouteMiddleware())
@@ -31,4 +33,7 @@ Route::domain(LogViewer::getRouteDomain())
 
             return $file->download();
         })->name('blv.download-file');
+
+        Route::get('is-scan-required', IsScanRequiredController::class)->name('blv.is-scan-required');
+        Route::get('scan-files', ScanFilesController::class)->name('blv.scan-files');
     });

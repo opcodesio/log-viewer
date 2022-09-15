@@ -149,7 +149,7 @@ class LogList extends Component
 
         $this->cacheRecentlyCleared = true;
 
-        $this->emit('fullCacheCleared');
+        $this->dispatchBrowserEvent('scan-files');
     }
 
     public function updatedPerPage($value)

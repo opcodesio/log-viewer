@@ -25,7 +25,12 @@
             this.$dispatch('file-selected', this.selectedFileIdentifier);
         }
     }"
-    x-init="$nextTick(() => { $store.fileViewer.reset(); @if(isset($selectedFile)) $store.fileViewer.foldersOpen.push('{{ $selectedFile->subFolderIdentifier() }}') @endif })"
+    @scan-files.window="$store.fileViewer.initScanCheck('{{ route('blv.is-scan-required') }}', '{{ route('blv.scan-files') }}')"
+    x-init="$nextTick(() => {
+        $store.fileViewer.reset();
+        $dispatch('scan-files');
+        @if(isset($selectedFile)) $store.fileViewer.foldersOpen.push('{{ $selectedFile->subFolderIdentifier() }}'); @endif
+    })"
 >
 <div class="flex h-full max-h-screen max-w-full">
     <div class="hidden md:flex md:w-88 md:flex-col md:fixed md:inset-y-0">
