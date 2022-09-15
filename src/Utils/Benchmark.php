@@ -108,7 +108,7 @@ class Benchmark
     {
         self::dump($name);
 
-        die();
+        exit();
     }
 
     /**
