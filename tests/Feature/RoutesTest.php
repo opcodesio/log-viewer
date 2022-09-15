@@ -52,7 +52,5 @@ function reloadRoutes(): void
     $router = Route::getFacadeRoot();
     $router->setRoutes((new RouteCollection()));
 
-    Route::middleware('web')
-        ->namespace('App\Http\Controllers')
-        ->group('routes/web.php');
+    Route::group([], 'routes/web.php');
 }
