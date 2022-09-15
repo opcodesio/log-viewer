@@ -1,4 +1,6 @@
-<nav class="flex flex-col h-full py-5">
+<nav class="flex flex-col h-full py-5" x-data
+    x-on:reload-files.window="$wire.call('reloadFiles')"
+>
     <div class="mx-3 mb-2">
         <h1 class="font-semibold text-emerald-800 dark:text-emerald-600 text-2xl flex items-center">
             Log Viewer
@@ -14,7 +16,13 @@
         @endif
 
         @if($shouldLoadFilesImmediately)
-        <div class="flex justify-end mt-4 mr-1">
+        <div class="flex justify-between mt-4 mr-1">
+            <div class="relative">
+                <div x-show="$store.fileViewer.scanInProgress" class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline spin mr-1" fill="currentColor"><use href="#icon-spinner" /></svg>
+                    Indexing logs...
+                </div>
+            </div>
             <div class="text-sm text-gray-500 dark:text-gray-400">
                 <label for="file-sort-direction" class="sr-only">Sort direction</label>
                 <select id="file-sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">

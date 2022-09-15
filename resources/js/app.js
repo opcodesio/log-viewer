@@ -39,6 +39,28 @@ Alpine.data('dropdown', () => ({
 }));
 
 Alpine.store('fileViewer', {
+    scanInProgress: false,
+    initScanCheck(routeScanCheck, routeScan) {
+        if (this.scanInProgress) return;
+        fetch(routeScanCheck)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.requires_scan) {
+                    this.scanInProgress = true;
+                    fetch(routeScan)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            this.scanInProgress = false;
+                            window.dispatchEvent(new CustomEvent('reload-files'));
+                        })
+                        .catch((error) => {
+                            console.error(error);
+                            this.scanInProgress = false;
+                        })
+                }
+            })
+    },
+
     foldersOpen: [],
     foldersInView: [],
     folderTops: {},

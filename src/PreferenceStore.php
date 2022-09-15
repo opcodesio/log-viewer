@@ -16,7 +16,7 @@ class PreferenceStore
 
     public function __construct(Request $request)
     {
-        $this->preferences = json_decode($request->cookie(self::COOKIE_KEY), true) ?? [];
+        $this->preferences = json_decode($request->cookie(self::COOKIE_KEY, 'null'), true) ?? [];
     }
 
     public function get(string $key, $default = null): mixed
