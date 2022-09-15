@@ -15,10 +15,9 @@
             </a>
         @endif
 
-        @if($shouldLoadFilesImmediately)
         <div class="flex justify-between mt-4 mr-1">
             <div class="relative">
-                <div x-show="$store.fileViewer.scanInProgress" class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                <div x-cloak x-show="$store.fileViewer.scanInProgress" class="flex items-center text-sm text-gray-500 dark:text-gray-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline spin mr-1" fill="currentColor"><use href="#icon-spinner" /></svg>
                     Indexing logs...
                 </div>
@@ -31,21 +30,11 @@
                 </select>
             </div>
         </div>
-        @endif
     </div>
 
-    <div id="file-list-container" class="relative h-full overflow-hidden" x-cloak @if(!$shouldLoadFilesImmediately) wire:init="loadFiles" @endif>
+    <div id="file-list-container" class="relative h-full overflow-hidden" x-cloak>
         <div class="pointer-events-none absolute z-10 top-0 h-4 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
         <div class="file-list" x-ref="list" x-on:scroll="(event) => $store.fileViewer.onScroll(event)">
-            @if(!$shouldLoadFilesImmediately)
-                <div class="w-full flex flex-col items-center justify-center text-gray-600 dark:text-gray-400 text-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 opacity-70 spin" fill="currentColor"><use href="#icon-spinner" /></svg>
-                    <p class="mt-5">Scanning <strong>{{ bytes_formatted($totalFileSize) }}</strong> worth of log files.</p>
-                    <p class="mt-5 text-sm">We are indexing these files to improve performance later on.</p>
-                    <p class="mt-5 text-sm">This should take ~ {{ $estimatedTimeToScan }}.</p>
-                </div>
-            @endif
-
     @php /** @var \Opcodes\LogViewer\LogFolder $folder */ @endphp
     @foreach($folderCollection as $folder)
         <div x-data="{ folder: '{{ $folder->identifier }}' }" :id="'folder-'+folder"

@@ -25,9 +25,10 @@
             this.$dispatch('file-selected', this.selectedFileIdentifier);
         }
     }"
+    @scan-files.window="$store.fileViewer.initScanCheck('{{ route('blv.is-scan-required') }}', '{{ route('blv.scan-files') }}')"
     x-init="$nextTick(() => {
         $store.fileViewer.reset();
-        $store.fileViewer.initScanCheck('{{ route('blv.requires-scan') }}', '{{ route('blv.scan-files') }}');
+        $dispatch('scan-files');
         @if(isset($selectedFile)) $store.fileViewer.foldersOpen.push('{{ $selectedFile->subFolderIdentifier() }}'); @endif
     })"
 >

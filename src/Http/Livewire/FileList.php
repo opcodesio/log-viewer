@@ -21,16 +21,9 @@ class FileList extends Component
 
     public ?string $selectedFileIdentifier = null;
 
-    public bool $shouldLoadFilesImmediately = true;
-
     public string $direction = self::NEWEST_FIRST;
 
     protected bool $cacheRecentlyCleared;
-
-    protected $listeners = [
-        'fullCacheCleared' => 'rescanAllFiles',
-        'loadFiles' => 'loadFiles',
-    ];
 
     public function mount(string $selectedFileIdentifier = null)
     {
@@ -59,10 +52,8 @@ class FileList extends Component
             });
 
         return view('log-viewer::livewire.file-list', [
-            'folderCollection' => $this->shouldLoadFilesImmediately && isset($folderCollection) ? $folderCollection : [],
+            'folderCollection' => $folderCollection,
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
-            'routeScanCheck' => route('blv.requires-scan'),
-            'routeScan' => route('blv.scan-files'),
         ]);
     }
 
@@ -81,17 +72,6 @@ class FileList extends Component
     public function reloadFiles()
     {
         //
-    }
-
-    public function loadFiles()
-    {
-        $this->shouldLoadFilesImmediately = true;
-    }
-
-    public function rescanAllFiles()
-    {
-        $this->shouldLoadFilesImmediately = false;
-        $this->emit('loadFiles');
     }
 
     public function selectFile(string $name)
