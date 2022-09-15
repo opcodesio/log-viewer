@@ -161,6 +161,10 @@ class LogViewerService
      */
     public function version(): string
     {
+        if (app()->runningUnitTests()) {
+            return 'unit-tests';
+        }
+
         return InstalledVersions::getPrettyVersion('opcodesio/log-viewer') ?? 'dev-main';
     }
 }

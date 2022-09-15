@@ -83,7 +83,7 @@ class LogFile
         return now()->addWeek();
     }
 
-    protected function cacheKey(): string
+    public function cacheKey(): string
     {
         return 'log-viewer:'.LogViewer::version().':file:'.md5($this->path);
     }
