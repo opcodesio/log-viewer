@@ -29,4 +29,20 @@ class LogFolderCollection extends Collection
 
         return $this;
     }
+
+    public function sortByEarliestFirstIncludingFiles(): self
+    {
+        $this->sortByEarliestFirst();
+        $this->each(fn (LogFolder $folder) => $folder->files()->sortByEarliestFirst());
+
+        return $this;
+    }
+
+    public function sortByLatestFirstIncludingFiles(): self
+    {
+        $this->sortByLatestFirst();
+        $this->each(fn (LogFolder $folder) => $folder->files()->sortByLatestFirst());
+
+        return $this;
+    }
 }
