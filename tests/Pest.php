@@ -42,7 +42,7 @@ function clearGeneratedLogFiles(): void
     File::cleanDirectory(storage_path('logs'));
 }
 
-function createLogIndex($file = null, $query = null, $predefinedLogs = []): LogIndex
+function createLogIndex($file = null, $query = null, array $predefinedLogs = []): LogIndex
 {
     if (is_null($file)) {
         $file = new LogFile('test.log', 'test.log');
@@ -50,7 +50,9 @@ function createLogIndex($file = null, $query = null, $predefinedLogs = []): LogI
 
     $logIndex = new LogIndex($file, $query);
 
-    // foreach ($predefinedLogs as $)
+    foreach ($predefinedLogs as $predefinedLog) {
+        $logIndex->addToIndex(...$predefinedLog);
+    }
 
     return $logIndex;
 }

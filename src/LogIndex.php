@@ -168,6 +168,38 @@ class LogIndex
         return $this->file->size() !== $this->getLastScannedFilePosition();
     }
 
+    public function getEarliestTimestamp(): ?int
+    {
+        $earliestTimestamp = null;
+
+        foreach ($this->get() as $timestamp => $tsIndex) {
+            $earliestTimestamp = min($timestamp, $earliestTimestamp ?? $timestamp);
+        }
+
+        return $earliestTimestamp;
+    }
+
+    public function getEarliestDate(): Carbon
+    {
+        return Carbon::createFromTimestamp($this->getEarliestTimestamp());
+    }
+
+    public function getLatestTimestamp(): ?int
+    {
+        $latestTimestamp = null;
+
+        foreach ($this->get() as $timestamp => $tsIndex) {
+            $latestTimestamp = max($timestamp, $latestTimestamp ?? $timestamp);
+        }
+
+        return $latestTimestamp;
+    }
+
+    public function getLatestDate(): Carbon
+    {
+        return Carbon::createFromTimestamp($this->getLatestTimestamp());
+    }
+
     protected function saveMetadata(): void
     {
         Cache::put(
