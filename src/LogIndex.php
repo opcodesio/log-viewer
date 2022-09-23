@@ -29,8 +29,7 @@ class LogIndex
     public function __construct(
         protected LogFile $file,
         protected ?string $query = null
-    )
-    {
+    ) {
     }
 
     public function cacheKey(): string
@@ -56,11 +55,11 @@ class LogIndex
             $timestamp = $timestamp->timestamp;
         }
 
-        if (!isset($this->index[$timestamp])) {
+        if (! isset($this->index[$timestamp])) {
             $this->index[$timestamp] = [];
         }
 
-        if (!isset($this->index[$timestamp][$severity])) {
+        if (! isset($this->index[$timestamp][$severity])) {
             $this->index[$timestamp][$severity] = [];
         }
 
@@ -73,27 +72,33 @@ class LogIndex
 
     public function get(): array
     {
-        if (!isset($this->index)) {
+        if (! isset($this->index)) {
             $this->index = Cache::get($this->cacheKey(), []);
         }
 
-        if (!$this->hasFilters()) {
+        if (! $this->hasFilters()) {
             return $this->index;
         }
 
         $results = [];
 
         foreach ($this->index as $timestamp => $tsIndex) {
-            if (isset($this->filterFrom) && $timestamp < $this->filterFrom) continue;
-            if (isset($this->filterTo) && $timestamp > $this->filterTo) continue;
+            if (isset($this->filterFrom) && $timestamp < $this->filterFrom) {
+                continue;
+            }
+            if (isset($this->filterTo) && $timestamp > $this->filterTo) {
+                continue;
+            }
 
-            if (!isset($this->filterLevels)) {
+            if (! isset($this->filterLevels)) {
                 $results[$timestamp] = $tsIndex;
             } else {
                 $results[$timestamp] = [];
 
                 foreach ($tsIndex as $level => $levelIndex) {
-                    if (!in_array($level, $this->filterLevels)) continue;
+                    if (! in_array($level, $this->filterLevels)) {
+                        continue;
+                    }
 
                     $results[$timestamp][$level] = $levelIndex;
                 }
@@ -140,7 +145,7 @@ class LogIndex
 
     public function save(): void
     {
-        if (!isset($this->index)) {
+        if (! isset($this->index)) {
             return;
         }
 
@@ -156,7 +161,7 @@ class LogIndex
 
     public function getLastScannedFilePosition(): int
     {
-        if (!isset($this->lastScannedFilePosition)) {
+        if (! isset($this->lastScannedFilePosition)) {
             $this->loadMetadata();
         }
 

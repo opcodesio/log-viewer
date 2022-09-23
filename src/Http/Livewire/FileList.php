@@ -5,10 +5,7 @@ namespace Opcodes\LogViewer\Http\Livewire;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\LogFileCollection;
-use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\LogFolderCollection;
-use Opcodes\LogViewer\LogReader;
 use Opcodes\LogViewer\PreferenceStore;
 
 class FileList extends Component

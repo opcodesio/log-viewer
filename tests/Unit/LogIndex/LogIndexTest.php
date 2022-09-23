@@ -22,8 +22,8 @@ it('can index a log entry', function () {
             $firstDate->timestamp => [
                 'info' => [
                     $firstIndexGenerated => $firstFilePosition,
-                ]
-            ]
+                ],
+            ],
         ]);
 
     // Adding another index should give a new generated index, and also add it to the full array
@@ -38,13 +38,13 @@ it('can index a log entry', function () {
             $firstDate->timestamp => [
                 'info' => [
                     $firstIndexGenerated => $firstFilePosition,
-                ]
+                ],
             ],
             $secondDate->timestamp => [
                 'debug' => [
                     $secondIndexGenerated => $newFilePosition,
-                ]
-            ]
+                ],
+            ],
         ]);
 });
 
@@ -67,8 +67,8 @@ it('can return an index for selected date range', function () {
         $secondDate->timestamp => [
             'debug' => [
                 $secondIndexGenerated => $newFilePosition,
-            ]
-        ]
+            ],
+        ],
     ]);
 });
 
@@ -91,8 +91,8 @@ it('can return an index for selected severity levels', function () {
         $firstDate->timestamp => [
             'info' => [
                 $firstIndexGenerated => $firstFilePosition,
-            ]
-        ]
+            ],
+        ],
     ]);
 });
 
@@ -110,7 +110,7 @@ it('tries to fetch the index from the cache first', function () {
                 'debug' => [
                     2 => 2500,
                 ],
-            ]
+            ],
         ],
         now()->addMinute(),
     );
@@ -133,8 +133,8 @@ it('can save to the cache after building up the index', function () {
         $firstDate->timestamp => [
             'info' => [
                 $firstIndexGenerated => $firstFilePosition,
-            ]
-        ]
+            ],
+        ],
     ];
     expect($logIndex->get())->toBe($expectedLogIndexData)
         ->and(Cache::get($cacheKey))->toBeNull();
