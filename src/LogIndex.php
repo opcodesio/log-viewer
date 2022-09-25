@@ -107,7 +107,7 @@ class LogIndex
     public function setChunkSize(int $size): void
     {
         if ($size < 1) {
-            throw new InvalidChunkSizeException($size . ' is not a valid chunk size. Must be higher than zero.');
+            throw new InvalidChunkSizeException($size.' is not a valid chunk size. Must be higher than zero.');
         }
 
         $this->chunkSize = $size;
@@ -151,7 +151,9 @@ class LogIndex
         foreach (range(0, $this->getChunkCount() - 1) as $chunkIndex) {
             $chunk = $this->getChunk($chunkIndex);
 
-            if (is_null($chunk)) continue;
+            if (is_null($chunk)) {
+                continue;
+            }
 
             foreach ($chunk as $timestamp => $tsIndex) {
                 if (isset($this->filterFrom) && $timestamp < $this->filterFrom) {
