@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Collection;
 use Opcodes\LogViewer\Level;
 
 it('can return the counts for each severity level in the file', function () {
