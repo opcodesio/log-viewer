@@ -20,7 +20,7 @@ class LogIndex
 
     protected int $chunkSize;
 
-    protected array $currentChunk;
+    protected LogIndexChunk $currentChunk;
 
     protected int $currentChunkSize = 0;
 
@@ -76,21 +76,12 @@ class LogIndex
             $timestamp = $timestamp->timestamp;
         }
 
-        if (! isset($this->currentChunk[$timestamp])) {
-            $this->currentChunk[$timestamp] = [];
-        }
-
-        if (! isset($this->currentChunk[$timestamp][$severity])) {
-            $this->currentChunk[$timestamp][$severity] = [];
-        }
-
-        $this->currentChunk[$timestamp][$severity][$nextLogIndex] = $filePosition;
+        $this->currentChunk->addToIndex($nextLogIndex, $filePosition, $timestamp, $severity);
 
         $this->nextLogIndex = $nextLogIndex + 1;
-        $this->currentChunkSize++;
 
-        if ($this->currentChunkSize >= $this->getChunkSize()) {
-            $this->rotateChunk();
+        if ($this->currentChunk->isFull()) {
+            $this->rotateCurrentChunk();
         }
 
         return $nextLogIndex;
@@ -98,22 +89,23 @@ class LogIndex
 
     public function getCurrentChunkSize(): int
     {
-        return $this->currentChunkSize;
+        return $this->currentChunk->size;
     }
 
     /**
      * @throws InvalidChunkSizeException
      */
-    public function setChunkSize(int $size): void
+    public function setMaxChunkSize(int $size): void
     {
         if ($size < 1) {
             throw new InvalidChunkSizeException($size . ' is not a valid chunk size. Must be higher than zero.');
         }
 
         $this->chunkSize = $size;
+        $this->currentChunk->maxSize = $size;
     }
 
-    public function getChunkSize(): int
+    public function getMaxChunkSize(): int
     {
         return $this->chunkSize;
     }
@@ -121,7 +113,7 @@ class LogIndex
     public function getChunk(int $index): ?array
     {
         if ($index === ($this->getChunkCount() - 1)) {
-            return $this->currentChunk ?? [];
+            return $this->currentChunk?->data ?? [];
         }
 
         return Cache::get($this->chunkCacheKey($index));
@@ -132,13 +124,15 @@ class LogIndex
         return $this->chunkCount ?? 1;
     }
 
-    protected function rotateChunk(): void
+    protected function rotateCurrentChunk(): void
     {
-        $chunkIndex = $this->chunkCount - 1;
-        Cache::put($this->chunkCacheKey($chunkIndex), $this->currentChunk, $this->cacheTtl());
+        Cache::put(
+            $this->chunkCacheKey($this->currentChunk->index),
+            $this->currentChunk->data,
+            $this->cacheTtl()
+        );
 
-        $this->currentChunk = [];
-        $this->currentChunkSize = 0;
+        $this->currentChunk = new LogIndexChunk($this->currentChunk->index + 1, [], 0, $this->getMaxChunkSize());
         $this->chunkCount++;
 
         $this->saveMetadata();
@@ -229,7 +223,13 @@ class LogIndex
             return;
         }
 
-        Cache::put($this->cacheKey(), $this->currentChunk, $this->cacheTtl());
+        Cache::put(
+            $this->chunkCacheKey($this->chunkCount - 1),
+            $this->currentChunk->data,
+            $this->cacheTtl()
+        );
+
+        $this->saveMetadata();
     }
 
     public function setLastScannedFilePosition(int $position): void
@@ -325,16 +325,21 @@ class LogIndex
     protected function loadCurrentChunk(): void
     {
         $latestChunkIndex = $this->chunkCount - 1;
+        $chunkData = Cache::get($this->chunkCacheKey($latestChunkIndex), []);
+        $chunkSize = 0;
 
-        $this->currentChunk = Cache::get($this->chunkCacheKey($latestChunkIndex), []);
-
-        $this->currentChunkSize = 0;
-
-        foreach ($this->currentChunk as $ts => $tsIndex) {
+        foreach ($chunkData as $ts => $tsIndex) {
             foreach ($tsIndex as $level => $levelIndex) {
-                $this->currentChunkSize += count($levelIndex);
+                $chunkSize += count($levelIndex);
             }
         }
+
+        $this->currentChunk = new LogIndexChunk(
+            $latestChunkIndex,
+            $chunkData,
+            $chunkSize,
+            $this->getMaxChunkSize()
+        );
     }
 
     protected function hasFilters(): bool

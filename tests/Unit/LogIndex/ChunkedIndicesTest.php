@@ -6,15 +6,15 @@ use Opcodes\LogViewer\LogFile;
 it('can set the chunk size for the log index', function () {
     $logIndex = createLogIndex();
 
-    $logIndex->setChunkSize(2);
+    $logIndex->setMaxChunkSize(2);
 
-    expect($logIndex->getChunkSize())->toBe(2);
+    expect($logIndex->getMaxChunkSize())->toBe(2);
 });
 
 it('cannot set a chunk size lower than 1', function () {
     $logIndex = createLogIndex();
 
-    $logIndex->setChunkSize(0);
+    $logIndex->setMaxChunkSize(0);
 })->throws(InvalidChunkSizeException::class);
 
 it('increments the current chunk size after adding a log', function () {
@@ -28,7 +28,7 @@ it('increments the current chunk size after adding a log', function () {
 
 it('chunks big indices into smaller pieces', function () {
     $logIndex = createLogIndex();
-    $logIndex->setChunkSize(1);
+    $logIndex->setMaxChunkSize(1);
 
     $firstIndexGenerated = $logIndex->addToIndex(
         $firstFilePosition = 1000,
@@ -59,7 +59,7 @@ it('chunks big indices into smaller pieces', function () {
 
 it('can get the number of chunks generated so far', function () {
     $logIndex = createLogIndex();
-    $logIndex->setChunkSize(2);
+    $logIndex->setMaxChunkSize(2);
     // let's generate three logs = 2 chunks so far.
     $logIndex->addToIndex(1000, now()->subMinute(), 'info');
     $logIndex->addToIndex(1500, now(), 'debug');
@@ -82,7 +82,7 @@ it('returns null for a non-existent chunk', function () {
 it('remembers the number of chunks after re-instantiation', function () {
     $file = Mockery::mock(new LogFile('laravel.log', 'laravel.log'));
     $logIndex = createLogIndex($file);
-    $logIndex->setChunkSize(1);
+    $logIndex->setMaxChunkSize(1);
     // 2 log entries at 1 per chunk = 3 chunks in total (2 full + 1 empty)
     $logIndex->addToIndex(1000, now()->subMinute(), 'info');
     $logIndex->addToIndex(1500, now(), 'debug');
@@ -95,7 +95,7 @@ it('remembers the number of chunks after re-instantiation', function () {
 
 it('combines all chunks when getting the full index', function () {
     $logIndex = createLogIndex();
-    $logIndex->setChunkSize(2);
+    $logIndex->setMaxChunkSize(2);
     // let's generate three logs = 2 chunks so far.
     $logIndex->addToIndex($firstPos = 1000, $firstDate = now()->subMinute(), 'info');
     $logIndex->addToIndex($secondPos = 1500, $secondDate = now(), 'debug');
@@ -105,6 +105,24 @@ it('combines all chunks when getting the full index', function () {
     $fullIndex = $logIndex->get();
 
     expect($fullIndex)->toBe([
+        $firstDate->timestamp => [
+            'info' => [
+                0 => $firstPos,
+            ]
+        ],
+        $secondDate->timestamp => [
+            'debug' => [
+                1 => $secondPos,
+                2 => $thirdPos,
+            ]
+        ],
+    ]);
+
+    // after saving and re-instantiating the log, we expect it to persist the index
+    $logIndex->save();
+    $logIndex = createLogIndex($logIndex->getFile());
+
+    expect($logIndex->get())->toBe([
         $firstDate->timestamp => [
             'info' => [
                 0 => $firstPos,

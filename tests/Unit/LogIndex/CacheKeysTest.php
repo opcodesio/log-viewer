@@ -33,3 +33,14 @@ it('can generate a cache key for metadata', function () {
     expect($logIndex->metaCacheKey())
         ->toBe($fileCacheKey.':'.md5($query).':metadata');
 });
+
+it('can generate a cache key for an index chunk', function () {
+    $file = Mockery::mock(new LogFile('test.log', 'test.log'))
+        ->allows(['cacheKey' => $fileCacheKey = 'file-cache-key']);
+    $logIndex = createLogIndex($file);
+
+    expect($logIndex->chunkCacheKey(0))
+        ->toBe($fileCacheKey.':'.md5('').':log-index:0')
+        ->and($logIndex->chunkCacheKey(123))
+        ->toBe($fileCacheKey.':'.md5('').':log-index:123');
+});

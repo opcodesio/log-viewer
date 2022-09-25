@@ -126,7 +126,7 @@ it('tries to fetch the index from the cache first', function () {
 
 it('can save to the cache after building up the index', function () {
     $logIndex = createLogIndex();
-    $cacheKey = $logIndex->cacheKey();
+    $cacheKey = $logIndex->chunkCacheKey(0);    // by default, it will save to the first chunk
     $firstIndexGenerated = $logIndex->addToIndex(
         $firstFilePosition = 1000,
         $firstDate = now()->subMinute(),
