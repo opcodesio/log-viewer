@@ -9,7 +9,8 @@ class LogIndexChunk
         public array $data,
         public int $size,
         public int $maxSize,
-    ) {}
+    ) {
+    }
 
     public function addToIndex(int $logIndex, int $filePosition, int $timestamp, string $severity): void
     {
