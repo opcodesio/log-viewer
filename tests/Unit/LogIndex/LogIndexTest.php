@@ -1,6 +1,7 @@
 <?php
 
 use Opcodes\LogViewer\LogFile;
+use Illuminate\Support\Facades\Cache;
 
 it('starts off with an empty index', function () {
     $logIndex = createLogIndex();
@@ -98,8 +99,8 @@ it('can return an index for selected severity levels', function () {
 
 it('tries to fetch the index from the cache first', function () {
     $logIndex = createLogIndex();
-    $cacheKey = $logIndex->cacheKey();
-    \Illuminate\Support\Facades\Cache::put(
+    $cacheKey = $logIndex->chunkCacheKey(0);
+    Cache::put(
         $cacheKey,
         $cachedIndexData = [
             1663249701 => [
@@ -114,11 +115,13 @@ it('tries to fetch the index from the cache first', function () {
         ],
         now()->addMinute(),
     );
+    // reload the log index instance, so it fetches from the cache.
+    $logIndex = createLogIndex($logIndex->getFile());
 
     expect($logIndex->get())->toBe($cachedIndexData);
 
     // Make sure to clean up!
-    \Illuminate\Support\Facades\Cache::forget($cacheKey);
+    Cache::forget($cacheKey);
 });
 
 it('can save to the cache after building up the index', function () {
