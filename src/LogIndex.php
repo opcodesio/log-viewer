@@ -278,7 +278,9 @@ class LogIndex
             }
         } else {
             foreach ($this->getChunkDefinitions() as $chunkDefinition) {
-                if (!isset($chunkDefinition['earliest_timestamp'])) continue;
+                if (! isset($chunkDefinition['earliest_timestamp'])) {
+                    continue;
+                }
 
                 $earliestTimestamp = min(
                     $chunkDefinition['earliest_timestamp'],
@@ -307,7 +309,9 @@ class LogIndex
             }
         } else {
             foreach ($this->getChunkDefinitions() as $chunkDefinition) {
-                if (! isset($chunkDefinition['latest_timestamp'])) continue;
+                if (! isset($chunkDefinition['latest_timestamp'])) {
+                    continue;
+                }
 
                 $latestTimestamp = max(
                     $chunkDefinition['latest_timestamp'],

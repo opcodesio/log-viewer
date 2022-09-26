@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 class LogIndexChunk
 {
     protected int $earliestTimestamp;
+
     protected int $latestTimestamp;
 
     public function __construct(
