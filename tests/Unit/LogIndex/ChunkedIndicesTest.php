@@ -126,13 +126,13 @@ it('combines all chunks when getting the full index', function () {
         $firstDate->timestamp => [
             'info' => [
                 0 => $firstPos,
-            ]
+            ],
         ],
         $secondDate->timestamp => [
             'debug' => [
                 1 => $secondPos,
                 2 => $thirdPos,
-            ]
+            ],
         ],
     ]);
 });
