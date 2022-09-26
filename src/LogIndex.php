@@ -18,13 +18,11 @@ class LogIndex
 {
     const DEFAULT_CHUNK_SIZE = 10_000;
 
-    protected int $chunkSize;
+    protected int $maxChunkSize;
+
+    protected array $chunkDefinitions = [];
 
     protected LogIndexChunk $currentChunk;
-
-    protected int $currentChunkSize = 0;
-
-    protected int $chunkCount = 1;
 
     protected int $nextLogIndex;
 
@@ -80,7 +78,7 @@ class LogIndex
 
         $this->nextLogIndex = $nextLogIndex + 1;
 
-        if ($this->currentChunk->isFull()) {
+        if ($this->currentChunk->size >= $this->getMaxChunkSize()) {
             $this->rotateCurrentChunk();
         }
 
@@ -101,19 +99,31 @@ class LogIndex
             throw new InvalidChunkSizeException($size.' is not a valid chunk size. Must be higher than zero.');
         }
 
-        $this->chunkSize = $size;
-        $this->currentChunk->maxSize = $size;
+        $this->maxChunkSize = $size;
     }
 
     public function getMaxChunkSize(): int
     {
-        return $this->chunkSize;
+        return $this->maxChunkSize;
+    }
+
+    public function getChunkDefinitions(): array
+    {
+        return [
+            ...$this->chunkDefinitions,
+            $this->currentChunk->toArray(),
+        ];
+    }
+
+    public function getChunkDefinition(int $index): ?array
+    {
+        return $this->getChunkDefinitions()[$index] ?? null;
     }
 
     public function getChunk(int $index): ?array
     {
-        if ($index === ($this->getChunkCount() - 1)) {
-            return $this->currentChunk?->data ?? [];
+        if (isset($this->currentChunk) && $index === $this->currentChunk->index) {
+            return $this->currentChunk->data ?? [];
         }
 
         return Cache::get($this->chunkCacheKey($index));
@@ -121,7 +131,7 @@ class LogIndex
 
     public function getChunkCount(): int
     {
-        return $this->chunkCount ?? 1;
+        return count($this->getChunkDefinitions());
     }
 
     protected function rotateCurrentChunk(): void
@@ -132,8 +142,9 @@ class LogIndex
             $this->cacheTtl()
         );
 
-        $this->currentChunk = new LogIndexChunk($this->currentChunk->index + 1, [], 0, $this->getMaxChunkSize());
-        $this->chunkCount++;
+        $this->chunkDefinitions[] = $this->currentChunk->toArray();
+
+        $this->currentChunk = new LogIndexChunk([], $this->currentChunk->index + 1, 0);
 
         $this->saveMetadata();
     }
@@ -142,8 +153,8 @@ class LogIndex
     {
         $results = [];
 
-        foreach (range(0, $this->getChunkCount() - 1) as $chunkIndex) {
-            $chunk = $this->getChunk($chunkIndex);
+        foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+            $chunk = $this->getChunk($chunkDefinition['index']);
 
             if (is_null($chunk)) {
                 continue;
@@ -226,7 +237,7 @@ class LogIndex
         }
 
         Cache::put(
-            $this->chunkCacheKey($this->chunkCount - 1),
+            $this->chunkCacheKey($this->currentChunk->index),
             $this->currentChunk->data,
             $this->cacheTtl()
         );
@@ -259,8 +270,21 @@ class LogIndex
     {
         $earliestTimestamp = null;
 
-        foreach ($this->get() as $timestamp => $tsIndex) {
-            $earliestTimestamp = min($timestamp, $earliestTimestamp ?? $timestamp);
+        if ($this->hasFilters()) {
+            // because it has filters, we can no longer use our chunk definitions, which has
+            // values for the whole index and not just particular levels/dates.
+            foreach ($this->get() as $timestamp => $tsIndex) {
+                $earliestTimestamp = min($timestamp, $earliestTimestamp ?? $timestamp);
+            }
+        } else {
+            foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+                if (!isset($chunkDefinition['earliest_timestamp'])) continue;
+
+                $earliestTimestamp = min(
+                    $chunkDefinition['earliest_timestamp'],
+                    $earliestTimestamp ?? $chunkDefinition['earliest_timestamp']
+                );
+            }
         }
 
         return $earliestTimestamp;
@@ -275,8 +299,21 @@ class LogIndex
     {
         $latestTimestamp = null;
 
-        foreach ($this->get() as $timestamp => $tsIndex) {
-            $latestTimestamp = max($timestamp, $latestTimestamp ?? $timestamp);
+        if ($this->hasFilters()) {
+            // because it has filters, we can no longer use our chunk definitions, which has
+            // values for the whole index and not just particular levels/dates.
+            foreach ($this->get() as $timestamp => $tsIndex) {
+                $latestTimestamp = max($timestamp, $latestTimestamp ?? $timestamp);
+            }
+        } else {
+            foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+                if (! isset($chunkDefinition['latest_timestamp'])) continue;
+
+                $latestTimestamp = max(
+                    $chunkDefinition['latest_timestamp'],
+                    $latestTimestamp ?? $chunkDefinition['latest_timestamp']
+                );
+            }
         }
 
         return $latestTimestamp;
@@ -306,8 +343,11 @@ class LogIndex
             $this->metaCacheKey(),
             [
                 'last_scanned_file_position' => $this->lastScannedFilePosition,
-                'chunk_size' => $this->chunkSize,
-                'chunk_count' => $this->chunkCount,
+                'next_log_index' => $this->nextLogIndex,
+                'max_chunk_size' => $this->maxChunkSize,
+                'current_chunk_index' => $this->currentChunk->index,
+                'chunk_definitions' => $this->chunkDefinitions,
+                'current_chunk_definition' => $this->currentChunk->toArray(),
             ],
             $this->cacheTtl()
         );
@@ -318,30 +358,12 @@ class LogIndex
         $data = Cache::get($this->metaCacheKey(), []);
 
         $this->lastScannedFilePosition = $data['last_scanned_file_position'] ?? 0;
-        $this->chunkSize = $data['chunk_size'] ?? self::DEFAULT_CHUNK_SIZE;
-        $this->chunkCount = $data['chunk_count'] ?? 1;
+        $this->nextLogIndex = $data['next_log_index'] ?? 0;
+        $this->maxChunkSize = $data['max_chunk_size'] ?? self::DEFAULT_CHUNK_SIZE;
+        $this->chunkDefinitions = $data['chunk_definitions'] ?? [];
 
-        $this->loadCurrentChunk();
-    }
-
-    protected function loadCurrentChunk(): void
-    {
-        $latestChunkIndex = $this->chunkCount - 1;
-        $chunkData = Cache::get($this->chunkCacheKey($latestChunkIndex), []);
-        $chunkSize = 0;
-
-        foreach ($chunkData as $ts => $tsIndex) {
-            foreach ($tsIndex as $level => $levelIndex) {
-                $chunkSize += count($levelIndex);
-            }
-        }
-
-        $this->currentChunk = new LogIndexChunk(
-            $latestChunkIndex,
-            $chunkData,
-            $chunkSize,
-            $this->getMaxChunkSize()
-        );
+        $this->currentChunk = LogIndexChunk::fromDefinitionArray($data['current_chunk_definition'] ?? []);
+        $this->currentChunk->data = Cache::get($this->chunkCacheKey($this->currentChunk->index), []);
     }
 
     protected function hasFilters(): bool

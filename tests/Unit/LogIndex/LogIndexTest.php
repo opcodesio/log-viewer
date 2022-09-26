@@ -172,3 +172,17 @@ it('can check whether the index is incomplete', function () {
 
     expect($logIndex->incomplete())->toBeFalse();
 });
+
+it('can continue from where it left off after re-instantiation', function () {
+    $logIndex = createLogIndex();
+    $logIndex->addToIndex(0, now(), 'info');
+    $logIndex->addToIndex(200, now(), 'info');
+    $lastKnownIndex = $logIndex->addToIndex(1000, now(), 'info');
+    $logIndex->save();
+
+    $logIndex = createLogIndex($logIndex->getFile());
+
+    $newestEntryIndex = $logIndex->addToIndex(2000, now(), 'debug');
+
+    expect($newestEntryIndex)->toBe($lastKnownIndex + 1);
+});
