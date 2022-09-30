@@ -13,6 +13,7 @@ use Opcodes\LogViewer\LogFolderCollection;
  *
  * @method static string version()
  * @method static LogFolder[]|LogFolderCollection getFilesGroupedByFolder()
+ * @method static LogFolder|null getFolder(?string $folderIdentifier)
  * @method static LogFile[]|LogFileCollection getFiles()
  * @method static LogFile|null getFile(string $fileIdentifier)
  * @method static void clearFileCache()

@@ -20,8 +20,13 @@ Alpine.data('dropdown', () => ({
         if (this.open) { return this.close() }
         this.$refs.button.focus()
         this.open = true
-        const p = this.$refs.list.getBoundingClientRect()
-        this.direction = this.$refs.button.getBoundingClientRect().bottom - p.top + 140 > p.height ? 'up' : 'down';
+
+        const fileListContainer = this.$refs.fileList;
+
+        if (fileListContainer) {
+            const p = fileListContainer.getBoundingClientRect()
+            this.direction = this.$refs.button.getBoundingClientRect().bottom - p.top + 140 > p.height ? 'up' : 'down';
+        }
     },
     close(focusAfter) {
         if (! this.open) { return }

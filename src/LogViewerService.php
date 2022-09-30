@@ -96,6 +96,16 @@ class LogViewerService
         return $file;
     }
 
+    public function getFolder(?string $folderIdentifier): ?LogFolder
+    {
+        return $this->getFilesGroupedByFolder()
+            ->first(function (LogFolder $folder) use ($folderIdentifier) {
+                return (empty($folderIdentifier) && $folder->isRoot())
+                    || $folder->identifier === $folderIdentifier
+                    || $folder->path === $folderIdentifier;
+            });
+    }
+
     public function clearFileCache(): void
     {
         $this->_cachedFiles = null;
