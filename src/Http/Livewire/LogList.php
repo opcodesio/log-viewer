@@ -84,6 +84,15 @@ class LogList extends Component
         $levels = $logQuery?->getLevelCounts();
         $logs = $logQuery?->paginate($this->perPage);
 
+        if ($logs->lastPage() < $this->page) {
+            $this->gotoPage($logs->lastPage());
+
+            // re-create the paginator instance to fix a bug
+            $logs = $logQuery?->paginate($this->perPage);
+        } elseif ($this->page < 1) {
+            $this->gotoPage(1);
+        }
+
         return view('log-viewer::livewire.log-list', array_merge([
             'file' => $file,
             'levels' => $levels,
