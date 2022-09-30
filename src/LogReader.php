@@ -118,6 +118,8 @@ class LogReader
             $this->levels = null;
         }
 
+        $this->index()->forLevels($this->levels);
+
         unset($this->_mergedIndex);
 
         return $this;
@@ -140,6 +142,10 @@ class LogReader
         } else {
             $this->levels = null;
         }
+
+        $this->index()->forLevels($this->levels);
+
+        unset($this->_mergedIndex);
 
         return $this;
     }
@@ -171,8 +177,6 @@ class LogReader
     /**
      * Open the log file for reading. Most other methods will open the file automatically if needed.
      *
-     * @return $this
-     *
      * @throws \Exception
      */
     public function open(): self
@@ -198,8 +202,6 @@ class LogReader
 
     /**
      * Close the file handle.
-     *
-     * @return $this
      *
      * @throws \Exception
      */
@@ -227,9 +229,6 @@ class LogReader
 
     /**
      * Skip a number of logs
-     *
-     * @param  int  $number
-     * @return $this
      *
      * @throws \Exception
      */
