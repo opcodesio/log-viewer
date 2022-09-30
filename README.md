@@ -223,6 +223,22 @@ public function boot()
 }
 ```
 
+#### Authorizing folder downloads
+
+You can also limit whether whole folders can be downloaded by defining a `downloadLogFolder` authorization gate:
+
+```php
+use Opcodes\LogViewer\LogFolder;
+
+//...
+
+Gate::define('downloadLogFolder', function (?User $user, LogFolder $folder) {
+    // return true if the user is allowed to download the whole folder.
+});
+```
+
+**NOTE:** Individual file permissions are also checked before downloading them, to avoid accidental downloads of protected log files.
+
 ### Authorizing log file deletion
 
 You can limit the ability to delete log files via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `deleteLogFile` authorization gate in your `App\Providers\AuthServiceProvider` class:
@@ -246,6 +262,22 @@ public function boot()
     });
 }
 ```
+
+#### Authorizing folder deletion
+
+You can also limit whether whole folders can be deleted by defining a `deleteLogFolder` authorization gate:
+
+```php
+use Opcodes\LogViewer\LogFolder;
+
+//...
+
+Gate::define('deleteLogFolder', function (?User $user, LogFolder $folder) {
+    // return true if the user is allowed to delete the whole folder.
+});
+```
+
+**NOTE:** Individual file permissions are also checked before deleting them, to avoid accidental deletion of protected log files.
 
 ## Troubleshooting
 
