@@ -11,6 +11,10 @@ html.dark {
     .dropdown-toggle {
         @apply whitespace-nowrap;
 
+        &:focus {
+            @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-600;
+        }
+
         & > svg {
             @apply w-4 h-4 ml-1 opacity-75;
         }
@@ -380,14 +384,15 @@ html.dark {
     &.has-error input {
         @apply border-red-600;
         &:focus {
-            @apply outline-red-500 border-transparent;
+            @apply ring-red-500 border-transparent;
         }
     }
     .clear-search {
         @apply absolute top-0 right-0 p-1.5;
         button {
-            @apply text-gray-500 dark:text-gray-400 p-1;
+            @apply rounded text-gray-500 dark:text-gray-400 p-1;
             &:hover { @apply text-gray-600 dark:text-gray-300; }
+            &:focus { @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-600; }
             & > svg { @apply h-5 w-5; }
         }
     }
