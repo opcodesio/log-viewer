@@ -34,26 +34,70 @@
 
     <div id="file-list-container" class="relative h-full overflow-hidden" x-cloak>
         <div class="pointer-events-none absolute z-10 top-0 h-4 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
-        <div class="file-list" x-ref="list" x-on:scroll="(event) => $store.fileViewer.onScroll(event)">
+        <div class="file-list" x-ref="fileList" x-on:scroll="(event) => $store.fileViewer.onScroll(event)">
     @php /** @var \Opcodes\LogViewer\LogFolder $folder */ @endphp
     @foreach($folderCollection as $folder)
         <div x-data="{ folder: '{{ $folder->identifier }}' }" :id="'folder-'+folder"
-             class="relative @if(!$folder->isRoot()) folder-container @endif"
+             class="relative folder-container"
+             x-init="$nextTick(() => { if (@json($folder->isRoot() && empty($selectedFileIdentifier))) { $store.fileViewer.foldersOpen.push('{{$folder->identifier}}') } })"
         >
-            @if(!$folder->isRoot())
             <div class="folder-item-container"
                  x-on:click="$store.fileViewer.toggle(folder)"
                  x-bind:class="[$store.fileViewer.isOpen(folder) ? 'active' : '', $store.fileViewer.shouldBeSticky(folder) ? 'sticky z-10' : '']"
                  x-bind:style="{ top: $store.fileViewer.isOpen(folder) ? ($store.fileViewer.folderTops[folder] || 0) : 0 }"
+                 x-data="dropdown"
+                 x-on:keydown.escape.prevent.stop="close($refs.button)"
+                 x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
+                 x-id="['dropdown-button']"
             >
                 <div class="file-item">
                     @include('log-viewer::partials.folder-icon')
-                    <div class="file-name">{{ $folder->cleanPath() }}</div>
+                    <div class="file-name @if($folder->isRoot()) text-gray-500 dark:text-gray-400 @endif">{{ $folder->cleanPath() }}</div>
+                    <button type="button" class="file-dropdown-toggle"
+                            x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-more" /></svg>
+                    </button>
+                </div>
+
+                <div
+                    x-ref="panel"
+                    x-show="open"
+                    x-bind="transitions"
+                    x-on:click.outside="close($refs.button)"
+                    :id="$id('dropdown-button')"
+                    class="dropdown w-48"
+                    :class="direction"
+                >
+                    <div class="py-2">
+                        <button wire:click="clearFolderCache('{{ $folder->identifier }}')" x-on:click.stop="cacheRecentlyCleared = false;" x-data="{ cacheRecentlyCleared: @json($cacheRecentlyCleared) }"
+                                x-init="setTimeout(() => cacheRecentlyCleared = false, 2000);"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class="hidden" wire:target="clearFolderCache" fill="currentColor"><use href="#icon-database" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class.remove="hidden" wire:target="clearFolderCache" class="hidden spin" fill="currentColor"><use href="#icon-spinner" /></svg>
+                            <span x-show="!cacheRecentlyCleared" wire:loading.class="hidden" wire:target="clearFolderCache">Rebuild indices</span>
+                        </button>
+
+                        @can('downloadLogFolder', $folder)
+                        <a href="{{ $folder->downloadUrl() }}" x-on:click.stop="">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-download" /></svg>
+                            Download
+                        </a>
+                        @endcan
+
+                        @can('deleteLogFolder', $folder)
+                        <div class="divider"></div>
+                        <button x-on:click.stop="if (confirm('Are you sure you want to delete the log folder \'{{ $folder->path }}\'? THIS ACTION CANNOT BE UNDONE.')) { $wire.call('deleteFolder', '{{ $folder->identifier }}') }" wire:loading.attr="disabled">
+                            <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class="hidden" wire:target="deleteFolder" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-trashcan" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class.remove="hidden" wire:target="deleteFolder" wire:target="deleteFolder('{{ $folder->identifier }}')" class="hidden spin" fill="currentColor"><use href="#icon-spinner" /></svg>
+                            Delete
+                        </button>
+                        @endcan
+                    </div>
                 </div>
             </div>
-            @endif
 
-            <div class="folder-files @if(!$folder->isRoot()) pl-3 ml-1 border-l border-gray-200 dark:border-gray-800 @endif" @if(!$folder->isRoot()) x-show="$store.fileViewer.isOpen(folder)" @endif>
+            <div class="folder-files pl-3 ml-1 border-l border-gray-200 dark:border-gray-800" x-show="$store.fileViewer.isOpen(folder)">
             @foreach($folder->files() as $logFile)
                 @include('log-viewer::partials.file-list-item', ['logFile' => $logFile])
             @endforeach

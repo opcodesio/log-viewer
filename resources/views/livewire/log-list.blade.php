@@ -10,7 +10,7 @@
                 <div>@include('log-viewer::partials.log-list-level-buttons')</div>
                 @endisset
             </div>
-            <div class="flex-1 flex items-center @empty($selectedFileIdentifier) justify-end @endempty min-h-[38px]">
+            <div class="flex-1 flex @empty($selectedFileIdentifier) justify-end @endempty min-h-[38px]">
                 @isset($selectedFileIdentifier)
                 <div class="flex-1">@include('log-viewer::partials.search-input')</div>
                 <div class="ml-5">@include('log-viewer::partials.log-list-share-page-button')</div>

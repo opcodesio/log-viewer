@@ -354,9 +354,7 @@ class LogReader
         } elseif (! empty($query)) {
             $query = '/'.$query.'/i';
 
-            if (! $this->isValidRegex($query)) {
-                throw new InvalidRegularExpression();
-            }
+            $this->validateRegex($query);
 
             $this->query = $query;
         } else {
@@ -368,14 +366,22 @@ class LogReader
         return $this;
     }
 
-    protected function isValidRegex(string $regexString): bool
+    /**
+     * @throws InvalidRegularExpression
+     */
+    protected function validateRegex(string $regexString): void
     {
-        set_error_handler(function () {
+        $error = null;
+        set_error_handler(function (int $errno, string $errstr) use (&$error) {
+            $error = $errstr;
         }, E_WARNING);
-        $isValidRegex = preg_match($regexString, '') !== false;
+        preg_match($regexString, '');
         restore_error_handler();
 
-        return $isValidRegex;
+        if (! empty($error)) {
+            $error = str_replace('preg_match(): ', '', $error);
+            throw new InvalidRegularExpression($error);
+        }
     }
 
     /**
