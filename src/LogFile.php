@@ -24,12 +24,8 @@ class LogFile
     ) {
         $this->identifier = Str::substr(md5($path), -8, 8).'-'.$name;
 
-        // by default, we load all logs from the storage/logs folder, so we can
-        // safely disregard that part because it's always going to be the same.
-        $folder = str_replace(Str::finish(storage_path('logs'), DIRECTORY_SEPARATOR), '', $path);
-
-        // now we're left with something like `folderA/laravel.log`. Let's remove the file name because we already know it.
-        $this->subFolder = str_replace([LogViewer::basePathForLogs(), $name], ['', ''], $folder);
+        // Let's remove the file name because we already know it.
+        $this->subFolder = str_replace($name, '', $path);
         $this->subFolder = rtrim($this->subFolder, DIRECTORY_SEPARATOR);
 
         $this->metaData = Cache::get($this->metaDataCacheKey(), []);

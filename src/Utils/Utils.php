@@ -21,13 +21,17 @@ class Utils
                 $query = '/'.$query.'/i';
             }
 
-            $text = preg_replace_callback(
-                $query,
-                function ($matches) {
-                    return '<mark>'.$matches[0].'</mark>';
-                },
-                $text
-            );
+            try {
+                $text = preg_replace_callback(
+                    $query,
+                    function ($matches) {
+                        return '<mark>'.$matches[0].'</mark>';
+                    },
+                    $text
+                );
+            } catch (\Exception $e) {
+                // in case the regex is invalid, we want to just continue without marking any text.
+            }
         }
 
         // Let's return the <mark> tags which we use for highlighting the search results

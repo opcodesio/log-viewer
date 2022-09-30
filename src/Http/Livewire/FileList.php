@@ -5,6 +5,9 @@ namespace Opcodes\LogViewer\Http\Livewire;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\LogFileCollection;
+use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\LogFolderCollection;
 use Opcodes\LogViewer\PreferenceStore;
 
@@ -77,15 +80,51 @@ class FileList extends Component
         }
     }
 
+    public function deleteFolder(string $folderIdentifier)
+    {
+        $folder = LogViewer::getFolder($folderIdentifier);
+
+        if ($folder) {
+            Gate::authorize('deleteLogFolder', $folder);
+
+            $folder?->files()->each(function (LogFile $file) {
+                if (Gate::check('deleteLogFile', $file)) {
+                    $file->delete();
+                }
+            });
+        }
+
+        if ($folder?->files()->contains('identifier', $this->selectedFileIdentifier)) {
+            $this->selectedFileIdentifier = null;
+            $this->emit('fileSelected', $this->selectedFileIdentifier);
+        }
+    }
+
     public function clearCache(string $fileIdentifier)
     {
-        LogViewer::getFile($fileIdentifier)?->clearCache();
+        $file = LogViewer::getFile($fileIdentifier);
+
+        if ($file) {
+            $file->clearCache();
+            $file->scan();
+        }
 
         if ($this->selectedFileIdentifier === $fileIdentifier) {
             $this->emit('fileSelected', $this->selectedFileIdentifier);
         }
 
         $this->cacheRecentlyCleared = true;
+    }
+
+    public function clearFolderCache(string $folderIdentifier)
+    {
+        $folder = LogViewer::getFolder($folderIdentifier);
+
+        $folder?->files()->each->clearCache();
+
+        $this->cacheRecentlyCleared = true;
+
+        $this->dispatchBrowserEvent('scan-files');
     }
 
     public function updatedDirection($value)
