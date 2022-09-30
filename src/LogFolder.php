@@ -41,7 +41,9 @@ class LogFolder
 
     public function cleanPath(): string
     {
-        if ($this->isRoot()) return 'root';
+        if ($this->isRoot()) {
+            return 'root';
+        }
 
         $folder = $this->path;
 
@@ -92,10 +94,10 @@ class LogFolder
 
     public function downloadFileName(): string
     {
-        $cleanName = preg_replace("/[^A-Za-z0-9.]/", '_', $this->cleanPath());
+        $cleanName = preg_replace('/[^A-Za-z0-9.]/', '_', $this->cleanPath());
         $cleanName = ltrim($cleanName, '_');
 
-        return $cleanName . '.zip';
+        return $cleanName.'.zip';
     }
 
     public function downloadUrl(): string
@@ -105,13 +107,13 @@ class LogFolder
 
     public function download(): BinaryFileResponse
     {
-        if (!extension_loaded('zip')) {
+        if (! extension_loaded('zip')) {
             throw new \Exception('This action requires PHP Zip extension.');
         }
 
         // zip it, and download it.
         $zipFileName = $this->downloadFileName();
-        $zipPath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $zipFileName;
+        $zipPath = sys_get_temp_dir().DIRECTORY_SEPARATOR.$zipFileName;
 
         // just in case we have created it before.
         @unlink($zipPath);
@@ -119,7 +121,7 @@ class LogFolder
         $zip = new \ZipArchive();
 
         if ($zip->open($zipPath, \ZipArchive::CREATE) !== true) {
-            throw new \Exception('Could not open ' . $zipPath . ' for writing.');
+            throw new \Exception('Could not open '.$zipPath.' for writing.');
         }
 
         /** @var LogFile $file */
@@ -132,7 +134,7 @@ class LogFolder
         try {
             $zip->close();
         } catch (\Exception $e) {
-            throw new \Exception('Could not save Zip file: '. $e->getMessage(), $e->getCode(), $e);
+            throw new \Exception('Could not save Zip file: '.$e->getMessage(), $e->getCode(), $e);
         }
 
         return response()->download($zipPath, $zipFileName);

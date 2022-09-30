@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFolder;
 use function Pest\Laravel\get;
 
