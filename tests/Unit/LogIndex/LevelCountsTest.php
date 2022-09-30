@@ -36,17 +36,3 @@ it('can return the smaller counts with date filter applied', function () {
     expect($logCounts[Level::Info])->toBe(1)
         ->and($logCounts[Level::Error])->toBe(1);
 });
-
-it('can return the smaller counts with severity filter applied', function () {
-    $logIndex = createLogIndex(predefinedLogs: [
-        [0, now()->subDays(3), 'info'],
-        [1500, now()->subDays(2), 'info'],
-        $latestLog = [3000, now()->subDay(), 'error'],
-    ]);
-
-    // info logs will be ignored
-    $logCounts = $logIndex->forLevels(Level::Error)->getLevelCounts();
-
-    expect($logCounts[Level::Info])->toBe(0)
-        ->and($logCounts[Level::Error])->toBe(1);
-});

@@ -29,7 +29,7 @@ it('can index a log entry', function () {
 
     // Adding another index should give a new generated index, and also add it to the full array
     $secondIndexGenerated = $logIndex->addToIndex(
-        $newFilePosition = 1500,
+        $secondFilePosition = 1500,
         $secondDate = now(),
         'debug'
     );
@@ -43,10 +43,31 @@ it('can index a log entry', function () {
             ],
             $secondDate->timestamp => [
                 'debug' => [
-                    $secondIndexGenerated => $newFilePosition,
+                    $secondIndexGenerated => $secondFilePosition,
                 ],
             ],
         ]);
+});
+
+it('can get a flat index/position array', function () {
+    $logIndex = createLogIndex();
+    $firstIndexGenerated = $logIndex->addToIndex(
+        $firstFilePosition = 1000,
+        $firstDate = now()->subMinute(),
+        $level = 'info'
+    );
+    $secondIndexGenerated = $logIndex->addToIndex(
+        $secondFilePosition = 1500,
+        $secondDate = now(),
+        'debug'
+    );
+
+    $flatArray = $logIndex->getFlatArray();
+
+    expect($flatArray)->toBe([
+        $firstIndexGenerated => $firstFilePosition,
+        $secondIndexGenerated => $secondFilePosition,
+    ]);
 });
 
 it('can return an index for selected date range', function () {
@@ -57,7 +78,7 @@ it('can return an index for selected date range', function () {
         $level = 'info'
     );
     $secondIndexGenerated = $logIndex->addToIndex(
-        $newFilePosition = 1500,
+        $secondFilePosition = 1500,
         $secondDate = now(),
         'debug'
     );
@@ -67,9 +88,16 @@ it('can return an index for selected date range', function () {
     expect($index)->toBe([
         $secondDate->timestamp => [
             'debug' => [
-                $secondIndexGenerated => $newFilePosition,
+                $secondIndexGenerated => $secondFilePosition,
             ],
         ],
+    ]);
+
+    // let's also check the flat index
+    $flatIndex = $logIndex->forDateRange(from: now()->subSeconds(30))->getFlatArray();
+
+    expect($flatIndex)->toBe([
+        $secondIndexGenerated => $secondFilePosition,
     ]);
 });
 
@@ -81,12 +109,12 @@ it('can return an index for selected severity levels', function () {
         $level = 'info'
     );
     $secondIndexGenerated = $logIndex->addToIndex(
-        $newFilePosition = 1500,
+        $secondFilePosition = 1500,
         $secondDate = now(),
         'debug'
     );
 
-    $index = $logIndex->forLevels(['danger', 'info'])->get();
+    $index = $logIndex->forLevels(['error', 'info'])->get();
 
     expect($index)->toBe([
         $firstDate->timestamp => [
@@ -94,6 +122,13 @@ it('can return an index for selected severity levels', function () {
                 $firstIndexGenerated => $firstFilePosition,
             ],
         ],
+    ]);
+
+    // let's also check the flat index
+    $flatIndex = $logIndex->forLevels(['error', 'info'])->getFlatArray();
+
+    expect($flatIndex)->toBe([
+        $firstIndexGenerated => $firstFilePosition,
     ]);
 });
 

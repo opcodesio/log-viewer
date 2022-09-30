@@ -13,6 +13,7 @@ it('can fetch a chunk definition for an empty chunk', function () {
             'size' => 0,
             'earliest_timestamp' => null,
             'latest_timestamp' => null,
+            'level_counts' => [],
         ]);
 });
 
@@ -27,6 +28,7 @@ it('updates the chunk data when adding an entry', function () {
         'size' => 1,
         'earliest_timestamp' => $time->timestamp,
         'latest_timestamp' => $time->timestamp,
+        'level_counts' => ['info' => 1],
     ]);
 });
 
@@ -43,12 +45,14 @@ it('gets multiple chunks after rotating', function () {
             'size' => 2,
             'earliest_timestamp' => $firstTime->timestamp,
             'latest_timestamp' => $secondTime->timestamp,
+            'level_counts' => ['info' => 2],
         ])
         ->and($logIndex->getChunkDefinition(1))->toBe([
             'index' => 1,
             'size' => 0,
             'earliest_timestamp' => null,
             'latest_timestamp' => null,
+            'level_counts' => [],
         ]);
 
     // Adding another log entry would add to the latest chunk
@@ -59,6 +63,7 @@ it('gets multiple chunks after rotating', function () {
         'size' => 1,
         'earliest_timestamp' => $thirdTime->timestamp,
         'latest_timestamp' => $thirdTime->timestamp,
+        'level_counts' => ['debug' => 1],
     ]);
 });
 

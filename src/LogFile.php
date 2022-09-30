@@ -18,6 +18,8 @@ class LogFile
 
     protected array $metaData;
 
+    protected LogIndex $logIndex;
+
     public function __construct(
         public string $name,
         public string $path,
@@ -37,6 +39,15 @@ class LogFile
             basename($filePath),
             $filePath,
         );
+    }
+
+    public function index(): LogIndex
+    {
+        if (! isset($this->logIndex)) {
+            $this->logIndex = new LogIndex($this);
+        }
+
+        return $this->logIndex;
     }
 
     public function logs(): LogReader
@@ -116,30 +127,6 @@ class LogFile
         return $this->cacheKey().':'.md5($query).':index';
     }
 
-    public function saveIndexDataForQuery(array $indexData, string $query = ''): void
-    {
-        $key = $this->indexCacheKeyForQuery($query);
-        Cache::put($key, $indexData, $this->cacheTtl());
-        $this->addRelatedCacheKey($key);
-    }
-
-    public function getIndexDataForQuery(string $query = '', $default = []): array
-    {
-        return Cache::get($this->indexCacheKeyForQuery($query), $default);
-    }
-
-    public function saveLastScanDataForQuery(array $data, string $query = ''): void
-    {
-        $lastScanKey = $this->indexCacheKeyForQuery($query).':last-scan';
-        Cache::put($lastScanKey, $data, $this->cacheTtl());
-        $this->addRelatedCacheKey($lastScanKey);
-    }
-
-    public function getLastScanDataForQuery(string $query = '', array $default = [0, 0]): array
-    {
-        return Cache::get($this->indexCacheKeyForQuery($query).':last-scan', $default);
-    }
-
     public function clearCache(): void
     {
         foreach ($this->getRelatedCacheKeys() as $relatedCacheKey) {
@@ -148,6 +135,8 @@ class LogFile
 
         Cache::forget($this->metaDataCacheKey());
         Cache::forget($this->relatedCacheKeysKey());
+
+        $this->index()->reset();
     }
 
     protected function metaDataCacheKey(): string

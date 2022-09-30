@@ -48,12 +48,12 @@ class LogIndex
 
     public function cacheKey(): string
     {
-        return $this->file->cacheKey().':'.md5($this->query).':log-index';
+        return $this->file->cacheKey().':'.md5($this->query ?? '').':log-index';
     }
 
     public function metaCacheKey(): string
     {
-        return $this->file->cacheKey().':'.md5($this->query).':metadata';
+        return $this->file->cacheKey().':'.md5($this->query ?? '').':metadata';
     }
 
     public function chunkCacheKey(int $index): string
@@ -64,6 +64,19 @@ class LogIndex
     public function cacheTtl(): Carbon
     {
         return now()->addWeek();
+    }
+
+    public function reset(): void
+    {
+        foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+            Cache::forget($this->chunkCacheKey($chunkDefinition['index']));
+        }
+
+        Cache::forget($this->metaCacheKey());
+        Cache::forget($this->cacheKey());
+
+        // this will reset all properties to default, because it won't find any cached settings for this index
+        $this->loadMetadata();
     }
 
     public function addToIndex(int $filePosition, int|Carbon $timestamp, string $severity): int
@@ -195,6 +208,42 @@ class LogIndex
                 }
             }
         }
+
+        return $results;
+    }
+
+    public function getFlatArray(): array
+    {
+        $results = [];
+
+        foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+            $chunk = $this->getChunk($chunkDefinition['index']);
+
+            if (is_null($chunk)) {
+                continue;
+            }
+
+            foreach ($chunk as $timestamp => $tsIndex) {
+                if (isset($this->filterFrom) && $timestamp < $this->filterFrom) {
+                    continue;
+                }
+                if (isset($this->filterTo) && $timestamp > $this->filterTo) {
+                    continue;
+                }
+
+                foreach ($tsIndex as $level => $levelIndex) {
+                    if (isset($this->filterLevels) && ! in_array($level, $this->filterLevels)) {
+                        continue;
+                    }
+
+                    foreach ($levelIndex as $idx => $filePosition) {
+                        $results[$idx] = $filePosition;
+                    }
+                }
+            }
+        }
+
+        ksort($results);
 
         return $results;
     }
@@ -332,9 +381,18 @@ class LogIndex
     {
         $counts = collect(Level::caseValues())->mapWithKeys(fn ($case) => [$case => 0]);
 
-        foreach ($this->get() as $timestamp => $tsIndex) {
-            foreach ($tsIndex as $severity => $logIndex) {
-                $counts[$severity] += count($logIndex);
+        if (! $this->hasDateFilters()) {
+            // without date filters, we can use a faster approach
+            foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+                foreach ($chunkDefinition['level_counts'] as $severity => $count) {
+                    $counts[$severity] += $count;
+                }
+            }
+        } else {
+            foreach ($this->get() as $timestamp => $tsIndex) {
+                foreach ($tsIndex as $severity => $logIndex) {
+                    $counts[$severity] += count($logIndex);
+                }
             }
         }
 
@@ -370,15 +428,15 @@ class LogIndex
         $this->currentChunk->data = Cache::get($this->chunkCacheKey($this->currentChunk->index), []);
     }
 
-    protected function hasFilters(): bool
+    protected function hasDateFilters(): bool
     {
         return isset($this->filterFrom)
-            || isset($this->filterTo)
-            || isset($this->filterLevels);
+            || isset($this->filterTo);
     }
 
-    public function __destruct()
+    protected function hasFilters(): bool
     {
-        $this->save();
+        return $this->hasDateFilters()
+            || isset($this->filterLevels);
     }
 }

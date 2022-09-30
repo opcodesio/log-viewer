@@ -8,6 +8,8 @@ class LogIndexChunk
 
     protected int $latestTimestamp;
 
+    protected array $levelCounts = [];
+
     public function __construct(
         public array $data,
         public int $index,
@@ -27,6 +29,10 @@ class LogIndexChunk
             $chunk->latestTimestamp = $definition['latest_timestamp'];
         }
 
+        if (isset($definition['level_counts'])) {
+            $chunk->levelCounts = $definition['level_counts'];
+        }
+
         return $chunk;
     }
 
@@ -39,6 +45,12 @@ class LogIndexChunk
         if (! isset($this->data[$timestamp][$severity])) {
             $this->data[$timestamp][$severity] = [];
         }
+
+        if (! isset($this->levelCounts[$severity])) {
+            $this->levelCounts[$severity] = 0;
+        }
+
+        $this->levelCounts[$severity]++;
 
         $this->data[$timestamp][$severity][$logIndex] = $filePosition;
         $this->size++;
@@ -53,6 +65,7 @@ class LogIndexChunk
             'size' => $this->size,
             'earliest_timestamp' => $this->earliestTimestamp ?? null,
             'latest_timestamp' => $this->latestTimestamp ?? null,
+            'level_counts' => $this->levelCounts ?? [],
         ];
     }
 }
