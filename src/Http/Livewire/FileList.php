@@ -6,8 +6,6 @@ use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
-use Opcodes\LogViewer\LogFileCollection;
-use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\LogFolderCollection;
 use Opcodes\LogViewer\PreferenceStore;
 
