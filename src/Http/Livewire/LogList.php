@@ -84,8 +84,8 @@ class LogList extends Component
         $levels = $logQuery?->getLevelCounts();
         $logs = $logQuery?->paginate($this->perPage);
 
-        if ($logs->lastPage() < $this->page) {
-            $this->gotoPage($logs->lastPage());
+        if ($logs?->lastPage() < $this->page) {
+            $this->gotoPage($logs?->lastPage() ?? 1);
 
             // re-create the paginator instance to fix a bug
             $logs = $logQuery?->paginate($this->perPage);
