@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Utils\Utils;
 
 class Log
 {
@@ -116,7 +117,7 @@ class Log
 
     public function fullTextLengthFormatted(): string
     {
-        return bytes_formatted($this->fullTextLength);
+        return Utils::bytesForHumans($this->fullTextLength);
     }
 
     public function url(): string

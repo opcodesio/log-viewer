@@ -37,10 +37,7 @@
     "autoload": {
         "psr-4": {
             "Opcodes\\LogViewer\\": "src"
-        },
-        "files": [
-            "src/helpers.php"
-        ]
+        }
     },
     "autoload-dev": {
         "psr-4": {

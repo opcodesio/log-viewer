@@ -1,6 +1,6 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Utils;
 
 class Benchmark
 {
@@ -102,7 +102,17 @@ class Benchmark
     }
 
     /**
-     * Dump the status about all tests
+     * Dump the results from the tests and exit immediately. Akin to Laravel's dd() call.
+     */
+    public static function dd(string $name = null): void
+    {
+        self::dump($name);
+
+        exit();
+    }
+
+    /**
+     * Dump the results from the tests
      */
     public static function dump(string $name = null): void
     {

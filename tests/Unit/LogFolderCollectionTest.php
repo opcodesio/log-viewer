@@ -65,3 +65,57 @@ test('LogFolderCollection can sort its folders by latest logs first', function (
     expect($collection[0])->toBe($secondFolder)
         ->and($collection[1])->toBe($firstFolder);
 });
+
+test('LogFolderCollection can sort its folders by earliest first, including its files', function () {
+    $firstFile = Mockery::mock(new LogFile('test.log', 'test.log'))
+        ->allows(['earliestTimestamp' => now()->subDay()->timestamp]);
+    $secondFile = Mockery::mock(new LogFile('test2.log', 'test2.log'))
+        ->allows(['earliestTimestamp' => now()->subDays(2)->timestamp]);
+
+    $dummyFolder = Mockery::mock(new LogFolder('folder2', []))
+        ->allows(['earliestTimestamp' => now()->subDay()->timestamp]);
+    $folderWithFiles = new LogFolder('folder', [$firstFile, $secondFile]);
+
+    $collection = new LogFolderCollection([$dummyFolder, $folderWithFiles]);
+
+    // So, from the setup above, we know that $folderWithFiles should come first,
+    // because it contains a file that has an earlier timestamp.
+    // The $folderWithFiles folder's files, though, should have the second file first,
+    // because that's earlier as well.
+
+    $collection->sortByEarliestFirstIncludingFiles();
+
+    expect($collection[0])->toBe($folderWithFiles)
+        ->and($collection[1])->toBe($dummyFolder);
+
+    $folderFiles = $collection[0]->files();
+    expect($folderFiles[0])->toBe($secondFile)
+        ->and($folderFiles[1])->toBe($firstFile);
+});
+
+test('LogFolderCollection can sort its folders by latest first, including its files', function () {
+    $firstFile = Mockery::mock(new LogFile('test.log', 'test.log'))
+        ->allows(['latestTimestamp' => now()->subDays(2)->timestamp]);
+    $secondFile = Mockery::mock(new LogFile('test2.log', 'test2.log'))
+        ->allows(['latestTimestamp' => now()->subDay()->timestamp]);
+
+    $dummyFolder = Mockery::mock(new LogFolder('folder2', []))
+        ->allows(['latestTimestamp' => now()->subDays(2)->timestamp]);
+    $folderWithFiles = new LogFolder('folder', [$firstFile, $secondFile]);
+
+    $collection = new LogFolderCollection([$dummyFolder, $folderWithFiles]);
+
+    // So, from the setup above, we know that $folderWithFiles should come first,
+    // because it contains a file that has a later timestamp.
+    // The $folderWithFiles folder's files, though, should have the second file first,
+    // because that's later as well.
+
+    $collection->sortByLatestFirstIncludingFiles();
+
+    expect($collection[0])->toBe($folderWithFiles)
+        ->and($collection[1])->toBe($dummyFolder);
+
+    $folderFiles = $collection[0]->files();
+    expect($folderFiles[0])->toBe($secondFile)
+        ->and($folderFiles[1])->toBe($firstFile);
+});

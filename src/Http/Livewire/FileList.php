@@ -6,10 +6,7 @@ use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
-use Opcodes\LogViewer\LogFileCollection;
-use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\LogFolderCollection;
-use Opcodes\LogViewer\LogReader;
 use Opcodes\LogViewer\PreferenceStore;
 
 class FileList extends Component
@@ -41,33 +38,19 @@ class FileList extends Component
     public function render()
     {
         $folderCollection = LogViewer::getFilesGroupedByFolder()
-            // sort the folders and their files
-            ->when($this->direction === self::OLDEST_FIRST, function (LogFolderCollection $folders) {
-                $folders->sortByEarliestFirst();
-
-                return $folders->each(fn (LogFolder $folder) => $folder->files()->sortByEarliestFirst());
-            }, function (LogFolderCollection $folders) {
-                $folders->sortByLatestFirst();
-
-                return $folders->each(fn (LogFolder $folder) => $folder->files()->sortByLatestFirst());
-            });
+            ->when(
+                $this->direction === self::NEWEST_FIRST,
+                fn (LogFolderCollection $folders) => $folders->sortByLatestFirstIncludingFiles()
+            )
+            ->when(
+                $this->direction === self::OLDEST_FIRST,
+                fn (LogFolderCollection $folders) => $folders->sortByEarliestFirstIncludingFiles()
+            );
 
         return view('log-viewer::livewire.file-list', [
             'folderCollection' => $folderCollection,
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
         ]);
-    }
-
-    public function scanFiles(LogFileCollection $fileCollection)
-    {
-        foreach ($fileCollection as $file) {
-            $file->logs()->scan();
-
-            // If there was a scan, it most likely loaded a big index array into memory,
-            // so we should clear the instance before checking the next file
-            // in order to save some memory.
-            LogReader::clearInstance($file);
-        }
     }
 
     public function reloadFiles()

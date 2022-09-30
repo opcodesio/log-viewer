@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Utils\Utils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogFile
@@ -55,7 +56,7 @@ class LogFile
 
     public function sizeFormatted(): string
     {
-        return bytes_formatted($this->size());
+        return Utils::bytesForHumans($this->size());
     }
 
     public function subFolderIdentifier(): string
