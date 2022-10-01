@@ -400,7 +400,7 @@ class LogReader
 
         if ($force) {
             // when forcing, make sure we start from scratch and reset everything.
-            $this->index()->reset();
+            $this->index()->clearCache();
         }
 
         // we don't care about the selected levels here, we should scan everything

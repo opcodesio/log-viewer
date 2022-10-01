@@ -16,6 +16,10 @@ use Opcodes\LogViewer\Exceptions\InvalidChunkSizeException;
  */
 class LogIndex
 {
+    const DIRECTION_FORWARD = 'forward';
+
+    const DIRECTION_BACKWARD = 'backward';
+
     const DEFAULT_CHUNK_SIZE = 10_000;
 
     protected int $maxChunkSize;
@@ -35,6 +39,10 @@ class LogIndex
     protected ?array $filterLevels = null;
 
     protected ?int $limit = null;
+
+    protected ?int $skip = null;
+
+    protected string $direction = self::DIRECTION_FORWARD;
 
     public function __construct(
         protected LogFile $file,
@@ -68,7 +76,37 @@ class LogIndex
         return now()->addWeek();
     }
 
-    public function reset(): void
+    public function isForward(): bool
+    {
+        return $this->direction === self::DIRECTION_FORWARD;
+    }
+
+    public function isBackward(): bool
+    {
+        return $this->direction === self::DIRECTION_BACKWARD;
+    }
+
+    /** @alias backward */
+    public function reverse(): self
+    {
+        return $this->backward();
+    }
+
+    public function backward(): self
+    {
+        $this->direction = self::DIRECTION_BACKWARD;
+
+        return $this;
+    }
+
+    public function forward(): self
+    {
+        $this->direction = self::DIRECTION_FORWARD;
+
+        return $this;
+    }
+
+    public function clearCache(): void
     {
         foreach ($this->getChunkDefinitions() as $chunkDefinition) {
             Cache::forget($this->chunkCacheKey($chunkDefinition['index']));
@@ -98,6 +136,11 @@ class LogIndex
         }
 
         return $nextLogIndex;
+    }
+
+    public function getCurrentChunk(): LogIndexChunk
+    {
+        return $this->currentChunk;
     }
 
     public function getCurrentChunkSize(): int
@@ -138,10 +181,12 @@ class LogIndex
     public function getChunk(int $index): ?array
     {
         if (isset($this->currentChunk) && $index === $this->currentChunk->index) {
-            return $this->currentChunk->data ?? [];
+            $chunkData = $this->currentChunk->data ?? [];
+        } else {
+            $chunkData = Cache::get($this->chunkCacheKey($index));
         }
 
-        return Cache::get($this->chunkCacheKey($index));
+        return $chunkData;
     }
 
     public function getChunkCount(): int
@@ -164,22 +209,52 @@ class LogIndex
         $this->saveMetadata();
     }
 
+    protected function sortKeys(array &$array): void
+    {
+        if ($this->isBackward()) {
+            krsort($array);
+        } else {
+            ksort($array);
+        }
+    }
+
+    protected function getRelevantItemsInChunk(array $chunkDefinition): int
+    {
+        $relevantItemsInChunk = 0;
+
+        foreach ($chunkDefinition['level_counts'] as $level => $count) {
+            if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
+                $relevantItemsInChunk += $count;
+            }
+        }
+
+        return $relevantItemsInChunk;
+    }
+
     public function get(int $limit = null): array
     {
         $results = [];
         $itemsAdded = 0;
         $limit = $limit ?? $this->limit;
-
-        // TODO: sometimes we want the index in reverse, latest to oldest, highest to lowest, etc.
-
-        // TODO: we can also instead limit it by reading the full chunk, sorting it, and then returning X items only.
+        $skip = $this->skip;
 
         foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+            if (isset($skip)) {
+                $relevantItemsInChunk = $this->getRelevantItemsInChunk($chunkDefinition);
+
+                if ($relevantItemsInChunk <= $skip) {
+                    $skip -= $relevantItemsInChunk;
+                    continue;
+                }
+            }
+
             $chunk = $this->getChunk($chunkDefinition['index']);
 
-            if (is_null($chunk)) {
+            if (empty($chunk)) {
                 continue;
             }
+
+            $this->sortKeys($chunk);
 
             foreach ($chunk as $timestamp => $tsIndex) {
                 if (isset($this->filterFrom) && $timestamp < $this->filterFrom) {
@@ -204,12 +279,23 @@ class LogIndex
                         $results[$timestamp][$level] = [];
                     }
 
+                    $this->sortKeys($levelIndex);
+
                     foreach ($levelIndex as $idx => $position) {
+                        if ($skip > 0) {
+                            $skip--;
+                            continue;
+                        }
+
                         $results[$timestamp][$level][$idx] = $position;
 
                         if (isset($limit) && ++$itemsAdded >= $limit) {
                             break 4;
                         }
+                    }
+
+                    if (empty($results[$timestamp][$level])) {
+                        unset($results[$timestamp][$level]);
                     }
                 }
 
@@ -227,17 +313,25 @@ class LogIndex
         $results = [];
         $itemsAdded = 0;
         $limit = $limit ?? $this->limit;
-
-        // TODO: sometimes we want the index in reverse, latest to oldest, highest to lowest, etc.
-
-        // TODO: we can also instead limit it by reading the full chunk, sorting it, and then returning X items only.
+        $skip = $this->skip;
 
         foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+            if (isset($skip)) {
+                $relevantItemsInChunk = $this->getRelevantItemsInChunk($chunkDefinition);
+
+                if ($relevantItemsInChunk <= $skip) {
+                    $skip -= $relevantItemsInChunk;
+                    continue;
+                }
+            }
+
             $chunk = $this->getChunk($chunkDefinition['index']);
 
             if (is_null($chunk)) {
                 continue;
             }
+
+            $this->sortKeys($chunk);
 
             foreach ($chunk as $timestamp => $tsIndex) {
                 if (isset($this->filterFrom) && $timestamp < $this->filterFrom) {
@@ -252,7 +346,14 @@ class LogIndex
                         continue;
                     }
 
+                    $this->sortKeys($levelIndex);
+
                     foreach ($levelIndex as $idx => $filePosition) {
+                        if ($skip > 0) {
+                            $skip--;
+                            continue;
+                        }
+
                         $results[$idx] = $filePosition;
 
                         if (isset($limit) && ++$itemsAdded >= $limit) {
@@ -262,8 +363,6 @@ class LogIndex
                 }
             }
         }
-
-        ksort($results);
 
         return $results;
     }
@@ -295,6 +394,13 @@ class LogIndex
         } else {
             $this->filterLevels = null;
         }
+
+        return $this;
+    }
+
+    public function skip(int $skip = null): self
+    {
+        $this->skip = $skip;
 
         return $this;
     }

@@ -1,11 +1,12 @@
 <?php
 
 test('it can limit the number of results expected for reduced index usage', function () {
-    $logIndex = createLogIndex();
     $timestamp = now()->subDay()->timestamp;
-    $idx1 = $logIndex->addToIndex($pos1 = 0, $timestamp, 'info');
-    $idx2 = $logIndex->addToIndex($pos2 = 500, $timestamp, 'debug');
-    $logIndex->addToIndex($pos3 = 1000, now()->subHours(22), 'info');
+    $logIndex = createLogIndex(null, null, [
+        $idx1 = 0 => [$pos1 = 0, $timestamp, 'info'],
+        $idx2 = 1 => [$pos2 = 500, $timestamp, 'debug'],
+        $idx3 = 2 => [$pos3 = 1000, $timestamp + 1, 'info'],
+    ]);
 
     $results = $logIndex->limit(2)->get();
 

@@ -136,7 +136,7 @@ class LogFile
         Cache::forget($this->metaDataCacheKey());
         Cache::forget($this->relatedCacheKeysKey());
 
-        $this->index()->reset();
+        $this->index()->clearCache();
     }
 
     protected function metaDataCacheKey(): string
