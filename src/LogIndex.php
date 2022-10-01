@@ -244,6 +244,7 @@ class LogIndex
 
                 if ($relevantItemsInChunk <= $skip) {
                     $skip -= $relevantItemsInChunk;
+
                     continue;
                 }
             }
@@ -284,6 +285,7 @@ class LogIndex
                     foreach ($levelIndex as $idx => $position) {
                         if ($skip > 0) {
                             $skip--;
+
                             continue;
                         }
 
@@ -321,6 +323,7 @@ class LogIndex
 
                 if ($relevantItemsInChunk <= $skip) {
                     $skip -= $relevantItemsInChunk;
+
                     continue;
                 }
             }
@@ -351,6 +354,7 @@ class LogIndex
                     foreach ($levelIndex as $idx => $filePosition) {
                         if ($skip > 0) {
                             $skip--;
+
                             continue;
                         }
 
