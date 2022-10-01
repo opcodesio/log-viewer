@@ -34,6 +34,8 @@ class LogIndex
 
     protected ?array $filterLevels = null;
 
+    protected ?int $limit = null;
+
     public function __construct(
         protected LogFile $file,
         protected ?string $query = null
@@ -162,9 +164,15 @@ class LogIndex
         $this->saveMetadata();
     }
 
-    public function get(): array
+    public function get(int $limit = null): array
     {
         $results = [];
+        $itemsAdded = 0;
+        $limit = $limit ?? $this->limit;
+
+        // TODO: sometimes we want the index in reverse, latest to oldest, highest to lowest, etc.
+
+        // TODO: we can also instead limit it by reading the full chunk, sorting it, and then returning X items only.
 
         foreach ($this->getChunkDefinitions() as $chunkDefinition) {
             $chunk = $this->getChunk($chunkDefinition['index']);
@@ -181,30 +189,32 @@ class LogIndex
                     continue;
                 }
 
-                if (! isset($this->filterLevels) && ! isset($results[$timestamp])) {
-                    $results[$timestamp] = $tsIndex;
-                } else {
-                    if (! isset($results[$timestamp])) {
-                        $results[$timestamp] = [];
+                // Timestamp is valid, let's start adding
+                if (! isset($results[$timestamp])) {
+                    $results[$timestamp] = [];
+                }
+
+                foreach ($tsIndex as $level => $levelIndex) {
+                    if (isset($this->filterLevels) && ! in_array($level, $this->filterLevels)) {
+                        continue;
                     }
 
-                    foreach ($tsIndex as $level => $levelIndex) {
-                        if (isset($this->filterLevels) && ! in_array($level, $this->filterLevels)) {
-                            continue;
+                    // severity is valid, let's start adding
+                    if (! isset($results[$timestamp][$level])) {
+                        $results[$timestamp][$level] = [];
+                    }
+
+                    foreach ($levelIndex as $idx => $position) {
+                        $results[$timestamp][$level][$idx] = $position;
+
+                        if (isset($limit) && ++$itemsAdded >= $limit) {
+                            break 4;
                         }
-
-                        if (! isset($results[$timestamp][$level])) {
-                            $results[$timestamp][$level] = $levelIndex;
-                        } else {
-                            foreach ($levelIndex as $idx => $position) {
-                                $results[$timestamp][$level][$idx] = $position;
-                            }
-                        }
                     }
+                }
 
-                    if (empty($results[$timestamp])) {
-                        unset($results[$timestamp]);
-                    }
+                if (empty($results[$timestamp])) {
+                    unset($results[$timestamp]);
                 }
             }
         }
@@ -212,9 +222,15 @@ class LogIndex
         return $results;
     }
 
-    public function getFlatArray(): array
+    public function getFlatArray(int $limit = null): array
     {
         $results = [];
+        $itemsAdded = 0;
+        $limit = $limit ?? $this->limit;
+
+        // TODO: sometimes we want the index in reverse, latest to oldest, highest to lowest, etc.
+
+        // TODO: we can also instead limit it by reading the full chunk, sorting it, and then returning X items only.
 
         foreach ($this->getChunkDefinitions() as $chunkDefinition) {
             $chunk = $this->getChunk($chunkDefinition['index']);
@@ -238,6 +254,10 @@ class LogIndex
 
                     foreach ($levelIndex as $idx => $filePosition) {
                         $results[$idx] = $filePosition;
+
+                        if (isset($limit) && ++$itemsAdded >= $limit) {
+                            break 4;
+                        }
                     }
                 }
             }
@@ -277,6 +297,18 @@ class LogIndex
         }
 
         return $this;
+    }
+
+    public function limit(int $limit = null): self
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    public function getLimit(): ?int
+    {
+        return $this->limit;
     }
 
     public function save(): void

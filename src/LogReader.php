@@ -238,6 +238,11 @@ class LogReader
             $this->open();
         }
 
+        // TODO: skipping here could also skip some chunks from the LogIndex as well, saving some memory/CPU-time
+
+        // TODO: perhaps skipping/limiting/moving across the index should all belong to the LogIndex class instead,
+        // while the LogReader class would only be responsible for parsing logs at given positions.
+
         $mergedIndex = $this->getMergedIndexForSelectedLevels();
 
         if (! empty($mergedIndex)) {
@@ -325,6 +330,7 @@ class LogReader
     public function limit(int $number): self
     {
         $this->limit = $number;
+        $this->index()->limit($number);
 
         return $this;
     }
