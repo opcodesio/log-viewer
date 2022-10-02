@@ -5,7 +5,6 @@ namespace Opcodes\LogViewer;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use Opcodes\LogViewer\Exceptions\InvalidChunkSizeException;
 
 /**
  * The idea of this class is to keep a grip on the index of the log file

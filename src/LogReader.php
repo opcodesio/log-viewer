@@ -489,8 +489,8 @@ class LogReader
     }
 
     /**
-     * @param int $index
-     * @param int $position
+     * @param  int  $index
+     * @param  int  $position
      * @return array|null Returns an array, [$level, $text, $position]
      *
      * @throws \Exception
