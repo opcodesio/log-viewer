@@ -10,7 +10,7 @@ it('can skip a number of entries in the index', function () {
 
     expect($logIndex->skip(2)->get())->toBe([
         $timestamp => ['info' => [2 => $pos3]],
-    ])->and($logIndex->skip(2)->getFlatArray())->toBe([
+    ])->and($logIndex->skip(2)->getFlatIndex())->toBe([
         2 => $pos3,
     ]);
 });
@@ -30,7 +30,7 @@ it('can skip a number of entries with severity filter applied', function () {
 
     expect($logIndex->get())->toBe([
         $timestamp => ['info' => [$idx5 => $pos5]],
-    ])->and($logIndex->getFlatArray())->toBe([
+    ])->and($logIndex->getFlatIndex())->toBe([
         $idx5 => $pos5,
     ]);
 });
@@ -53,7 +53,7 @@ it('works across multiple chunks', function () {
             $idx2 => $pos2,
             $idx5 => $pos5,
         ]],
-    ])->and($logIndex->getFlatArray())->toBe([
+    ])->and($logIndex->getFlatIndex())->toBe([
         $idx2 => $pos2,
         $idx5 => $pos5,
     ]);
@@ -89,7 +89,7 @@ test('get() skips unnecessary chunks by not loading them into memory', function 
     ]);
 });
 
-test('getFlatArray() skips unnecessary chunks by not loading them into memory', function () {
+test('getFlatIndex() skips unnecessary chunks by not loading them into memory', function () {
     $timestamp = now()->subHour()->timestamp;
     $logIndex = Mockery::mock('Opcodes\LogViewer\LogIndex[getChunk]', [
         new \Opcodes\LogViewer\LogFile('laravel.log', 'laravel.log'),
@@ -111,7 +111,7 @@ test('getFlatArray() skips unnecessary chunks by not loading them into memory', 
         ->shouldReceive('getChunk')->with(1)->andReturn(Cache::get($logIndex->chunkCacheKey(1)))
         ->shouldReceive('getChunk')->with(2)->andReturn($logIndex->getCurrentChunk()->data);
 
-    expect($logIndex->getFlatArray())->toBe([
+    expect($logIndex->getFlatIndex())->toBe([
         $idx3 => $pos3,
         $idx4 => $pos4,
         $idx5 => $pos5,

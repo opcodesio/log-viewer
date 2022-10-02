@@ -51,7 +51,7 @@ test('get() results are returned sorted based on direction chosen', function () 
     ]);
 });
 
-test('getFlatArray() results are returned sorted based on direction chosen', function () {
+test('getFlatIndex() results are returned sorted based on direction chosen', function () {
     $logIndex = createLogIndex(null, null, [
         [$posMiddle = 0, $tsMiddle = now()->subHours(2)->timestamp, 'info'],
         [$posEarliest = 100, $tsEarliest = now()->subHours(3)->timestamp, 'info'],
@@ -59,7 +59,7 @@ test('getFlatArray() results are returned sorted based on direction chosen', fun
     ]);
 
     // first, forward
-    $forwardResult = $logIndex->forward()->getFlatArray();
+    $forwardResult = $logIndex->forward()->getFlatIndex();
     expect($forwardResult)->toBe([
         1 => $posEarliest,
         0 => $posMiddle,
@@ -67,10 +67,42 @@ test('getFlatArray() results are returned sorted based on direction chosen', fun
     ]);
 
     // now backwards
-    $backwardsResult = $logIndex->backward()->getFlatArray();
+    $backwardsResult = $logIndex->backward()->getFlatIndex();
     expect($backwardsResult)->toBe([
         2 => $posLatest,
         0 => $posMiddle,
         1 => $posEarliest,
+    ]);
+});
+
+test('chunked indices are correctly read when going backwards', function () {
+    $timestamp = now()->timestamp;
+    $logIndex = createLogIndex();
+    $logIndex->setMaxChunkSize(2);
+    $idx1 = $logIndex->addToIndex($pos1 = 0, $timestamp, 'info');
+    $idx2 = $logIndex->addToIndex($pos2 = 100, $timestamp, 'info');
+    $idx3 = $logIndex->addToIndex($pos3 = 200, $timestamp, 'info');
+    $idx4 = $logIndex->addToIndex($pos4 = 300, $timestamp, 'info');
+    $idx5 = $logIndex->addToIndex($pos5 = 400, $timestamp, 'info');
+    expect($logIndex->getChunkCount())->toBe(3);
+
+    $logIndex->reverse();
+
+    // we now expect it to read chunks backwards - latest to earliest.
+    expect($logIndex->get(2))->toBe([
+        $timestamp => [
+            'info' => [
+                $idx5 => $pos5,
+                $idx4 => $pos4,
+            ]
+        ]
+    ]);
+
+    // and the same for flat arrays
+    $logIndex->reset();
+
+    expect($logIndex->getFlatIndex(2))->toBe([
+        $idx5 => $pos5,
+        $idx4 => $pos4,
     ]);
 });

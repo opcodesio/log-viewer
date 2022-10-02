@@ -62,7 +62,7 @@ it('can get a flat index/position array', function () {
         'debug'
     );
 
-    $flatArray = $logIndex->getFlatArray();
+    $flatArray = $logIndex->getFlatIndex();
 
     expect($flatArray)->toBe([
         $firstIndexGenerated => $firstFilePosition,
@@ -94,7 +94,7 @@ it('can return an index for selected date range', function () {
     ]);
 
     // let's also check the flat index
-    $flatIndex = $logIndex->forDateRange(from: now()->subSeconds(30))->getFlatArray();
+    $flatIndex = $logIndex->forDateRange(from: now()->subSeconds(30))->getFlatIndex();
 
     expect($flatIndex)->toBe([
         $secondIndexGenerated => $secondFilePosition,
@@ -125,7 +125,7 @@ it('can return an index for selected severity levels', function () {
     ]);
 
     // let's also check the flat index
-    $flatIndex = $logIndex->forLevels(['error', 'info'])->getFlatArray();
+    $flatIndex = $logIndex->forLevels(['error', 'info'])->getFlatIndex();
 
     expect($flatIndex)->toBe([
         $firstIndexGenerated => $firstFilePosition,

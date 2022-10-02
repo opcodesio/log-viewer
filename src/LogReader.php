@@ -21,8 +21,6 @@ class LogReader
      */
     public static array $_instances = [];
 
-    protected array $_mergedIndex;
-
     /**
      * @var LogFile
      */
@@ -33,25 +31,11 @@ class LogReader
      */
     protected LogIndex $logIndex;
 
-    /**
-     * The log levels that should be read from this file.
-     *
-     * @var array|null
-     */
-    protected ?array $levels = null;
-
     protected ?int $limit = null;
 
     protected ?string $query = null;
 
     protected ?int $onlyShowIndex = null;
-
-    /**
-     * The index of the next log to be read
-     *
-     * @var int
-     */
-    protected int $nextLogIndex = 0;
 
     /**
      * @var resource|null
@@ -84,7 +68,7 @@ class LogReader
     public function index(): LogIndex
     {
         if (! isset($this->logIndex)) {
-            $this->logIndex = new LogIndex($this->file);
+            $this->logIndex = new LogIndex($this->file, $this->query);
         }
 
         return $this->logIndex;
@@ -98,29 +82,7 @@ class LogReader
      */
     public function only($levels = null): self
     {
-        if (is_array($levels)) {
-            $this->levels = [];
-            $defaultLevels = self::getDefaultLevels();
-            $levels = array_map('strtolower', $levels);
-
-            foreach ($levels as $level) {
-                if (in_array($level, $defaultLevels)) {
-                    $this->levels[] = $level;
-                }
-            }
-        } elseif (is_string($levels)) {
-            $level = strtolower($levels);
-
-            if (in_array($level, self::getDefaultLevels())) {
-                $this->levels = [$level];
-            }
-        } else {
-            $this->levels = null;
-        }
-
-        $this->index()->forLevels($this->levels);
-
-        unset($this->_mergedIndex);
+        $this->index()->forLevels($levels);
 
         return $this;
     }
@@ -133,30 +95,19 @@ class LogReader
      */
     public function except($levels = null): self
     {
+        $levels = null;
+
         if (is_array($levels)) {
             $levels = array_map('strtolower', $levels);
-            $this->levels = array_diff(self::getDefaultLevels(), $levels);
+            $levels = array_diff(self::getDefaultLevels(), $levels);
         } elseif (is_string($levels)) {
             $level = strtolower($levels);
-            $this->levels = array_diff(self::getDefaultLevels(), [$level]);
-        } else {
-            $this->levels = null;
+            $levels = array_diff(self::getDefaultLevels(), [$level]);
         }
 
-        $this->index()->forLevels($this->levels);
-
-        unset($this->_mergedIndex);
+        $this->index()->forLevels($levels);
 
         return $this;
-    }
-
-    public function getSelectedLevels(): array
-    {
-        if (is_array($this->levels)) {
-            return $this->levels;
-        }
-
-        return self::getDefaultLevels();
     }
 
     public static function getDefaultLevels(): array
@@ -223,6 +174,7 @@ class LogReader
     public function reverse(): self
     {
         $this->direction = self::DIRECTION_BACKWARD;
+        $this->index()->reverse();
 
         return $this->reset();
     }
@@ -234,90 +186,9 @@ class LogReader
      */
     public function skip(int $number): self
     {
-        if ($this->isClosed()) {
-            $this->open();
-        }
-
-        // TODO: skipping here could also skip some chunks from the LogIndex as well, saving some memory/CPU-time
-
-        // TODO: perhaps skipping/limiting/moving across the index should all belong to the LogIndex class instead,
-        // while the LogReader class would only be responsible for parsing logs at given positions.
-
-        $mergedIndex = $this->getMergedIndexForSelectedLevels();
-
-        if (! empty($mergedIndex)) {
-            if ($this->direction === self::DIRECTION_BACKWARD) {
-                // Remember, we're going backwards from highest to lowest indices.
-                foreach ($mergedIndex as $logIndex => $positionInFile) {
-                    if ($logIndex >= $this->nextLogIndex) {
-                        continue;
-                    }
-                    if ($number <= 0) {
-                        break;
-                    }
-
-                    $this->nextLogIndex = $logIndex;
-                    $number--;
-                }
-            } else {
-                // The goal of this loop is to find the first index that matches the current log index
-                foreach ($mergedIndex as $logIndex => $positionInFile) {
-                    if ($logIndex <= $this->nextLogIndex) {
-                        continue;
-                    }
-                    if ($number <= 0) {
-                        break;
-                    }
-
-                    $this->nextLogIndex = $logIndex;
-                    $number--;
-                }
-            }
-
-            if ($number <= 0) {
-                return $this;
-            }
-
-            // otherwise, if there's still a few items to skip (due to not all of them being indexed, for example),
-            // then we will continue below by reading the new logs from the file until we skip the right number.
-        }
-
-        // not cached, thus we must read and discard each log.
-        while ($number > 0) {
-            $log = $this->next();
-
-            if (is_null($log)) {
-                break;
-            }
-
-            $number--;
-        }
+        $this->index()->skip($number);
 
         return $this;
-    }
-
-    public function findPageForIndex(int $targetIndex, int $perPage = 25): int
-    {
-        $mergedIndex = $this->getMergedIndexForSelectedLevels();
-        $currentPage = 1;
-        $counter = 1;
-
-        foreach ($mergedIndex as $index => $position) {
-            if ($this->direction === self::DIRECTION_BACKWARD && $index <= $targetIndex) {
-                break;
-            } elseif ($this->direction === self::DIRECTION_FORWARD && $index >= $targetIndex) {
-                break;
-            }
-
-            $counter++;
-
-            if ($counter > $perPage) {
-                $currentPage++;
-                $counter = 1;
-            }
-        }
-
-        return $currentPage;
     }
 
     public function onlyShow(int $targetIndex = 0): self
@@ -329,7 +200,6 @@ class LogReader
 
     public function limit(int $number): self
     {
-        $this->limit = $number;
         $this->index()->limit($number);
 
         return $this;
@@ -481,24 +351,12 @@ class LogReader
         // Let's reset the position in preparation for real log reads.
         rewind($this->fileHandle);
 
-        unset($this->_mergedIndex);
-
         return $this->reset();
     }
 
     public function reset(): self
     {
-        $index = $this->getMergedIndexForSelectedLevels();
-
-        if (empty($index)) {
-            $index = [0];
-        }
-
-        if ($this->direction === self::DIRECTION_FORWARD) {
-            $this->nextLogIndex = min(array_keys($index));
-        } elseif ($this->direction === self::DIRECTION_BACKWARD) {
-            $this->nextLogIndex = max(array_keys($index));
-        }
+        $this->index()->reset();
 
         return $this;
     }
@@ -510,11 +368,7 @@ class LogReader
      */
     public function getLevelCounts(): array
     {
-        if (! $this->isOpen()) {
-            $this->open();
-        }
-
-        $selectedLevels = $this->getSelectedLevels();
+        $selectedLevels = $this->index()->getSelectedLevels();
 
         return $this->index()->getLevelCounts()->map(function (int $count, string $level) use ($selectedLevels) {
             return new LevelCount(
@@ -537,19 +391,17 @@ class LogReader
 
         $logs = [];
 
-        while (($log = $this->next()) && (is_null($this->limit) || $this->limit > 0)) {
+        while (($log = $this->next())) {
             $logs[] = $log;
-            $this->limit--;
         }
-
-        $this->limit = null;
 
         return $logs;
     }
 
     public function getLogAtIndex(int $index): ?Log
     {
-        [$level, $text, $position] = $this->getLogTextAtIndex($index);
+        throw new \Exception('missing implementation. We need to get the position inside the method here.');
+        [$level, $text, $position] = $this->getLogText($index, $position);
 
         // If we did not find any logs, this means either the file is empty, or
         // we have already reached the end of file. So we return early.
@@ -557,32 +409,29 @@ class LogReader
             return null;
         }
 
-        $log = $this->makeLog($text, $position);
-        $log->index = $index;
-
-        return $log;
+        return $this->makeLog($text, $position, $index);
     }
 
     public function next(): ?Log
     {
-        $levels = $this->getSelectedLevels();
+        [$index, $position] = $this->index()->next();
 
-        [$level, $text, $position] = $this->getLogTextAtIndex($this->nextLogIndex);
+        if (is_null($index)) {
+            return null;
+        }
+
+        [$level, $text, $position] = $this->getLogText($index, $position);
 
         if (empty($text)) {
             return null;
         }
 
-        $nextLog = $this->makeLog($text, $position);
-
-        $this->setNextLogIndex();
-
-        return $nextLog;
+        return $this->makeLog($text, $position, $index);
     }
 
     public function total(): int
     {
-        return count($this->getMergedIndexForSelectedLevels());
+        return $this->index()->total();
     }
 
     /**
@@ -624,27 +473,22 @@ class LogReader
         );
     }
 
-    protected function makeLog(string $text, int $filePosition, $index = null)
+    protected function makeLog(string $text, int $filePosition, int $index)
     {
-        return new Log($index ?? $this->nextLogIndex, $text, $this->file->identifier, $filePosition);
+        return new Log($index, $text, $this->file->identifier, $filePosition);
     }
 
     /**
-     * @param  int  $index
+     * @param int $index
+     * @param int $position
      * @return array|null Returns an array, [$level, $text, $position]
      *
      * @throws \Exception
      */
-    protected function getLogTextAtIndex(int $index): ?array
+    protected function getLogText(int $index, int $position): ?array
     {
         if ($this->isClosed()) {
             $this->open();
-        }
-
-        $position = $this->getLogPositionFromIndex($index);
-
-        if (is_null($position)) {
-            return null;
         }
 
         fseek($this->fileHandle, $position, SEEK_SET);
@@ -672,63 +516,6 @@ class LogReader
         }
 
         return [$currentLogLevel, $currentLog, $position];
-    }
-
-    protected function getLogPositionFromIndex(int $index): ?int
-    {
-        $fullIndex = $this->getMergedIndexForSelectedLevels();
-
-        return $fullIndex[$index] ?? null;
-    }
-
-    protected function setNextLogIndex(): void
-    {
-        $numberSet = false;
-
-        if ($this->direction === self::DIRECTION_FORWARD) {
-            foreach ($this->getMergedIndexForSelectedLevels() as $logIndex => $logPosition) {
-                if ($logIndex <= $this->nextLogIndex) {
-                    continue;
-                }
-
-                $this->nextLogIndex = $logIndex;
-                $numberSet = true;
-                break;
-            }
-
-            if (! $numberSet) {
-                $this->nextLogIndex++;
-            }
-        } else {
-            foreach ($this->getMergedIndexForSelectedLevels() as $logIndex => $logPosition) {
-                if ($logIndex >= $this->nextLogIndex) {
-                    continue;
-                }
-
-                $this->nextLogIndex = $logIndex;
-                $numberSet = true;
-                break;
-            }
-
-            if (! $numberSet) {
-                $this->nextLogIndex--;
-            }
-        }
-    }
-
-    public function getMergedIndexForSelectedLevels(): array
-    {
-        if (! isset($this->_mergedIndex)) {
-            $this->_mergedIndex = $this->index()
-                ->forLevels($this->getSelectedLevels())
-                ->getFlatArray();
-
-            if ($this->direction === self::DIRECTION_BACKWARD) {
-                $this->_mergedIndex = array_reverse($this->_mergedIndex, true);
-            }
-        }
-
-        return $this->_mergedIndex ?? [];
     }
 
     public function numberOfNewBytes(): int

@@ -16,33 +16,19 @@ use Opcodes\LogViewer\Exceptions\InvalidChunkSizeException;
  */
 class LogIndex
 {
+    use Concerns\CanFilterIndex;
+    use Concerns\CanIterateIndex;
+    use Concerns\SplitsIndexIntoChunks;
+
     const DIRECTION_FORWARD = 'forward';
 
     const DIRECTION_BACKWARD = 'backward';
 
     const DEFAULT_CHUNK_SIZE = 10_000;
 
-    protected int $maxChunkSize;
-
-    protected array $chunkDefinitions = [];
-
-    protected LogIndexChunk $currentChunk;
-
-    protected int $nextLogIndex;
+    protected int $nextLogIndexToCreate;
 
     protected int $lastScannedFilePosition;
-
-    protected ?int $filterFrom = null;
-
-    protected ?int $filterTo = null;
-
-    protected ?array $filterLevels = null;
-
-    protected ?int $limit = null;
-
-    protected ?int $skip = null;
-
-    protected string $direction = self::DIRECTION_FORWARD;
 
     public function __construct(
         protected LogFile $file,
@@ -66,51 +52,14 @@ class LogIndex
         return $this->file->cacheKey().':'.md5($this->query ?? '').':metadata';
     }
 
-    public function chunkCacheKey(int $index): string
-    {
-        return $this->cacheKey().':'.$index;
-    }
-
     public function cacheTtl(): Carbon
     {
         return now()->addWeek();
     }
 
-    public function isForward(): bool
-    {
-        return $this->direction === self::DIRECTION_FORWARD;
-    }
-
-    public function isBackward(): bool
-    {
-        return $this->direction === self::DIRECTION_BACKWARD;
-    }
-
-    /** @alias backward */
-    public function reverse(): self
-    {
-        return $this->backward();
-    }
-
-    public function backward(): self
-    {
-        $this->direction = self::DIRECTION_BACKWARD;
-
-        return $this;
-    }
-
-    public function forward(): self
-    {
-        $this->direction = self::DIRECTION_FORWARD;
-
-        return $this;
-    }
-
     public function clearCache(): void
     {
-        foreach ($this->getChunkDefinitions() as $chunkDefinition) {
-            Cache::forget($this->chunkCacheKey($chunkDefinition['index']));
-        }
+        $this->clearChunksFromCache();
 
         Cache::forget($this->metaCacheKey());
         Cache::forget($this->cacheKey());
@@ -121,114 +70,21 @@ class LogIndex
 
     public function addToIndex(int $filePosition, int|Carbon $timestamp, string $severity): int
     {
-        $nextLogIndex = $this->nextLogIndex ?? 0;
+        $logIndex = $this->nextLogIndexToCreate ?? 0;
 
         if ($timestamp instanceof Carbon) {
             $timestamp = $timestamp->timestamp;
         }
 
-        $this->currentChunk->addToIndex($nextLogIndex, $filePosition, $timestamp, $severity);
+        $this->currentChunk->addToIndex($logIndex, $filePosition, $timestamp, $severity);
 
-        $this->nextLogIndex = $nextLogIndex + 1;
+        $this->nextLogIndexToCreate = $logIndex + 1;
 
         if ($this->currentChunk->size >= $this->getMaxChunkSize()) {
             $this->rotateCurrentChunk();
         }
 
-        return $nextLogIndex;
-    }
-
-    public function getCurrentChunk(): LogIndexChunk
-    {
-        return $this->currentChunk;
-    }
-
-    public function getCurrentChunkSize(): int
-    {
-        return $this->currentChunk->size;
-    }
-
-    /**
-     * @throws InvalidChunkSizeException
-     */
-    public function setMaxChunkSize(int $size): void
-    {
-        if ($size < 1) {
-            throw new InvalidChunkSizeException($size.' is not a valid chunk size. Must be higher than zero.');
-        }
-
-        $this->maxChunkSize = $size;
-    }
-
-    public function getMaxChunkSize(): int
-    {
-        return $this->maxChunkSize;
-    }
-
-    public function getChunkDefinitions(): array
-    {
-        return [
-            ...$this->chunkDefinitions,
-            $this->currentChunk->toArray(),
-        ];
-    }
-
-    public function getChunkDefinition(int $index): ?array
-    {
-        return $this->getChunkDefinitions()[$index] ?? null;
-    }
-
-    public function getChunk(int $index): ?array
-    {
-        if (isset($this->currentChunk) && $index === $this->currentChunk->index) {
-            $chunkData = $this->currentChunk->data ?? [];
-        } else {
-            $chunkData = Cache::get($this->chunkCacheKey($index));
-        }
-
-        return $chunkData;
-    }
-
-    public function getChunkCount(): int
-    {
-        return count($this->getChunkDefinitions());
-    }
-
-    protected function rotateCurrentChunk(): void
-    {
-        Cache::put(
-            $this->chunkCacheKey($this->currentChunk->index),
-            $this->currentChunk->data,
-            $this->cacheTtl()
-        );
-
-        $this->chunkDefinitions[] = $this->currentChunk->toArray();
-
-        $this->currentChunk = new LogIndexChunk([], $this->currentChunk->index + 1, 0);
-
-        $this->saveMetadata();
-    }
-
-    protected function sortKeys(array &$array): void
-    {
-        if ($this->isBackward()) {
-            krsort($array);
-        } else {
-            ksort($array);
-        }
-    }
-
-    protected function getRelevantItemsInChunk(array $chunkDefinition): int
-    {
-        $relevantItemsInChunk = 0;
-
-        foreach ($chunkDefinition['level_counts'] as $level => $count) {
-            if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
-                $relevantItemsInChunk += $count;
-            }
-        }
-
-        return $relevantItemsInChunk;
+        return $logIndex;
     }
 
     public function get(int $limit = null): array
@@ -237,8 +93,11 @@ class LogIndex
         $itemsAdded = 0;
         $limit = $limit ?? $this->limit;
         $skip = $this->skip;
+        $chunkDefinitions = $this->getChunkDefinitions();
 
-        foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+        $this->sortKeys($chunkDefinitions);
+
+        foreach ($chunkDefinitions as $chunkDefinition) {
             if (isset($skip)) {
                 $relevantItemsInChunk = $this->getRelevantItemsInChunk($chunkDefinition);
 
@@ -249,7 +108,7 @@ class LogIndex
                 }
             }
 
-            $chunk = $this->getChunk($chunkDefinition['index']);
+            $chunk = $this->getChunkData($chunkDefinition['index']);
 
             if (empty($chunk)) {
                 continue;
@@ -310,14 +169,17 @@ class LogIndex
         return $results;
     }
 
-    public function getFlatArray(int $limit = null): array
+    public function getFlatIndex(int $limit = null): array
     {
         $results = [];
         $itemsAdded = 0;
         $limit = $limit ?? $this->limit;
         $skip = $this->skip;
+        $chunkDefinitions = $this->getChunkDefinitions();
 
-        foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+        $this->sortKeys($chunkDefinitions);
+
+        foreach ($chunkDefinitions as $chunkDefinition) {
             if (isset($skip)) {
                 $relevantItemsInChunk = $this->getRelevantItemsInChunk($chunkDefinition);
 
@@ -328,7 +190,7 @@ class LogIndex
                 }
             }
 
-            $chunk = $this->getChunk($chunkDefinition['index']);
+            $chunk = $this->getChunkData($chunkDefinition['index']);
 
             if (is_null($chunk)) {
                 continue;
@@ -369,56 +231,6 @@ class LogIndex
         }
 
         return $results;
-    }
-
-    public function forDateRange(int|Carbon $from = null, int|Carbon $to = null): self
-    {
-        if ($from instanceof Carbon) {
-            $from = $from->timestamp;
-        }
-
-        if ($to instanceof Carbon) {
-            $to = $to->timestamp;
-        }
-
-        $this->filterFrom = $from;
-        $this->filterTo = $to;
-
-        return $this;
-    }
-
-    public function forLevels(string|array $levels = null): self
-    {
-        if (is_string($levels)) {
-            $levels = [$levels];
-        }
-
-        if (is_array($levels)) {
-            $this->filterLevels = array_map('strtolower', $levels);
-        } else {
-            $this->filterLevels = null;
-        }
-
-        return $this;
-    }
-
-    public function skip(int $skip = null): self
-    {
-        $this->skip = $skip;
-
-        return $this;
-    }
-
-    public function limit(int $limit = null): self
-    {
-        $this->limit = $limit;
-
-        return $this;
-    }
-
-    public function getLimit(): ?int
-    {
-        return $this->limit;
     }
 
     public function save(): void
@@ -541,13 +353,63 @@ class LogIndex
         return $counts;
     }
 
+    public function total(): int
+    {
+        return array_reduce($this->getChunkDefinitions(), function ($sum, $chunkDefinition) {
+            foreach ($chunkDefinition['level_counts'] as $level => $count) {
+                if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
+                    $sum += $count;
+                }
+            }
+
+            return $sum;
+        }, 0);
+    }
+
+    protected function sortKeys(array &$array): void
+    {
+        if ($this->isBackward()) {
+            krsort($array);
+        } else {
+            ksort($array);
+        }
+    }
+
+    protected function rotateCurrentChunk(): void
+    {
+        Cache::put(
+            $this->chunkCacheKey($this->currentChunk->index),
+            $this->currentChunk->data,
+            $this->cacheTtl()
+        );
+
+        $this->chunkDefinitions[] = $this->currentChunk->toArray();
+
+        $this->currentChunk = new LogIndexChunk([], $this->currentChunk->index + 1, 0);
+
+        $this->saveMetadata();
+    }
+
+    protected function getRelevantItemsInChunk(array $chunkDefinition): int
+    {
+        $relevantItemsInChunk = 0;
+
+        foreach ($chunkDefinition['level_counts'] as $level => $count) {
+            if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
+                $relevantItemsInChunk += $count;
+            }
+        }
+
+        return $relevantItemsInChunk;
+    }
+
     protected function saveMetadata(): void
     {
         Cache::put(
             $this->metaCacheKey(),
             [
                 'last_scanned_file_position' => $this->lastScannedFilePosition,
-                'next_log_index' => $this->nextLogIndex,
+                'next_log_index_to_create' => $this->nextLogIndexToCreate,
                 'max_chunk_size' => $this->maxChunkSize,
                 'current_chunk_index' => $this->currentChunk->index,
                 'chunk_definitions' => $this->chunkDefinitions,
@@ -562,23 +424,11 @@ class LogIndex
         $data = Cache::get($this->metaCacheKey(), []);
 
         $this->lastScannedFilePosition = $data['last_scanned_file_position'] ?? 0;
-        $this->nextLogIndex = $data['next_log_index'] ?? 0;
+        $this->nextLogIndexToCreate = $data['next_log_index_to_create'] ?? 0;
         $this->maxChunkSize = $data['max_chunk_size'] ?? self::DEFAULT_CHUNK_SIZE;
         $this->chunkDefinitions = $data['chunk_definitions'] ?? [];
 
         $this->currentChunk = LogIndexChunk::fromDefinitionArray($data['current_chunk_definition'] ?? []);
         $this->currentChunk->data = Cache::get($this->chunkCacheKey($this->currentChunk->index), []);
-    }
-
-    protected function hasDateFilters(): bool
-    {
-        return isset($this->filterFrom)
-            || isset($this->filterTo);
-    }
-
-    protected function hasFilters(): bool
-    {
-        return $this->hasDateFilters()
-            || isset($this->filterLevels);
     }
 }

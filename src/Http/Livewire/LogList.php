@@ -64,8 +64,7 @@ class LogList extends Component
     public function render()
     {
         $file = LogViewer::getFile($this->selectedFileIdentifier);
-        $selectedLevels = $this->getSelectedLevels();
-        $logQuery = $file?->logs()->only($selectedLevels);
+        $logQuery = $file?->logs();
 
         try {
             $logQuery?->search($this->query);
@@ -76,6 +75,9 @@ class LogList extends Component
         } catch (InvalidRegularExpression $exception) {
             $this->queryError = $exception->getMessage();
         }
+
+        $selectedLevels = $this->getSelectedLevels();
+        $logQuery->only($selectedLevels);
 
         if ($this->direction === self::NEWEST_FIRST) {
             $logQuery?->reverse();

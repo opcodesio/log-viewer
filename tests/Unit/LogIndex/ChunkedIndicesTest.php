@@ -19,11 +19,11 @@ it('cannot set a chunk size lower than 1', function () {
 
 it('increments the current chunk size after adding a log', function () {
     $logIndex = createLogIndex();
-    expect($logIndex->getCurrentChunkSize())->toBe(0);
+    expect($logIndex->getCurrentChunk()->size)->toBe(0);
 
     $logIndex->addToIndex(1000, now()->subMinute(), 'info');
 
-    expect($logIndex->getCurrentChunkSize())->toBe(1);
+    expect($logIndex->getCurrentChunk()->size)->toBe(1);
 });
 
 it('chunks big indices into smaller pieces', function () {
@@ -41,14 +41,14 @@ it('chunks big indices into smaller pieces', function () {
         'debug',
     );
 
-    expect($logIndex->getChunk(0))->toBe([
+    expect($logIndex->getChunkData(0))->toBe([
         $firstDate->timestamp => [
             'info' => [
                 $firstIndexGenerated => $firstFilePosition,
             ],
         ],
     ])
-        ->and($logIndex->getChunk(1))->toBe([
+        ->and($logIndex->getChunkData(1))->toBe([
             $secondDate->timestamp => [
                 'debug' => [
                     $secondIndexGenerated => $secondFilePosition,
@@ -76,7 +76,7 @@ it('can get the number of chunks generated so far', function () {
 it('returns null for a non-existent chunk', function () {
     $logIndex = createLogIndex();
 
-    expect($logIndex->getChunk(5))->toBeNull();
+    expect($logIndex->getChunkData(5))->toBeNull();
 });
 
 it('remembers the number of chunks after re-instantiation', function () {

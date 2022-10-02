@@ -22,7 +22,7 @@ test('it can limit the number of results expected for reduced index usage', func
     ]);
 
     // Let's also check the flat map
-    $flatIndex = $logIndex->limit(2)->getFlatArray();
+    $flatIndex = $logIndex->limit(2)->getFlatIndex();
 
     expect($flatIndex)->toBe([
         $idx1 => $pos1,
@@ -51,7 +51,7 @@ test('it can limit the result set by providing a first parameter to get()', func
     ])->and($logIndex->getLimit())->toBeNull();
 
     // Let's also check the flat map
-    $flatIndex = $logIndex->getFlatArray(2);
+    $flatIndex = $logIndex->getFlatIndex(2);
 
     expect($flatIndex)->toBe([
         $idx1 => $pos1,
