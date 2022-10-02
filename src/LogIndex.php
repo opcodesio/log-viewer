@@ -94,13 +94,16 @@ class LogIndex
             if (($itemsSkipped + $chunkDefinition['size']) <= $indexToFind) {
                 // not in this index, let's move on
                 $itemsSkipped += $chunkDefinition['size'];
+
                 continue;
             }
 
             foreach ($this->getChunkData($chunkDefinition['index']) as $timestamp => $tsIndex) {
                 foreach ($tsIndex as $level => $levelIndex) {
                     foreach ($levelIndex as $index => $position) {
-                        if ($index === $indexToFind) return $position;
+                        if ($index === $indexToFind) {
+                            return $position;
+                        }
                     }
                 }
             }
