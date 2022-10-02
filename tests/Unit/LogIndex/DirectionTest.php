@@ -94,8 +94,8 @@ test('chunked indices are correctly read when going backwards', function () {
             'info' => [
                 $idx5 => $pos5,
                 $idx4 => $pos4,
-            ]
-        ]
+            ],
+        ],
     ]);
 
     // and the same for flat arrays
