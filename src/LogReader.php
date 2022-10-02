@@ -223,7 +223,7 @@ class LogReader
             $this->query = null;
         }
 
-        unset($this->logIndex);
+        $this->index()->setQuery($this->query);
 
         return $this;
     }
@@ -368,6 +368,10 @@ class LogReader
      */
     public function getLevelCounts(): array
     {
+        if ($this->isClosed()) {
+            $this->open();
+        }
+
         $selectedLevels = $this->index()->getSelectedLevels();
 
         return $this->index()->getLevelCounts()->map(function (int $count, string $level) use ($selectedLevels) {
@@ -400,7 +404,8 @@ class LogReader
 
     public function getLogAtIndex(int $index): ?Log
     {
-        throw new \Exception('missing implementation. We need to get the position inside the method here.');
+        $position = $this->index()->getPositionForIndex($index);
+
         [$level, $text, $position] = $this->getLogText($index, $position);
 
         // If we did not find any logs, this means either the file is empty, or
@@ -414,6 +419,11 @@ class LogReader
 
     public function next(): ?Log
     {
+        // We open it here to make we also check for possible need of index re-building.
+        if ($this->isClosed()) {
+            $this->open();
+        }
+
         [$index, $position] = $this->index()->next();
 
         if (is_null($index)) {

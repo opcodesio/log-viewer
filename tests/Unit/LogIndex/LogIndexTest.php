@@ -221,3 +221,16 @@ it('can continue from where it left off after re-instantiation', function () {
 
     expect($newestEntryIndex)->toBe($lastKnownIndex + 1);
 });
+
+it('can get a particular index position even with chunks', function () {
+    $logIndex = createLogIndex();
+    $logIndex->setMaxChunkSize(2);
+    $idx1 = $logIndex->addToIndex($pos1 = 0, now(), 'info');
+    $idx2 = $logIndex->addToIndex($pos2 = 200, now(), 'info');
+    $idx3 = $logIndex->addToIndex($pos3 = 400, now(), 'info');
+    $idx4 = $logIndex->addToIndex($pos4 = 600, now(), 'info');
+    $idx5 = $logIndex->addToIndex($pos5 = 600, now(), 'info');
+
+    expect($logIndex->getPositionForIndex($idx4))->toBe($pos4)
+        ->and($logIndex->getPositionForIndex($idx1))->toBe($pos1);
+});

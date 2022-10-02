@@ -17,6 +17,15 @@ trait CanFilterIndex
 
     protected ?int $skip = null;
 
+    public function setQuery(string $query = null): self
+    {
+        $this->query = $query;
+
+        $this->loadMetadata();
+
+        return $this;
+    }
+
     public function forDateRange(int|Carbon $from = null, int|Carbon $to = null): self
     {
         if ($from instanceof Carbon) {

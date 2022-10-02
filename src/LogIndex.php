@@ -87,6 +87,29 @@ class LogIndex
         return $logIndex;
     }
 
+    public function getPositionForIndex(int $indexToFind): ?int
+    {
+        $itemsSkipped = 0;
+
+        foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+            if (($itemsSkipped + $chunkDefinition['size']) <= $indexToFind) {
+                // not in this index, let's move on
+                $itemsSkipped += $chunkDefinition['size'];
+                continue;
+            }
+
+            foreach ($this->getChunkData($chunkDefinition['index']) as $timestamp => $tsIndex) {
+                foreach ($tsIndex as $level => $levelIndex) {
+                    foreach ($levelIndex as $index => $position) {
+                        if ($index === $indexToFind) return $position;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function get(int $limit = null): array
     {
         $results = [];
