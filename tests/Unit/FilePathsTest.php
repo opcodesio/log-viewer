@@ -6,7 +6,7 @@ use Opcodes\LogViewer\LogViewerService;
 test('handles square brackets in the logs path', function () {
     // Get the original path inside which we'll create a dummy folder with square brackets
     $originalBasePath = LogViewer::basePathForLogs();
-    $pathWithSquareBrackets = $originalBasePath . '[logs]' . DIRECTORY_SEPARATOR;
+    $pathWithSquareBrackets = $originalBasePath.'[logs]'.DIRECTORY_SEPARATOR;
     if (! file_exists($pathWithSquareBrackets)) {
         mkdir($pathWithSquareBrackets, recursive: true);
     }
@@ -14,13 +14,13 @@ test('handles square brackets in the logs path', function () {
     // Let's mock LogViewer to return the new path as the base path for logs
     app()->instance(
         LogViewerService::class,
-        Mockery::mock(LogViewerService::class . '[basePathForLogs]')
+        Mockery::mock(LogViewerService::class.'[basePathForLogs]')
             ->shouldReceive('basePathForLogs')->andReturn($pathWithSquareBrackets)->getMock()
     );
     LogViewer::clearResolvedInstance('log-viewer');
 
     // Create a dummy log file and make sure it's actually there
-    $expectedLogFilePath = $pathWithSquareBrackets . ($fileName = 'laravel.log');
+    $expectedLogFilePath = $pathWithSquareBrackets.($fileName = 'laravel.log');
     touch($expectedLogFilePath);
     expect(file_exists($expectedLogFilePath))->toBeTrue();
 
