@@ -26,10 +26,11 @@ class LogViewerService
         // search pattern.
         if (PHP_OS_FAMILY === 'Windows') {
             $baseDir = preg_replace_callback(
-                '/\[.*\]/i',
-                fn (array $matches) => '['.$matches[0].']',
+                '/\[(.*\)]/i',
+                fn (array $matches) => '[[]'.$matches[1].'[]]',
                 $this->basePathForLogs()
             );
+            dump('Base dir on Windows after formatting: ' . $baseDir);
         } else {
             $baseDir = str_replace(
                 ['*', '?', '\\', '[', ']'],
