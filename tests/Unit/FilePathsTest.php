@@ -10,7 +10,6 @@ test('handles square brackets in the logs path', function () {
     if (! file_exists($pathWithSquareBrackets)) {
         mkdir($pathWithSquareBrackets, recursive: true);
     }
-    dump('Path with square brackets: '.$pathWithSquareBrackets);
 
     // Let's mock LogViewer to return the new path as the base path for logs
     app()->instance(
@@ -24,7 +23,6 @@ test('handles square brackets in the logs path', function () {
     $expectedLogFilePath = $pathWithSquareBrackets.($fileName = 'laravel.log');
     touch($expectedLogFilePath);
     expect(file_exists($expectedLogFilePath))->toBeTrue();
-    dump('Log file path: '.$pathWithSquareBrackets);
 
     // Act! Let's get the files and make sure they have found the log file created previously.
     $logFiles = LogViewer::getFiles();

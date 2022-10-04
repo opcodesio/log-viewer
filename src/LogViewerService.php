@@ -24,12 +24,19 @@ class LogViewerService
         // glob's special characters and treat those as actual characters of the path.
         // We can assume this, because it's the actual path of the Laravel app, not a user-defined
         // search pattern.
-        $baseDir = str_replace(
-            ['*', '?', '\\', '[', ']'],
-            ['\*', '\?', '\\\\', '\[', '\]'],
-            $this->basePathForLogs()
-        );
-        dump('Base Dir after escaping: '.$baseDir);
+        if (PHP_OS_FAMILY === 'Windows') {
+            $baseDir = preg_replace_callback(
+                '/\[.*\]/i',
+                fn (array $matches) => '['.$matches[0].']',
+                $this->basePathForLogs()
+            );
+        } else {
+            $baseDir = str_replace(
+                ['*', '?', '\\', '[', ']'],
+                ['\*', '\?', '\\\\', '\[', '\]'],
+                $this->basePathForLogs()
+            );
+        }
         $files = [];
 
         foreach (config('log-viewer.include_files', []) as $pattern) {
