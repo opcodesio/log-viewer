@@ -29,7 +29,7 @@ class LogViewerService
             ['\*', '\?', '\\\\', '\[', '\]'],
             $this->basePathForLogs()
         );
-        dump('Base Dir after escaping: ' . $baseDir);
+        dump('Base Dir after escaping: '.$baseDir);
         $files = [];
 
         foreach (config('log-viewer.include_files', []) as $pattern) {
