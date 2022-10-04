@@ -20,7 +20,23 @@ class LogViewerService
 
     protected function getFilePaths(): array
     {
-        $baseDir = $this->basePathForLogs();
+        // Because we'll use the base path as a parameter for `glob`, we should escape any
+        // glob's special characters and treat those as actual characters of the path.
+        // We can assume this, because it's the actual path of the Laravel app, not a user-defined
+        // search pattern.
+        if (PHP_OS_FAMILY === 'Windows') {
+            $baseDir = preg_replace_callback(
+                '/\[(.*)\]/i',
+                fn (array $matches) => '[[]'.$matches[1].'[]]',
+                $this->basePathForLogs()
+            );
+        } else {
+            $baseDir = str_replace(
+                ['*', '?', '\\', '[', ']'],
+                ['\*', '\?', '\\\\', '\[', '\]'],
+                $this->basePathForLogs()
+            );
+        }
         $files = [];
 
         foreach (config('log-viewer.include_files', []) as $pattern) {
@@ -28,7 +44,7 @@ class LogViewerService
                 $pattern = $baseDir.$pattern;
             }
 
-            $files = array_merge($files, glob($pattern));
+            $files = array_merge($files, $this->getFilePathsMatchingPattern($pattern));
         }
 
         foreach (config('log-viewer.exclude_files', []) as $pattern) {
@@ -36,7 +52,7 @@ class LogViewerService
                 $pattern = $baseDir.$pattern;
             }
 
-            $files = array_diff($files, glob($pattern));
+            $files = array_diff($files, $this->getFilePathsMatchingPattern($pattern));
         }
 
         $files = array_map('realpath', $files);
@@ -44,6 +60,11 @@ class LogViewerService
         $files = array_filter($files, 'is_file');
 
         return array_values(array_reverse($files));
+    }
+
+    protected function getFilePathsMatchingPattern($pattern)
+    {
+        return glob($pattern, GLOB_BRACE);
     }
 
     public function basePathForLogs(): string
