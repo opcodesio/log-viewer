@@ -26,7 +26,7 @@ class LogViewerService
         // search pattern.
         if (PHP_OS_FAMILY === 'Windows') {
             $baseDir = preg_replace_callback(
-                '/\[(.*\)]/i',
+                '/\[(.*)\]/i',
                 fn (array $matches) => '[[]'.$matches[1].'[]]',
                 $this->basePathForLogs()
             );
