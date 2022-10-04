@@ -30,7 +30,6 @@ class LogViewerService
                 fn (array $matches) => '[[]'.$matches[1].'[]]',
                 $this->basePathForLogs()
             );
-            dump('Base dir on Windows after formatting: '.$baseDir);
         } else {
             $baseDir = str_replace(
                 ['*', '?', '\\', '[', ']'],
