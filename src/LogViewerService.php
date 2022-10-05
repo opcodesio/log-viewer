@@ -25,10 +25,10 @@ class LogViewerService
         // We can assume this, because it's the actual path of the Laravel app, not a user-defined
         // search pattern.
         if (PHP_OS_FAMILY === 'Windows') {
-            $baseDir = preg_replace_callback(
-                '/\[(.*)\]/i',
-                fn (array $matches) => '[[]'.$matches[1].'[]]',
-                $this->basePathForLogs()
+            $baseDir = str_replace(
+                ['*', '?', '\\', '[', ']'],
+                ['\\\*', '\\\?', '\\\\', '\\\[', '\\\]'],
+                str_replace('\\', '/', $this->basePathForLogs())
             );
         } else {
             $baseDir = str_replace(
