@@ -38,7 +38,7 @@ test('handles square brackets in the logs path', function ($folderPath) {
     '[logs]',
     '[logs',
     'logs]',
-    // '[[logs]]',  // fails on Windows
+    '[[logs]]',
     '[logs][1]',
     'log[s]',
     'log[s',
