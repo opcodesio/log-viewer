@@ -3,10 +3,10 @@
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogViewerService;
 
-test('handles square brackets in the logs path', function () {
+test('handles square brackets in the logs path', function ($folderPath) {
     // Get the original path inside which we'll create a dummy folder with square brackets
     $originalBasePath = LogViewer::basePathForLogs();
-    $pathWithSquareBrackets = $originalBasePath.'[logs]'.DIRECTORY_SEPARATOR;
+    $pathWithSquareBrackets = $originalBasePath.$folderPath.DIRECTORY_SEPARATOR;
     if (! file_exists($pathWithSquareBrackets)) {
         mkdir($pathWithSquareBrackets, recursive: true);
     }
@@ -34,4 +34,12 @@ test('handles square brackets in the logs path', function () {
     // clean up!
     unlink($expectedLogFilePath);
     rmdir($pathWithSquareBrackets);
-});
+})->with([
+    '[logs]',
+    '[logs',
+    'logs]',
+    '[[logs]]',
+    'log[s]',
+    'log[s',
+    'log]s',
+]);
