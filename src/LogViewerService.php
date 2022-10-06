@@ -69,7 +69,9 @@ class LogViewerService
 
     protected function getFilePathsMatchingPattern($pattern)
     {
-        return glob($pattern, GLOB_BRACE);
+        // The GLOB_BRACE flag is not available on some non GNU systems, like Solaris or Alpine Linux.
+
+        return glob($pattern);
     }
 
     public function basePathForLogs(): string
