@@ -375,20 +375,27 @@ html.dark {
 }
 
 .search {
+    @apply bg-white border rounded-md text-sm w-full flex items-center dark:bg-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-100 transition duration-200;
+
+    .prefix-icon {
+        @apply ml-3 mr-1 text-gray-500 dark:text-gray-400;
+
+        & > svg {
+            @apply h-4 w-4;
+        }
+    }
+
     input {
-        @apply border rounded-md pl-3 pr-10 py-2 text-sm w-full dark:bg-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-100 ring-2 ring-transparent transition duration-200;
+        @apply px-1 mx-1 py-1 my-1 rounded flex-1 bg-inherit ring-2 ring-transparent;
         &:focus {
             @apply outline-none ring-emerald-500 dark:ring-emerald-700 border-transparent;
         }
     }
-    &.has-error input {
+    &.has-error {
         @apply border-red-600;
-        &:focus {
-            @apply ring-red-500 border-transparent;
-        }
     }
     .clear-search {
-        @apply absolute top-0 right-0 p-1.5;
+        @apply mr-1;
         button {
             @apply rounded text-gray-500 dark:text-gray-400 p-1;
             &:hover { @apply text-gray-600 dark:text-gray-300; }
@@ -475,6 +482,10 @@ html.dark {
 
         &.active .file-item {
             @apply border-emerald-500 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900 dark:bg-opacity-40;
+        }
+
+        &.active-folder .file-item {
+            @apply border-gray-300 dark:border-gray-700;
         }
 
         &:hover .file-item {

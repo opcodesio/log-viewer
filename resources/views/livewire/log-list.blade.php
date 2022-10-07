@@ -6,20 +6,18 @@
     <div class="flex flex-col h-full w-full mx-3 mb-4">
         <div class="px-4 mb-4 flex items-start">
             <div class="flex-1 flex items-center mr-6">
-                @isset($selectedFileIdentifier)
+                @if($showLevelsDropdown)
                 <div>@include('log-viewer::partials.log-list-level-buttons')</div>
-                @endisset
+                @endif
             </div>
-            <div class="flex-1 flex @empty($selectedFileIdentifier) justify-end @endempty min-h-[38px]">
-                @isset($selectedFileIdentifier)
+            <div class="flex-1 flex justify-end min-h-[38px]">
                 <div class="flex-1">@include('log-viewer::partials.search-input')</div>
                 <div class="ml-5">@include('log-viewer::partials.log-list-share-page-button')</div>
-                @endisset
                 <div class="ml-2">@include('log-viewer::partials.site-settings-dropdown')</div>
             </div>
         </div>
 
-        @isset($selectedFileIdentifier)
+        @isset($logs)
         <div class="relative overflow-hidden text-sm h-full" x-data x-init="$nextTick(() => {  })">
             <div id="log-item-container" class="log-item-container h-full overflow-y-auto px-4" x-on:scroll="(event) => $store.logViewer.onScroll(event)">
                 <div class="inline-block min-w-full max-w-full align-middle">
@@ -93,11 +91,17 @@
     <td colspan="6">
         <div class="bg-white text-gray-600 dark:bg-gray-800 dark:text-gray-200 p-12">
             <div class="text-center font-semibold">No results</div>
-            @if(!empty($query))
             <div class="text-center mt-6">
+                @if(!empty($query))
                 <button class="px-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md" wire:click="clearQuery">Clear search query</button>
+                @endif
+                @if(!empty($query) && isset($file))
+                <button class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md" x-on:click.prevent="selectFile(null)">Search all files</button>
+                @endif
+                @if(isset($levels) && count(array_filter($levels, fn ($level) => $level->selected)) === 0 && count(array_filter($levels, fn ($level) => $level->count > 0)))
+                <button class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md" wire:click="selectAllLevels">Show all severities</button>
+                @endif
             </div>
-            @endif
         </div>
     </td>
 </tr>

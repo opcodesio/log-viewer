@@ -1,5 +1,5 @@
 @php
-    $levelsFound = array_filter($levels, fn ($level) => $level->count > 0);
+    $levelsFound = array_filter($levels ?? [], fn ($level) => $level->count > 0);
     $levelsSelected = array_values(array_filter($levelsFound, fn ($level) => $level->selected));
     $totalLogsFound = array_sum(array_map(fn ($level) => $level->count, $levelsFound));
 @endphp

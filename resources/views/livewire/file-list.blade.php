@@ -43,7 +43,7 @@
         >
             <div class="folder-item-container"
                  x-on:click="$store.fileViewer.toggle(folder)"
-                 x-bind:class="[$store.fileViewer.isOpen(folder) ? 'active' : '', $store.fileViewer.shouldBeSticky(folder) ? 'sticky z-10' : '']"
+                 x-bind:class="[$store.fileViewer.isOpen(folder) ? 'active-folder' : '', $store.fileViewer.shouldBeSticky(folder) ? 'sticky z-10' : '']"
                  x-bind:style="{ top: $store.fileViewer.isOpen(folder) ? ($store.fileViewer.folderTops[folder] || 0) : 0 }"
                  x-data="dropdown"
                  x-on:keydown.escape.prevent.stop="close($refs.button)"

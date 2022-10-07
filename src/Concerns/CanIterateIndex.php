@@ -3,6 +3,7 @@
 namespace Opcodes\LogViewer\Concerns;
 
 use ArrayIterator;
+use Opcodes\LogViewer\Direction;
 
 trait CanIterateIndex
 {
@@ -10,16 +11,25 @@ trait CanIterateIndex
 
     protected ArrayIterator $_cachedFlatIndexIterator;
 
-    protected string $direction = self::DIRECTION_FORWARD;
+    protected string $direction = Direction::Forward;
+
+    public function setDirection(string $direction): self
+    {
+        $this->direction = $direction === Direction::Backward
+            ? Direction::Backward
+            : Direction::Forward;
+
+        return $this;
+    }
 
     public function isForward(): bool
     {
-        return $this->direction === self::DIRECTION_FORWARD;
+        return $this->direction === Direction::Forward;
     }
 
     public function isBackward(): bool
     {
-        return $this->direction === self::DIRECTION_BACKWARD;
+        return $this->direction === Direction::Backward;
     }
 
     /** @alias backward */
@@ -30,14 +40,14 @@ trait CanIterateIndex
 
     public function backward(): self
     {
-        $this->direction = self::DIRECTION_BACKWARD;
+        $this->direction = Direction::Backward;
 
         return $this;
     }
 
     public function forward(): self
     {
-        $this->direction = self::DIRECTION_FORWARD;
+        $this->direction = Direction::Forward;
 
         return $this;
     }

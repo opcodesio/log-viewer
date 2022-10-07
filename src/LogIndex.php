@@ -19,10 +19,6 @@ class LogIndex
     use Concerns\CanIterateIndex;
     use Concerns\SplitsIndexIntoChunks;
 
-    const DIRECTION_FORWARD = 'forward';
-
-    const DIRECTION_BACKWARD = 'backward';
-
     const DEFAULT_CHUNK_SIZE = 10_000;
 
     protected int $nextLogIndexToCreate;

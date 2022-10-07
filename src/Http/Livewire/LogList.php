@@ -8,7 +8,9 @@ use Livewire\WithPagination;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Level;
+use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogReader;
+use Opcodes\LogViewer\MultipleLogReader;
 use Opcodes\LogViewer\PreferenceStore;
 
 class LogList extends Component
@@ -64,8 +66,36 @@ class LogList extends Component
     public function render()
     {
         $file = LogViewer::getFile($this->selectedFileIdentifier);
-        $selectedLevels = $this->getSelectedLevels();
-        $logQuery = $file?->logs()->only($selectedLevels);
+        $results = [
+            'file' => null,
+            'logs' => null,
+            'levels' => [],
+            'expandAutomatically' => false,
+        ];
+
+        if ($this->page < 1) {
+            $this->gotoPage(1);
+        }
+
+        if (isset($file)) {
+            $results = array_merge($results, $this->singleFileResults($file));
+        } elseif (! empty($this->query)) {
+            $results = array_merge($results, $this->searchAllFilesResults());
+        }
+
+        return view('log-viewer::livewire.log-list', array_merge(
+            $results,
+            $this->getRequestPerformanceInfo(),
+            [
+                'showLevelsDropdown' => isset($file) || !empty($this->query),
+                'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
+            ],
+        ));
+    }
+
+    protected function singleFileResults(LogFile $file): array
+    {
+        $logQuery = $file?->logs()->only($this->getSelectedLevels());
 
         try {
             $logQuery?->search($this->query);
@@ -89,17 +119,45 @@ class LogList extends Component
 
             // re-create the paginator instance to fix a bug
             $logs = $logQuery?->paginate($this->perPage);
-        } elseif ($this->page < 1) {
-            $this->gotoPage(1);
         }
 
-        return view('log-viewer::livewire.log-list', array_merge([
+        return [
             'file' => $file,
             'levels' => $levels,
             'logs' => $logs,
             'expandAutomatically' => $expandAutomatically ?? false,
-            'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
-        ], $this->getRequestPerformanceInfo()));
+        ];
+    }
+
+    protected function searchAllFilesResults(): array
+    {
+        $logQuery = new MultipleLogReader(LogViewer::getFiles());
+        $logQuery->onlyLevels($this->getSelectedLevels());
+
+        try {
+            $logQuery->search($this->query);
+
+            if ($this->direction === self::NEWEST_FIRST) {
+                $logQuery->reverse();
+            }
+
+            $levels = $logQuery->getLevelCounts();
+            $logs = $logQuery->paginate($this->perPage);
+
+            if ($logs->lastPage() < $this->page) {
+                $this->gotoPage($logs->lastPage() ?? 1);
+
+                // re-create the paginator instance to fix a bug
+                $logs = $logQuery->paginate($this->perPage);
+            }
+        } catch (InvalidRegularExpression $exception) {
+            $this->queryError = $exception->getMessage();
+        }
+
+        return [
+            'levels' => $levels ?? [],
+            'logs' => $logs ?? null,
+        ];
     }
 
     public function updatingQuery()

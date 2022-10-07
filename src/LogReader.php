@@ -7,13 +7,10 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Utils\Utils;
 
 class LogReader
 {
-    const DIRECTION_FORWARD = 'forward';
-
-    const DIRECTION_BACKWARD = 'backward';
-
     /**
      * Cached LogReader instances.
      *
@@ -42,7 +39,7 @@ class LogReader
      */
     protected $fileHandle = null;
 
-    protected string $direction = self::DIRECTION_FORWARD;
+    protected string $direction = Direction::Forward;
 
     public function __construct(LogFile $file)
     {
@@ -87,6 +84,18 @@ class LogReader
         return $this;
     }
 
+    public function setLevels($levels = null): self
+    {
+        return $this->only($levels);
+    }
+
+    public function allLevels(): self
+    {
+        $this->index()->forLevels(null);
+
+        return $this;
+    }
+
     /**
      * Load all log levels except the provided ones.
      *
@@ -108,6 +117,11 @@ class LogReader
         $this->index()->forLevels($levels);
 
         return $this;
+    }
+
+    public function exceptLevels($levels = null): self
+    {
+        return $this->except($levels);
     }
 
     public static function getDefaultLevels(): array
@@ -173,17 +187,22 @@ class LogReader
 
     public function reverse(): self
     {
-        $this->direction = self::DIRECTION_BACKWARD;
+        $this->direction = Direction::Backward;
         $this->index()->reverse();
 
         return $this->reset();
     }
 
-    /**
-     * Skip a number of logs
-     *
-     * @throws \Exception
-     */
+    public function setDirection(string $direction = null): self
+    {
+        $this->direction = $direction === Direction::Backward
+            ? Direction::Backward
+            : Direction::Forward;
+        $this->index()->setDirection($this->direction);
+
+        return $this;
+    }
+
     public function skip(int $number): self
     {
         $this->index()->skip($number);
@@ -205,7 +224,7 @@ class LogReader
         return $this;
     }
 
-    public function search(string $query = null): self
+    public function setQuery(string $query = null): self
     {
         $this->close();
 
@@ -216,7 +235,7 @@ class LogReader
         } elseif (! empty($query)) {
             $query = '/'.$query.'/i';
 
-            $this->validateRegex($query);
+            Utils::validateRegex($query);
 
             $this->query = $query;
         } else {
@@ -228,22 +247,9 @@ class LogReader
         return $this;
     }
 
-    /**
-     * @throws InvalidRegularExpression
-     */
-    protected function validateRegex(string $regexString): void
+    public function search(string $query = null): self
     {
-        $error = null;
-        set_error_handler(function (int $errno, string $errstr) use (&$error) {
-            $error = $errstr;
-        }, E_WARNING);
-        preg_match($regexString, '');
-        restore_error_handler();
-
-        if (! empty($error)) {
-            $error = str_replace('preg_match(): ', '', $error);
-            throw new InvalidRegularExpression($error);
-        }
+        return $this->setQuery($query);
     }
 
     /**
@@ -395,7 +401,7 @@ class LogReader
 
         $logs = [];
 
-        while (($log = $this->next())) {
+        while ($log = $this->next()) {
             $logs[] = $log;
         }
 

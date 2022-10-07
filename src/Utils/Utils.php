@@ -3,6 +3,7 @@
 namespace Opcodes\LogViewer\Utils;
 
 use Illuminate\Support\Str;
+use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 
 class Utils
 {
@@ -78,5 +79,27 @@ class Utils
     public static function sizeOfVarInMB(mixed $var): string
     {
         return self::bytesForHumans(self::sizeOfVar($var));
+    }
+
+    public static function validateRegex(string $regexString, bool $throw = true): bool
+    {
+        $error = null;
+        set_error_handler(function (int $errno, string $errstr) use (&$error) {
+            $error = $errstr;
+        }, E_WARNING);
+        preg_match($regexString, '');
+        restore_error_handler();
+
+        if (! empty($error)) {
+            $error = str_replace('preg_match(): ', '', $error);
+
+            if ($throw) {
+                throw new InvalidRegularExpression($error);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }

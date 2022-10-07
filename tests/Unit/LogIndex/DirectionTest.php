@@ -1,5 +1,7 @@
 <?php
 
+use Opcodes\LogViewer\Direction;
+
 test('direction is forward by default', function () {
     $logIndex = createLogIndex();
 
@@ -14,6 +16,26 @@ test('direction can be reversed', function () {
 
     expect($logIndex->isForward())->toBeFalse()
         ->and($logIndex->isBackward())->toBeTrue();
+});
+
+test('direction can be set explicitly', function () {
+    $logIndex = createLogIndex();
+
+    $logIndex->setDirection(Direction::Backward);
+
+    expect($logIndex->isBackward())->toBeTrue();
+
+    $logIndex->setDirection(Direction::Forward);
+
+    expect($logIndex->isForward())->toBeTrue();
+});
+
+test('invalid directions get defaulted to forward', function () {
+    $logIndex = createLogIndex();
+
+    $logIndex->setDirection('invalid-direction');
+
+    expect($logIndex->isForward())->toBeTrue();
 });
 
 test('direction can be set to forward again', function () {
