@@ -51,6 +51,85 @@ test('get() results are returned sorted based on direction chosen', function () 
     ]);
 });
 
+test('items are sorted by timestamp, and then index', function () {
+    $timestampEarlier = now()->subHour()->timestamp;
+    $timestampLater = now()->timestamp;
+    $logIndex = createLogIndex(null, null, [
+        $idx1 = 0 => [$pos1 = 0, $timestampEarlier, 'info'],
+        $idx2 = 1 => [$pos2 = 100, $timestampEarlier, 'info'],
+        $idx3 = 2 => [$pos3 = 200, $timestampLater, 'info'],
+        $idx4 = 3 => [$pos4 = 300, $timestampEarlier, 'info'],
+        $idx5 = 4 => [$pos5 = 400, $timestampLater, 'info'],
+    ]);
+
+    $forwardResult = $logIndex->forward()->get();
+    expect($forwardResult)->toBe([
+        $timestampEarlier => ['info' => [
+            $idx1 => $pos1,
+            $idx2 => $pos2,
+            $idx4 => $pos4,
+        ]],
+        $timestampLater => ['info' => [
+            $idx3 => $pos3,
+            $idx5 => $pos5,
+        ]],
+    ]);
+
+    $backwardResult = $logIndex->reverse()->get();
+    expect($backwardResult)->toBe([
+        $timestampLater => ['info' => [
+            $idx5 => $pos5,
+            $idx3 => $pos3,
+        ]],
+        $timestampEarlier => ['info' => [
+            $idx4 => $pos4,
+            $idx2 => $pos2,
+            $idx1 => $pos1,
+        ]],
+    ]);
+
+    $backwardLimitedResult = $logIndex->reverse()->get(3);
+    expect($backwardLimitedResult)->toBe([
+        $timestampLater => ['info' => [
+            $idx5 => $pos5,
+            $idx3 => $pos3,
+        ]],
+        $timestampEarlier => ['info' => [
+            $idx4 => $pos4,
+        ]],
+    ]);
+});
+
+test('flat array items are sorted by timestamp, and then index', function () {
+    $timestampEarlier = now()->subHour()->timestamp;
+    $timestampLater = now()->timestamp;
+    $logIndex = createLogIndex(null, null, [
+        $idx1 = 0 => [$pos1 = 0, $timestampEarlier, 'info'],
+        $idx2 = 1 => [$pos2 = 100, $timestampEarlier, 'info'],
+        $idx3 = 2 => [$pos3 = 200, $timestampLater, 'debug'],   // this one stands out - it's a DEBUG log for a purpose
+        $idx4 = 3 => [$pos4 = 300, $timestampEarlier, 'info'],
+        $idx5 = 4 => [$pos5 = 400, $timestampLater, 'info'],
+    ]);
+
+    $forwardResult = $logIndex->forward()->getFlatIndex();
+    expect($forwardResult)->toBe([
+        $idx1 => $pos1, // earlier
+        $idx2 => $pos2, // earlier
+        $idx4 => $pos4, // earlier
+        $idx3 => $pos3, // later
+        $idx5 => $pos5, // later
+    ]);
+
+    $backwardResult = $logIndex->reverse()->getFlatIndex();
+    expect($backwardResult)->toBe([
+        $idx5 => $pos5, // later
+        $idx3 => $pos3, // later
+        $idx4 => $pos4, // earlier
+        $idx2 => $pos2, // earlier
+        $idx1 => $pos1, // earlier
+    ]);
+});
+
 test('getFlatIndex() results are returned sorted based on direction chosen', function () {
     $logIndex = createLogIndex(null, null, [
         [$posMiddle = 0, $tsMiddle = now()->subHours(2)->timestamp, 'info'],

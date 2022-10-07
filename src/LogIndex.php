@@ -231,25 +231,31 @@ class LogIndex
                     continue;
                 }
 
+                $itemsWithinThisTimestamp = [];
+
                 foreach ($tsIndex as $level => $levelIndex) {
                     if (isset($this->filterLevels) && ! in_array($level, $this->filterLevels)) {
                         continue;
                     }
 
-                    $this->sortKeys($levelIndex);
-
                     foreach ($levelIndex as $idx => $filePosition) {
-                        if ($skip > 0) {
-                            $skip--;
+                        $itemsWithinThisTimestamp[$idx] = $filePosition;
+                    }
+                }
 
-                            continue;
-                        }
+                $this->sortKeys($itemsWithinThisTimestamp);
 
-                        $results[$idx] = $filePosition;
+                foreach ($itemsWithinThisTimestamp as $idx => $filePosition) {
+                    if ($skip > 0) {
+                        $skip--;
 
-                        if (isset($limit) && ++$itemsAdded >= $limit) {
-                            break 4;
-                        }
+                        continue;
+                    }
+
+                    $results[$idx] = $filePosition;
+
+                    if (isset($limit) && ++$itemsAdded >= $limit) {
+                        break 3;
                     }
                 }
             }
