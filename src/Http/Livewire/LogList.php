@@ -87,7 +87,7 @@ class LogList extends Component
             $results,
             $this->getRequestPerformanceInfo(),
             [
-                'showLevelsDropdown' => isset($file) || !empty($this->query),
+                'showLevelsDropdown' => isset($file) || ! empty($this->query),
                 'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
             ],
         ));

@@ -125,7 +125,7 @@ class MultipleLogReader
     /**
      * Get the logs from this file collection.
      *
-     * @param int|null $limit
+     * @param  int|null  $limit
      * @return array|Log[]
      */
     public function get(int $limit = null): array
