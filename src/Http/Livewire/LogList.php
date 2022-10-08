@@ -8,11 +8,9 @@ use Livewire\WithPagination;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Level;
-use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogReader;
 use Opcodes\LogViewer\MultipleLogReader;
 use Opcodes\LogViewer\PreferenceStore;
-use Opcodes\LogViewer\Utils\Utils;
 
 class LogList extends Component
 {
@@ -119,7 +117,7 @@ class LogList extends Component
             'levels' => $levels ?? [],
             'logs' => $logs ?? null,
             'expandAutomatically' => $expandAutomatically ?? false,
-            'showLevelsDropdown' => isset($file) || !empty($this->query),
+            'showLevelsDropdown' => isset($file) || ! empty($this->query),
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
             'hasMoreResults' => $hasMoreResults,
             'percentScanned' => $percentScanned,
