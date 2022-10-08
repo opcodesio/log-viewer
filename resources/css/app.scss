@@ -402,7 +402,7 @@ html.dark {
 }
 
 .search-progress-bar {
-    @apply absolute top-1 bg-emerald-500 dark:bg-emerald-600 h-0.5 rounded transition duration-200;
+    @apply absolute top-1 bg-emerald-500 dark:bg-emerald-600 h-0.5 rounded transition-width ease-linear duration-300;
 }
 
 .dropdown {

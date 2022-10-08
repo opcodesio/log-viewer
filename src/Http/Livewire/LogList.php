@@ -95,7 +95,7 @@ class LogList extends Component
                     $logQuery->reverse();
                 }
 
-                $logQuery->scan(200 * 1024 * 1024); // Let's scan the first 200 MB for potential results
+                $logQuery->scan(LogViewer::lazyScanChunkSize());
 
                 $logs = $logQuery->paginate($this->perPage);
                 $levels = $logQuery->getLevelCounts();

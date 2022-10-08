@@ -18,7 +18,10 @@ module.exports = {
             },
             padding: {
                 '88': '22rem',
-            }
+            },
+            transitionProperty: {
+                'width': 'width'
+            },
         },
     },
     plugins: [],

@@ -169,6 +169,11 @@ class LogViewerService
         }
     }
 
+    public function lazyScanChunkSize(): int
+    {
+        return intval(config('log-viewer.lazy_scan_chunk_size_in_mb', 100)) * 1024 * 1024;
+    }
+
     /**
      * Get the maximum number of bytes of the log that we should display.
      *

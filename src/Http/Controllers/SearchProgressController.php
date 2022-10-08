@@ -20,8 +20,7 @@ class SearchProgressController
             $logQuery = new MultipleLogReader(LogViewer::getFiles());
             $logQuery->search($query);
 
-            // let's scan 100 MB at a time
-            $logQuery->scan(100 * 1024 * 1024);
+            $logQuery->scan(LogViewer::lazyScanChunkSize());
 
             $requiresScan = $logQuery->requiresScan();
             $percentScanned = $logQuery->percentScanned();

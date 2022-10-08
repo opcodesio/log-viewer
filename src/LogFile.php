@@ -192,9 +192,9 @@ class LogFile
             ?? (is_file($this->path) ? filemtime($this->path) : 0);
     }
 
-    public function scan(bool $force = false): void
+    public function scan(int $maxBytesToScan = null, bool $force = false): void
     {
-        $this->logs()->scan($force);
+        $this->logs()->scan($maxBytesToScan, $force);
     }
 
     public function requiresScan(): bool

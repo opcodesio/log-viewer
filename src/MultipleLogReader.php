@@ -147,10 +147,8 @@ class MultipleLogReader
             $logQuery = $this->getLogQueryForFile($file);
 
             if (isset($skip)) {
-                // $logQuery->scan();  // this will only scan the file if it needs to
-                $totalItemsInFile = $logQuery->total();
                 $logsToSkip = min($skip, $logQuery->total());
-                $logQuery->skip($logsToSkip);
+                $logQuery->reset()->skip($logsToSkip);
                 $skip -= $logsToSkip;
             }
 
@@ -188,7 +186,7 @@ class MultipleLogReader
         return 100 - intval($missingScansSize / $totalFileSize * 100);
     }
 
-    public function scan(int $fileSizeLimit = null): void
+    public function scan(int $maxBytesToScan = null, bool $force = false): void
     {
         $fileSizeScanned = 0;
 
@@ -202,9 +200,9 @@ class MultipleLogReader
 
             $fileSizeScanned += $logQuery->numberOfNewBytes();
 
-            $logQuery->scan();
+            $logQuery->scan($maxBytesToScan, $force);
 
-            if (isset($fileSizeLimit) && $fileSizeScanned >= $fileSizeLimit) {
+            if (isset($maxBytesToScan) && $fileSizeScanned >= $maxBytesToScan) {
                 break;
             }
         }

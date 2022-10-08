@@ -266,7 +266,7 @@ class LogReader
      *
      * @throws \Exception
      */
-    public function scan(bool $force = false): self
+    public function scan(int $maxBytesToScan = null, bool $force = false): self
     {
         if ($this->isClosed()) {
             $this->open();
@@ -298,8 +298,12 @@ class LogReader
         $currentTimestamp = null;
         fseek($this->fileHandle, $this->index()->getLastScannedFilePosition());
         $currentLogPosition = ftell($this->fileHandle);
+        $lastPositionToScan = isset($maxBytesToScan) ? ($currentLogPosition + $maxBytesToScan) : null;
 
-        while (($line = fgets($this->fileHandle, 1024)) !== false) {
+        while (
+            (! isset($lastPositionToScan) || $currentLogPosition < $lastPositionToScan)
+            && ($line = fgets($this->fileHandle, 1024)) !== false
+        ) {
             /**
              * $matches[0] - the full line being checked
              * $matches[1] - the full timestamp in-between the square brackets, including the optional microseconds
@@ -506,11 +510,12 @@ class LogReader
     /**
      * @param  int  $index
      * @param  int  $position
+     * @param  bool  $fullText
      * @return array|null Returns an array, [$level, $text, $position]
      *
      * @throws \Exception
      */
-    protected function getLogText(int $index, int $position): ?array
+    protected function getLogText(int $index, int $position, bool $fullText = false): ?array
     {
         if ($this->isClosed()) {
             $this->open();
