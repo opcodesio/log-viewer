@@ -26,6 +26,11 @@ trait CanFilterIndex
         return $this;
     }
 
+    public function getQuery(): ?string
+    {
+        return $this->query;
+    }
+
     public function forDateRange(int|Carbon $from = null, int|Carbon $to = null): self
     {
         if ($from instanceof Carbon) {

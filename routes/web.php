@@ -7,6 +7,7 @@ use Opcodes\LogViewer\Http\Controllers\DownloadFolderController;
 use Opcodes\LogViewer\Http\Controllers\IndexController;
 use Opcodes\LogViewer\Http\Controllers\IsScanRequiredController;
 use Opcodes\LogViewer\Http\Controllers\ScanFilesController;
+use Opcodes\LogViewer\Http\Controllers\SearchProgressController;
 
 Route::domain(LogViewer::getRouteDomain())
     ->middleware(LogViewer::getRouteMiddleware())
@@ -19,4 +20,6 @@ Route::domain(LogViewer::getRouteDomain())
 
         Route::get('is-scan-required', IsScanRequiredController::class)->name('blv.is-scan-required');
         Route::get('scan-files', ScanFilesController::class)->name('blv.scan-files');
+
+        Route::get('search-progress', SearchProgressController::class)->name('blv.search-more');
     });

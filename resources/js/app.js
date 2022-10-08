@@ -43,24 +43,66 @@ Alpine.data('dropdown', () => ({
     }
 }));
 
+Alpine.store('search', {
+    query: '',
+    searchMoreRoute: null,
+    searching: false,
+    percentScanned: 0,
+    error: null,
+    update(query, error, searchMoreRoute, searching = false, percentScanned = 0) {
+        this.query = query;
+        this.error = (error && error !== '') ? error : null;
+        this.searchMoreRoute = searchMoreRoute;
+        this.searching = searching;
+        this.percentScanned = percentScanned;
+
+        if (this.searching) {
+            this.check();
+        }
+    },
+    check() {
+        if (this.query === '') return;
+        const queryParams = '?' + new URLSearchParams({ query: this.query });
+        fetch(this.searchMoreRoute + queryParams)
+            .then((response) => response.json())
+            .then((data) => {
+                const wasPreviouslySearching = this.searching;
+                this.searching = data.hasMoreResults;
+                this.percentScanned = data.percentScanned;
+
+                if (this.searching) {
+                    this.check();
+                } else if (wasPreviouslySearching && !this.searching) {
+                    window.dispatchEvent(new CustomEvent('reload-results'));
+                }
+            });
+    },
+    init() {
+        this.check();
+    },
+});
+
 Alpine.store('fileViewer', {
-    scanInProgress: false,
-    initScanCheck(routeScanCheck, routeScan) {
-        if (this.scanInProgress) return;
-        fetch(routeScanCheck)
+    scanInProgress: {},
+    initScanCheck(routeScanCheck, routeScan, eventDetail) {
+        const query = eventDetail && eventDetail.query ? eventDetail.query : '';
+        if (this.scanInProgress[query]) return;
+        let queryParams = '?' + (query !== '' ? new URLSearchParams({ query }) : '');
+        fetch(routeScanCheck + String(queryParams))
             .then((response) => response.json())
             .then((data) => {
                 if (data.requires_scan) {
-                    this.scanInProgress = true;
-                    fetch(routeScan)
+                    this.scanInProgress[query] = true;
+                    fetch(routeScan + String(queryParams))
                         .then((response) => response.json())
                         .then((data) => {
-                            this.scanInProgress = false;
+                            this.scanInProgress[query] = false;
                             window.dispatchEvent(new CustomEvent('reload-files'));
+                            window.dispatchEvent(new CustomEvent('file-scan-complete'));
                         })
                         .catch((error) => {
                             console.error(error);
-                            this.scanInProgress = false;
+                            this.scanInProgress[query] = false;
                         })
                 }
             })

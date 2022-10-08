@@ -17,7 +17,7 @@
 
         <div class="flex justify-between mt-4 mr-1">
             <div class="relative">
-                <div x-cloak x-show="$store.fileViewer.scanInProgress" class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                <div x-cloak x-show="$store.fileViewer.scanInProgress['']" class="flex items-center text-sm text-gray-500 dark:text-gray-400">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline spin mr-1" fill="currentColor"><use href="#icon-spinner" /></svg>
                     Indexing logs...
                 </div>

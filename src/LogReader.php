@@ -34,6 +34,8 @@ class LogReader
 
     protected ?int $onlyShowIndex = null;
 
+    protected bool $lazyScanning = false;
+
     /**
      * @var resource|null
      */
@@ -156,7 +158,7 @@ class LogReader
             throw new \Exception('Could not open "'.$this->file->path.'" for reading.');
         }
 
-        if ($this->requiresScan()) {
+        if ($this->requiresScan() && ! $this->lazyScanning) {
             $this->scan();
         } else {
             $this->reset();
@@ -250,6 +252,13 @@ class LogReader
     public function search(string $query = null): self
     {
         return $this->setQuery($query);
+    }
+
+    public function lazyScanning($lazy = true): self
+    {
+        $this->lazyScanning = $lazy;
+
+        return $this;
     }
 
     /**
@@ -351,6 +360,7 @@ class LogReader
         $this->file->setMetaData('size', $this->file->size());
         $this->file->setMetaData('earliest_timestamp', $this->index()->getEarliestTimestamp());
         $this->file->setMetaData('latest_timestamp', $this->index()->getLatestTimestamp());
+        $this->file->addRelatedIndex($logIndex);
 
         $this->file->saveMetaData();
 
@@ -542,6 +552,11 @@ class LogReader
     public function requiresScan(): bool
     {
         return $this->numberOfNewBytes() !== 0;
+    }
+
+    public function percentScanned(): int
+    {
+        return 100 - intval(($this->numberOfNewBytes() / $this->file->size() * 100));
     }
 
     public function __destruct()

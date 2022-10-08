@@ -12,6 +12,7 @@ use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogReader;
 use Opcodes\LogViewer\MultipleLogReader;
 use Opcodes\LogViewer\PreferenceStore;
+use Opcodes\LogViewer\Utils\Utils;
 
 class LogList extends Component
 {
@@ -66,98 +67,63 @@ class LogList extends Component
     public function render()
     {
         $file = LogViewer::getFile($this->selectedFileIdentifier);
-        $results = [
-            'file' => null,
-            'logs' => null,
-            'levels' => [],
-            'expandAutomatically' => false,
-        ];
-
-        if ($this->page < 1) {
-            $this->gotoPage(1);
-        }
+        $hasMoreResults = false;
+        $percentScanned = 0;
 
         if (isset($file)) {
-            $results = array_merge($results, $this->singleFileResults($file));
+            $logQuery = $file->logs();
         } elseif (! empty($this->query)) {
-            $results = array_merge($results, $this->searchAllFilesResults());
+            $logQuery = new MultipleLogReader(LogViewer::getFiles());
         }
 
-        return view('log-viewer::livewire.log-list', array_merge(
-            $results,
-            $this->getRequestPerformanceInfo(),
-            [
-                'showLevelsDropdown' => isset($file) || !empty($this->query),
-                'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
-            ],
-        ));
-    }
-
-    protected function singleFileResults(LogFile $file): array
-    {
-        $logQuery = $file?->logs()->only($this->getSelectedLevels());
-
-        try {
-            $logQuery?->search($this->query);
-            if (Str::startsWith($this->query, 'log-index:')) {
-                $logIndex = explode(':', $this->query)[1];
-                $expandAutomatically = intval($logIndex) || $logIndex === '0';
-            }
-        } catch (InvalidRegularExpression $exception) {
-            $this->queryError = $exception->getMessage();
-        }
-
-        if ($this->direction === self::NEWEST_FIRST) {
-            $logQuery?->reverse();
-        }
-
-        $levels = $logQuery?->getLevelCounts();
-        $logs = $logQuery?->paginate($this->perPage);
-
-        if ($logs?->lastPage() < $this->page) {
-            $this->gotoPage($logs?->lastPage() ?? 1);
-
-            // re-create the paginator instance to fix a bug
-            $logs = $logQuery?->paginate($this->perPage);
-        }
-
-        return [
-            'file' => $file,
-            'levels' => $levels,
-            'logs' => $logs,
-            'expandAutomatically' => $expandAutomatically ?? false,
-        ];
-    }
-
-    protected function searchAllFilesResults(): array
-    {
-        $logQuery = new MultipleLogReader(LogViewer::getFiles());
-        $logQuery->onlyLevels($this->getSelectedLevels());
-
-        try {
-            $logQuery->search($this->query);
-
-            if ($this->direction === self::NEWEST_FIRST) {
-                $logQuery->reverse();
+        if (isset($logQuery)) {
+            if ($this->page < 1) {
+                $this->gotoPage(1);
             }
 
-            $levels = $logQuery->getLevelCounts();
-            $logs = $logQuery->paginate($this->perPage);
+            $logQuery->setLevels($this->getSelectedLevels());
 
-            if ($logs->lastPage() < $this->page) {
-                $this->gotoPage($logs->lastPage() ?? 1);
+            try {
+                $logQuery->search($this->query);
 
-                // re-create the paginator instance to fix a bug
+                if (isset($file) && Str::startsWith($this->query, 'log-index:')) {
+                    $logIndex = explode(':', $this->query)[1];
+                    $expandAutomatically = intval($logIndex) || $logIndex === '0';
+                }
+
+                if ($this->direction === self::NEWEST_FIRST) {
+                    $logQuery->reverse();
+                }
+
+                $logQuery->scan(200 * 1024 * 1024); // Let's scan the first 200 MB for potential results
+
                 $logs = $logQuery->paginate($this->perPage);
+                $levels = $logQuery->getLevelCounts();
+
+                if ($logs->lastPage() < $this->page) {
+                    $this->gotoPage($logs->lastPage() ?? 1);
+
+                    // re-create the paginator instance to fix a bug
+                    $logs = $logQuery->paginate($this->perPage);
+                }
+
+                $hasMoreResults = $logQuery->requiresScan();
+                $percentScanned = $logQuery->percentScanned();
+            } catch (InvalidRegularExpression $exception) {
+                $this->queryError = $exception->getMessage();
             }
-        } catch (InvalidRegularExpression $exception) {
-            $this->queryError = $exception->getMessage();
         }
 
-        return [
+        return view('log-viewer::livewire.log-list', array_merge([
+            'file' => $file,
             'levels' => $levels ?? [],
             'logs' => $logs ?? null,
-        ];
+            'expandAutomatically' => $expandAutomatically ?? false,
+            'showLevelsDropdown' => isset($file) || !empty($this->query),
+            'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
+            'hasMoreResults' => $hasMoreResults,
+            'percentScanned' => $percentScanned,
+        ], $this->getRequestPerformanceInfo()));
     }
 
     public function updatingQuery()

@@ -30,7 +30,7 @@ class MultipleLogReader
         }
     }
 
-    public function onlyLevels($levels = null): self
+    public function setLevels($levels = null): self
     {
         $this->levels = $levels;
 
@@ -147,6 +147,7 @@ class MultipleLogReader
             $logQuery = $this->getLogQueryForFile($file);
 
             if (isset($skip)) {
+                // $logQuery->scan();  // this will only scan the file if it needs to
                 $totalItemsInFile = $logQuery->total();
                 $logsToSkip = min($skip, $logQuery->total());
                 $logQuery->skip($logsToSkip);
@@ -172,7 +173,19 @@ class MultipleLogReader
 
     public function requiresScan(): bool
     {
-        return $this->fileCollection->some(fn (LogFile $file) => $file->requiresScan());
+        return $this->fileCollection->some(function (LogFile $file) {
+            return $this->getLogQueryForFile($file)->requiresScan();
+        });
+    }
+
+    public function percentScanned(): int
+    {
+        $totalFileSize = $this->fileCollection->sum->size();
+        $missingScansSize = $this->fileCollection->sum(function (LogFile $file) {
+            return $this->getLogQueryForFile($file)->numberOfNewBytes();
+        });
+
+        return 100 - intval($missingScansSize / $totalFileSize * 100);
     }
 
     public function scan(int $fileSizeLimit = null): void
@@ -181,11 +194,11 @@ class MultipleLogReader
 
         /** @var LogFile $logFile */
         foreach ($this->fileCollection as $logFile) {
-            if (! $logFile->requiresScan()) {
+            $logQuery = $this->getLogQueryForFile($logFile);
+
+            if (! $logQuery->requiresScan()) {
                 continue;
             }
-
-            $logQuery = $this->getLogQueryForFile($logFile);
 
             $fileSizeScanned += $logQuery->numberOfNewBytes();
 
@@ -202,6 +215,7 @@ class MultipleLogReader
         return $file->logs()
             ->setDirection($this->direction)
             ->setLevels($this->levels)
-            ->setQuery($this->query);
+            ->setQuery($this->query)
+            ->lazyScanning();
     }
 }

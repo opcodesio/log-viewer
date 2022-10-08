@@ -95,6 +95,14 @@ class LogFile
         return 'log-viewer:'.LogViewer::version().':file:'.md5($this->path);
     }
 
+    public function addRelatedIndex(LogIndex $logIndex): void
+    {
+        $relatedIndexQueries = $this->getMetaData('related_index_queries', []);
+        $relatedIndexQueries[] = $logIndex->getQuery();
+
+        $this->setMetaData('related_index_queries', array_unique($relatedIndexQueries));
+    }
+
     protected function relatedCacheKeysKey(): string
     {
         return $this->cacheKey().':related-cache-keys';
@@ -129,6 +137,11 @@ class LogFile
 
     public function clearCache(): void
     {
+        foreach ($this->getMetaData('related_index_queries', []) as $indexQuery) {
+            $logIndex = new LogIndex($this, $indexQuery);
+            $logIndex->clearCache();
+        }
+
         foreach ($this->getRelatedCacheKeys() as $relatedCacheKey) {
             Cache::forget($relatedCacheKey);
         }

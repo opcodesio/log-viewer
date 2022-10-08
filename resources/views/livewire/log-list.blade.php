@@ -2,6 +2,7 @@
     x-cloak
     x-data
     x-on:file-selected.window="$wire.call('selectFile', $event.detail)"
+    x-on:reload-results.window="$wire.call('reloadResults')"
 >
     <div class="flex flex-col h-full w-full mx-3 mb-4">
         <div class="px-4 mb-4 flex items-start">
@@ -17,7 +18,7 @@
             </div>
         </div>
 
-        @isset($logs)
+        @if(isset($logs) && ($logs->isNotEmpty() || !$hasMoreResults))
         <div class="relative overflow-hidden text-sm h-full" x-data x-init="$nextTick(() => {  })">
             <div id="log-item-container" class="log-item-container h-full overflow-y-auto px-4" x-on:scroll="(event) => $store.logViewer.onScroll(event)">
                 <div class="inline-block min-w-full max-w-full align-middle">
@@ -119,8 +120,11 @@
         </div>
         @else
         <div class="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
-            <span wire:loading.remove>Please select a file...</span>
-            <span wire:loading>Loading...</span>
+            @if($hasMoreResults)
+            <span>Searching...</span>
+            @else
+            <span>Select a file or start searching...</span>
+            @endif
         </div>
         @endisset
 

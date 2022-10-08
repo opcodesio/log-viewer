@@ -262,15 +262,13 @@ class LogIndex
 
     public function save(): void
     {
-        if (! isset($this->currentChunk)) {
-            return;
+        if (isset($this->currentChunk)) {
+            Cache::put(
+                $this->chunkCacheKey($this->currentChunk->index),
+                $this->currentChunk->data,
+                $this->cacheTtl()
+            );
         }
-
-        Cache::put(
-            $this->chunkCacheKey($this->currentChunk->index),
-            $this->currentChunk->data,
-            $this->cacheTtl()
-        );
 
         $this->saveMetadata();
     }
