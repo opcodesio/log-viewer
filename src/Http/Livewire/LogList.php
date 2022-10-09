@@ -9,7 +9,6 @@ use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Level;
 use Opcodes\LogViewer\LogReader;
-use Opcodes\LogViewer\MultipleLogReader;
 use Opcodes\LogViewer\PreferenceStore;
 
 class LogList extends Component
