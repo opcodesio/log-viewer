@@ -54,5 +54,7 @@ function createLogIndex($file = null, $query = null, array $predefinedLogs = [])
         $logIndex->addToIndex(...$predefinedLog);
     }
 
+    $logIndex->save();
+
     return $logIndex;
 }

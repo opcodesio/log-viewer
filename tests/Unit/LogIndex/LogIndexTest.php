@@ -133,7 +133,11 @@ it('can return an index for selected severity levels', function () {
 });
 
 it('tries to fetch the index from the cache first', function () {
-    $logIndex = createLogIndex();
+    $logIndex = createLogIndex(null, null, [
+        [0, 123, 'info'],
+        [100, 123, 'info'],
+        [200, 123, 'info'],
+    ]);
     $cacheKey = $logIndex->chunkCacheKey(0);
     Cache::put(
         $cacheKey,
