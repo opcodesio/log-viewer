@@ -85,26 +85,23 @@ Alpine.store('search', {
 });
 
 Alpine.store('fileViewer', {
-    scanInProgress: {},
-    initScanCheck(routeScanCheck, routeScan, eventDetail) {
-        const query = eventDetail && eventDetail.query ? eventDetail.query : '';
-        if (this.scanInProgress[query]) return;
-        let queryParams = '?' + (query !== '' ? new URLSearchParams({ query }) : '');
-        fetch(routeScanCheck + String(queryParams))
+    scanInProgress: false,
+    initScanCheck(routeScanCheck, routeScan) {
+        if (this.scanInProgress) return;
+        fetch(routeScanCheck)
             .then((response) => response.json())
             .then((data) => {
                 if (data.requires_scan) {
-                    this.scanInProgress[query] = true;
-                    fetch(routeScan + String(queryParams))
+                    this.scanInProgress = true;
+                    fetch(routeScan)
                         .then((response) => response.json())
                         .then((data) => {
-                            this.scanInProgress[query] = false;
+                            this.scanInProgress = false;
                             window.dispatchEvent(new CustomEvent('reload-files'));
-                            window.dispatchEvent(new CustomEvent('file-scan-complete'));
                         })
                         .catch((error) => {
                             console.error(error);
-                            this.scanInProgress[query] = false;
+                            this.scanInProgress = false;
                         })
                 }
             })

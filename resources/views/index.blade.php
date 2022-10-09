@@ -25,7 +25,7 @@
             this.$dispatch('file-selected', this.selectedFileIdentifier);
         }
     }"
-    @scan-files.window="$store.fileViewer.initScanCheck('{{ route('blv.is-scan-required') }}', '{{ route('blv.scan-files') }}', $event.detail)"
+    @scan-files.window="$store.fileViewer.initScanCheck('{{ route('blv.is-scan-required') }}', '{{ route('blv.scan-files') }}')"
     x-init="$nextTick(() => {
         $store.fileViewer.reset();
         $dispatch('scan-files');
