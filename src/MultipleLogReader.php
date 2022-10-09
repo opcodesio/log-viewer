@@ -211,9 +211,9 @@ class MultipleLogReader
     protected function getLogQueryForFile(LogFile $file): LogReader
     {
         return $file->logs()
+            ->setQuery($this->query)
             ->setDirection($this->direction)
             ->setLevels($this->levels)
-            ->setQuery($this->query)
             ->lazyScanning();
     }
 }

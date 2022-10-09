@@ -10,6 +10,8 @@ trait SplitsIndexIntoChunks
 {
     protected int $maxChunkSize;
 
+    protected array $currentChunkDefinition;
+
     protected LogIndexChunk $currentChunk;
 
     protected array $chunkDefinitions = [];
@@ -33,6 +35,11 @@ trait SplitsIndexIntoChunks
 
     public function getCurrentChunk(): LogIndexChunk
     {
+        if (! isset($this->currentChunk)) {
+            $this->currentChunk = LogIndexChunk::fromDefinitionArray($this->currentChunkDefinition);
+            $this->currentChunk->data = Cache::get($this->chunkCacheKey($this->currentChunk->index), []);
+        }
+
         return $this->currentChunk;
     }
 
@@ -40,7 +47,7 @@ trait SplitsIndexIntoChunks
     {
         return [
             ...$this->chunkDefinitions,
-            $this->currentChunk->toArray(),
+            $this->getCurrentChunk()->toArray(),
         ];
     }
 
@@ -61,8 +68,10 @@ trait SplitsIndexIntoChunks
 
     public function getChunkData(int $index): ?array
     {
-        if (isset($this->currentChunk) && $index === $this->currentChunk->index) {
-            $chunkData = $this->currentChunk->data ?? [];
+        $currentChunk = $this->getCurrentChunk();
+
+        if ($index === $currentChunk?->index) {
+            $chunkData = $currentChunk->data ?? [];
         } else {
             $chunkData = Cache::get($this->chunkCacheKey($index));
         }

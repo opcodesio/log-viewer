@@ -10,11 +10,17 @@ it('can set the last-scanned file position', function () {
 
 it('remembers the last-scanned file position', function () {
     $logIndex = createLogIndex();
+    $metaCacheKey = $logIndex->metaCacheKey();
 
     $logIndex->setLastScannedFilePosition($position = 1500);
 
-    $metaCacheResult = Cache::get($logIndex->metaCacheKey());
-    expect($metaCacheResult)
+    // At first, it won't be cached because it's data waiting to be saved.
+    expect(Cache::get($metaCacheKey))
+        ->not->toHaveKey('last_scanned_file_position');
+
+    $logIndex->save();
+
+    expect($metaCacheResult = Cache::get($metaCacheKey))
         ->toHaveKey('last_scanned_file_position')
         ->and($metaCacheResult['last_scanned_file_position'])->toBe($position);
 });

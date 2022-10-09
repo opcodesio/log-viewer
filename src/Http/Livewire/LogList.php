@@ -178,6 +178,7 @@ class LogList extends Component
     {
         LogViewer::getFiles()->each->clearCache();
 
+        $this->query = '';
         $this->cacheRecentlyCleared = true;
 
         $this->dispatchBrowserEvent('scan-files');

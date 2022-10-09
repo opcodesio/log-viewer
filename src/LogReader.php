@@ -75,19 +75,26 @@ class LogReader
     /**
      * Load only the provided log levels
      *
+     * @alias setLevels
      * @param  string|array|null  $levels
-     * @return $this
+     * @return self
      */
     public function only($levels = null): self
+    {
+        return $this->setLevels($levels);
+    }
+
+    /**
+     * Load only the provided log levels
+     *
+     * @param  string|array|null  $levels
+     * @return self
+     */
+    public function setLevels($levels = null): self
     {
         $this->index()->forLevels($levels);
 
         return $this;
-    }
-
-    public function setLevels($levels = null): self
-    {
-        return $this->only($levels);
     }
 
     public function allLevels(): self
@@ -100,10 +107,22 @@ class LogReader
     /**
      * Load all log levels except the provided ones.
      *
+     * @alias exceptLevels
      * @param  string|array|null  $levels
      * @return $this
      */
     public function except($levels = null): self
+    {
+        return $this->exceptLevels($levels);
+    }
+
+    /**
+     * Load all log levels except the provided ones.
+     *
+     * @param  string|array|null  $levels
+     * @return $this
+     */
+    public function exceptLevels($levels = null): self
     {
         $levels = null;
 
@@ -118,11 +137,6 @@ class LogReader
         $this->index()->forLevels($levels);
 
         return $this;
-    }
-
-    public function exceptLevels($levels = null): self
-    {
-        return $this->except($levels);
     }
 
     public static function getDefaultLevels(): array
@@ -363,6 +377,7 @@ class LogReader
         $this->file->setMetaData('size', $this->file->size());
         $this->file->setMetaData('earliest_timestamp', $this->index()->getEarliestTimestamp());
         $this->file->setMetaData('latest_timestamp', $this->index()->getLatestTimestamp());
+        $this->file->setMetaData('last_scanned_file_position', ftell($this->fileHandle));
         $this->file->addRelatedIndex($logIndex);
 
         $this->file->saveMetaData();
@@ -550,7 +565,13 @@ class LogReader
 
     public function numberOfNewBytes(): int
     {
-        return $this->file->size() - $this->index()->getLastScannedFilePosition();
+        $lastScannedFilePosition = $this->file->getLastScannedFilePositionForQuery($this->query);
+
+        if (is_null($lastScannedFilePosition)) {
+            $lastScannedFilePosition = $this->index()->getLastScannedFilePosition();
+        }
+
+        return $this->file->size() - $lastScannedFilePosition;
     }
 
     public function requiresScan(): bool

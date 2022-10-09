@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
@@ -97,10 +98,13 @@ class LogFile
 
     public function addRelatedIndex(LogIndex $logIndex): void
     {
-        $relatedIndexQueries = $this->getMetaData('related_index_queries', []);
-        $relatedIndexQueries[] = $logIndex->getQuery();
+        $relatedIndices = collect($this->getMetaData('related_indices', []));
+        $relatedIndices[$logIndex->identifier()] = Arr::only(
+            $logIndex->getMetadata(),
+            ['query', 'last_scanned_file_position']
+        );
 
-        $this->setMetaData('related_index_queries', array_unique($relatedIndexQueries));
+        $this->setMetaData('related_indices', $relatedIndices->toArray());
     }
 
     protected function relatedCacheKeysKey(): string
@@ -137,8 +141,8 @@ class LogFile
 
     public function clearCache(): void
     {
-        foreach ($this->getMetaData('related_index_queries', []) as $indexQuery) {
-            $logIndex = new LogIndex($this, $indexQuery);
+        foreach ($this->getMetaData('related_indices', []) as $indexIdentifier => $indexMetadata) {
+            $logIndex = new LogIndex($this, $indexMetadata['query']);
             $logIndex->clearCache();
         }
 
@@ -150,6 +154,17 @@ class LogFile
         Cache::forget($this->relatedCacheKeysKey());
 
         $this->index()->clearCache();
+    }
+
+    public function getLastScannedFilePositionForQuery(?string $query = ''): ?int
+    {
+        foreach ($this->getMetaData('related_indices', []) as $indexIdentifier => $indexMetadata) {
+            if ($query === $indexMetadata['query']) {
+                return $indexMetadata['last_scanned_file_position'] ?? 0;
+            }
+        }
+
+        return null;
     }
 
     protected function metaDataCacheKey(): string

@@ -19,9 +19,11 @@ trait CanFilterIndex
 
     public function setQuery(string $query = null): self
     {
-        $this->query = $query;
+        if ($this->query !== $query) {
+            $this->query = $query;
 
-        $this->loadMetadata();
+            $this->loadMetadata();
+        }
 
         return $this;
     }

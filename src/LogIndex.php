@@ -19,7 +19,7 @@ class LogIndex
     use Concerns\CanIterateIndex;
     use Concerns\SplitsIndexIntoChunks;
 
-    const DEFAULT_CHUNK_SIZE = 10_000;
+    const DEFAULT_CHUNK_SIZE = 20_000;
 
     protected int $nextLogIndexToCreate;
 
@@ -32,6 +32,11 @@ class LogIndex
         $this->loadMetadata();
     }
 
+    public function identifier(): string
+    {
+        return md5($this->query ?? '');
+    }
+
     public function getFile(): LogFile
     {
         return $this->file;
@@ -39,16 +44,22 @@ class LogIndex
 
     public function cacheKey(): string
     {
-        return $this->file->cacheKey().':'.md5($this->query ?? '').':log-index';
+        return $this->file->cacheKey().':'.$this->identifier().':log-index';
     }
 
     public function metaCacheKey(): string
     {
-        return $this->file->cacheKey().':'.md5($this->query ?? '').':metadata';
+        return $this->file->cacheKey().':'.$this->identifier().':metadata';
     }
 
     public function cacheTtl(): Carbon
     {
+        if (! empty($this->query)) {
+            // There will be a lot more search queries, and they're usually just one-off searches.
+            // We don't want these to take up too much of Redis/File-cache space for too long.
+            return now()->addDay();
+        }
+
         return now()->addWeek();
     }
 
@@ -71,11 +82,11 @@ class LogIndex
             $timestamp = $timestamp->timestamp;
         }
 
-        $this->currentChunk->addToIndex($logIndex, $filePosition, $timestamp, $severity);
+        $this->getCurrentChunk()->addToIndex($logIndex, $filePosition, $timestamp, $severity);
 
         $this->nextLogIndexToCreate = $logIndex + 1;
 
-        if ($this->currentChunk->size >= $this->getMaxChunkSize()) {
+        if ($this->getCurrentChunk()->size >= $this->getMaxChunkSize()) {
             $this->rotateCurrentChunk();
         }
 
@@ -276,8 +287,6 @@ class LogIndex
     public function setLastScannedFilePosition(int $position): void
     {
         $this->lastScannedFilePosition = $position;
-
-        $this->saveMetadata();
     }
 
     public function getLastScannedFilePosition(): int
@@ -428,20 +437,23 @@ class LogIndex
         return $relevantItemsInChunk;
     }
 
+    public function getMetadata(): array
+    {
+        return [
+            'query' => $this->getQuery(),
+            'identifier' => $this->identifier(),
+            'last_scanned_file_position' => $this->lastScannedFilePosition,
+            'next_log_index_to_create' => $this->nextLogIndexToCreate,
+            'max_chunk_size' => $this->maxChunkSize,
+            'current_chunk_index' => $this->getCurrentChunk()->index,
+            'chunk_definitions' => $this->chunkDefinitions,
+            'current_chunk_definition' => $this->getCurrentChunk()->toArray(),
+        ];
+    }
+
     protected function saveMetadata(): void
     {
-        Cache::put(
-            $this->metaCacheKey(),
-            [
-                'last_scanned_file_position' => $this->lastScannedFilePosition,
-                'next_log_index_to_create' => $this->nextLogIndexToCreate,
-                'max_chunk_size' => $this->maxChunkSize,
-                'current_chunk_index' => $this->currentChunk->index,
-                'chunk_definitions' => $this->chunkDefinitions,
-                'current_chunk_definition' => $this->currentChunk->toArray(),
-            ],
-            $this->cacheTtl()
-        );
+        Cache::put($this->metaCacheKey(), $this->getMetadata(), $this->cacheTtl());
     }
 
     protected function loadMetadata(): void
@@ -452,8 +464,6 @@ class LogIndex
         $this->nextLogIndexToCreate = $data['next_log_index_to_create'] ?? 0;
         $this->maxChunkSize = $data['max_chunk_size'] ?? self::DEFAULT_CHUNK_SIZE;
         $this->chunkDefinitions = $data['chunk_definitions'] ?? [];
-
-        $this->currentChunk = LogIndexChunk::fromDefinitionArray($data['current_chunk_definition'] ?? []);
-        $this->currentChunk->data = Cache::get($this->chunkCacheKey($this->currentChunk->index), []);
+        $this->currentChunkDefinition = $data['current_chunk_definition'] ?? [];
     }
 }
