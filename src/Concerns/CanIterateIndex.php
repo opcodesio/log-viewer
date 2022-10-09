@@ -19,7 +19,7 @@ trait CanIterateIndex
             ? Direction::Backward
             : Direction::Forward;
 
-        return $this;
+        return $this->reset();
     }
 
     public function isForward(): bool
@@ -40,16 +40,12 @@ trait CanIterateIndex
 
     public function backward(): self
     {
-        $this->direction = Direction::Backward;
-
-        return $this;
+        return $this->setDirection(Direction::Backward);
     }
 
     public function forward(): self
     {
-        $this->direction = Direction::Forward;
-
-        return $this;
+        return $this->setDirection(Direction::Forward);
     }
 
     public function next(): ?array

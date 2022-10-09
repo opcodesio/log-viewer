@@ -15,7 +15,7 @@ class MultipleLogReader
 
     protected ?string $query = null;
 
-    protected string $direction = Direction::Forward;
+    protected string $direction;
 
     protected ?array $levels = null;
 
@@ -28,6 +28,8 @@ class MultipleLogReader
         } else {
             $this->fileCollection = $files;
         }
+
+        $this->setDirection(Direction::Forward);
     }
 
     public function setLevels($levels = null): self
@@ -44,20 +46,29 @@ class MultipleLogReader
         return $this;
     }
 
-    public function forward(): self
+    public function setDirection(string $direction = null): self
     {
-        $this->direction = Direction::Forward;
-        $this->fileCollection->sortByEarliestFirst();
+        $this->direction = $direction === Direction::Backward
+            ? Direction::Backward
+            : Direction::Forward;
+
+        if ($this->direction === Direction::Forward) {
+            $this->fileCollection = $this->fileCollection->sortByEarliestFirst();
+        } elseif ($this->direction === Direction::Backward) {
+            $this->fileCollection = $this->fileCollection->sortByLatestFirst();
+        }
 
         return $this;
     }
 
+    public function forward(): self
+    {
+        return $this->setDirection(Direction::Forward);
+    }
+
     public function reverse(): self
     {
-        $this->direction = Direction::Backward;
-        $this->fileCollection->sortByLatestFirst();
-
-        return $this;
+        return $this->setDirection(Direction::Backward);
     }
 
     public function skip(int $number): self
