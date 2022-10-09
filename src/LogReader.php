@@ -76,6 +76,7 @@ class LogReader
      * Load only the provided log levels
      *
      * @alias setLevels
+     *
      * @param  string|array|null  $levels
      * @return self
      */
@@ -108,6 +109,7 @@ class LogReader
      * Load all log levels except the provided ones.
      *
      * @alias exceptLevels
+     *
      * @param  string|array|null  $levels
      * @return $this
      */
