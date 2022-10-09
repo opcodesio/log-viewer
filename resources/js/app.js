@@ -61,11 +61,13 @@ Alpine.store('search', {
         }
     },
     check() {
-        if (this.query === '') return;
-        const queryParams = '?' + new URLSearchParams({ query: this.query });
+        const queryChecked = this.query;
+        if (queryChecked === '') return;
+        const queryParams = '?' + new URLSearchParams({ query: queryChecked });
         fetch(this.searchMoreRoute + queryParams)
             .then((response) => response.json())
             .then((data) => {
+                if (this.query !== queryChecked) return;
                 const wasPreviouslySearching = this.searching;
                 this.searching = data.hasMoreResults;
                 this.percentScanned = data.percentScanned;

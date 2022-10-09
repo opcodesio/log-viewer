@@ -37,7 +37,10 @@ trait SplitsIndexIntoChunks
     {
         if (! isset($this->currentChunk)) {
             $this->currentChunk = LogIndexChunk::fromDefinitionArray($this->currentChunkDefinition);
-            $this->currentChunk->data = Cache::get($this->chunkCacheKey($this->currentChunk->index), []);
+
+            if ($this->currentChunk->size > 0) {
+                $this->currentChunk->data = Cache::get($this->chunkCacheKey($this->currentChunk->index), []);
+            }
         }
 
         return $this->currentChunk;

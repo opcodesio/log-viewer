@@ -71,7 +71,7 @@ class LogList extends Component
         if (isset($file)) {
             $logQuery = $file->logs();
         } elseif (! empty($this->query)) {
-            $logQuery = new MultipleLogReader(LogViewer::getFiles());
+            $logQuery = LogViewer::getFiles()->logs();
         }
 
         if (isset($logQuery)) {

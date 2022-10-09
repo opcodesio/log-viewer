@@ -29,4 +29,9 @@ class LogFileCollection extends Collection
     {
         return $this->sortBy->earliestTimestamp()->first();
     }
+
+    public function logs(): MultipleLogReader
+    {
+        return new MultipleLogReader($this->items);
+    }
 }
