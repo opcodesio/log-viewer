@@ -58,3 +58,13 @@ test('can clear cache of all files from the Livewire component', function () {
 
     expect(Cache::has($cacheKey))->toBeFalse();
 });
+
+test('clearing file cache will also clear the index cache', function () {
+    $logIndex = new \Opcodes\LogViewer\LogIndex($this->file);
+    $logIndex->save();
+    expect(Cache::has($logIndex->metaCacheKey()))->toBeTrue();
+
+    $this->file->clearCache();
+
+    expect(Cache::has($logIndex->metaCacheKey()))->toBeFalse();
+});

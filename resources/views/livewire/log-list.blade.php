@@ -2,24 +2,23 @@
     x-cloak
     x-data
     x-on:file-selected.window="$wire.call('selectFile', $event.detail)"
+    x-on:reload-results.window="$wire.call('reloadResults')"
 >
     <div class="flex flex-col h-full w-full mx-3 mb-4">
         <div class="px-4 mb-4 flex items-start">
             <div class="flex-1 flex items-center mr-6">
-                @isset($selectedFileIdentifier)
+                @if($showLevelsDropdown)
                 <div>@include('log-viewer::partials.log-list-level-buttons')</div>
-                @endisset
+                @endif
             </div>
-            <div class="flex-1 flex @empty($selectedFileIdentifier) justify-end @endempty min-h-[38px]">
-                @isset($selectedFileIdentifier)
+            <div class="flex-1 flex justify-end min-h-[38px]">
                 <div class="flex-1">@include('log-viewer::partials.search-input')</div>
                 <div class="ml-5">@include('log-viewer::partials.log-list-share-page-button')</div>
-                @endisset
                 <div class="ml-2">@include('log-viewer::partials.site-settings-dropdown')</div>
             </div>
         </div>
 
-        @isset($selectedFileIdentifier)
+        @if(isset($logs) && ($logs->isNotEmpty() || !$hasMoreResults))
         <div class="relative overflow-hidden text-sm h-full" x-data x-init="$nextTick(() => {  })">
             <div id="log-item-container" class="log-item-container h-full overflow-y-auto px-4" x-on:scroll="(event) => $store.logViewer.onScroll(event)">
                 <div class="inline-block min-w-full max-w-full align-middle">
@@ -39,12 +38,12 @@
             <span>Description</span>
             <div>
                 <label for="log-sort-direction" class="sr-only">Sort direction</label>
-                <select id="log-sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
+                <select id="log-sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
                     <option value="desc">Newest first</option>
                     <option value="asc">Oldest first</option>
                 </select>
                 <label for="items-per-page" class="sr-only">Items per page</label>
-                <select id="items-per-page" wire:model="perPage" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
+                <select id="items-per-page" wire:model="perPage" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
                     <option value="10">10 items per page</option>
                     <option value="25">25 items per page</option>
                     <option value="50">50 items per page</option>
@@ -93,11 +92,17 @@
     <td colspan="6">
         <div class="bg-white text-gray-600 dark:bg-gray-800 dark:text-gray-200 p-12">
             <div class="text-center font-semibold">No results</div>
-            @if(!empty($query))
             <div class="text-center mt-6">
+                @if(!empty($query))
                 <button class="px-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md" wire:click="clearQuery">Clear search query</button>
+                @endif
+                @if(!empty($query) && isset($file))
+                <button class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md" x-on:click.prevent="selectFile(null)">Search all files</button>
+                @endif
+                @if(isset($levels) && count(array_filter($levels, fn ($level) => $level->selected)) === 0 && count(array_filter($levels, fn ($level) => $level->count > 0)))
+                <button class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md" wire:click="selectAllLevels">Select all severities</button>
+                @endif
             </div>
-            @endif
         </div>
     </td>
 </tr>
@@ -115,8 +120,11 @@
         </div>
         @else
         <div class="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
-            <span wire:loading.remove>Please select a file...</span>
-            <span wire:loading>Loading...</span>
+            @if($hasMoreResults)
+            <span>Searching...</span>
+            @else
+            <span>Select a file or start searching...</span>
+            @endif
         </div>
         @endisset
 

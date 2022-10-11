@@ -4,12 +4,12 @@
     <div class="mx-3 mb-2">
         <h1 class="font-semibold text-emerald-800 dark:text-emerald-600 text-2xl flex items-center">
             Log Viewer
-            <a href="https://www.github.com/opcodesio/log-viewer" target="_blank" class="ml-3 text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 p-1">
+            <a href="https://www.github.com/opcodesio/log-viewer" target="_blank" class="rounded ml-3 text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700 p-1">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><use href="#icon-github" /></svg>
             </a>
         </h1>
         @if($backUrl = config('log-viewer.back_to_system_url'))
-            <a href="{{ $backUrl }}" class="inline-flex items-center text-sm text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 mt-3">
+            <a href="{{ $backUrl }}" class="rounded inline-flex items-center text-sm text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700 mt-3">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1.5" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-arrow-left" /></svg>
                 {{ config('log-viewer.back_to_system_label') ?? 'Back to '.config('app.name') }}
             </a>
@@ -24,7 +24,7 @@
             </div>
             <div class="text-sm text-gray-500 dark:text-gray-400">
                 <label for="file-sort-direction" class="sr-only">Sort direction</label>
-                <select id="file-sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
+                <select id="file-sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
                     <option value="desc">Newest first</option>
                     <option value="asc">Oldest first</option>
                 </select>
@@ -43,7 +43,7 @@
         >
             <div class="folder-item-container"
                  x-on:click="$store.fileViewer.toggle(folder)"
-                 x-bind:class="[$store.fileViewer.isOpen(folder) ? 'active' : '', $store.fileViewer.shouldBeSticky(folder) ? 'sticky z-10' : '']"
+                 x-bind:class="[$store.fileViewer.isOpen(folder) ? 'active-folder' : '', $store.fileViewer.shouldBeSticky(folder) ? 'sticky z-10' : '']"
                  x-bind:style="{ top: $store.fileViewer.isOpen(folder) ? ($store.fileViewer.folderTops[folder] || 0) : 0 }"
                  x-data="dropdown"
                  x-on:keydown.escape.prevent.stop="close($refs.button)"

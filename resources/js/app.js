@@ -43,6 +43,47 @@ Alpine.data('dropdown', () => ({
     }
 }));
 
+Alpine.store('search', {
+    query: '',
+    searchMoreRoute: null,
+    searching: false,
+    percentScanned: 0,
+    error: null,
+    update(query, error, searchMoreRoute, searching = false, percentScanned = 0) {
+        this.query = query;
+        this.error = (error && error !== '') ? error : null;
+        this.searchMoreRoute = searchMoreRoute;
+        this.searching = searching;
+        this.percentScanned = percentScanned;
+
+        if (this.searching) {
+            this.check();
+        }
+    },
+    check() {
+        const queryChecked = this.query;
+        if (queryChecked === '') return;
+        const queryParams = '?' + new URLSearchParams({ query: queryChecked });
+        fetch(this.searchMoreRoute + queryParams)
+            .then((response) => response.json())
+            .then((data) => {
+                if (this.query !== queryChecked) return;
+                const wasPreviouslySearching = this.searching;
+                this.searching = data.hasMoreResults;
+                this.percentScanned = data.percentScanned;
+
+                if (this.searching) {
+                    this.check();
+                } else if (wasPreviouslySearching && !this.searching) {
+                    window.dispatchEvent(new CustomEvent('reload-results'));
+                }
+            });
+    },
+    init() {
+        this.check();
+    },
+});
+
 Alpine.store('fileViewer', {
     scanInProgress: false,
     initScanCheck(routeScanCheck, routeScan) {

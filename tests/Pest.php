@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\File;
+use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\LogIndex;
 use Opcodes\LogViewer\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);
@@ -38,4 +40,21 @@ function generateLogFiles(array $files): void
 function clearGeneratedLogFiles(): void
 {
     File::cleanDirectory(storage_path('logs'));
+}
+
+function createLogIndex($file = null, $query = null, array $predefinedLogs = []): LogIndex
+{
+    if (is_null($file)) {
+        $file = new LogFile('test.log', 'test.log');
+    }
+
+    $logIndex = new LogIndex($file, $query);
+
+    foreach ($predefinedLogs as $predefinedLog) {
+        $logIndex->addToIndex(...$predefinedLog);
+    }
+
+    $logIndex->save();
+
+    return $logIndex;
 }

@@ -64,42 +64,68 @@ class LogList extends Component
     public function render()
     {
         $file = LogViewer::getFile($this->selectedFileIdentifier);
-        $selectedLevels = $this->getSelectedLevels();
-        $logQuery = $file?->logs()->only($selectedLevels);
+        $hasMoreResults = false;
+        $percentScanned = 0;
 
-        try {
-            $logQuery?->search($this->query);
-            if (Str::startsWith($this->query, 'log-index:')) {
-                $logIndex = explode(':', $this->query)[1];
-                $expandAutomatically = intval($logIndex) || $logIndex === '0';
+        if (isset($file)) {
+            $logQuery = $file->logs();
+        } elseif (! empty($this->query)) {
+            $logQuery = LogViewer::getFiles()->logs();
+        }
+
+        if (isset($logQuery)) {
+            if ($this->page < 1) {
+                $this->gotoPage(1);
             }
-        } catch (InvalidRegularExpression $exception) {
-            $this->queryError = $exception->getMessage();
-        }
 
-        if ($this->direction === self::NEWEST_FIRST) {
-            $logQuery?->reverse();
-        }
+            $logQuery->setLevels($this->getSelectedLevels());
 
-        $levels = $logQuery?->getLevelCounts();
-        $logs = $logQuery?->paginate($this->perPage);
+            try {
+                $logQuery->search($this->query);
 
-        if ($logs?->lastPage() < $this->page) {
-            $this->gotoPage($logs?->lastPage() ?? 1);
+                if (isset($file) && Str::startsWith($this->query, 'log-index:')) {
+                    $logIndex = explode(':', $this->query)[1];
+                    $expandAutomatically = intval($logIndex) || $logIndex === '0';
+                }
 
-            // re-create the paginator instance to fix a bug
-            $logs = $logQuery?->paginate($this->perPage);
-        } elseif ($this->page < 1) {
-            $this->gotoPage(1);
+                if ($this->direction === self::NEWEST_FIRST) {
+                    $logQuery->reverse();
+                }
+
+                $logQuery->scan(LogViewer::lazyScanChunkSize());
+
+                $logs = $logQuery->paginate($this->perPage);
+                $levels = $logQuery->getLevelCounts();
+
+                if ($logs->lastPage() < $this->page) {
+                    $this->gotoPage($logs->lastPage() ?? 1);
+
+                    // re-create the paginator instance to fix a bug
+                    $logs = $logQuery->paginate($this->perPage);
+                }
+
+                $hasMoreResults = $logQuery->requiresScan();
+                $percentScanned = $logQuery->percentScanned();
+            } catch (InvalidRegularExpression $exception) {
+                $this->queryError = $exception->getMessage();
+            }
         }
 
         return view('log-viewer::livewire.log-list', array_merge([
             'file' => $file,
-            'levels' => $levels,
-            'logs' => $logs,
+            'levels' => $levels ?? [],
+            'logs' => $logs ?? null,
             'expandAutomatically' => $expandAutomatically ?? false,
+            'showLevelsDropdown' => isset($file) || ! empty($this->query),
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
+            'hasMoreResults' => $hasMoreResults,
+            'percentScanned' => $percentScanned,
         ], $this->getRequestPerformanceInfo()));
+    }
+
+    public function submitSearch()
+    {
+        // We don't need to do anything extra. It's just to submit the new query parameter.
     }
 
     public function updatingQuery()
@@ -156,6 +182,7 @@ class LogList extends Component
     {
         LogViewer::getFiles()->each->clearCache();
 
+        $this->query = '';
         $this->cacheRecentlyCleared = true;
 
         $this->dispatchBrowserEvent('scan-files');

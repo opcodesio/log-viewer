@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
@@ -17,6 +18,8 @@ class LogFile
     public string $subFolder = '';
 
     protected array $metaData;
+
+    private array $_logIndexCache;
 
     public function __construct(
         public string $name,
@@ -37,6 +40,15 @@ class LogFile
             basename($filePath),
             $filePath,
         );
+    }
+
+    public function index(string $query = null): LogIndex
+    {
+        if (! isset($this->_logIndexCache[$query])) {
+            $this->_logIndexCache[$query] = new LogIndex($this, $query);
+        }
+
+        return $this->_logIndexCache[$query];
     }
 
     public function logs(): LogReader
@@ -79,9 +91,20 @@ class LogFile
         return now()->addWeek();
     }
 
-    protected function cacheKey(): string
+    public function cacheKey(): string
     {
         return 'log-viewer:'.LogViewer::version().':file:'.md5($this->path);
+    }
+
+    public function addRelatedIndex(LogIndex $logIndex): void
+    {
+        $relatedIndices = collect($this->getMetaData('related_indices', []));
+        $relatedIndices[$logIndex->identifier()] = Arr::only(
+            $logIndex->getMetadata(),
+            ['query', 'last_scanned_file_position']
+        );
+
+        $this->setMetaData('related_indices', $relatedIndices->toArray());
     }
 
     protected function relatedCacheKeysKey(): string
@@ -116,38 +139,31 @@ class LogFile
         return $this->cacheKey().':'.md5($query).':index';
     }
 
-    public function saveIndexDataForQuery(array $indexData, string $query = ''): void
-    {
-        $key = $this->indexCacheKeyForQuery($query);
-        Cache::put($key, $indexData, $this->cacheTtl());
-        $this->addRelatedCacheKey($key);
-    }
-
-    public function getIndexDataForQuery(string $query = '', $default = []): array
-    {
-        return Cache::get($this->indexCacheKeyForQuery($query), $default);
-    }
-
-    public function saveLastScanDataForQuery(array $data, string $query = ''): void
-    {
-        $lastScanKey = $this->indexCacheKeyForQuery($query).':last-scan';
-        Cache::put($lastScanKey, $data, $this->cacheTtl());
-        $this->addRelatedCacheKey($lastScanKey);
-    }
-
-    public function getLastScanDataForQuery(string $query = '', array $default = [0, 0]): array
-    {
-        return Cache::get($this->indexCacheKeyForQuery($query).':last-scan', $default);
-    }
-
     public function clearCache(): void
     {
+        foreach ($this->getMetaData('related_indices', []) as $indexIdentifier => $indexMetadata) {
+            $this->index($indexMetadata['query'])->clearCache();
+        }
+
         foreach ($this->getRelatedCacheKeys() as $relatedCacheKey) {
             Cache::forget($relatedCacheKey);
         }
 
         Cache::forget($this->metaDataCacheKey());
         Cache::forget($this->relatedCacheKeysKey());
+
+        $this->index()->clearCache();
+    }
+
+    public function getLastScannedFilePositionForQuery(?string $query = ''): ?int
+    {
+        foreach ($this->getMetaData('related_indices', []) as $indexIdentifier => $indexMetadata) {
+            if ($query === $indexMetadata['query']) {
+                return $indexMetadata['last_scanned_file_position'] ?? 0;
+            }
+        }
+
+        return null;
     }
 
     protected function metaDataCacheKey(): string
@@ -190,9 +206,9 @@ class LogFile
             ?? (is_file($this->path) ? filemtime($this->path) : 0);
     }
 
-    public function scan(bool $force = false): void
+    public function scan(int $maxBytesToScan = null, bool $force = false): void
     {
-        $this->logs()->scan($force);
+        $this->logs()->scan($maxBytesToScan, $force);
     }
 
     public function requiresScan(): bool

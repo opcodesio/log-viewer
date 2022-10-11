@@ -5,15 +5,11 @@ namespace Opcodes\LogViewer;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
-use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Utils\Utils;
 
 class LogReader
 {
-    const DIRECTION_FORWARD = 'forward';
-
-    const DIRECTION_BACKWARD = 'backward';
-
     /**
      * Cached LogReader instances.
      *
@@ -21,41 +17,15 @@ class LogReader
      */
     public static array $_instances = [];
 
-    protected array $_mergedIndex;
-
     /**
      * @var LogFile
      */
     protected LogFile $file;
 
     /**
-     * Whether the index has been updated. Used to check whether we should write
-     * the new changes to the cache.
-     *
-     * @var bool
+     * Contains an index of file positions where each log entry is located in.
      */
-    protected bool $indexChanged = false;
-
-    /**
-     * Contains an index of file positions where each log is located in.
-     *
-     * @var array
-     */
-    public array $logIndex = [];
-
-    /**
-     * File size when it was last indexed.
-     *
-     * @var int
-     */
-    protected int $lastScanFileSize;
-
-    /**
-     * The log levels that should be read from this file.
-     *
-     * @var array|null
-     */
-    protected ?array $levels = null;
+    protected LogIndex $logIndex;
 
     protected ?int $limit = null;
 
@@ -63,19 +33,14 @@ class LogReader
 
     protected ?int $onlyShowIndex = null;
 
-    /**
-     * The index of the next log to be read
-     *
-     * @var int
-     */
-    protected int $nextLogIndex = 0;
+    protected bool $lazyScanning = false;
 
     /**
      * @var resource|null
      */
     protected $fileHandle = null;
 
-    protected string $direction = self::DIRECTION_FORWARD;
+    protected string $direction = Direction::Forward;
 
     public function __construct(LogFile $file)
     {
@@ -98,37 +63,55 @@ class LogReader
         }
     }
 
+    public function index(): LogIndex
+    {
+        return $this->file->index($this->query);
+    }
+
+    /**
+     * Load only the provided log levels
+     *
+     * @alias setLevels
+     *
+     * @param  string|array|null  $levels
+     * @return self
+     */
+    public function only($levels = null): self
+    {
+        return $this->setLevels($levels);
+    }
+
     /**
      * Load only the provided log levels
      *
      * @param  string|array|null  $levels
-     * @return $this
+     * @return self
      */
-    public function only($levels = null): self
+    public function setLevels($levels = null): self
     {
-        if (is_array($levels)) {
-            $this->levels = [];
-            $defaultLevels = self::getDefaultLevels();
-            $levels = array_map('strtolower', $levels);
-
-            foreach ($levels as $level) {
-                if (in_array($level, $defaultLevels)) {
-                    $this->levels[] = $level;
-                }
-            }
-        } elseif (is_string($levels)) {
-            $level = strtolower($levels);
-
-            if (in_array($level, self::getDefaultLevels())) {
-                $this->levels = [$level];
-            }
-        } else {
-            $this->levels = null;
-        }
-
-        unset($this->_mergedIndex);
+        $this->index()->forLevels($levels);
 
         return $this;
+    }
+
+    public function allLevels(): self
+    {
+        $this->index()->forLevels(null);
+
+        return $this;
+    }
+
+    /**
+     * Load all log levels except the provided ones.
+     *
+     * @alias exceptLevels
+     *
+     * @param  string|array|null  $levels
+     * @return $this
+     */
+    public function except($levels = null): self
+    {
+        return $this->exceptLevels($levels);
     }
 
     /**
@@ -137,28 +120,21 @@ class LogReader
      * @param  string|array|null  $levels
      * @return $this
      */
-    public function except($levels = null): self
+    public function exceptLevels($levels = null): self
     {
+        $levels = null;
+
         if (is_array($levels)) {
             $levels = array_map('strtolower', $levels);
-            $this->levels = array_diff(self::getDefaultLevels(), $levels);
+            $levels = array_diff(self::getDefaultLevels(), $levels);
         } elseif (is_string($levels)) {
             $level = strtolower($levels);
-            $this->levels = array_diff(self::getDefaultLevels(), [$level]);
-        } else {
-            $this->levels = null;
+            $levels = array_diff(self::getDefaultLevels(), [$level]);
         }
+
+        $this->index()->forLevels($levels);
 
         return $this;
-    }
-
-    public function getSelectedLevels(): array
-    {
-        if (is_array($this->levels)) {
-            return $this->levels;
-        }
-
-        return self::getDefaultLevels();
     }
 
     public static function getDefaultLevels(): array
@@ -179,8 +155,6 @@ class LogReader
     /**
      * Open the log file for reading. Most other methods will open the file automatically if needed.
      *
-     * @return $this
-     *
      * @throws \Exception
      */
     public function open(): self
@@ -195,10 +169,7 @@ class LogReader
             throw new \Exception('Could not open "'.$this->file->path.'" for reading.');
         }
 
-        $this->logIndex = $this->file->getIndexDataForQuery($this->query ?? '');
-        [$this->lastScanFileSize, $this->nextLogIndex] = $this->file->getLastScanDataForQuery($this->query ?? '');
-
-        if ($this->requiresScan()) {
+        if ($this->requiresScan() && ! $this->lazyScanning) {
             $this->scan();
         } else {
             $this->reset();
@@ -210,8 +181,6 @@ class LogReader
     /**
      * Close the file handle.
      *
-     * @return $this
-     *
      * @throws \Exception
      */
     public function close(): self
@@ -222,8 +191,6 @@ class LogReader
 
         if (fclose($this->fileHandle)) {
             $this->fileHandle = null;
-            $this->nextLogIndex = 0;
-            unset($this->lastScanFileSize);
         } else {
             throw new \Exception('Could not close the file "'.$this->file->path.'".');
         }
@@ -233,100 +200,27 @@ class LogReader
 
     public function reverse(): self
     {
-        $this->direction = self::DIRECTION_BACKWARD;
+        $this->direction = Direction::Backward;
+        $this->index()->reverse();
 
         return $this->reset();
     }
 
-    /**
-     * Skip a number of logs
-     *
-     * @param  int  $number
-     * @return $this
-     *
-     * @throws \Exception
-     */
-    public function skip(int $number): self
+    public function setDirection(string $direction = null): self
     {
-        if ($this->isClosed()) {
-            $this->open();
-        }
-
-        $mergedIndex = $this->getMergedIndexForSelectedLevels();
-
-        if (! empty($mergedIndex)) {
-            if ($this->direction === self::DIRECTION_BACKWARD) {
-                // Remember, we're going backwards from highest to lowest indices.
-                foreach ($mergedIndex as $logIndex => $positionInFile) {
-                    if ($logIndex >= $this->nextLogIndex) {
-                        continue;
-                    }
-                    if ($number <= 0) {
-                        break;
-                    }
-
-                    $this->nextLogIndex = $logIndex;
-                    $number--;
-                }
-            } else {
-                // The goal of this loop is to find the first index that matches the current log index
-                foreach ($mergedIndex as $logIndex => $positionInFile) {
-                    if ($logIndex <= $this->nextLogIndex) {
-                        continue;
-                    }
-                    if ($number <= 0) {
-                        break;
-                    }
-
-                    $this->nextLogIndex = $logIndex;
-                    $number--;
-                }
-            }
-
-            if ($number <= 0) {
-                return $this;
-            }
-
-            // otherwise, if there's still a few items to skip (due to not all of them being indexed, for example),
-            // then we will continue below by reading the new logs from the file until we skip the right number.
-        }
-
-        // not cached, thus we must read and discard each log.
-        while ($number > 0) {
-            $log = $this->next();
-
-            if (is_null($log)) {
-                break;
-            }
-
-            $number--;
-        }
+        $this->direction = $direction === Direction::Backward
+            ? Direction::Backward
+            : Direction::Forward;
+        $this->index()->setDirection($this->direction);
 
         return $this;
     }
 
-    public function findPageForIndex(int $targetIndex, int $perPage = 25): int
+    public function skip(int $number): self
     {
-        $mergedIndex = $this->getMergedIndexForSelectedLevels();
-        $currentPage = 1;
-        $counter = 1;
+        $this->index()->skip($number);
 
-        foreach ($mergedIndex as $index => $position) {
-            if ($this->direction === self::DIRECTION_BACKWARD && $index <= $targetIndex) {
-                break;
-            } elseif ($this->direction === self::DIRECTION_FORWARD && $index >= $targetIndex) {
-                break;
-            }
-
-            $counter++;
-
-            if ($counter > $perPage) {
-                $currentPage++;
-                $counter = 1;
-            }
-        }
-
-        return $currentPage;
+        return $this;
     }
 
     public function onlyShow(int $targetIndex = 0): self
@@ -338,12 +232,12 @@ class LogReader
 
     public function limit(int $number): self
     {
-        $this->limit = $number;
+        $this->index()->limit($number);
 
         return $this;
     }
 
-    public function search(string $query = null): self
+    public function setQuery(string $query = null): self
     {
         $this->close();
 
@@ -354,45 +248,37 @@ class LogReader
         } elseif (! empty($query)) {
             $query = '/'.$query.'/i';
 
-            $this->validateRegex($query);
+            Utils::validateRegex($query);
 
             $this->query = $query;
         } else {
             $this->query = null;
         }
 
-        unset($this->lastScanFileSize);
+        $this->index()->setQuery($this->query);
 
         return $this;
     }
 
-    /**
-     * @throws InvalidRegularExpression
-     */
-    protected function validateRegex(string $regexString): void
+    public function search(string $query = null): self
     {
-        $error = null;
-        set_error_handler(function (int $errno, string $errstr) use (&$error) {
-            $error = $errstr;
-        }, E_WARNING);
-        preg_match($regexString, '');
-        restore_error_handler();
+        return $this->setQuery($query);
+    }
 
-        if (! empty($error)) {
-            $error = str_replace('preg_match(): ', '', $error);
-            throw new InvalidRegularExpression($error);
-        }
+    public function lazyScanning($lazy = true): self
+    {
+        $this->lazyScanning = $lazy;
+
+        return $this;
     }
 
     /**
      * This method scans the whole file quickly to index the logs in order to speed up
      * the retrieval of individual logs
      *
-     * @return $this
-     *
      * @throws \Exception
      */
-    public function scan(bool $force = false): self
+    public function scan(int $maxBytesToScan = null, bool $force = false): self
     {
         if ($this->isClosed()) {
             $this->open();
@@ -404,18 +290,17 @@ class LogReader
 
         if ($this->numberOfNewBytes() < 0) {
             // the file reduced in size... something must've gone wrong, so let's
-            // for a full re-index.
+            // force a full re-index.
             $force = true;
         }
 
         if ($force) {
             // when forcing, make sure we start from scratch and reset everything.
-            $this->logIndex = [];
-            $this->nextLogIndex = 0;
-            $this->lastScanFileSize = 0;
+            $this->index()->clearCache();
         }
 
         // we don't care about the selected levels here, we should scan everything
+        $logIndex = $this->index();
         $levels = self::getDefaultLevels();
         $logMatchPattern = LogViewer::logMatchPattern();
         $earliest_timestamp = $this->file->getMetaData('earliest_timestamp');
@@ -423,10 +308,14 @@ class LogReader
         $currentLog = '';
         $currentLogLevel = '';
         $currentTimestamp = null;
-        fseek($this->fileHandle, $this->lastScanFileSize ?? 0);
+        fseek($this->fileHandle, $this->index()->getLastScannedFilePosition());
         $currentLogPosition = ftell($this->fileHandle);
+        $lastPositionToScan = isset($maxBytesToScan) ? ($currentLogPosition + $maxBytesToScan) : null;
 
-        while (($line = fgets($this->fileHandle, 1024)) !== false) {
+        while (
+            (! isset($lastPositionToScan) || $currentLogPosition < $lastPositionToScan)
+            && ($line = fgets($this->fileHandle, 1024)) !== false
+        ) {
             /**
              * $matches[0] - the full line being checked
              * $matches[1] - the full timestamp in-between the square brackets, including the optional microseconds
@@ -438,10 +327,9 @@ class LogReader
             if (preg_match($logMatchPattern, $line, $matches) === 1) {
                 if ($currentLog !== '') {
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
-                        $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
+                        $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel);
                     }
 
-                    $this->nextLogIndex++;
                     $currentLog = '';
                 }
 
@@ -473,25 +361,24 @@ class LogReader
 
         if ($currentLog !== '' && preg_match($logMatchPattern, $currentLog) === 1) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
-                $this->indexLogPosition($this->nextLogIndex, $currentLogLevel, $currentLogPosition, $currentTimestamp);
+                $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel);
             }
 
-            $this->nextLogIndex++;
             $currentLog = '';
         }
 
-        $this->lastScanFileSize = ftell($this->fileHandle);
-        $this->indexChanged = true;
+        $logIndex->setLastScannedFilePosition(ftell($this->fileHandle));
+        $logIndex->save();
 
         $this->file->setMetaData('name', $this->file->name);
         $this->file->setMetaData('path', $this->file->path);
         $this->file->setMetaData('size', $this->file->size());
-        $this->file->setMetaData('earliest_timestamp', $earliest_timestamp);
-        $this->file->setMetaData('latest_timestamp', $latest_timestamp);
+        $this->file->setMetaData('earliest_timestamp', $this->index()->getEarliestTimestamp());
+        $this->file->setMetaData('latest_timestamp', $this->index()->getLatestTimestamp());
+        $this->file->setMetaData('last_scanned_file_position', ftell($this->fileHandle));
+        $this->file->addRelatedIndex($logIndex);
 
         $this->file->saveMetaData();
-        $this->file->saveIndexDataForQuery($this->logIndex, $this->query ?? '');
-        $this->file->saveLastScanDataForQuery([$this->lastScanFileSize, $this->nextLogIndex], $this->query ?? '');
 
         // Let's reset the position in preparation for real log reads.
         rewind($this->fileHandle);
@@ -501,18 +388,7 @@ class LogReader
 
     public function reset(): self
     {
-        unset($this->_mergedIndex);
-        $index = $this->getMergedIndexForSelectedLevels();
-
-        if (empty($index)) {
-            $index = [0];
-        }
-
-        if ($this->direction === self::DIRECTION_FORWARD) {
-            $this->nextLogIndex = min(array_keys($index));
-        } elseif ($this->direction === self::DIRECTION_BACKWARD) {
-            $this->nextLogIndex = max(array_keys($index));
-        }
+        $this->index()->reset();
 
         return $this;
     }
@@ -524,30 +400,19 @@ class LogReader
      */
     public function getLevelCounts(): array
     {
-        if (! $this->isOpen()) {
+        if ($this->isClosed()) {
             $this->open();
         }
 
-        $selectedLevels = $this->getSelectedLevels();
-        $counts = [];
+        $selectedLevels = $this->index()->getSelectedLevels();
 
-        foreach (self::getDefaultLevels() as $level) {
-            $countForThisLevel = 0;
-
-            if (isset($this->logIndex[$level])) {
-                foreach ($this->logIndex[$level] as $timestamp => $timestampIndex) {
-                    $countForThisLevel += count($timestampIndex ?? []);
-                }
-            }
-
-            $counts[$level] = new LevelCount(
+        return $this->index()->getLevelCounts()->map(function (int $count, string $level) use ($selectedLevels) {
+            return new LevelCount(
                 Level::from($level),
-                $countForThisLevel,
+                $count,
                 in_array($level, $selectedLevels)
             );
-        }
-
-        return $counts;
+        })->toArray();
     }
 
     /**
@@ -562,19 +427,18 @@ class LogReader
 
         $logs = [];
 
-        while (($log = $this->next()) && (is_null($this->limit) || $this->limit > 0)) {
+        while ($log = $this->next()) {
             $logs[] = $log;
-            $this->limit--;
         }
-
-        $this->limit = null;
 
         return $logs;
     }
 
     public function getLogAtIndex(int $index): ?Log
     {
-        [$level, $text, $position] = $this->getLogTextAtIndex($index);
+        $position = $this->index()->getPositionForIndex($index);
+
+        [$level, $text, $position] = $this->getLogText($index, $position);
 
         // If we did not find any logs, this means either the file is empty, or
         // we have already reached the end of file. So we return early.
@@ -582,32 +446,34 @@ class LogReader
             return null;
         }
 
-        $log = $this->makeLog($text, $position);
-        $log->index = $index;
-
-        return $log;
+        return $this->makeLog($text, $position, $index);
     }
 
     public function next(): ?Log
     {
-        $levels = $this->getSelectedLevels();
+        // We open it here to make we also check for possible need of index re-building.
+        if ($this->isClosed()) {
+            $this->open();
+        }
 
-        [$level, $text, $position] = $this->getLogTextAtIndex($this->nextLogIndex);
+        [$index, $position] = $this->index()->next();
+
+        if (is_null($index)) {
+            return null;
+        }
+
+        [$level, $text, $position] = $this->getLogText($index, $position);
 
         if (empty($text)) {
             return null;
         }
 
-        $nextLog = $this->makeLog($text, $position);
-
-        $this->setNextLogIndex();
-
-        return $nextLog;
+        return $this->makeLog($text, $position, $index);
     }
 
     public function total(): int
     {
-        return count($this->getMergedIndexForSelectedLevels());
+        return $this->index()->total();
     }
 
     /**
@@ -649,27 +515,23 @@ class LogReader
         );
     }
 
-    protected function makeLog(string $text, int $filePosition, $index = null)
+    protected function makeLog(string $text, int $filePosition, int $index)
     {
-        return new Log($index ?? $this->nextLogIndex, $text, $this->file->identifier, $filePosition);
+        return new Log($index, $text, $this->file->identifier, $filePosition);
     }
 
     /**
      * @param  int  $index
+     * @param  int  $position
+     * @param  bool  $fullText
      * @return array|null Returns an array, [$level, $text, $position]
      *
      * @throws \Exception
      */
-    protected function getLogTextAtIndex(int $index): ?array
+    protected function getLogText(int $index, int $position, bool $fullText = false): ?array
     {
         if ($this->isClosed()) {
             $this->open();
-        }
-
-        $position = $this->getLogPositionFromIndex($index);
-
-        if (is_null($position)) {
-            return null;
         }
 
         fseek($this->fileHandle, $position, SEEK_SET);
@@ -699,104 +561,15 @@ class LogReader
         return [$currentLogLevel, $currentLog, $position];
     }
 
-    protected function getLogPositionFromIndex(int $index): ?int
+    public function numberOfNewBytes(): int
     {
-        $fullIndex = $this->getMergedIndexForSelectedLevels();
+        $lastScannedFilePosition = $this->file->getLastScannedFilePositionForQuery($this->query);
 
-        return $fullIndex[$index] ?? null;
-    }
-
-    protected function setNextLogIndex(): void
-    {
-        $numberSet = false;
-
-        if ($this->direction === self::DIRECTION_FORWARD) {
-            foreach ($this->getMergedIndexForSelectedLevels() as $logIndex => $logPosition) {
-                if ($logIndex <= $this->nextLogIndex) {
-                    continue;
-                }
-
-                $this->nextLogIndex = $logIndex;
-                $numberSet = true;
-                break;
-            }
-
-            if (! $numberSet) {
-                $this->nextLogIndex++;
-            }
-        } else {
-            foreach ($this->getMergedIndexForSelectedLevels() as $logIndex => $logPosition) {
-                if ($logIndex >= $this->nextLogIndex) {
-                    continue;
-                }
-
-                $this->nextLogIndex = $logIndex;
-                $numberSet = true;
-                break;
-            }
-
-            if (! $numberSet) {
-                $this->nextLogIndex--;
-            }
-        }
-    }
-
-    public function getMergedIndexForSelectedLevels(): array
-    {
-        if (! isset($this->_mergedIndex)) {
-            $this->_mergedIndex = [];
-
-            if (empty($this->logIndex)) {
-                $this->open();
-            }
-
-            foreach ($this->getSelectedLevels() as $level) {
-                if (! isset($this->logIndex[$level])) {
-                    continue;
-                }
-
-                foreach ($this->logIndex[$level] as $timestamp => $timestampIndex) {
-                    foreach ($timestampIndex as $logIndex => $logPosition) {
-                        $this->_mergedIndex[$logIndex] = $logPosition;
-                    }
-                }
-            }
-
-            ksort($this->_mergedIndex);
-
-            if ($this->direction === self::DIRECTION_BACKWARD) {
-                $this->_mergedIndex = array_reverse($this->_mergedIndex, true);
-            }
+        if (is_null($lastScannedFilePosition)) {
+            $lastScannedFilePosition = $this->index()->getLastScannedFilePosition();
         }
 
-        return $this->_mergedIndex ?? [];
-    }
-
-    protected function indexLogPosition(int $index, string $level, int $position, ?int $timestamp = 0): void
-    {
-        if (! isset($this->logIndex[$level])) {
-            $this->logIndex[$level] = [];
-        }
-
-        if (! isset($this->logIndex[$level][$timestamp])) {
-            $this->logIndex[$level][$timestamp] = [];
-        }
-
-        $this->logIndex[$level][$timestamp][$index] = $position;
-        $this->indexChanged = true;
-    }
-
-    protected function getIndexedLogPosition(int $index): ?int
-    {
-        foreach ($this->logIndex as $levelIndex) {
-            foreach ($levelIndex as $timestampIndex) {
-                if (isset($timestampIndex[$index])) {
-                    return $timestampIndex[$index];
-                }
-            }
-        }
-
-        return null;
+        return $this->file->size() - $lastScannedFilePosition;
     }
 
     public function requiresScan(): bool
@@ -804,13 +577,9 @@ class LogReader
         return $this->numberOfNewBytes() !== 0;
     }
 
-    public function numberOfNewBytes(): int
+    public function percentScanned(): int
     {
-        if (! isset($this->lastScanFileSize)) {
-            [$this->lastScanFileSize, $this->nextLogIndex] = $this->file->getLastScanDataForQuery($this->query ?? '');
-        }
-
-        return $this->file->size() - ($this->lastScanFileSize ?? 0);
+        return 100 - intval(($this->numberOfNewBytes() / $this->file->size() * 100));
     }
 
     public function __destruct()

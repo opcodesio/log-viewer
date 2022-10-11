@@ -1,5 +1,5 @@
 @php
-    $levelsFound = array_filter($levels, fn ($level) => $level->count > 0);
+    $levelsFound = array_filter($levels ?? [], fn ($level) => $level->count > 0);
     $levelsSelected = array_values(array_filter($levelsFound, fn ($level) => $level->selected));
     $totalLogsFound = array_sum(array_map(fn ($level) => $level->count, $levelsFound));
 @endphp
@@ -14,13 +14,13 @@
                 x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')"
         >
             @if(count($levelsSelected) > 2)
-            <span class="opacity-90 mr-1">{{ number_format($logs->total()) }} entries in</span>
+            <span class="opacity-90 mr-1">{{ number_format($logs->total()) }}@if($hasMoreResults)+@endif entries in</span>
             <strong class="font-semibold">{{ $levelsSelected[0]->level->getName() }} + {{ count($levelsSelected) - 1 }} more</strong>
             @elseif(count($levelsSelected) > 0)
-            <span class="opacity-90 mr-1">{{ number_format($logs->total()) }} entries in</span>
+            <span class="opacity-90 mr-1">{{ number_format($logs->total()) }}@if($hasMoreResults)+@endif entries in</span>
             <strong class="font-semibold">{{ implode(', ', array_map(fn ($levelCount) => $levelCount->level->getName(), $levelsSelected)) }}</strong>
             @elseif(count($levelsFound))
-            <span class="opacity-90">{{ number_format($totalLogsFound) }} entries found. None selected</span>
+            <span class="opacity-90">{{ number_format($totalLogsFound) }}@if($hasMoreResults)+@endif entries found. None selected</span>
             @else
             <span class="opacity-90">No entries found</span>
             @endif
