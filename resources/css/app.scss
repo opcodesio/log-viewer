@@ -12,7 +12,7 @@ html.dark {
         @apply whitespace-nowrap;
 
         &:focus {
-            @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-600;
+            @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-700;
         }
 
         & > svg {
@@ -375,14 +375,14 @@ html.dark {
 }
 
 .search {
-    @apply relative overflow-hidden bg-white border rounded-md text-sm w-full flex items-center dark:bg-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-100 transition duration-200;
+    @apply relative bg-white border rounded-md text-sm w-full flex items-center dark:bg-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-100 transition duration-200;
 
     .prefix-icon {
-        @apply ml-3 mr-1 text-gray-500 dark:text-gray-400;
+        @apply ml-3 mr-1 text-gray-400 dark:text-gray-500;
     }
 
     input {
-        @apply px-1 mx-1 py-1 my-1 rounded flex-1 bg-inherit ring-2 ring-transparent;
+        @apply w-full px-1 py-1 rounded flex-1 bg-inherit ring-2 ring-transparent transition duration-200;
         &:focus {
             @apply outline-none ring-emerald-500 dark:ring-emerald-700 border-transparent;
         }
@@ -390,12 +390,20 @@ html.dark {
     &.has-error {
         @apply border-red-600;
     }
-    .clear-search {
-        @apply mr-1;
+    .submit-search {
         button {
-            @apply rounded text-gray-500 dark:text-gray-400 p-1;
-            &:hover { @apply text-gray-600 dark:text-gray-300; }
-            &:focus { @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-600; }
+            @apply flex rounded-r items-center bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-2 transition duration-200;
+            &:hover { @apply bg-gray-200 dark:bg-gray-600; }
+            &:focus { @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-700; }
+            & > svg { @apply h-5 w-5 ml-1 opacity-75; }
+        }
+    }
+    .clear-search {
+        @apply absolute right-0 top-0;
+        button {
+            @apply rounded text-gray-400 dark:text-gray-500 p-1 transition duration-200;
+            &:hover { @apply text-gray-600 dark:text-gray-400; }
+            &:focus { @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-700; }
             & > svg { @apply h-5 w-5; }
         }
     }

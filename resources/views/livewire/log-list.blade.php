@@ -38,12 +38,12 @@
             <span>Description</span>
             <div>
                 <label for="log-sort-direction" class="sr-only">Sort direction</label>
-                <select id="log-sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
+                <select id="log-sort-direction" wire:model="direction" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
                     <option value="desc">Newest first</option>
                     <option value="asc">Oldest first</option>
                 </select>
                 <label for="items-per-page" class="sr-only">Items per page</label>
-                <select id="items-per-page" wire:model="perPage" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-600">
+                <select id="items-per-page" wire:model="perPage" class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
                     <option value="10">10 items per page</option>
                     <option value="25">25 items per page</option>
                     <option value="50">50 items per page</option>

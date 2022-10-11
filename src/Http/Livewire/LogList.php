@@ -123,6 +123,11 @@ class LogList extends Component
         ], $this->getRequestPerformanceInfo()));
     }
 
+    public function submitSearch()
+    {
+        // We don't need to do anything extra. It's just to submit the new query parameter.
+    }
+
     public function updatingQuery()
     {
         $this->resetPage();
