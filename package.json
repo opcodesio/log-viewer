@@ -1,4 +1,6 @@
 {
+    "name": "opcodesio/log-viewer",
+    "private": true,
     "scripts": {
         "dev": "mix",
         "watch": "mix watch",
