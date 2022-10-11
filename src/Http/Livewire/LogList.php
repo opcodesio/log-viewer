@@ -78,8 +78,6 @@ class LogList extends Component
                 $this->gotoPage(1);
             }
 
-            $logQuery->setLevels($this->getSelectedLevels());
-
             try {
                 $logQuery->search($this->query);
 
@@ -93,6 +91,8 @@ class LogList extends Component
                 }
 
                 $logQuery->scan(LogViewer::lazyScanChunkSize());
+
+                $logQuery->setLevels($this->getSelectedLevels());
 
                 $logs = $logQuery->paginate($this->perPage);
                 $levels = $logQuery->getLevelCounts();
