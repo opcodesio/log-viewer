@@ -19,7 +19,7 @@ class LogFile
 
     protected array $metaData;
 
-    protected LogIndex $logIndex;
+    private array $_logIndexCache;
 
     public function __construct(
         public string $name,
@@ -42,13 +42,13 @@ class LogFile
         );
     }
 
-    public function index(): LogIndex
+    public function index(string $query = null): LogIndex
     {
-        if (! isset($this->logIndex)) {
-            $this->logIndex = new LogIndex($this);
+        if (! isset($this->_logIndexCache[$query])) {
+            $this->_logIndexCache[$query] = new LogIndex($this, $query);
         }
 
-        return $this->logIndex;
+        return $this->_logIndexCache[$query];
     }
 
     public function logs(): LogReader
@@ -142,8 +142,7 @@ class LogFile
     public function clearCache(): void
     {
         foreach ($this->getMetaData('related_indices', []) as $indexIdentifier => $indexMetadata) {
-            $logIndex = new LogIndex($this, $indexMetadata['query']);
-            $logIndex->clearCache();
+            $this->index($indexMetadata['query'])->clearCache();
         }
 
         foreach ($this->getRelatedCacheKeys() as $relatedCacheKey) {

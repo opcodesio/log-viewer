@@ -65,11 +65,7 @@ class LogReader
 
     public function index(): LogIndex
     {
-        if (! isset($this->logIndex)) {
-            $this->logIndex = new LogIndex($this->file, $this->query);
-        }
-
-        return $this->logIndex;
+        return $this->file->index($this->query);
     }
 
     /**

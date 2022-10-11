@@ -6,13 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
-/**
- * The idea of this class is to keep a grip on the index of the log file
- * in a sustainable way, such as:
- *   - not having to load the full index into memory (chunking)
- *   - knowing when we should re-build the index
- *   - knowing about the different chunks and which ones are relevant to our search
- */
 class LogIndex
 {
     use Concerns\CanFilterIndex;

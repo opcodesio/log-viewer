@@ -189,12 +189,12 @@ class MultipleLogReader
 
     public function percentScanned(): int
     {
-        $totalFileSize = $this->fileCollection->sum->size();
-        $missingScansSize = $this->fileCollection->sum(function (LogFile $file) {
+        $totalFileBytes = $this->fileCollection->sum->size();
+        $missingScansBytes = $this->fileCollection->sum(function (LogFile $file) {
             return $this->getLogQueryForFile($file)->numberOfNewBytes();
         });
 
-        return 100 - intval($missingScansSize / $totalFileSize * 100);
+        return 100 - intval($missingScansBytes / $totalFileBytes * 100);
     }
 
     public function scan(int $maxBytesToScan = null, bool $force = false): void
