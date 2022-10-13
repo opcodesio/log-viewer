@@ -20,7 +20,15 @@ class IsScanRequiredController
             $file = $filesRequiringScans->filter(fn ($file) => $file->sizeInMB() > 10)->first();
 
             if (is_null($file)) {
-                $file = $filesRequiringScans->sortByDesc(fn ($file) => $file->size())->first();
+                $file = $filesRequiringScans
+                    ->sortByDesc(fn ($file) => $file->size())
+                    ->filter(fn ($file) => $file->size() > 0)
+                    ->first();
+            }
+
+            if (is_null($file)) {
+                // Haven't found any files that are not empty. No scan required.
+                return response()->json(['requires_scan' => false]);
             }
 
             $scanStart = microtime(true);

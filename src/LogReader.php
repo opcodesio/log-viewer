@@ -579,6 +579,11 @@ class LogReader
 
     public function percentScanned(): int
     {
+        if ($this->file->size() <= 0) {
+            // empty file, so assume it has been fully scanned.
+            return 100;
+        }
+
         return 100 - intval(($this->numberOfNewBytes() / $this->file->size() * 100));
     }
 
