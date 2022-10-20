@@ -21,7 +21,7 @@
         </button>
         @else
         <button wire:click="submitSearch">
-            <span>Search {{ isset($file) ? $file->name : 'all files' }}</span>
+            <span>Search {{ isset($file) ? 'in "' . $file->name.'"' : 'all files' }}</span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-arrow-right" /></svg>
         </button>
         @endif
