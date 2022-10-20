@@ -7,7 +7,7 @@
     <div class="flex flex-col h-full w-full mx-3 mb-4">
         <div class="px-4 mb-4 flex items-start">
             <div class="flex-1 flex items-center mr-6">
-                @if($showLevelsDropdown)
+                @if(isset($showLevelsDropdown) && $showLevelsDropdown)
                 <div>@include('log-viewer::partials.log-list-level-buttons')</div>
                 @endif
             </div>
