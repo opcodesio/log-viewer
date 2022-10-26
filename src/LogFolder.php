@@ -47,11 +47,7 @@ class LogFolder
 
         $folder = $this->path;
 
-        if (str_contains($folder, $storageLogsFolder = DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.'logs')) {
-            // If we have /something/storage/logs, then we can remove it to make the string cleaner.
-            // storage/logs is implied on Laravel environments.
-            $folder = str_replace($storageLogsFolder, '', $folder);
-        }
+        $folder = str_replace(LogViewer::basePathForLogs(), 'root'.DIRECTORY_SEPARATOR, $folder);
 
         if ($unixHomePath = getenv('HOME')) {
             $folder = str_replace($unixHomePath, '~', $folder);

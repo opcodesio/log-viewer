@@ -43,7 +43,7 @@
         >
             <div class="folder-item-container"
                  x-on:click="$store.fileViewer.toggle(folder)"
-                 x-bind:class="[$store.fileViewer.isOpen(folder) ? 'active-folder' : '', $store.fileViewer.shouldBeSticky(folder) ? 'sticky z-10' : '']"
+                 x-bind:class="[$store.fileViewer.isOpen(folder) ? 'active-folder' : '', $store.fileViewer.shouldBeSticky(folder) ? 'sticky ' + (open ? 'z-20' : 'z-10') : '' ]"
                  x-bind:style="{ top: $store.fileViewer.isOpen(folder) ? ($store.fileViewer.folderTops[folder] || 0) : 0 }"
                  x-data="dropdown"
                  x-on:keydown.escape.prevent.stop="close($refs.button)"
@@ -52,7 +52,7 @@
             >
                 <div class="file-item">
                     @include('log-viewer::partials.folder-icon')
-                    <div class="file-name @if($folder->isRoot()) text-gray-500 dark:text-gray-400 @endif">{{ $folder->cleanPath() }}</div>
+                    <div class="file-name">@if(\Illuminate\Support\Str::startsWith($folder->cleanPath(),'root'))<span class="text-gray-500 dark:text-gray-400">root</span>{{ substr($folder->cleanPath(), 4) }}@else{{ $folder->cleanPath() }}@endif</div>
                     <button type="button" class="file-dropdown-toggle"
                             x-ref="button" x-on:click.stop="toggle()" :aria-expanded="open" :aria-controls="$id('dropdown-button')"
                     >
