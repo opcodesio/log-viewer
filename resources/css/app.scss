@@ -481,6 +481,7 @@ html.dark {
 
             .file-name {
                 @apply text-sm mr-3 w-full;
+                word-break: break-word;
             }
 
             .file-size {
