@@ -308,6 +308,7 @@ class LogReader
         $currentLog = '';
         $currentLogLevel = '';
         $currentTimestamp = null;
+        $currentIndex = $this->index()->getLastScannedIndex();
         fseek($this->fileHandle, $this->index()->getLastScannedFilePosition());
         $currentLogPosition = ftell($this->fileHandle);
         $lastPositionToScan = isset($maxBytesToScan) ? ($currentLogPosition + $maxBytesToScan) : null;
@@ -327,10 +328,11 @@ class LogReader
             if (preg_match($logMatchPattern, $line, $matches) === 1) {
                 if ($currentLog !== '') {
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
-                        $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel);
+                        $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel, $currentIndex);
                     }
 
                     $currentLog = '';
+                    $currentIndex++;
                 }
 
                 $currentTimestamp = strtotime($matches[1] ?? '');
@@ -361,12 +363,11 @@ class LogReader
 
         if ($currentLog !== '' && preg_match($logMatchPattern, $currentLog) === 1) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
-                $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel);
+                $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel, $currentIndex);
             }
-
-            $currentLog = '';
         }
 
+        $logIndex->setLastScannedIndex($currentIndex);
         $logIndex->setLastScannedFilePosition(ftell($this->fileHandle));
         $logIndex->save();
 
