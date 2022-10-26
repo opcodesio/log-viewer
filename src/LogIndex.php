@@ -18,6 +18,8 @@ class LogIndex
 
     protected int $lastScannedFilePosition;
 
+    protected int $lastScannedIndex;
+
     public function __construct(
         protected LogFile $file,
         protected ?string $query = null
@@ -67,9 +69,9 @@ class LogIndex
         $this->loadMetadata();
     }
 
-    public function addToIndex(int $filePosition, int|Carbon $timestamp, string $severity): int
+    public function addToIndex(int $filePosition, int|Carbon $timestamp, string $severity, int $index = null): int
     {
-        $logIndex = $this->nextLogIndexToCreate ?? 0;
+        $logIndex = $index ?? $this->nextLogIndexToCreate ?? 0;
 
         if ($timestamp instanceof Carbon) {
             $timestamp = $timestamp->timestamp;
@@ -291,6 +293,20 @@ class LogIndex
         return $this->lastScannedFilePosition;
     }
 
+    public function setLastScannedIndex(int $index): void
+    {
+        $this->lastScannedIndex = $index;
+    }
+
+    public function getLastScannedIndex(): int
+    {
+        if (! isset($this->lastScannedIndex)) {
+            $this->loadMetadata();
+        }
+
+        return $this->lastScannedIndex;
+    }
+
     public function incomplete(): bool
     {
         return $this->file->size() !== $this->getLastScannedFilePosition();
@@ -436,6 +452,7 @@ class LogIndex
             'query' => $this->getQuery(),
             'identifier' => $this->identifier(),
             'last_scanned_file_position' => $this->lastScannedFilePosition,
+            'last_scanned_index' => $this->lastScannedIndex,
             'next_log_index_to_create' => $this->nextLogIndexToCreate,
             'max_chunk_size' => $this->maxChunkSize,
             'current_chunk_index' => $this->getCurrentChunk()->index,
@@ -454,6 +471,7 @@ class LogIndex
         $data = Cache::get($this->metaCacheKey(), []);
 
         $this->lastScannedFilePosition = $data['last_scanned_file_position'] ?? 0;
+        $this->lastScannedIndex = $data['last_scanned_index'] ?? 0;
         $this->nextLogIndexToCreate = $data['next_log_index_to_create'] ?? 0;
         $this->maxChunkSize = $data['max_chunk_size'] ?? self::DEFAULT_CHUNK_SIZE;
         $this->chunkDefinitions = $data['chunk_definitions'] ?? [];

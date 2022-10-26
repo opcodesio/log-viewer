@@ -49,6 +49,19 @@ it('can index a log entry', function () {
         ]);
 });
 
+it('can optionally provide a specific index', function () {
+    $logIndex = createLogIndex();
+
+    $indexGenerated = $logIndex->addToIndex(
+        100,
+        now()->subMinute(),
+        'info',
+        $indexProvided = 10
+    );
+
+    expect($indexGenerated)->toBe($indexProvided);
+});
+
 it('can get a flat index/position array', function () {
     $logIndex = createLogIndex();
     $firstIndexGenerated = $logIndex->addToIndex(
