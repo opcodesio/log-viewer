@@ -19,6 +19,8 @@ class FileList extends Component
 
     public ?string $selectedFileIdentifier = null;
 
+    public $selectedFilesArray = null;
+
     public string $direction = self::NEWEST_FIRST;
 
     protected bool $cacheRecentlyCleared;
@@ -29,6 +31,7 @@ class FileList extends Component
         $this->direction = $preferenceStore->get('file_sort_direction', self::NEWEST_FIRST);
 
         $this->selectedFileIdentifier = $selectedFileIdentifier;
+        $this->selectedFilesArray = collect([]);
 
         if (! LogViewer::getFile($this->selectedFileIdentifier)) {
             $this->selectedFileIdentifier = null;
@@ -61,6 +64,25 @@ class FileList extends Component
     public function selectFile(string $name)
     {
         $this->selectedFileIdentifier = $name;
+    }
+
+    public function selectMultipleFiles(string $name)
+    {
+        if ($this->selectedFilesArray->contains($name)) {
+            $this->selectedFilesArray = $this->selectedFilesArray->reject(function ($value) use ($name) {
+                return $value == $name;
+            });
+        } else {
+            $this->selectedFilesArray->push($name);
+        }
+    }
+
+    public function deleteMultipleFiles()
+    {
+        foreach($this->selectedFilesArray as $fileIdentifier){
+            $this->deleteFile($fileIdentifier);
+        }
+        $this->selectedFilesArray = collect([]);
     }
 
     public function deleteFile(string $fileIdentifier)

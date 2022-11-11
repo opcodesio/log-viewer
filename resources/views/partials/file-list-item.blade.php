@@ -1,3 +1,7 @@
+<div class="inline-flex">
+    @can('deleteLogFile', $logFile)
+    <span class="mt-3 pr-2"><input type="checkbox" @if($selectedFilesArray->contains($logFile->identifier)) checked @endif class="form-control" value="{{$logFile->identifier}}" wire:click="selectMultipleFiles('{{$logFile->identifier}}')"></span>
+    @endcan
 <div class="file-item-container"
     x-bind:class="[selectedFileIdentifier && selectedFileIdentifier === '{{ $logFile->identifier }}' ? 'active' : '']"
     wire:key="log-file-{{$logFile->identifier}}"
@@ -52,4 +56,5 @@
             @endcan
         </div>
     </div>
+</div>
 </div>
