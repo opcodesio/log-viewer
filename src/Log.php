@@ -38,8 +38,8 @@ class Log
         $this->index = $index;
         $this->fileIdentifier = $fileIdentifier;
         $this->filePosition = $filePosition;
+        $text = mb_convert_encoding(rtrim($text, "\t\n\r"), 'UTF-8', 'UTF-8');
         $this->fullTextLength = strlen($text);
-        $text = mb_convert_encoding(trim($text), 'UTF-8', 'UTF-8');
 
         $matches = [];
         [$firstLine, $theRestOfIt] = explode("\n", Str::finish($text, "\n"), 2);
