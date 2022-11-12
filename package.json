@@ -1,6 +1,11 @@
 {
-    "name": "opcodesio/log-viewer",
+    "name": "log-viewer",
+    "author": "Arunas Skirius <arunas@belltastic.com>",
     "private": true,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/opcodesio/log-viewer.git"
+    },
     "scripts": {
         "dev": "mix",
         "watch": "mix watch",
@@ -17,6 +22,7 @@
         "resolve-url-loader": "^5.0.0",
         "sass": "^1.53.0",
         "sass-loader": "^12.6.0",
-        "tailwindcss": "^3.1.6"
+        "tailwindcss": "^3.1.6",
+        "loader-utils": ">=2.0.3"
     }
 }

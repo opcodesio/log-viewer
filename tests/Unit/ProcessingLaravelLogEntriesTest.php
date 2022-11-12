@@ -93,3 +93,14 @@ it('finds the correct log level', function ($levelProvided, $levelExpected) {
     ['iNfO', Level::Info],
     ['', Level::None],
 ]);
+
+it('handles missing message', function () {
+    $text = '[2022-11-07 17:51:33] production.ERROR: ';
+
+    $log = new Log(0, $text, 'laravel.log', 0);
+
+    assertEquals('2022-11-07 17:51:33', $log->time?->toDateTimeString());
+    assertEquals(Level::Error, $log->level->value);
+    assertEquals('production', $log->environment);
+    assertEquals('', $log->fullText);
+});
