@@ -95,7 +95,7 @@ it('finds the correct log level', function ($levelProvided, $levelExpected) {
 ]);
 
 it('handles missing message', function () {
-    $text = "[2022-11-07 17:51:33] production.ERROR: ";
+    $text = '[2022-11-07 17:51:33] production.ERROR: ';
 
     $log = new Log(0, $text, 'laravel.log', 0);
 
