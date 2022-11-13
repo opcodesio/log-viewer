@@ -78,6 +78,14 @@ class FileList extends Component
         }
     }
 
+    public function deleteMultipleFiles(array $selectedFilesArray)
+    {
+        foreach($selectedFilesArray as $fileIdentifier){
+            $this->deleteFile($fileIdentifier);
+        }
+        $this->dispatchBrowserEvent('files-deleted');
+    }
+
     public function deleteFolder(string $folderIdentifier)
     {
         $folder = LogViewer::getFolder($folderIdentifier);

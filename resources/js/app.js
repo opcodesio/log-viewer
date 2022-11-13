@@ -106,7 +106,8 @@ Alpine.store('fileViewer', {
                 }
             })
     },
-
+    checkBoxesVisibility:false,
+    filesChecked: [],
     foldersOpen: [],
     foldersInView: [],
     folderTops: {},
@@ -162,6 +163,23 @@ Alpine.store('fileViewer', {
         const container = document.getElementById('file-list-container');
         this.containerTop = container.getBoundingClientRect().top;
         container.scrollTo(0, 0);
+    },
+    isChecked(file) {
+        return this.filesChecked.includes(file);
+    },
+    checkBoxToggle(file){
+        if (this.isChecked(file)) {
+            this.filesChecked = this.filesChecked.filter(f => f !== file);
+        } else {
+            this.filesChecked.push(file);
+        }
+    },
+    showCheckBoxes(){
+        this.checkBoxesVisibility = !this.checkBoxesVisibility;
+    },
+    resetChecks(){
+        this.filesChecked = [];
+        this.checkBoxesVisibility = false;
     }
 });
 

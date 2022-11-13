@@ -1,4 +1,4 @@
-<div class="file-item-container"
+<div class="file-item-container flex"
     x-bind:class="[selectedFileIdentifier && selectedFileIdentifier === '{{ $logFile->identifier }}' ? 'active' : '']"
     wire:key="log-file-{{$logFile->identifier}}"
     wire:click="selectFile('{{ $logFile->identifier }}')"
@@ -8,7 +8,18 @@
     x-on:focusin.window="! $refs.panel.contains($event.target) && close()"
     x-id="['dropdown-button']"
 >
-    <div class="file-item">
+    @can('deleteLogFile', $logFile)
+    <div class="my-auto px-2" x-show="$store.fileViewer.checkBoxesVisibility">
+        <input 
+            type="checkbox"
+            x-init="$watch(`$store.fileViewer.isChecked('{{$logFile->identifier}}')`, (value) => {
+                $el.checked = value;
+            })"
+            x-on:click.stop="$store.fileViewer.checkBoxToggle('{{$logFile->identifier}}')"
+            value="{{$logFile->identifier}}" />
+    </div>
+    @endcan
+    <div class="file-item grow">
         <p class="file-name">{{ $logFile->name }}</p>
         <span class="file-size">{{ $logFile->sizeFormatted() }}</span>
         <button type="button" class="file-dropdown-toggle"
@@ -48,6 +59,10 @@
             <button x-on:click.stop="if (confirm('Are you sure you want to delete the log file \'{{ $logFile->name }}\'? THIS ACTION CANNOT BE UNDONE.')) { $wire.call('deleteFile', '{{ $logFile->identifier }}') }">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-trashcan" /></svg>
                 Delete
+            </button>
+            <button x-on:click.stop="$store.fileViewer.showCheckBoxes()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-trashcan" /></svg>
+                Delete Multiple
             </button>
             @endcan
         </div>
