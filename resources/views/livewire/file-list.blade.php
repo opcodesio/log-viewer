@@ -32,6 +32,17 @@
         </div>
     </div>
 
+    <div class="grid grid-flow-col pr-4 mt-2" x-bind:class="[$store.fileViewer.filesChecked.length ? 'justify-between' : 'justify-end']" x-show="$store.fileViewer.checkBoxesVisibility">
+        <button x-show="$store.fileViewer.filesChecked.length" x-on:click.stop="if (confirm('Are you sure you want to delete selected log files? THIS ACTION CANNOT BE UNDONE.')) { $wire.call('deleteMultipleFiles', $store.fileViewer.filesChecked) }"
+                class="button inline-flex">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-5 mr-1" fill="currentColor"><use href="#icon-trashcan" /></svg>
+            Delete selected files
+        </button>
+        <button class="button inline-flex" x-on:click.stop="$store.fileViewer.showCheckBoxes(); $store.fileViewer.resetChecks()">
+            Cancel <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-5 ml-1" fill="currentColor"><use href="#icon-cross" /></svg>
+        </button>
+    </div>
+
     <div id="file-list-container" class="relative h-full overflow-hidden" x-cloak>
         <div class="pointer-events-none absolute z-10 top-0 h-4 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
         <div class="file-list" x-ref="fileList" x-on:scroll="(event) => $store.fileViewer.onScroll(event)">
@@ -98,14 +109,6 @@
             </div>
 
             <div class="folder-files pl-3 ml-1 border-l border-gray-200 dark:border-gray-800" x-show="$store.fileViewer.isOpen(folder)">
-                <div class="grid grid-flow-col gap-x-32" x-show="$store.fileViewer.filesChecked.length">
-                    <button x-on:click.stop="if (confirm('Are you sure you want to delete selected log files? THIS ACTION CANNOT BE UNDONE.')) { $wire.call('deleteMultipleFiles', $store.fileViewer.filesChecked) }" class="pt-4 pb-3 inline-flex" >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-5" fill="currentColor"><use href="#icon-trashcan" /></svg>&nbsp;<small>Delete Selected Files</small>
-                    </button>
-                    <button class="inline-flex pt-4 pb-3" x-on:click.stop="$store.fileViewer.showCheckBoxes(), $store.fileViewer.resetChecks()">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-5" fill="currentColor"><use href="#icon-cross" /></svg>
-                    </button>
-                </div>
                 @foreach($folder->files() as $logFile)
                     @include('log-viewer::partials.file-list-item', ['logFile' => $logFile])
                 @endforeach
