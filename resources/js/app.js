@@ -106,7 +106,7 @@ Alpine.store('fileViewer', {
                 }
             })
     },
-    checkBoxesVisibility:false,
+    checkBoxesVisibility: false,
     filesChecked: [],
     foldersOpen: [],
     foldersInView: [],

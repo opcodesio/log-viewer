@@ -537,3 +537,18 @@ html.dark {
         @apply outline-none ring-2 ring-emerald-500 dark:ring-emerald-700;
     }
 }
+
+button.button, a.button {
+    @apply block flex items-center w-full px-4 py-2 text-left text-sm outline-emerald-500 dark:outline-emerald-800 text-gray-900 dark:text-gray-200 rounded-md;
+    & > svg {
+        @apply w-4 h-4 text-gray-600 dark:text-gray-400;
+        &.spin {
+            // Spinner is slightly dimmer by default, especially because it's constantly spinning
+            // and it's also a little smaller in size
+            @apply text-gray-600;
+        }
+    }
+}
+button.button:hover, a.button:hover {
+    @apply bg-gray-50 dark:bg-gray-700;
+}
