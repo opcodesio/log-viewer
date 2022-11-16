@@ -98,9 +98,17 @@
             </div>
 
             <div class="folder-files pl-3 ml-1 border-l border-gray-200 dark:border-gray-800" x-show="$store.fileViewer.isOpen(folder)">
-            @foreach($folder->files() as $logFile)
-                @include('log-viewer::partials.file-list-item', ['logFile' => $logFile])
-            @endforeach
+                <div class="grid grid-flow-col gap-x-32" x-show="$store.fileViewer.filesChecked.length">
+                    <button x-on:click.stop="if (confirm('Are you sure you want to delete selected log files? THIS ACTION CANNOT BE UNDONE.')) { $wire.call('deleteMultipleFiles', $store.fileViewer.filesChecked) }" class="pt-4 pb-3 inline-flex" >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-5" fill="currentColor"><use href="#icon-trashcan" /></svg>&nbsp;<small>Delete Selected Files</small>
+                    </button>
+                    <button class="inline-flex pt-4 pb-3" x-on:click.stop="$store.fileViewer.showCheckBoxes(), $store.fileViewer.resetChecks()">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-5" fill="currentColor"><use href="#icon-cross" /></svg>
+                    </button>
+                </div>
+                @foreach($folder->files() as $logFile)
+                    @include('log-viewer::partials.file-list-item', ['logFile' => $logFile])
+                @endforeach
             </div>
         </div>
     @endforeach

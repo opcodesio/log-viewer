@@ -25,6 +25,7 @@
             this.$dispatch('file-selected', this.selectedFileIdentifier);
         }
     }"
+    @files-deleted.window = "$store.fileViewer.resetChecks()"
     @scan-files.window="$store.fileViewer.initScanCheck('{{ route('blv.is-scan-required') }}', '{{ route('blv.scan-files') }}')"
     x-init="$nextTick(() => {
         $store.fileViewer.reset();
