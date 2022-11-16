@@ -80,7 +80,7 @@ class FileList extends Component
 
     public function deleteMultipleFiles(array $selectedFilesArray)
     {
-        foreach($selectedFilesArray as $fileIdentifier){
+        foreach ($selectedFilesArray as $fileIdentifier) {
             $this->deleteFile($fileIdentifier);
         }
         $this->dispatchBrowserEvent('files-deleted');
