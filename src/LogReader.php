@@ -364,6 +364,7 @@ class LogReader
         if ($currentLog !== '' && preg_match($logMatchPattern, $currentLog) === 1) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
                 $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel, $currentIndex);
+                $currentIndex++;
             }
         }
 
