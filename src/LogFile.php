@@ -58,6 +58,8 @@ class LogFile
 
     public function size(): int
     {
+        clearstatcache();
+
         return filesize($this->path);
     }
 
