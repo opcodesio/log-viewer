@@ -279,6 +279,14 @@ Gate::define('deleteLogFolder', function (?User $user, LogFolder $folder) {
 
 **NOTE:** Individual file permissions are also checked before deleting them, to avoid accidental deletion of protected log files.
 
+### Disabling Log Viewer
+
+To disable web access to the Log Viewer, just add an environment variable to your `.env` file:
+
+```env
+LOG_VIEWER_ENABLED=false
+```
+
 ## Troubleshooting
 
 Here are some common problems and solutions.
