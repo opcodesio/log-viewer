@@ -26,7 +26,17 @@ class LogViewerServiceProvider extends ServiceProvider
 
     private function basePath(string $path): string
     {
-        return __DIR__.'/..'.$path;
+        return __DIR__ . '/..' . $path;
+    }
+
+    /**
+     * Check if config is enabled
+     *
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return (bool) $this->app['config']->get("{$this->name}.enabled", true);
     }
 
     public function boot()
@@ -39,6 +49,10 @@ class LogViewerServiceProvider extends ServiceProvider
 
             // registering the command
             $this->commands([GenerateDummyLogsCommand::class]);
+        }
+
+        if (!$this->isEnabled()) {
+            return;
         }
 
         // registering routes
@@ -54,19 +68,19 @@ class LogViewerServiceProvider extends ServiceProvider
             LogViewer::clearFileCache();
         });
 
-        if (! Gate::has('downloadLogFile')) {
+        if (!Gate::has('downloadLogFile')) {
             Gate::define('downloadLogFile', fn (mixed $user, LogFile $file) => true);
         }
 
-        if (! Gate::has('downloadLogFolder')) {
+        if (!Gate::has('downloadLogFolder')) {
             Gate::define('downloadLogFolder', fn (mixed $user, LogFolder $folder) => true);
         }
 
-        if (! Gate::has('deleteLogFile')) {
+        if (!Gate::has('deleteLogFile')) {
             Gate::define('deleteLogFile', fn (mixed $user, LogFile $file) => true);
         }
 
-        if (! Gate::has('deleteLogFolder')) {
+        if (!Gate::has('deleteLogFolder')) {
             Gate::define('deleteLogFolder', fn (mixed $user, LogFolder $folder) => true);
         }
     }
