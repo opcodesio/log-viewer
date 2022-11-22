@@ -2,7 +2,7 @@
 
 namespace Opcodes\LogViewer\Concerns;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Opcodes\LogViewer\Level;
 
 trait CanFilterIndex
@@ -33,13 +33,13 @@ trait CanFilterIndex
         return $this->query;
     }
 
-    public function forDateRange(int|Carbon $from = null, int|Carbon $to = null): self
+    public function forDateRange(int|CarbonInterface $from = null, int|CarbonInterface $to = null): self
     {
-        if ($from instanceof Carbon) {
+        if ($from instanceof CarbonInterface) {
             $from = $from->timestamp;
         }
 
-        if ($to instanceof Carbon) {
+        if ($to instanceof CarbonInterface) {
             $to = $to->timestamp;
         }
 

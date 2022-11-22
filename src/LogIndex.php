@@ -2,7 +2,8 @@
 
 namespace Opcodes\LogViewer;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -47,7 +48,7 @@ class LogIndex
         return $this->file->cacheKey().':'.$this->identifier().':metadata';
     }
 
-    public function cacheTtl(): Carbon
+    public function cacheTtl(): CarbonInterface
     {
         if (! empty($this->query)) {
             // There will be a lot more search queries, and they're usually just one-off searches.
@@ -69,11 +70,11 @@ class LogIndex
         $this->loadMetadata();
     }
 
-    public function addToIndex(int $filePosition, int|Carbon $timestamp, string $severity, int $index = null): int
+    public function addToIndex(int $filePosition, int|CarbonInterface $timestamp, string $severity, int $index = null): int
     {
         $logIndex = $index ?? $this->nextLogIndexToCreate ?? 0;
 
-        if ($timestamp instanceof Carbon) {
+        if ($timestamp instanceof CarbonInterface) {
             $timestamp = $timestamp->timestamp;
         }
 
@@ -338,7 +339,7 @@ class LogIndex
         return $earliestTimestamp;
     }
 
-    public function getEarliestDate(): Carbon
+    public function getEarliestDate(): CarbonInterface
     {
         return Carbon::createFromTimestamp($this->getEarliestTimestamp());
     }
@@ -369,7 +370,7 @@ class LogIndex
         return $latestTimestamp;
     }
 
-    public function getLatestDate(): Carbon
+    public function getLatestDate(): CarbonInterface
     {
         return Carbon::createFromTimestamp($this->getLatestTimestamp());
     }
