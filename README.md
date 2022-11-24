@@ -7,8 +7,7 @@
 <p align="center">
     <a href="#features">Features</a> |
     <a href="#installation">Installation</a> |
-    <a href="#configuration">Configuration</a> |
-    <a href="#authorization">Authorization</a> |
+    <a href="https://log-viewer.opcodes.io/">Documentation</a> |
     <a href="#troubleshooting">Troubleshooting</a> |
     <a href="#credits">Credits</a>
 </p>
@@ -31,6 +30,8 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 
 > 📺 **[Watch a quick 4-minute video](https://www.youtube.com/watch?v=q7SnF2vubRE)** showcasing some Log Viewer features.
 
+> Visit the [official website](https://log-viewer.opcodes.io/).
+
 ### Features
 
 - 📂 **View all the Laravel logs** in your `storage/logs` directory,
@@ -39,7 +40,7 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 - 🔗 **Sharable links** to individual log entries,
 - 🌑 **Dark mode**
 - 💾 **Download & delete** log files from the UI,
-- ☑️ **Horizon** log support,
+- ☑️ **Horizon** log support (up to Horizon v9.20)
 - and more...
 
 ## Get Started
@@ -67,225 +68,7 @@ By default, the application is available at: `{APP_URL}/log-viewer`.
 
 ## Configuration
 
-### Config file
-
-To publish the [config file](https://github.com/opcodesio/log-viewer/blob/main/config/log-viewer.php), run:
-
-```bash
-php artisan vendor:publish --tag="log-viewer-config"
-```
-
-### Route & Middleware
-
-You can easily change the default route and its middleware in the config/log-viewer.php.
-
-See the configuration below:
-
-```php
-    /*
-    |--------------------------------------------------------------------------
-    | Log Viewer Domain
-    |--------------------------------------------------------------------------
-    | You may change the domain where Log Viewer should be active.
-    | If the domain is empty, all domains will be valid.
-    |
-    */
-
-    'route_domain' => null,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Log Viewer Route
-    |--------------------------------------------------------------------------
-    | Log Viewer will be available under this URL.
-    |
-    */
-
-    'route_path' => 'log-viewer',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Log Viewer route middleware.
-    |--------------------------------------------------------------------------
-    | The middleware should enable session and cookies support in order for the Log Viewer to work.
-    | The 'web' middleware will be applied automatically if empty.
-    |
-    */
-
-    'middleware' => ['web'],
-```
-
-## Authorization
-
-Several things can be configured to have different access based on the user logged in, or the log file in action.
-
-Here are the permissions and how to set them up.
-
-### Authorizing Log Viewer access
-
-You can limit who has access to the Log Viewer in several ways.
-
-#### Via "auth" callback
-You can limit access to the Log Viewer by providing a custom authorization callback to the `LogViewer::auth()` method within your `AppServiceProvider`, like so:
-
-```php
-use Opcodes\LogViewer\Facades\LogViewer;
-
-/**
- * Bootstrap any application services.
- *
- * @return void
- */
-public function boot()
-{
-    LogViewer::auth(function ($request) {
-        // return true to allow viewing the Log Viewer.
-    });
-
-    // Here's an example:
-    LogViewer::auth(function ($request) {
-        return $request->user()
-            && in_array($request->user()->email, [
-                // 'john@example.com',
-            ]);
-    });
-}
-```
-
-#### Via "viewLogViewer" gate
-
-Another easy way to limit access to the Log Viewer is via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `viewLogViewer` authorization gate in your `App\Providers\AuthServiceProvider` class:
-
-```php
-use App\Models\User;
-use Illuminate\Support\Facades\Gate;
- 
-/**
- * Register any authentication / authorization services.
- *
- * @return void
- */
-public function boot()
-{
-    $this->registerPolicies();
- 
-    Gate::define('viewLogViewer', function (?User $user) {
-        // return true if the user is allowed access to the Log Viewer
-    });
-}
-```
-
-#### Via middleware
-
-You can easily add [authentication](https://laravel.com/docs/9.x/authentication#protecting-routes) to log viewing routes using popular `auth` middleware in the `config/log-viewer.php`.
-
-If your application doesn't use the default authentication solutions, you can use the `auth.basic` [HTTP Basic Authentication](https://laravel.com/docs/9.x/authentication#http-basic-authentication) middleware.
-
-_**Note:** By default, the `auth.basic` middleware will assume the email column on your users database table is the user's "username"._
-
-See the `auth` middleware configuration below:
-```php
-    /*
-    |--------------------------------------------------------------------------
-    | Log Viewer route middleware.
-    |--------------------------------------------------------------------------
-    | The middleware should enable session and cookies support in order for the Log Viewer to work.
-    | The 'web' middleware will be applied automatically if empty.
-    |
-    */
-
-    'middleware' => ['web', 'auth'],
-```
-
-For authorization using Spatie permissions [see this discussion](https://github.com/opcodesio/log-viewer/discussions/16)
-
-### Authorizing log file download
-
-You can limit the ability to download log files via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `downloadLogFile` authorization gate in your `App\Providers\AuthServiceProvider` class:
-
-```php
-use App\Models\User;
-use Opcodes\LogViewer\LogFile;
-use Illuminate\Support\Facades\Gate;
-
-/**
- * Register any authentication / authorization services.
- *
- * @return void
- */
-public function boot()
-{
-    $this->registerPolicies();
- 
-    Gate::define('downloadLogFile', function (?User $user, LogFile $file) {
-        // return true if the user is allowed to download the specific log file.
-    });
-}
-```
-
-#### Authorizing folder downloads
-
-You can also limit whether whole folders can be downloaded by defining a `downloadLogFolder` authorization gate:
-
-```php
-use Opcodes\LogViewer\LogFolder;
-
-//...
-
-Gate::define('downloadLogFolder', function (?User $user, LogFolder $folder) {
-    // return true if the user is allowed to download the whole folder.
-});
-```
-
-**NOTE:** Individual file permissions are also checked before downloading them, to avoid accidental downloads of protected log files.
-
-### Authorizing log file deletion
-
-You can limit the ability to delete log files via [Laravel Gates](https://laravel.com/docs/9.x/authorization#gates). Just define a `deleteLogFile` authorization gate in your `App\Providers\AuthServiceProvider` class:
-
-```php
-use App\Models\User;
-use Opcodes\LogViewer\LogFile;
-use Illuminate\Support\Facades\Gate;
-
-/**
- * Register any authentication / authorization services.
- *
- * @return void
- */
-public function boot()
-{
-    $this->registerPolicies();
- 
-    Gate::define('deleteLogFile', function (?User $user, LogFile $file) {
-        // return true if the user is allowed to delete the specific log file.
-    });
-}
-```
-
-#### Authorizing folder deletion
-
-You can also limit whether whole folders can be deleted by defining a `deleteLogFolder` authorization gate:
-
-```php
-use Opcodes\LogViewer\LogFolder;
-
-//...
-
-Gate::define('deleteLogFolder', function (?User $user, LogFolder $folder) {
-    // return true if the user is allowed to delete the whole folder.
-});
-```
-
-**NOTE:** Individual file permissions are also checked before deleting them, to avoid accidental deletion of protected log files.
-
-### Disabling Log Viewer
-
-To disable web access to the Log Viewer, just add an environment variable to your `.env` file:
-
-```env
-LOG_VIEWER_ENABLED=false
-```
+Please visit the **[Log Viewer Docs](https://log-viewer.opcodes.io/docs)** to learn about configuring Log Viewer to your needs.
 
 ## Troubleshooting
 
