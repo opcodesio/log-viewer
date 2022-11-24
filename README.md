@@ -30,8 +30,6 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 
 > 📺 **[Watch a quick 4-minute video](https://www.youtube.com/watch?v=q7SnF2vubRE)** showcasing some Log Viewer features.
 
-> Visit the [official website](https://log-viewer.opcodes.io/).
-
 ### Features
 
 - 📂 **View all the Laravel logs** in your `storage/logs` directory,
@@ -42,6 +40,10 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 - 💾 **Download & delete** log files from the UI,
 - ☑️ **Horizon** log support (up to Horizon v9.20)
 - and more...
+
+### Documentation
+
+Documentation can be found on the [official website](https://log-viewer.opcodes.io/).
 
 ## Get Started
 
