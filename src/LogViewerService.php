@@ -87,7 +87,7 @@ class LogViewerService
         if (! isset($this->_cachedFiles)) {
             $this->_cachedFiles = (new LogFileCollection($this->getFilePaths()))
                 ->unique()
-                ->map(fn ($file) => LogFile::fromPath($file))
+                ->map(fn ($filePath) => new LogFile($filePath))
                 ->values();
         }
 

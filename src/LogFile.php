@@ -14,33 +14,24 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogFile
 {
+    public string $path;
+    public string $name;
     public string $identifier;
-
     public string $subFolder = '';
-
     protected array $metaData;
-
     private array $_logIndexCache;
 
-    public function __construct(
-        public string $name,
-        public string $path,
-    ) {
-        $this->identifier = Str::substr(md5($path), -8, 8).'-'.$name;
+    public function __construct(string $path)
+    {
+        $this->path = $path;
+        $this->name = basename($path);
+        $this->identifier = Str::substr(md5($path), -8, 8).'-'.$this->name;
 
         // Let's remove the file name because we already know it.
-        $this->subFolder = str_replace($name, '', $path);
+        $this->subFolder = str_replace($this->name, '', $path);
         $this->subFolder = rtrim($this->subFolder, DIRECTORY_SEPARATOR);
 
         $this->metaData = Cache::get($this->metaDataCacheKey(), []);
-    }
-
-    public static function fromPath(string $filePath): LogFile
-    {
-        return new self(
-            basename($filePath),
-            $filePath,
-        );
     }
 
     public function index(string $query = null): LogIndex

@@ -3,7 +3,7 @@
 use Opcodes\LogViewer\LogFile;
 
 it('can generate a cache key', function () {
-    $file = Mockery::mock(new LogFile('test.log', 'test.log'))
+    $file = Mockery::mock(new LogFile('test.log'))
         ->allows(['cacheKey' => $fileCacheKey = 'file-cache-key']);
     $logIndex = createLogIndex($file);
 
@@ -19,7 +19,7 @@ it('can generate a cache key', function () {
 });
 
 it('can generate a cache key for metadata', function () {
-    $file = Mockery::mock(new LogFile('test.log', 'test.log'))
+    $file = Mockery::mock(new LogFile('test.log'))
         ->allows(['cacheKey' => $fileCacheKey = 'file-cache-key']);
     $logIndex = createLogIndex($file);
 
@@ -35,7 +35,7 @@ it('can generate a cache key for metadata', function () {
 });
 
 it('can generate a cache key for an index chunk', function () {
-    $file = Mockery::mock(new LogFile('test.log', 'test.log'))
+    $file = Mockery::mock(new LogFile('test.log'))
         ->allows(['cacheKey' => $fileCacheKey = 'file-cache-key']);
     $logIndex = createLogIndex($file);
 

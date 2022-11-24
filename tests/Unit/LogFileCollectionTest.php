@@ -10,9 +10,9 @@ test('LogViewer::getFiles() returns a LogFileCollection', function () {
 });
 
 test('LogFileCollection can sort its files by earliest logs first', function () {
-    $firstFile = Mockery::mock(new LogFile('test.log', 'test.log'))
+    $firstFile = Mockery::mock(new LogFile('test.log'))
         ->allows(['earliestTimestamp' => now()->subDay()->timestamp]);
-    $secondFile = Mockery::mock(new LogFile('test2.log', 'test2.log'))
+    $secondFile = Mockery::mock(new LogFile('test2.log'))
         ->allows(['earliestTimestamp' => now()->subDays(2)->timestamp]);
     $collection = new LogFileCollection([$firstFile, $secondFile]);
 
@@ -23,9 +23,9 @@ test('LogFileCollection can sort its files by earliest logs first', function () 
 });
 
 test('LogFileCollection can sort its files by latest logs first', function () {
-    $firstFile = Mockery::mock(new LogFile('test.log', 'test.log'))
+    $firstFile = Mockery::mock(new LogFile('test.log'))
         ->allows(['latestTimestamp' => now()->subDays(2)->timestamp]);
-    $secondFile = Mockery::mock(new LogFile('test2.log', 'test2.log'))
+    $secondFile = Mockery::mock(new LogFile('test2.log'))
         ->allows(['latestTimestamp' => now()->subDay()->timestamp]);
     $collection = new LogFileCollection([$firstFile, $secondFile]);
 
@@ -42,9 +42,9 @@ test('LogFolder::files() returns a LogFileCollection', function () {
 });
 
 test('LogFileCollection can return the latest log file', function () {
-    $firstFile = Mockery::mock(new LogFile('test.log', 'test.log'))
+    $firstFile = Mockery::mock(new LogFile('test.log'))
         ->allows(['latestTimestamp' => now()->subDays(2)->timestamp]);
-    $secondFile = Mockery::mock(new LogFile('test2.log', 'test2.log'))
+    $secondFile = Mockery::mock(new LogFile('test2.log'))
         ->allows(['latestTimestamp' => now()->subDay()->timestamp]);
     $collection = new LogFileCollection([$firstFile, $secondFile]);
 
@@ -54,9 +54,9 @@ test('LogFileCollection can return the latest log file', function () {
 });
 
 test('LogFileCollection can return the earliest log file', function () {
-    $firstFile = Mockery::mock(new LogFile('test.log', 'test.log'))
+    $firstFile = Mockery::mock(new LogFile('test.log'))
         ->allows(['earliestTimestamp' => now()->subDay()->timestamp]);
-    $secondFile = Mockery::mock(new LogFile('test2.log', 'test2.log'))
+    $secondFile = Mockery::mock(new LogFile('test2.log'))
         ->allows(['earliestTimestamp' => now()->subDays(2)->timestamp]);
     $collection = new LogFileCollection([$firstFile, $secondFile]);
 

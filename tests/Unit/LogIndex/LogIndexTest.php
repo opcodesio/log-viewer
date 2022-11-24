@@ -201,7 +201,7 @@ it('can save to the cache after building up the index', function () {
 
 it('can check whether the index is incomplete', function () {
     $logIndex = createLogIndex(
-        Mockery::mock(new LogFile('test.log', 'test.log'))->allows(['size' => 0])
+        Mockery::mock(new LogFile('test.log'))->allows(['size' => 0])
     );
 
     expect($logIndex->incomplete())->toBeFalse();
@@ -209,7 +209,7 @@ it('can check whether the index is incomplete', function () {
     // if we then provide a file with some data in it (fake file size),
     // the log index should be considered incomplete
     $logIndex = createLogIndex(
-        Mockery::mock(new LogFile('test.log', 'test.log'))->allows(['size' => 1000])
+        Mockery::mock(new LogFile('test.log'))->allows(['size' => 1000])
     );
 
     expect($logIndex->incomplete())->toBeTrue();
@@ -218,7 +218,7 @@ it('can check whether the index is incomplete', function () {
     // that the file was scanned at, was 1000. If the file size is still at 1000,
     // then the index should be considered complete.
     $logIndex = createLogIndex(
-        Mockery::mock(new LogFile('test.log', 'test.log'))->allows(['size' => 1000])
+        Mockery::mock(new LogFile('test.log'))->allows(['size' => 1000])
     );
     $logIndex->setLastScannedFilePosition(1000);
 

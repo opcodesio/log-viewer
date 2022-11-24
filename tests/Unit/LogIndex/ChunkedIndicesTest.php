@@ -80,7 +80,7 @@ it('returns null for a non-existent chunk', function () {
 });
 
 it('remembers the number of chunks after re-instantiation', function () {
-    $file = Mockery::mock(new LogFile('laravel.log', 'laravel.log'));
+    $file = Mockery::mock(new LogFile('laravel.log'));
     $logIndex = createLogIndex($file);
     $logIndex->setMaxChunkSize(1);
     // 2 log entries at 1 per chunk = 3 chunks in total (2 full + 1 empty)

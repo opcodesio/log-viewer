@@ -45,7 +45,7 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
     // we perform a regular PHP assertion, so it doesn't count towards the unit test assertion count.
     assert(file_exists($path));
 
-    return new LogFile($fileName, $path);
+    return new LogFile($path);
 }
 
 function dummyLogData(int $lines = null): string
@@ -76,7 +76,7 @@ function makeLogEntry(CarbonInterface $date = null, string $level = 'debug', str
 function createLogIndex($file = null, $query = null, array $predefinedLogs = []): LogIndex
 {
     if (is_null($file)) {
-        $file = new LogFile('test.log', 'test.log');
+        $file = new LogFile('test.log');
     }
 
     $logIndex = new LogIndex($file, $query);

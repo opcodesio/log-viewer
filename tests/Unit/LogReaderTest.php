@@ -29,7 +29,7 @@ it('can re-scan the file after a new entry has been added', function () {
     File::append($this->file->path, PHP_EOL.makeLogEntry());
 
     // re-instantiate the log reader to make sure we don't have anything cached
-    $this->file = new LogFile($this->file->name, $this->file->path);
+    $this->file = new LogFile($this->file->path);
     $logReader = $this->file->logs();
     expect($logReader->requiresScan())->toBeTrue();
 
