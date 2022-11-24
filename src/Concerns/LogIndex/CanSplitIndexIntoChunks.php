@@ -2,10 +2,8 @@
 
 namespace Opcodes\LogViewer\Concerns\LogIndex;
 
-use Illuminate\Support\Facades\Cache;
 use Opcodes\LogViewer\Exceptions\InvalidChunkSizeException;
 use Opcodes\LogViewer\LogIndexChunk;
-use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
 trait CanSplitIndexIntoChunks
 {

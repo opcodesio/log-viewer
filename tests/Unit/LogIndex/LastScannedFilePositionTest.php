@@ -1,5 +1,6 @@
 <?php
 
+use Opcodes\LogViewer\Facades\Cache;
 use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
 it('can set the last-scanned file position', function () {

@@ -2,8 +2,6 @@
 
 namespace Opcodes\LogViewer\Concerns\LogIndex;
 
-use Illuminate\Support\Facades\Cache;
-
 trait HasMetadata
 {
     public function getMetadata(): array

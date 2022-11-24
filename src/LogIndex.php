@@ -3,10 +3,7 @@
 namespace Opcodes\LogViewer;
 
 use Carbon\CarbonInterface;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
-use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
 class LogIndex
 {

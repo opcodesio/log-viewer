@@ -2,24 +2,22 @@
 
 namespace Opcodes\LogViewer;
 
-use Carbon\CarbonInterface;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
-use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Utils\GenerateCacheKey;
 use Opcodes\LogViewer\Utils\Utils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogFile
 {
+    use Concerns\LogFile\HasMetadata;
+    use Concerns\LogFile\CanCacheData;
+
     public string $path;
     public string $name;
     public string $identifier;
     public string $subFolder = '';
-    protected array $metaData;
     private array $_logIndexCache;
 
     public function __construct(string $path)
@@ -32,7 +30,7 @@ class LogFile
         $this->subFolder = str_replace($this->name, '', $path);
         $this->subFolder = rtrim($this->subFolder, DIRECTORY_SEPARATOR);
 
-        $this->metaData = Cache::get($this->metaDataCacheKey(), []);
+        $this->loadMetadata();
     }
 
     public function index(string $query = null): LogIndex
@@ -81,78 +79,20 @@ class LogFile
         return response()->download($this->path);
     }
 
-    protected function cacheTtl(): CarbonInterface
-    {
-        return now()->addWeek();
-    }
-
-    protected function cacheKey(): string
-    {
-        return GenerateCacheKey::for($this);
-    }
-
     public function addRelatedIndex(LogIndex $logIndex): void
     {
-        $relatedIndices = collect($this->getMetaData('related_indices', []));
+        $relatedIndices = collect($this->getMetadata('related_indices', []));
         $relatedIndices[$logIndex->identifier] = Arr::only(
             $logIndex->getMetadata(),
             ['query', 'last_scanned_file_position']
         );
 
-        $this->setMetaData('related_indices', $relatedIndices->toArray());
-    }
-
-    protected function relatedCacheKeysKey(): string
-    {
-        return GenerateCacheKey::for($this, 'related-cache-keys');
-    }
-
-    public function addRelatedCacheKey(string $key): void
-    {
-        $keys = $this->getRelatedCacheKeys();
-        $keys[] = $key;
-        Cache::put(
-            $this->relatedCacheKeysKey(),
-            array_unique($keys),
-            $this->cacheTtl()
-        );
-    }
-
-    protected function getRelatedCacheKeys(): array
-    {
-        return array_merge(
-            Cache::get($this->relatedCacheKeysKey(), []),
-            [
-                $this->indexCacheKeyForQuery(),
-                $this->indexCacheKeyForQuery().':last-scan',
-            ]
-        );
-    }
-
-    protected function indexCacheKeyForQuery(string $query = ''): string
-    {
-        return GenerateCacheKey::for($this, md5($query) . ':index');
-    }
-
-    public function clearCache(): void
-    {
-        foreach ($this->getMetaData('related_indices', []) as $indexIdentifier => $indexMetadata) {
-            $this->index($indexMetadata['query'])->clearCache();
-        }
-
-        foreach ($this->getRelatedCacheKeys() as $relatedCacheKey) {
-            Cache::forget($relatedCacheKey);
-        }
-
-        Cache::forget($this->metaDataCacheKey());
-        Cache::forget($this->relatedCacheKeysKey());
-
-        $this->index()->clearCache();
+        $this->setMetadata('related_indices', $relatedIndices->toArray());
     }
 
     public function getLastScannedFilePositionForQuery(?string $query = ''): ?int
     {
-        foreach ($this->getMetaData('related_indices', []) as $indexIdentifier => $indexMetadata) {
+        foreach ($this->getMetadata('related_indices', []) as $indexIdentifier => $indexMetadata) {
             if ($query === $indexMetadata['query']) {
                 return $indexMetadata['last_scanned_file_position'] ?? 0;
             }
@@ -161,43 +101,15 @@ class LogFile
         return null;
     }
 
-    protected function metaDataCacheKey(): string
-    {
-        return GenerateCacheKey::for($this, 'metadata');
-    }
-
-    public function setMetaData(string $attribute, $value): void
-    {
-        $this->metaData[$attribute] = $value;
-    }
-
-    public function getMetaData(string $attribute = null, $default = null): mixed
-    {
-        if (! isset($this->metaData)) {
-            $this->metaData = Cache::get($this->metaDataCacheKey(), []);
-        }
-
-        if (isset($attribute)) {
-            return $this->metaData[$attribute] ?? $default;
-        }
-
-        return $this->metaData;
-    }
-
-    public function saveMetaData(): void
-    {
-        Cache::put($this->metaDataCacheKey(), $this->metaData, $this->cacheTtl());
-    }
-
     public function earliestTimestamp(): int
     {
-        return $this->getMetaData('earliest_timestamp')
+        return $this->getMetadata('earliest_timestamp')
             ?? (is_file($this->path) ? filemtime($this->path) : 0);
     }
 
     public function latestTimestamp(): int
     {
-        return $this->getMetaData('latest_timestamp')
+        return $this->getMetadata('latest_timestamp')
             ?? (is_file($this->path) ? filemtime($this->path) : 0);
     }
 

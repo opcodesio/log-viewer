@@ -303,8 +303,8 @@ class LogReader
         $logIndex = $this->index();
         $levels = self::getDefaultLevels();
         $logMatchPattern = LogViewer::logMatchPattern();
-        $earliest_timestamp = $this->file->getMetaData('earliest_timestamp');
-        $latest_timestamp = $this->file->getMetaData('latest_timestamp');
+        $earliest_timestamp = $this->file->getMetadata('earliest_timestamp');
+        $latest_timestamp = $this->file->getMetadata('latest_timestamp');
         $currentLog = '';
         $currentLogLevel = '';
         $currentTimestamp = null;
@@ -372,15 +372,15 @@ class LogReader
         $logIndex->setLastScannedFilePosition(ftell($this->fileHandle));
         $logIndex->save();
 
-        $this->file->setMetaData('name', $this->file->name);
-        $this->file->setMetaData('path', $this->file->path);
-        $this->file->setMetaData('size', $this->file->size());
-        $this->file->setMetaData('earliest_timestamp', $this->index()->getEarliestTimestamp());
-        $this->file->setMetaData('latest_timestamp', $this->index()->getLatestTimestamp());
-        $this->file->setMetaData('last_scanned_file_position', ftell($this->fileHandle));
+        $this->file->setMetadata('name', $this->file->name);
+        $this->file->setMetadata('path', $this->file->path);
+        $this->file->setMetadata('size', $this->file->size());
+        $this->file->setMetadata('earliest_timestamp', $this->index()->getEarliestTimestamp());
+        $this->file->setMetadata('latest_timestamp', $this->index()->getLatestTimestamp());
+        $this->file->setMetadata('last_scanned_file_position', ftell($this->fileHandle));
         $this->file->addRelatedIndex($logIndex);
 
-        $this->file->saveMetaData();
+        $this->file->saveMetadata();
 
         // Let's reset the position in preparation for real log reads.
         rewind($this->fileHandle);

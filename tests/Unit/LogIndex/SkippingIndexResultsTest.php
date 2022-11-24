@@ -1,5 +1,7 @@
 <?php
 
+use Opcodes\LogViewer\Facades\Cache;
+
 it('can skip a number of entries in the index', function () {
     $timestamp = now()->subHour()->timestamp;
     $logIndex = createLogIndex(null, null, [

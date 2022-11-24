@@ -3,8 +3,7 @@
 namespace Opcodes\LogViewer\Concerns\LogIndex;
 
 use Carbon\CarbonInterface;
-use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Support\Facades\Cache;
+use Opcodes\LogViewer\Facades\Cache;
 use Opcodes\LogViewer\LogIndexChunk;
 use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
@@ -14,8 +13,8 @@ trait CanCacheIndex
     {
         $this->clearChunksFromCache();
 
-        $this->cache()->forget($this->metaCacheKey());
-        $this->cache()->forget($this->cacheKey());
+        Cache::forget($this->metaCacheKey());
+        Cache::forget($this->cacheKey());
 
         // this will reset all properties to default, because it won't find any cached settings for this index
         $this->loadMetadata();
@@ -23,17 +22,17 @@ trait CanCacheIndex
 
     protected function saveMetadataToCache(): void
     {
-        $this->cache()->put($this->metaCacheKey(), $this->getMetadata(), $this->cacheTtl());
+        Cache::put($this->metaCacheKey(), $this->getMetadata(), $this->cacheTtl());
     }
 
     protected function getMetadataFromCache(): array
     {
-        return $this->cache()->get($this->metaCacheKey(), []);
+        return Cache::get($this->metaCacheKey(), []);
     }
 
     protected function saveChunkToCache(LogIndexChunk $chunk): void
     {
-        $this->cache()->put(
+        Cache::put(
             $this->chunkCacheKey($chunk->index),
             $chunk->data,
             $this->cacheTtl()
@@ -42,13 +41,13 @@ trait CanCacheIndex
 
     protected function getChunkDataFromCache(int $index, $default = null): ?array
     {
-        return $this->cache()->get($this->chunkCacheKey($index), $default);
+        return Cache::get($this->chunkCacheKey($index), $default);
     }
 
     protected function clearChunksFromCache(): void
     {
         foreach ($this->getChunkDefinitions() as $chunkDefinition) {
-            $this->cache()->forget($this->chunkCacheKey($chunkDefinition['index']));
+            Cache::forget($this->chunkCacheKey($chunkDefinition['index']));
         }
     }
 
@@ -65,11 +64,6 @@ trait CanCacheIndex
     protected function chunkCacheKey(int $index): string
     {
         return GenerateCacheKey::for($this, "chunk:$index");
-    }
-
-    protected function cache(): Repository
-    {
-        return app('log-viewer-cache');
     }
 
     protected function cacheTtl(): CarbonInterface
