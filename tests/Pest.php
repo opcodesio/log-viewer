@@ -1,6 +1,6 @@
 <?php
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\File;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogIndex;
@@ -65,9 +65,9 @@ function clearGeneratedLogFiles(): void
     File::cleanDirectory(storage_path('logs'));
 }
 
-function makeLogEntry(Carbon $date = null, string $level = 'debug', string $message = 'Testing log entry'): string
+function makeLogEntry(CarbonInterface $date = null, string $level = 'debug', string $message = 'Testing log entry'): string
 {
-    $dateFormatted = $date instanceof Carbon ? $date->toDateTimeString() : now()->toDateTimeString();
+    $dateFormatted = $date instanceof CarbonInterface ? $date->toDateTimeString() : now()->toDateTimeString();
     $level = strtoupper($level);
 
     return "[$dateFormatted] local.$level: $message";

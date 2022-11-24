@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Carbon\CarbonInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -88,7 +89,7 @@ class LogFile
         return response()->download($this->path);
     }
 
-    protected function cacheTtl()
+    protected function cacheTtl(): CarbonInterface
     {
         return now()->addWeek();
     }

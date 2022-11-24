@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
@@ -11,7 +12,7 @@ class Log
 {
     public int $index;
 
-    public Carbon $time;
+    public CarbonInterface $time;
 
     public Level $level;
 
