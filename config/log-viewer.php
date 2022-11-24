@@ -134,6 +134,15 @@ return [
     | The size in MB of files to scan before updating the progress bar when searching across all files.
     |
     */
+    'cache_driver' => env('LOG_VIEWER_CACHE_DRIVER', null),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Chunk size when scanning log files lazily
+    |--------------------------------------------------------------------------
+    | The size in MB of files to scan before updating the progress bar when searching across all files.
+    |
+    */
 
     'lazy_scan_chunk_size_in_mb' => 200,
 ];

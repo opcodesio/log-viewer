@@ -8,7 +8,7 @@ it('can get the total count of logs in the index', function () {
         [0, now(), 'error'],
     ]);
 
-    expect($logIndex->total())->toBe(4);
+    expect($logIndex->count())->toBe(4);
 });
 
 it('can get the total count after severity filter applied', function () {
@@ -19,8 +19,8 @@ it('can get the total count after severity filter applied', function () {
         [0, now(), 'error'],
     ]);
 
-    expect($logIndex->forLevels('info')->total())->toBe(2)
-        ->and($logIndex->forLevels('debug')->total())->toBe(1)
-        ->and($logIndex->forLevels('error')->total())->toBe(1)
-        ->and($logIndex->forLevels('warning')->total())->toBe(0);
+    expect($logIndex->forLevels('info')->count())->toBe(2)
+        ->and($logIndex->forLevels('debug')->count())->toBe(1)
+        ->and($logIndex->forLevels('error')->count())->toBe(1)
+        ->and($logIndex->forLevels('warning')->count())->toBe(0);
 });

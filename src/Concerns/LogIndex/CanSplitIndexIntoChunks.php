@@ -1,12 +1,13 @@
 <?php
 
-namespace Opcodes\LogViewer\Concerns;
+namespace Opcodes\LogViewer\Concerns\LogIndex;
 
 use Illuminate\Support\Facades\Cache;
 use Opcodes\LogViewer\Exceptions\InvalidChunkSizeException;
 use Opcodes\LogViewer\LogIndexChunk;
+use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
-trait SplitsIndexIntoChunks
+trait CanSplitIndexIntoChunks
 {
     protected int $maxChunkSize;
 
@@ -39,7 +40,7 @@ trait SplitsIndexIntoChunks
             $this->currentChunk = LogIndexChunk::fromDefinitionArray($this->currentChunkDefinition);
 
             if ($this->currentChunk->size > 0) {
-                $this->currentChunk->data = Cache::get($this->chunkCacheKey($this->currentChunk->index), []);
+                $this->currentChunk->data = $this->getChunkDataFromCache($this->currentChunk->index, []);
             }
         }
 
@@ -64,11 +65,6 @@ trait SplitsIndexIntoChunks
         return count($this->getChunkDefinitions());
     }
 
-    public function chunkCacheKey(int $index): string
-    {
-        return $this->cacheKey().':'.$index;
-    }
-
     public function getChunkData(int $index): ?array
     {
         $currentChunk = $this->getCurrentChunk();
@@ -76,16 +72,33 @@ trait SplitsIndexIntoChunks
         if ($index === $currentChunk?->index) {
             $chunkData = $currentChunk->data ?? [];
         } else {
-            $chunkData = Cache::get($this->chunkCacheKey($index));
+            $chunkData = $this->getChunkDataFromCache($index);
         }
 
         return $chunkData;
     }
 
-    protected function clearChunksFromCache(): void
+    protected function rotateCurrentChunk(): void
     {
-        foreach ($this->getChunkDefinitions() as $chunkDefinition) {
-            Cache::forget($this->chunkCacheKey($chunkDefinition['index']));
+        $this->saveChunkToCache($this->currentChunk);
+
+        $this->chunkDefinitions[] = $this->currentChunk->toArray();
+
+        $this->currentChunk = new LogIndexChunk([], $this->currentChunk->index + 1, 0);
+
+        $this->saveMetadata();
+    }
+
+    protected function getRelevantItemsInChunk(array $chunkDefinition): int
+    {
+        $relevantItemsInChunk = 0;
+
+        foreach ($chunkDefinition['level_counts'] as $level => $count) {
+            if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
+                $relevantItemsInChunk += $count;
+            }
         }
+
+        return $relevantItemsInChunk;
     }
 }

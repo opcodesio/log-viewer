@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Cache;
 use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
 it('starts off with an empty index', function () {
     $logIndex = createLogIndex();
@@ -151,7 +152,7 @@ it('tries to fetch the index from the cache first', function () {
         [100, 123, 'info'],
         [200, 123, 'info'],
     ]);
-    $cacheKey = $logIndex->chunkCacheKey(0);
+    $cacheKey = GenerateCacheKey::for($logIndex, 'chunk:0');
     Cache::put(
         $cacheKey,
         $cachedIndexData = [
@@ -168,7 +169,7 @@ it('tries to fetch the index from the cache first', function () {
         now()->addMinute(),
     );
     // reload the log index instance, so it fetches from the cache.
-    $logIndex = createLogIndex($logIndex->getFile());
+    $logIndex = createLogIndex($logIndex->file);
 
     expect($logIndex->get())->toBe($cachedIndexData);
 
@@ -178,7 +179,7 @@ it('tries to fetch the index from the cache first', function () {
 
 it('can save to the cache after building up the index', function () {
     $logIndex = createLogIndex();
-    $cacheKey = $logIndex->chunkCacheKey(0);    // by default, it will save to the first chunk
+    $cacheKey = GenerateCacheKey::for($logIndex, 'chunk:0');    // by default, it will save to the first chunk
     $firstIndexGenerated = $logIndex->addToIndex(
         $firstFilePosition = 1000,
         $firstDate = now()->subMinute(),
@@ -200,28 +201,18 @@ it('can save to the cache after building up the index', function () {
 });
 
 it('can check whether the index is incomplete', function () {
-    $logIndex = createLogIndex(
-        Mockery::mock(new LogFile('test.log'))->allows(['size' => 0])
-    );
-
+    $logFile = generateLogFile('test.log');
+    $logIndex = createLogIndex($logFile);
     expect($logIndex->incomplete())->toBeFalse();
 
-    // if we then provide a file with some data in it (fake file size),
-    // the log index should be considered incomplete
-    $logIndex = createLogIndex(
-        Mockery::mock(new LogFile('test.log'))->allows(['size' => 1000])
-    );
-
+    // if we add some data to the file, the log index should be considered incomplete
+    file_put_contents($logFile->path, makeLogEntry());
+    $logIndex = createLogIndex($logFile);
     expect($logIndex->incomplete())->toBeTrue();
 
-    // Now let's say there's a cached status of this log file, where the last position
-    // that the file was scanned at, was 1000. If the file size is still at 1000,
-    // then the index should be considered complete.
-    $logIndex = createLogIndex(
-        Mockery::mock(new LogFile('test.log'))->allows(['size' => 1000])
-    );
-    $logIndex->setLastScannedFilePosition(1000);
-
+    // if we had manually set the last scanned position to the end of the file, it should be considered complete.
+    $logIndex = createLogIndex($logFile);
+    $logIndex->setLastScannedFilePosition($logFile->size());
     expect($logIndex->incomplete())->toBeFalse();
 });
 
@@ -232,7 +223,7 @@ it('can continue from where it left off after re-instantiation', function () {
     $lastKnownIndex = $logIndex->addToIndex(1000, now(), 'info');
     $logIndex->save();
 
-    $logIndex = createLogIndex($logIndex->getFile());
+    $logIndex = createLogIndex($logIndex->file);
 
     $newestEntryIndex = $logIndex->addToIndex(2000, now(), 'debug');
 

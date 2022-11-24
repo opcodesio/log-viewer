@@ -6,67 +6,29 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
 class LogIndex
 {
-    use Concerns\CanFilterIndex;
-    use Concerns\CanIterateIndex;
-    use Concerns\SplitsIndexIntoChunks;
+    use Concerns\LogIndex\HasMetadata;
+    use Concerns\LogIndex\CanCacheIndex;
+    use Concerns\LogIndex\CanFilterIndex;
+    use Concerns\LogIndex\CanIterateIndex;
+    use Concerns\LogIndex\CanSplitIndexIntoChunks;
+    use Concerns\LogIndex\PreservesIndexingProgress;
 
     const DEFAULT_CHUNK_SIZE = 20_000;
 
+    public string $identifier;
     protected int $nextLogIndexToCreate;
-
     protected int $lastScannedFilePosition;
-
     protected int $lastScannedIndex;
 
     public function __construct(
-        protected LogFile $file,
+        public LogFile $file,
         protected ?string $query = null
     ) {
-        $this->loadMetadata();
-    }
-
-    public function identifier(): string
-    {
-        return md5($this->query ?? '');
-    }
-
-    public function getFile(): LogFile
-    {
-        return $this->file;
-    }
-
-    public function cacheKey(): string
-    {
-        return $this->file->cacheKey().':'.$this->identifier().':log-index';
-    }
-
-    public function metaCacheKey(): string
-    {
-        return $this->file->cacheKey().':'.$this->identifier().':metadata';
-    }
-
-    public function cacheTtl(): CarbonInterface
-    {
-        if (! empty($this->query)) {
-            // There will be a lot more search queries, and they're usually just one-off searches.
-            // We don't want these to take up too much of Redis/File-cache space for too long.
-            return now()->addDay();
-        }
-
-        return now()->addWeek();
-    }
-
-    public function clearCache(): void
-    {
-        $this->clearChunksFromCache();
-
-        Cache::forget($this->metaCacheKey());
-        Cache::forget($this->cacheKey());
-
-        // this will reset all properties to default, because it won't find any cached settings for this index
+        $this->identifier = md5($this->query ?? '');
         $this->loadMetadata();
     }
 
@@ -270,109 +232,10 @@ class LogIndex
     public function save(): void
     {
         if (isset($this->currentChunk)) {
-            Cache::put(
-                $this->chunkCacheKey($this->currentChunk->index),
-                $this->currentChunk->data,
-                $this->cacheTtl()
-            );
+            $this->saveChunkToCache($this->currentChunk);
         }
 
         $this->saveMetadata();
-    }
-
-    public function setLastScannedFilePosition(int $position): void
-    {
-        $this->lastScannedFilePosition = $position;
-    }
-
-    public function getLastScannedFilePosition(): int
-    {
-        if (! isset($this->lastScannedFilePosition)) {
-            $this->loadMetadata();
-        }
-
-        return $this->lastScannedFilePosition;
-    }
-
-    public function setLastScannedIndex(int $index): void
-    {
-        $this->lastScannedIndex = $index;
-    }
-
-    public function getLastScannedIndex(): int
-    {
-        if (! isset($this->lastScannedIndex)) {
-            $this->loadMetadata();
-        }
-
-        return $this->lastScannedIndex;
-    }
-
-    public function incomplete(): bool
-    {
-        return $this->file->size() !== $this->getLastScannedFilePosition();
-    }
-
-    public function getEarliestTimestamp(): ?int
-    {
-        $earliestTimestamp = null;
-
-        if ($this->hasFilters()) {
-            // because it has filters, we can no longer use our chunk definitions, which has
-            // values for the whole index and not just particular levels/dates.
-            foreach ($this->get() as $timestamp => $tsIndex) {
-                $earliestTimestamp = min($timestamp, $earliestTimestamp ?? $timestamp);
-            }
-        } else {
-            foreach ($this->getChunkDefinitions() as $chunkDefinition) {
-                if (! isset($chunkDefinition['earliest_timestamp'])) {
-                    continue;
-                }
-
-                $earliestTimestamp = min(
-                    $chunkDefinition['earliest_timestamp'],
-                    $earliestTimestamp ?? $chunkDefinition['earliest_timestamp']
-                );
-            }
-        }
-
-        return $earliestTimestamp;
-    }
-
-    public function getEarliestDate(): CarbonInterface
-    {
-        return Carbon::createFromTimestamp($this->getEarliestTimestamp());
-    }
-
-    public function getLatestTimestamp(): ?int
-    {
-        $latestTimestamp = null;
-
-        if ($this->hasFilters()) {
-            // because it has filters, we can no longer use our chunk definitions, which has
-            // values for the whole index and not just particular levels/dates.
-            foreach ($this->get() as $timestamp => $tsIndex) {
-                $latestTimestamp = max($timestamp, $latestTimestamp ?? $timestamp);
-            }
-        } else {
-            foreach ($this->getChunkDefinitions() as $chunkDefinition) {
-                if (! isset($chunkDefinition['latest_timestamp'])) {
-                    continue;
-                }
-
-                $latestTimestamp = max(
-                    $chunkDefinition['latest_timestamp'],
-                    $latestTimestamp ?? $chunkDefinition['latest_timestamp']
-                );
-            }
-        }
-
-        return $latestTimestamp;
-    }
-
-    public function getLatestDate(): CarbonInterface
-    {
-        return Carbon::createFromTimestamp($this->getLatestTimestamp());
     }
 
     public function getLevelCounts(): Collection
@@ -397,7 +260,15 @@ class LogIndex
         return $counts;
     }
 
+    /**
+     * @deprecated Will be removed in v2.0. Please use LogIndex::count()
+     */
     public function total(): int
+    {
+        return $this->count();
+    }
+
+    public function count(): int
     {
         return array_reduce($this->getChunkDefinitions(), function ($sum, $chunkDefinition) {
             foreach ($chunkDefinition['level_counts'] as $level => $count) {
@@ -417,65 +288,5 @@ class LogIndex
         } else {
             ksort($array);
         }
-    }
-
-    protected function rotateCurrentChunk(): void
-    {
-        Cache::put(
-            $this->chunkCacheKey($this->currentChunk->index),
-            $this->currentChunk->data,
-            $this->cacheTtl()
-        );
-
-        $this->chunkDefinitions[] = $this->currentChunk->toArray();
-
-        $this->currentChunk = new LogIndexChunk([], $this->currentChunk->index + 1, 0);
-
-        $this->saveMetadata();
-    }
-
-    protected function getRelevantItemsInChunk(array $chunkDefinition): int
-    {
-        $relevantItemsInChunk = 0;
-
-        foreach ($chunkDefinition['level_counts'] as $level => $count) {
-            if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
-                $relevantItemsInChunk += $count;
-            }
-        }
-
-        return $relevantItemsInChunk;
-    }
-
-    public function getMetadata(): array
-    {
-        return [
-            'query' => $this->getQuery(),
-            'identifier' => $this->identifier(),
-            'last_scanned_file_position' => $this->lastScannedFilePosition,
-            'last_scanned_index' => $this->lastScannedIndex,
-            'next_log_index_to_create' => $this->nextLogIndexToCreate,
-            'max_chunk_size' => $this->maxChunkSize,
-            'current_chunk_index' => $this->getCurrentChunk()->index,
-            'chunk_definitions' => $this->chunkDefinitions,
-            'current_chunk_definition' => $this->getCurrentChunk()->toArray(),
-        ];
-    }
-
-    protected function saveMetadata(): void
-    {
-        Cache::put($this->metaCacheKey(), $this->getMetadata(), $this->cacheTtl());
-    }
-
-    protected function loadMetadata(): void
-    {
-        $data = Cache::get($this->metaCacheKey(), []);
-
-        $this->lastScannedFilePosition = $data['last_scanned_file_position'] ?? 0;
-        $this->lastScannedIndex = $data['last_scanned_index'] ?? 0;
-        $this->nextLogIndexToCreate = $data['next_log_index_to_create'] ?? 0;
-        $this->maxChunkSize = $data['max_chunk_size'] ?? self::DEFAULT_CHUNK_SIZE;
-        $this->chunkDefinitions = $data['chunk_definitions'] ?? [];
-        $this->currentChunkDefinition = $data['current_chunk_definition'] ?? [];
     }
 }

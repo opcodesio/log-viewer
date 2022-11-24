@@ -1,6 +1,6 @@
 <?php
 
-namespace Opcodes\LogViewer\Concerns;
+namespace Opcodes\LogViewer\Concerns\LogIndex;
 
 use ArrayIterator;
 use Opcodes\LogViewer\Direction;

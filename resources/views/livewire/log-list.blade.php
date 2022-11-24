@@ -99,7 +99,7 @@
                 @if(!empty($query) && isset($file))
                 <button class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md" x-on:click.prevent="selectFile(null)">Search all files</button>
                 @endif
-                @if(isset($levels) && count(array_filter($levels, fn ($level) => $level->selected)) === 0 && count(array_filter($levels, fn ($level) => $level->count > 0)))
+                @if(isset($levels) && count(array_filter($levels, fn ($level) => $level->count > 0 && $level->selected)) === 0 && count(array_filter($levels, fn ($level) => $level->count > 0)) > 0)
                 <button class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md" wire:click="selectAllLevels">Select all severities</button>
                 @endif
             </div>

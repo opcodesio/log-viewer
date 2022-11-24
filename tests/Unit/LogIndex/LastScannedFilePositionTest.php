@@ -1,5 +1,7 @@
 <?php
 
+use Opcodes\LogViewer\Utils\GenerateCacheKey;
+
 it('can set the last-scanned file position', function () {
     $logIndex = createLogIndex();
 
@@ -10,7 +12,7 @@ it('can set the last-scanned file position', function () {
 
 it('remembers the last-scanned file position', function () {
     $logIndex = createLogIndex();
-    $metaCacheKey = $logIndex->metaCacheKey();
+    $metaCacheKey = GenerateCacheKey::for($logIndex, 'metadata');
 
     $logIndex->setLastScannedFilePosition($position = 1500);
 
@@ -27,15 +29,16 @@ it('remembers the last-scanned file position', function () {
 
 it('fetches the last-scanned file position from the cache first', function () {
     $logIndex = createLogIndex();
+    $metaCacheKey = GenerateCacheKey::for($logIndex, 'metadata');
     Cache::put(
-        $logIndex->metaCacheKey(),
+        $metaCacheKey,
         ['last_scanned_file_position' => $position = 5000],
     );
     // re-instantiate so it picks up the new cache value
-    $logIndex = createLogIndex($logIndex->getFile());
+    $logIndex = createLogIndex($logIndex->file);
 
     expect($logIndex->getLastScannedFilePosition())->toBe($position);
 
     // Make sure to clean up!
-    Cache::forget($logIndex->metaCacheKey());
+    Cache::forget($metaCacheKey);
 });

@@ -1,5 +1,7 @@
 <?php
 
+use Opcodes\LogViewer\Utils\GenerateCacheKey;
+
 it('can fetch a chunk definition for an empty chunk', function () {
     $logIndex = createLogIndex();
     $logIndex->setMaxChunkSize(2);
@@ -85,8 +87,9 @@ it('saves chunks to cache', function () {
     $logIndex->setMaxChunkSize(2);
     $logIndex->addToIndex(1500, now(), 'info');
     $logIndex->addToIndex(2500, now(), 'info');
+    $metaCacheKey = GenerateCacheKey::for($logIndex, 'metadata');
 
-    $cachedMetadata = Cache::get($logIndex->metaCacheKey());
+    $cachedMetadata = Cache::get($metaCacheKey);
 
     expect($cachedMetadata)->toHaveKey('chunk_definitions')
         ->and($cachedMetadata['chunk_definitions'])->toBeArray()->toHaveCount(1)
@@ -96,11 +99,11 @@ it('saves chunks to cache', function () {
     // after adding a new log entry, the cache won't be updated until calling the –>save() method.
     $logIndex->addToIndex(3500, now(), 'info');
 
-    expect(Cache::get($logIndex->metaCacheKey()))->toBe($cachedMetadata);   // still the old value
+    expect(Cache::get($metaCacheKey))->toBe($cachedMetadata);   // still the old value
 
     // after saving, it should be updated:
     $logIndex->save();
-    $updatedCachedMetadata = Cache::get($logIndex->metaCacheKey());
+    $updatedCachedMetadata = Cache::get($metaCacheKey);
 
     expect($updatedCachedMetadata)->not->toBe($cachedMetadata)
         ->toHaveKey('current_chunk_definition')
@@ -119,7 +122,7 @@ it('keeps the chunk definitions after re-instantiating the log index', function 
     $secondChunk = $logIndex->getChunkDefinition(1);
     $logIndex->save();
 
-    $logIndex = createLogIndex($logIndex->getFile());
+    $logIndex = createLogIndex($logIndex->file);
 
     expect($logIndex->getChunkDefinitions())->toHaveCount(2)
         ->and($logIndex->getChunkDefinition(0))->toBe($firstChunk)

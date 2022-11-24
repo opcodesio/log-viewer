@@ -475,7 +475,7 @@ class LogReader
 
     public function total(): int
     {
-        return $this->index()->total();
+        return $this->index()->count();
     }
 
     /**

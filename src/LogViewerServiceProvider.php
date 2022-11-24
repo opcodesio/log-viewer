@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -21,6 +22,9 @@ class LogViewerServiceProvider extends ServiceProvider
         $this->mergeConfigFrom($this->basePath("/config/{$this->name}.php"), $this->name);
 
         $this->app->bind('log-viewer', LogViewerService::class);
+        $this->app->bind('log-viewer-cache', function () {
+            return Cache::driver(config('log-viewer.cache_driver'));
+        });
         $this->app->singleton(PreferenceStore::class, PreferenceStore::class);
     }
 

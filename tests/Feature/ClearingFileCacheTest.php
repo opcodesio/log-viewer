@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Cache;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogIndex;
+use Opcodes\LogViewer\Utils\GenerateCacheKey;
 use function PHPUnit\Framework\assertNotSame;
 
 beforeEach(function () {
@@ -60,11 +62,12 @@ test('can clear cache of all files from the Livewire component', function () {
 });
 
 test('clearing file cache will also clear the index cache', function () {
-    $logIndex = new \Opcodes\LogViewer\LogIndex($this->file);
+    $logIndex = new LogIndex($this->file);
     $logIndex->save();
-    expect(Cache::has($logIndex->metaCacheKey()))->toBeTrue();
+    $metaCacheKey = GenerateCacheKey::for($logIndex, 'metadata');
+    expect(Cache::has($metaCacheKey))->toBeTrue();
 
     $this->file->clearCache();
 
-    expect(Cache::has($logIndex->metaCacheKey()))->toBeFalse();
+    expect(Cache::has($metaCacheKey))->toBeFalse();
 });

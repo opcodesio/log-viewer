@@ -80,15 +80,14 @@ it('returns null for a non-existent chunk', function () {
 });
 
 it('remembers the number of chunks after re-instantiation', function () {
-    $file = Mockery::mock(new LogFile('laravel.log'));
-    $logIndex = createLogIndex($file);
+    $logIndex = createLogIndex();
     $logIndex->setMaxChunkSize(1);
     // 2 log entries at 1 per chunk = 3 chunks in total (2 full + 1 empty)
     $logIndex->addToIndex(1000, now()->subMinute(), 'info');
     $logIndex->addToIndex(1500, now(), 'debug');
     expect($logIndex->getChunkCount())->toBe(3);
 
-    $newInstance = createLogIndex($file);
+    $newInstance = createLogIndex($logIndex->file);
 
     expect($newInstance->getChunkCount())->toBe(3);
 });
@@ -120,7 +119,7 @@ it('combines all chunks when getting the full index', function () {
 
     // after saving and re-instantiating the log, we expect it to persist the index
     $logIndex->save();
-    $logIndex = createLogIndex($logIndex->getFile());
+    $logIndex = createLogIndex($logIndex->file);
 
     expect($logIndex->get())->toBe([
         $firstDate->timestamp => [

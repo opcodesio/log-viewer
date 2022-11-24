@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Utils\GenerateCacheKey;
 use Opcodes\LogViewer\Utils\Utils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -85,15 +86,15 @@ class LogFile
         return now()->addWeek();
     }
 
-    public function cacheKey(): string
+    protected function cacheKey(): string
     {
-        return 'log-viewer:'.LogViewer::version().':file:'.md5($this->path);
+        return GenerateCacheKey::for($this);
     }
 
     public function addRelatedIndex(LogIndex $logIndex): void
     {
         $relatedIndices = collect($this->getMetaData('related_indices', []));
-        $relatedIndices[$logIndex->identifier()] = Arr::only(
+        $relatedIndices[$logIndex->identifier] = Arr::only(
             $logIndex->getMetadata(),
             ['query', 'last_scanned_file_position']
         );
@@ -103,7 +104,7 @@ class LogFile
 
     protected function relatedCacheKeysKey(): string
     {
-        return $this->cacheKey().':related-cache-keys';
+        return GenerateCacheKey::for($this, 'related-cache-keys');
     }
 
     public function addRelatedCacheKey(string $key): void
@@ -117,7 +118,7 @@ class LogFile
         );
     }
 
-    public function getRelatedCacheKeys(): array
+    protected function getRelatedCacheKeys(): array
     {
         return array_merge(
             Cache::get($this->relatedCacheKeysKey(), []),
@@ -130,7 +131,7 @@ class LogFile
 
     protected function indexCacheKeyForQuery(string $query = ''): string
     {
-        return $this->cacheKey().':'.md5($query).':index';
+        return GenerateCacheKey::for($this, md5($query) . ':index');
     }
 
     public function clearCache(): void
@@ -162,7 +163,7 @@ class LogFile
 
     protected function metaDataCacheKey(): string
     {
-        return $this->cacheKey().':metadata';
+        return GenerateCacheKey::for($this, 'metadata');
     }
 
     public function setMetaData(string $attribute, $value): void
