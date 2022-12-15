@@ -4,9 +4,12 @@ namespace Opcodes\LogViewer;
 
 use Composer\InstalledVersions;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\Finder\Glob;
 
 class LogViewerService
 {
@@ -20,29 +23,19 @@ class LogViewerService
 
     protected function getFilePaths(): array
     {
-        // Because we'll use the base path as a parameter for `glob`, we should escape any
-        // glob's special characters and treat those as actual characters of the path.
-        // We can assume this, because it's the actual path of the Laravel app, not a user-defined
-        // search pattern.
-        if (PHP_OS_FAMILY === 'Windows') {
-            $baseDir = str_replace(
-                ['[', ']'],
-                ['{LEFTBRACKET}', '{RIGHTBRACKET}'],
-                str_replace('\\', '/', $this->basePathForLogs())
-            );
-            $baseDir = str_replace(
-                ['{LEFTBRACKET}', '{RIGHTBRACKET}'],
-                ['[[]', '[]]'],
-                $baseDir
-            );
-        } else {
-            $baseDir = str_replace(
-                ['*', '?', '\\', '[', ']'],
-                ['\*', '\?', '\\\\', '\[', '\]'],
-                $this->basePathForLogs()
-            );
-        }
         $files = [];
+
+        // Because we use the Glob::toRegex function we have to escape the brackets
+        $baseDir = str_replace(
+            ['[', ']'],
+            ['{LEFTBRACKET}', '{RIGHTBRACKET}'],
+            str_replace('\\', '/', $this->basePathForLogs())
+        );
+        $baseDir = str_replace(
+            ['{LEFTBRACKET}', '{RIGHTBRACKET}'],
+            ['[[]', '[]]'],
+            $baseDir
+        );
 
         foreach (config('log-viewer.include_files', []) as $pattern) {
             if (! str_starts_with($pattern, DIRECTORY_SEPARATOR)) {
@@ -60,23 +53,26 @@ class LogViewerService
             $files = array_diff($files, $this->getFilePathsMatchingPattern($pattern));
         }
 
-        $files = array_map('realpath', $files);
-
-        $files = array_filter($files, 'is_file');
-
         return array_values(array_reverse($files));
     }
 
     protected function getFilePathsMatchingPattern($pattern)
     {
-        // The GLOB_BRACE flag is not available on some non GNU systems, like Solaris or Alpine Linux.
+        $files = [];
 
-        return glob($pattern);
+        foreach($this->getFilesystem()->allFiles($this->basePathForLogs()) as $file)
+        {
+            if (preg_match(pattern: Glob::toRegex(glob: $pattern), subject: $file)) {
+                $files[] = $file;
+            }
+        }
+
+        return $files;
     }
 
     public function basePathForLogs(): string
     {
-        return Str::finish(realpath(storage_path('logs')), DIRECTORY_SEPARATOR);
+        return config('log-viewer.filesystem.root');
     }
 
     /**
@@ -152,6 +148,11 @@ class LogViewerService
     public function getRouteMiddleware(): array
     {
         return config('log-viewer.middleware', []) ?: ['web'];
+    }
+
+    public function getFilesystem(): Filesystem
+    {
+        return Storage::disk(config('log-viewer.filesystem.disk'));
     }
 
     public function auth($callback = null): void

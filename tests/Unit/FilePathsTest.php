@@ -5,11 +5,9 @@ use Opcodes\LogViewer\LogViewerService;
 
 test('handles square brackets in the logs path', function ($folderPath) {
     // Get the original path inside which we'll create a dummy folder with square brackets
+    $storage = LogViewer::getFilesystem();
     $originalBasePath = LogViewer::basePathForLogs();
     $pathWithSquareBrackets = $originalBasePath.$folderPath.DIRECTORY_SEPARATOR;
-    if (! file_exists($pathWithSquareBrackets)) {
-        mkdir($pathWithSquareBrackets, recursive: true);
-    }
 
     // Let's mock LogViewer to return the new path as the base path for logs
     app()->instance(
@@ -21,8 +19,8 @@ test('handles square brackets in the logs path', function ($folderPath) {
 
     // Create a dummy log file and make sure it's actually there
     $expectedLogFilePath = $pathWithSquareBrackets.($fileName = 'laravel.log');
-    touch($expectedLogFilePath);
-    expect(file_exists($expectedLogFilePath))->toBeTrue();
+    $storage->put($expectedLogFilePath, '');
+    expect($storage->exists($expectedLogFilePath))->toBeTrue();
 
     // Act! Let's get the files and make sure they have found the log file created previously.
     $logFiles = LogViewer::getFiles();
@@ -32,8 +30,8 @@ test('handles square brackets in the logs path', function ($folderPath) {
         ->and($logFiles[0]->path)->toBe($expectedLogFilePath);
 
     // clean up!
-    unlink($expectedLogFilePath);
-    rmdir($pathWithSquareBrackets);
+    $storage->delete($expectedLogFilePath);
+    $storage->deleteDirectory($pathWithSquareBrackets);
 })->with([
     '[logs]',
     '[logs',
