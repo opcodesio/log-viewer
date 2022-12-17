@@ -11,14 +11,8 @@ uses(TestCase::class)->in(__DIR__);
 uses()
     ->afterEach(function () {
         clearGeneratedLogFiles();
-        LogViewer::clearFileCache();
     })
     ->in('Feature');
-uses()
-    ->afterEach(function () {
-        LogViewer::clearFileCache();
-    })
-    ->in('Unit');
 
 /*
 |--------------------------------------------------------------------------

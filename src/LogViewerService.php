@@ -15,8 +15,6 @@ class LogViewerService
 {
     const DEFAULT_MAX_LOG_SIZE_TO_DISPLAY = 131_072;    // 128 KB
 
-    protected ?Collection $_cachedFiles = null;
-
     protected mixed $authCallback;
 
     protected int $maxLogSizeToDisplay = self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
@@ -83,14 +81,10 @@ class LogViewerService
      */
     public function getFiles(): LogFileCollection
     {
-        if (! isset($this->_cachedFiles)) {
-            $this->_cachedFiles = (new LogFileCollection($this->getFilePaths()))
-                ->unique()
-                ->map(fn ($filePath) => new LogFile($filePath))
-                ->values();
-        }
-
-        return $this->_cachedFiles;
+        return (new LogFileCollection($this->getFilePaths()))
+            ->unique()
+            ->map(fn ($filePath) => new LogFile($filePath))
+            ->values();
     }
 
     public function getFilesGroupedByFolder(): LogFolderCollection
@@ -131,11 +125,6 @@ class LogViewerService
                     || $folder->identifier === $folderIdentifier
                     || $folder->path === $folderIdentifier;
             });
-    }
-
-    public function clearFileCache(): void
-    {
-        $this->_cachedFiles = null;
     }
 
     public function getRouteDomain(): ?string

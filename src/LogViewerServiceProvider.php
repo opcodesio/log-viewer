@@ -59,7 +59,7 @@ class LogViewerServiceProvider extends ServiceProvider
         Livewire::component('log-viewer::log-list', LogList::class);
 
         Event::listen(LogFileDeleted::class, function (LogFileDeleted $event) {
-            LogViewer::clearFileCache();
+            //
         });
 
         if (! Gate::has('downloadLogFile')) {

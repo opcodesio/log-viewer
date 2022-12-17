@@ -37,8 +37,7 @@ test('retains related cache keys after object re-initialisation', function () {
     $this->file->addRelatedCacheKey($cacheKey);
     expect(Cache::has($cacheKey))->toBeTrue();
 
-    // let's reinitialise the file object by clearing the log viewer log file cache
-    LogViewer::clearFileCache();
+    // let's reinitialise the file object
     $newFileObject = LogViewer::getFile($this->file->identifier);
     // to make sure the object is not the exact same one:
     assertNotSame($this->file, $newFileObject);

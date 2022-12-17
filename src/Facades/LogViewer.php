@@ -17,7 +17,6 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @method static LogFolder|null getFolder(?string $folderIdentifier)
  * @method static LogFile[]|LogFileCollection getFiles()
  * @method static LogFile|null getFile(string $fileIdentifier)
- * @method static void clearFileCache()
  * @method static string|null getRouteDomain()
  * @method static array getRouteMiddleware()
  * @method static Filesystem getFilesystem()
