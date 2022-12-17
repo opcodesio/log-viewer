@@ -42,6 +42,7 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
     }
 
     $storage->put($fileName, $content ?? ($randomContent ? dummyLogData() : ''));
+    clearstatcache();
 
     // we perform a regular PHP assertion, so it doesn't count towards the unit test assertion count.
     assert($storage->exists($fileName));
