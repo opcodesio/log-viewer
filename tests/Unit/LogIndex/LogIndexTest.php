@@ -1,6 +1,7 @@
 <?php
 
 use Opcodes\LogViewer\Facades\Cache;
+use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
@@ -206,7 +207,7 @@ it('can check whether the index is incomplete', function () {
     expect($logIndex->incomplete())->toBeFalse();
 
     // if we add some data to the file, the log index should be considered incomplete
-    file_put_contents($logFile->path, makeLogEntry());
+    LogViewer::getFilesystem()->put($logFile->path, makeLogEntry());
     $logIndex = createLogIndex($logFile);
     expect($logIndex->incomplete())->toBeTrue();
 

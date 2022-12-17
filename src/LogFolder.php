@@ -123,7 +123,7 @@ class LogFolder
         /** @var LogFile $file */
         foreach ($this->files() as $file) {
             if (Gate::check('downloadLogFile', $file)) {
-                $zip->addFile($file->path, $file->name);
+                $zip->addFromString(name: $file->name, content: LogViewer::getFilesystem()->get($file->path));
             }
         }
 
