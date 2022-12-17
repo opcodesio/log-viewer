@@ -8,10 +8,12 @@ use Opcodes\LogViewer\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);
 uses()
-    ->afterEach(function () {
-        clearGeneratedLogFiles();
-    })
+    ->afterEach(fn () => clearGeneratedLogFiles())
     ->in('Feature');
+
+uses()
+    ->afterEach(fn () => clearGeneratedLogFiles())
+    ->in('Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -66,6 +68,7 @@ function clearGeneratedLogFiles(): void
 {
     $storage = LogViewer::getFilesystem();
     $storage->delete($storage->allFiles());
+    clearstatcache();
 }
 
 function makeLogEntry(CarbonInterface $date = null, string $level = 'debug', string $message = 'Testing log entry'): string

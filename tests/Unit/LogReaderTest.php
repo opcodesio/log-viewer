@@ -8,10 +8,6 @@ beforeEach(function () {
     LogViewer::getFilesystem()->append($this->file->path, makeLogEntry());
 });
 
-afterEach(function () {
-    LogViewer::getFilesystem()->delete($this->file->path);
-});
-
 it('can scan a log file', function () {
     $logReader = $this->file->logs();
     expect($logReader->requiresScan())->toBeTrue();
