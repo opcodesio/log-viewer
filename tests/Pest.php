@@ -65,7 +65,8 @@ function dummyLogData(int $lines = null): string
 
 function clearGeneratedLogFiles(): void
 {
-    File::cleanDirectory(storage_path('logs'));
+    $storage = LogViewer::getFilesystem();
+    $storage->deleteDirectory('');
 }
 
 function makeLogEntry(CarbonInterface $date = null, string $level = 'debug', string $message = 'Testing log entry'): string
