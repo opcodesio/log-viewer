@@ -60,8 +60,7 @@ class LogViewerService
     {
         $files = [];
 
-        foreach($this->getFilesystem()->allFiles($this->basePathForLogs()) as $file)
-        {
+        foreach ($this->getFilesystem()->allFiles($this->basePathForLogs()) as $file) {
             if (preg_match(pattern: Glob::toRegex(glob: $pattern), subject: $file)) {
                 $files[] = $file;
             }
@@ -73,6 +72,7 @@ class LogViewerService
     public function basePathForLogs(): string
     {
         $rootFolder = Str::of(config('log-viewer.filesystem.root'));
+
         return empty($rootFolder)
             ? $rootFolder->finish('/')
             : $rootFolder;

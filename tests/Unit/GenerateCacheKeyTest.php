@@ -10,7 +10,7 @@ it('can generate a cache key for a LogFile', function () {
     $result = GenerateCacheKey::for($file);
 
     expect($result)->toBe(
-        'log-viewer:' . LogViewer::version() . ':file:' . md5($file->path)
+        'log-viewer:'.LogViewer::version().':file:'.md5($file->path)
     );
 });
 
@@ -20,7 +20,7 @@ it('can pass a namespace for a more specific cache key', function () {
     $result = GenerateCacheKey::for($file, $namespace = 'randomNamespace');
 
     expect($result)->toBe(
-        GenerateCacheKey::for($file) . ':' . $namespace
+        GenerateCacheKey::for($file).':'.$namespace
     );
 });
 
@@ -30,7 +30,7 @@ it('can generate a cache key for a LogIndex', function () {
     $result = GenerateCacheKey::for($logIndex);
 
     expect($result)->toBe(
-        GenerateCacheKey::for($logIndex->file) . ':' . $logIndex->identifier
+        GenerateCacheKey::for($logIndex->file).':'.$logIndex->identifier
     );
 });
 
@@ -39,5 +39,5 @@ it('can generate a cache key for an arbitrary string', function () {
 
     $result = GenerateCacheKey::for($string);
 
-    expect($result)->toBe('log-viewer:' . LogViewer::version() . ':' . $string);
+    expect($result)->toBe('log-viewer:'.LogViewer::version().':'.$string);
 });
