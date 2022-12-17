@@ -67,8 +67,8 @@ return [
     |
     */
     'filesystem' => [
-        'root' => env('LOG_VIEWER_FILESYSTEM_ROOT',  ''),
-        'disk' => env('LOG_VIEWER_FILESYSTEM_DISK',  'log-viewer-local'),
+        'root' => env('LOG_VIEWER_FILESYSTEM_ROOT', ''),
+        'disk' => env('LOG_VIEWER_FILESYSTEM_DISK', 'log-viewer-local'),
     ],
 
     /*
