@@ -23,7 +23,7 @@ class LogViewerServiceProvider extends ServiceProvider
 
         $this->app['config']['filesystems.disks.log-viewer-local'] = [
             'driver' => 'local',
-            'root' => storage_path('logs'),
+            'root' => realpath(storage_path('logs')),
         ];
 
         $this->app->bind('log-viewer', LogViewerService::class);

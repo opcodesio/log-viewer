@@ -29,41 +29,56 @@ class LogViewerService
         $baseDir = str_replace(
             ['[', ']'],
             ['{LEFTBRACKET}', '{RIGHTBRACKET}'],
-            str_replace('\\', '/', $this->basePathForLogs())
+            str_replace('\\', '/', $this->basePathForLogs()),
         );
         $baseDir = str_replace(
-            ['{LEFTBRACKET}', '{RIGHTBRACKET}'],
-            ['[[]', '[]]'],
+            ['{LEFTBRACKET}', '{RIGHTBRACKET}', '\\'],
+            ['[[]', '[]]', '\\\\'],
             $baseDir
         );
 
         foreach (config('log-viewer.include_files', []) as $pattern) {
+            $absolute = true;
             if (! str_starts_with($pattern, DIRECTORY_SEPARATOR)) {
                 $pattern = $baseDir.$pattern;
+                $absolute = false;
             }
 
-            $files = array_merge($files, $this->getFilePathsMatchingPattern($pattern));
+            $files = array_merge($files, $this->getFilePathsMatchingPattern($pattern, $absolute));
         }
 
         foreach (config('log-viewer.exclude_files', []) as $pattern) {
+            $absolute = true;
             if (! str_starts_with($pattern, DIRECTORY_SEPARATOR)) {
                 $pattern = $baseDir.$pattern;
+                $absolute = false;
             }
 
-            $files = array_diff($files, $this->getFilePathsMatchingPattern($pattern));
+            $files = array_diff($files, $this->getFilePathsMatchingPattern($pattern, $absolute));
         }
 
         return array_values(array_reverse($files));
     }
 
-    protected function getFilePathsMatchingPattern($pattern)
+    protected function getFilePathsMatchingPattern($pattern, $absolute = false): array
     {
         $files = [];
 
-        foreach($this->getFilesystem()->allFiles($this->basePathForLogs()) as $file)
-        {
+        if (! $absolute) {
+            $scannedFiles = $this->getFilesystem()->files($this->basePathForLogs());
+        } else {
+            $pathInfo = pathinfo($pattern);
+            $dirname = $pathInfo['dirname'];
+            $pattern = $pathInfo['basename'];
+
+            $scannedFiles = $this->getFilesystem($dirname)->files();
+        }
+
+        foreach ($scannedFiles as $file) {
             if (preg_match(pattern: Glob::toRegex(glob: $pattern), subject: $file)) {
-                $files[] = $file;
+                $files[] = isset($dirname)
+                    ? $dirname.DIRECTORY_SEPARATOR.$file
+                    : $file;
             }
         }
 
@@ -73,8 +88,9 @@ class LogViewerService
     public function basePathForLogs(): string
     {
         $rootFolder = Str::of(config('log-viewer.filesystem.root'));
-        return empty($rootFolder)
-            ? $rootFolder->finish('/')
+
+        return ($rootFolder != '')
+            ? $rootFolder->finish(DIRECTORY_SEPARATOR)
             : $rootFolder;
     }
 
@@ -153,8 +169,17 @@ class LogViewerService
         return config('log-viewer.middleware', []) ?: ['web'];
     }
 
-    public function getFilesystem(): Filesystem
+    public function getFilesystem($absolutePath = ''): Filesystem
     {
+        if (! config('disable_absolute_filepaths') && ($absolutePath !== '') && is_dir($absolutePath)) {
+            config()->set('filesystems.disks.log-viewer-absolute', [
+                'driver' => 'local',
+                'root' => $absolutePath,
+            ]);
+
+            return Storage::disk('log-viewer-absolute');
+        }
+
         return Storage::disk(config('log-viewer.filesystem.disk'));
     }
 

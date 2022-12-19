@@ -20,7 +20,7 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @method static void clearFileCache()
  * @method static string|null getRouteDomain()
  * @method static array getRouteMiddleware()
- * @method static Filesystem getFilesystem()
+ * @method static Filesystem getFilesystem($absolutePath = '')
  * @method static string getRoutePrefix()
  * @method static void auth($callback = null)
  * @method static void setMaxLogSize(int $bytes)

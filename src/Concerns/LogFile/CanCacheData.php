@@ -3,7 +3,6 @@
 namespace Opcodes\LogViewer\Concerns\LogFile;
 
 use Carbon\CarbonInterface;
-use Illuminate\Contracts\Cache\Repository;
 use Opcodes\LogViewer\Facades\Cache;
 use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
@@ -11,7 +10,7 @@ trait CanCacheData
 {
     protected function indexCacheKeyForQuery(string $query = ''): string
     {
-        return GenerateCacheKey::for($this, md5($query) . ':index');
+        return GenerateCacheKey::for($this, md5($query).':index');
     }
 
     public function clearCache(): void
