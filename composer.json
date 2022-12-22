@@ -47,7 +47,7 @@
     },
     "scripts": {
         "analyse": "echo \"Static analysis not configured yet.\" && exit 0",
-        "test": "vendor/bin/pest",
+        "test": "vendor/bin/pest --order-by random",
         "test-coverage": "echo \"Test coverage not configured yet.\" && exit 0",
         "format": "vendor/bin/pint"
     },
