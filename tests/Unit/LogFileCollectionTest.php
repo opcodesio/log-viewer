@@ -36,7 +36,7 @@ test('LogFileCollection can sort its files by latest logs first', function () {
 });
 
 test('LogFolder::files() returns a LogFileCollection', function () {
-    $folder = new LogFolder(storage_path('subfolder'), []);
+    $folder = new LogFolder('subfolder', []);
 
     expect($folder->files())->toBeInstanceOf(LogFileCollection::class);
 });

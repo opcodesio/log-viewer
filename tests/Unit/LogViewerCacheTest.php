@@ -2,7 +2,6 @@
 
 use Illuminate\Cache\FileStore;
 use Illuminate\Cache\RedisStore;
-use Illuminate\Cache\Repository;
 
 it('it defaults to the app\'s default cache driver', function ($cacheType, $cacheStoreClass) {
     config(['cache.default' => $cacheType]);

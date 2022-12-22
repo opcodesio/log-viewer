@@ -13,19 +13,19 @@ class GenerateCacheKey
         $key = '';
 
         if ($object instanceof LogFile) {
-            $key = self::baseKey() . ':file:' . md5($object->path);
+            $key = self::baseKey().':file:'.md5($object->path);
         }
 
         if ($object instanceof LogIndex) {
-            $key = self::for($object->file) . ':' . $object->identifier;
+            $key = self::for($object->file).':'.$object->identifier;
         }
 
         if (is_string($object)) {
-            $key = self::baseKey() . ':' . $object;
+            $key = self::baseKey().':'.$object;
         }
 
-        if (!empty($namespace)) {
-            $key .= ':' . $namespace;
+        if (! empty($namespace)) {
+            $key .= ':'.$namespace;
         }
 
         return $key;
@@ -33,6 +33,6 @@ class GenerateCacheKey
 
     protected static function baseKey(): string
     {
-        return 'log-viewer:' . LogViewer::version();
+        return 'log-viewer:'.LogViewer::version();
     }
 }
