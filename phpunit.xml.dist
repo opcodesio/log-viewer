@@ -11,7 +11,6 @@
     convertWarningsToExceptions="true"
     processIsolation="false"
     stopOnFailure="false"
-    executionOrder="random"
     failOnWarning="true"
     failOnRisky="true"
     failOnEmptyTestSuite="true"
