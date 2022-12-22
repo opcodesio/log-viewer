@@ -75,10 +75,11 @@ class LogViewerService
         }
 
         foreach ($scannedFiles as $file) {
+            $checkFile = str_replace('/', DIRECTORY_SEPARATOR, $file);
             if (preg_match(pattern: Glob::toRegex(glob: $pattern), subject: $file)) {
                 $files[] = isset($dirname)
-                    ? $dirname.DIRECTORY_SEPARATOR.$file
-                    : $file;
+                    ? $dirname.DIRECTORY_SEPARATOR.$checkFile
+                    : $checkFile;
             }
         }
 
