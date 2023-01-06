@@ -41,9 +41,9 @@
             <button wire:click="clearCache('{{ $logFile->identifier }}')" x-on:click.stop="cacheRecentlyCleared = false;" x-data="{ cacheRecentlyCleared: @json($cacheRecentlyCleared) }" x-init="setTimeout(() => cacheRecentlyCleared = false, 2000)">
                 <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class="hidden" fill="currentColor"><use href="#icon-database" /></svg>
                 <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class.remove="hidden" class="hidden spin" fill="currentColor"><use href="#icon-spinner" /></svg>
-                <span x-show="!cacheRecentlyCleared" wire:loading.class="hidden">Rebuild index</span>
-                <span x-show="!cacheRecentlyCleared" wire:loading wire:target="clearCache('{{ $logFile->identifier }}')">Rebuilding...</span>
-                <span x-show="cacheRecentlyCleared" class="text-emerald-500">Index rebuilt</span>
+                <span x-show="!cacheRecentlyCleared" wire:loading.class="hidden">Clear index</span>
+                <span x-show="!cacheRecentlyCleared" wire:loading wire:target="clearCache('{{ $logFile->identifier }}')">Clearing...</span>
+                <span x-show="cacheRecentlyCleared" class="text-emerald-500">Index cleared</span>
             </button>
 
             @can('downloadLogFile', $logFile)

@@ -8,8 +8,6 @@ beforeEach(function () {
     File::append($this->file->path, makeLogEntry());
 });
 
-afterEach(fn () => clearGeneratedLogFiles());
-
 it('can scan a log file', function () {
     $logReader = $this->file->logs();
     expect($logReader->requiresScan())->toBeTrue();

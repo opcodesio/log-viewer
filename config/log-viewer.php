@@ -11,6 +11,7 @@ return [
     | Log Viewer can be disabled, so it's no longer accessible via browser.
     |
     */
+
     'enabled' => env('LOG_VIEWER_ENABLED', true),
 
     /*
@@ -129,11 +130,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Chunk size when scanning log files lazily
+    | Eager-scan log files
     |--------------------------------------------------------------------------
-    | The size in MB of files to scan before updating the progress bar when searching across all files.
+    | Whether to eagerly scan all log files configured with the Log Viewer.
+    | Scanning a log file will create an index for it, which will
+    | speed up further navigation of that log file.
     |
     */
+
+    'eager_scan' => env('LOG_VIEWER_EAGER_SCAN', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cache driver
+    |--------------------------------------------------------------------------
+    | Cache driver to use for storing the log indices. Indices are used to speed up
+    | log navigation. Defaults to your application's default cache driver.
+    |
+    */
+
     'cache_driver' => env('LOG_VIEWER_CACHE_DRIVER', null),
 
     /*

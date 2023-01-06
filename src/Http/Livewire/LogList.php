@@ -185,7 +185,9 @@ class LogList extends Component
         $this->query = '';
         $this->cacheRecentlyCleared = true;
 
-        $this->dispatchBrowserEvent('scan-files');
+        if (LogViewer::shouldEagerScanLogFiles()) {
+            $this->dispatchBrowserEvent('scan-files');
+        }
     }
 
     public function updatedPerPage($value)

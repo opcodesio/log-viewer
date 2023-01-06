@@ -109,11 +109,7 @@ class FileList extends Component
     public function clearCache(string $fileIdentifier)
     {
         $file = LogViewer::getFile($fileIdentifier);
-
-        if ($file) {
-            $file->clearCache();
-            $file->scan();
-        }
+        $file?->clearCache();
 
         if ($this->selectedFileIdentifier === $fileIdentifier) {
             $this->emit('fileSelected', $this->selectedFileIdentifier);
@@ -130,7 +126,9 @@ class FileList extends Component
 
         $this->cacheRecentlyCleared = true;
 
-        $this->dispatchBrowserEvent('scan-files');
+        if (LogViewer::shouldEagerScanLogFiles()) {
+            $this->dispatchBrowserEvent('scan-files');
+        }
     }
 
     public function updatedDirection($value)
