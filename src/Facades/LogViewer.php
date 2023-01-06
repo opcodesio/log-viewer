@@ -2,7 +2,6 @@
 
 namespace Opcodes\LogViewer\Facades;
 
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Facade;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFileCollection;
@@ -20,7 +19,6 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @method static void clearFileCache()
  * @method static string|null getRouteDomain()
  * @method static array getRouteMiddleware()
- * @method static Filesystem getFilesystem()
  * @method static string getRoutePrefix()
  * @method static void auth($callback = null)
  * @method static void setMaxLogSize(int $bytes)

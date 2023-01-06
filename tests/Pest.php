@@ -2,7 +2,6 @@
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\File;
-use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogIndex;
 use Opcodes\LogViewer\Tests\TestCase;
@@ -35,18 +34,18 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
         $fileName = \Illuminate\Support\Str::random().'.log';
     }
 
-    $storage = LogViewer::getFilesystem();
+    $path = storage_path('logs/'.$fileName);
 
-    if ($storage->exists($fileName)) {
-        $storage->delete($fileName);
+    if (File::exists($path)) {
+        File::delete($path);
     }
 
-    $storage->put($fileName, $content ?? ($randomContent ? dummyLogData() : ''));
+    File::put($path, $content ?? ($randomContent ? dummyLogData() : ''));
 
     // we perform a regular PHP assertion, so it doesn't count towards the unit test assertion count.
-    assert($storage->exists($fileName));
+    assert(file_exists($path));
 
-    return new LogFile($fileName);
+    return new LogFile($path);
 }
 
 function dummyLogData(int $lines = null): string

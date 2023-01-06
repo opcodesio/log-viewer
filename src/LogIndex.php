@@ -17,8 +17,11 @@ class LogIndex
     const DEFAULT_CHUNK_SIZE = 20_000;
 
     public string $identifier;
+
     protected int $nextLogIndexToCreate;
+
     protected int $lastScannedFilePosition;
+
     protected int $lastScannedIndex;
 
     public function __construct(
