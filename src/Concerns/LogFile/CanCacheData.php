@@ -35,11 +35,6 @@ trait CanCacheData
         return now()->addWeek();
     }
 
-    protected function cacheKey(): string
-    {
-        return GenerateCacheKey::for($this);
-    }
-
     protected function relatedCacheKeysKey(): string
     {
         return GenerateCacheKey::for($this, 'related-cache-keys');

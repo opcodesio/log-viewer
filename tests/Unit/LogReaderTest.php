@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\File;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
 
@@ -8,8 +7,6 @@ beforeEach(function () {
     $this->file = generateLogFile();
     LogViewer::getFilesystem()->append($this->file->path, makeLogEntry());
 });
-
-afterEach(fn () => clearGeneratedLogFiles());
 
 it('can scan a log file', function () {
     $logReader = $this->file->logs();

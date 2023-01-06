@@ -12,6 +12,10 @@ uses()
     ->afterEach(fn () => clearGeneratedLogFiles())
     ->in('Feature');
 
+uses()
+    ->afterEach(fn () => clearGeneratedLogFiles())
+    ->in('Unit');
+
 /*
 |--------------------------------------------------------------------------
 | HELPERS
