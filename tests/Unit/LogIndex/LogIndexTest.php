@@ -1,7 +1,6 @@
 <?php
 
 use Opcodes\LogViewer\Facades\Cache;
-use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\Utils\GenerateCacheKey;
 
 it('starts off with an empty index', function () {
