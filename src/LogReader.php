@@ -163,7 +163,7 @@ class LogReader
             return $this;
         }
 
-        $this->fileHandle = LogViewer::getFilesystem()->readStream($this->file->path);
+        $this->fileHandle = fopen($this->file->path, 'r');
 
         if ($this->fileHandle === false) {
             throw new \Exception('Could not open "'.$this->file->path.'" for reading.');

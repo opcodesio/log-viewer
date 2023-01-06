@@ -1,15 +1,14 @@
 <?php
 
-use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
 
 test('log file can be instantiated with just a path to the file', function () {
-    $filename = 'laravel.log';
-    LogViewer::getFilesystem()->put($filename, str_repeat('0', 10));
+    $path = storage_path('logs/laravel.log');
+    file_put_contents($path, str_repeat('0', 10));  // 10 bytes
 
-    $logFile = new LogFile($filename);
+    $logFile = new LogFile($path);
 
-    expect($logFile->path)->toBe($filename)
+    expect($logFile->path)->toBe($path)
         ->and($logFile->name)->toBe('laravel.log')
         ->and($logFile->size())->toBe(10);
 });

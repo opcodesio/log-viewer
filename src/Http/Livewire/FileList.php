@@ -90,7 +90,6 @@ class FileList extends Component
     {
         $folder = LogViewer::getFolder($folderIdentifier);
 
-
         if ($folder) {
             Gate::authorize('deleteLogFolder', $folder);
 

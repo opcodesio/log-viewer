@@ -6,10 +6,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
-use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Utils\Utils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LogFile
 {
@@ -51,7 +49,9 @@ class LogFile
 
     public function size(): int
     {
-        return LogViewer::getFilesystem()->size($this->path);
+        clearstatcache();
+
+        return filesize($this->path);
     }
 
     public function sizeInMB(): float
@@ -74,9 +74,9 @@ class LogFile
         return route('blv.download-file', $this->identifier);
     }
 
-    public function download(): StreamedResponse
+    public function download(): BinaryFileResponse
     {
-        return LogViewer::getFilesystem()->download($this->path);
+        return response()->download($this->path);
     }
 
     public function addRelatedIndex(LogIndex $logIndex): void
@@ -104,13 +104,13 @@ class LogFile
     public function earliestTimestamp(): int
     {
         return $this->getMetadata('earliest_timestamp')
-            ?? LogViewer::getFilesystem()->lastModified($this->path);
+            ?? (is_file($this->path) ? filemtime($this->path) : 0);
     }
 
     public function latestTimestamp(): int
     {
         return $this->getMetadata('latest_timestamp')
-            ?? LogViewer::getFilesystem()->lastModified($this->path);
+            ?? (is_file($this->path) ? filemtime($this->path) : 0);
     }
 
     public function scan(int $maxBytesToScan = null, bool $force = false): void
@@ -134,7 +134,7 @@ class LogFile
     public function delete(): void
     {
         $this->clearCache();
-        LogViewer::getFilesystem()->delete($this->path);
+        unlink($this->path);
         LogFileDeleted::dispatch($this);
     }
 }

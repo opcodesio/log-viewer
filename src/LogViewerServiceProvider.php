@@ -21,11 +21,6 @@ class LogViewerServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom($this->basePath("/config/{$this->name}.php"), $this->name);
 
-        $this->app['config']['filesystems.disks.log-viewer-local'] = [
-            'driver' => 'local',
-            'root' => storage_path('logs'),
-        ];
-
         $this->app->bind('log-viewer', LogViewerService::class);
         $this->app->bind('log-viewer-cache', function () {
             return Cache::driver(config('log-viewer.cache_driver'));
