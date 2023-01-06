@@ -11,6 +11,10 @@ uses()
     ->afterEach(fn () => clearGeneratedLogFiles())
     ->in('Feature');
 
+uses()
+    ->afterEach(fn () => clearGeneratedLogFiles())
+    ->in('Unit');
+
 /*
 |--------------------------------------------------------------------------
 | HELPERS
@@ -35,6 +39,11 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
     }
 
     $path = storage_path('logs/'.$fileName);
+    $folder = dirname($path);
+
+    if (! File::isDirectory($folder)) {
+        File::makeDirectory($folder, 0755, true);
+    }
 
     if (File::exists($path)) {
         File::delete($path);

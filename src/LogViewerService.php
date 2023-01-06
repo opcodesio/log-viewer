@@ -174,6 +174,11 @@ class LogViewerService
         return intval(config('log-viewer.lazy_scan_chunk_size_in_mb', 100)) * 1024 * 1024;
     }
 
+    public function shouldEagerScanLogFiles(): bool
+    {
+        return config('log-viewer.eager_scan', false);
+    }
+
     /**
      * Get the maximum number of bytes of the log that we should display.
      *

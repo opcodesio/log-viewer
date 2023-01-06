@@ -105,16 +105,19 @@ class LogFile
         return null;
     }
 
+    public function mtime(): int
+    {
+        return is_file($this->path) ? filemtime($this->path) : 0;
+    }
+
     public function earliestTimestamp(): int
     {
-        return $this->getMetadata('earliest_timestamp')
-            ?? (is_file($this->path) ? filemtime($this->path) : 0);
+        return $this->getMetadata('earliest_timestamp') ?? $this->mtime();
     }
 
     public function latestTimestamp(): int
     {
-        return $this->getMetadata('latest_timestamp')
-            ?? (is_file($this->path) ? filemtime($this->path) : 0);
+        return $this->getMetadata('latest_timestamp') ?? $this->mtime();
     }
 
     public function scan(int $maxBytesToScan = null, bool $force = false): void

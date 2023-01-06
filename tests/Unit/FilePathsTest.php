@@ -44,3 +44,19 @@ test('handles square brackets in the logs path', function ($folderPath) {
     'log[s',
     'log]s',
 ]);
+
+test('can set an absolute path', function () {
+    $first = generateLogFile('first.log');
+    $second = generateLogFile('subfolder/second.log');
+
+    config(['log-viewer.include_files' => [
+        '*.log',    // equals to "storage/logs/*.log"
+        dirname($second->path).'/*.log',
+    ]]);
+
+    $files = LogViewer::getFiles();
+
+    expect($files)->toHaveCount(2)
+        ->and($files->contains('path', $first->path))->toBeTrue()
+        ->and($files->contains('path', $second->path))->toBeTrue();
+});

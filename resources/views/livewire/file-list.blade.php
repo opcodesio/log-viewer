@@ -86,7 +86,7 @@
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class="hidden" wire:target="clearFolderCache" fill="currentColor"><use href="#icon-database" /></svg>
                             <svg xmlns="http://www.w3.org/2000/svg" wire:loading.class.remove="hidden" wire:target="clearFolderCache" class="hidden spin" fill="currentColor"><use href="#icon-spinner" /></svg>
-                            <span x-show="!cacheRecentlyCleared" wire:loading.class="hidden" wire:target="clearFolderCache">Rebuild indices</span>
+                            <span x-show="!cacheRecentlyCleared" wire:loading.class="hidden" wire:target="clearFolderCache">Clear indices</span>
                         </button>
 
                         @can('downloadLogFolder', $folder)

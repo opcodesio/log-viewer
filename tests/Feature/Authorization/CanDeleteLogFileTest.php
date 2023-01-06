@@ -4,8 +4,6 @@ use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
 use Opcodes\LogViewer\LogFile;
 
-afterEach(fn () => clearGeneratedLogFiles());
-
 test('can delete every file by default', function () {
     generateLogFiles([$fileName = 'laravel.log']);
 
