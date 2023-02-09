@@ -6,7 +6,7 @@ use Illuminate\Support\Collection;
 
 class FileListReader
 {
-    static ?Collection $_files = null;
+    public static ?Collection $_files = null;
 
     public static function findByName(string $fileName): ?LogFile
     {
@@ -23,15 +23,15 @@ class FileListReader
      */
     public function getFiles()
     {
-        if (!isset(self::$_files)) {
+        if (! isset(self::$_files)) {
             $files = [];
 
             foreach (config('better-log-viewer.include_files', []) as $pattern) {
-                $files = array_merge($files, glob(storage_path() . '/logs/' . $pattern));
+                $files = array_merge($files, glob(storage_path().'/logs/'.$pattern));
             }
 
             foreach (config('better-log-viewer.exclude_files', []) as $pattern) {
-                $files = array_diff($files, glob(storage_path() . '/logs/' . $pattern));
+                $files = array_diff($files, glob(storage_path().'/logs/'.$pattern));
             }
 
             $files = array_reverse($files);

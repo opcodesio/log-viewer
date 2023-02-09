@@ -1,7 +1,6 @@
 <?php
 
 use Arukompas\BetterLogViewer\FileListReader;
-use Arukompas\BetterLogViewer\Http\Resources\LogFileResource;
 use Arukompas\BetterLogViewer\LogFile;
 use Illuminate\Support\Facades\Route;
 
@@ -35,7 +34,7 @@ Route::middleware('web')->get('logs-new', function () {
     /** TODO: remove this before publishing */
     \Illuminate\Support\Facades\Artisan::call('vendor:publish', [
         '--tag' => 'better-log-viewer-assets',
-        '--force' => 1
+        '--force' => 1,
     ]);
 
     return view('better-log-viewer::vue');

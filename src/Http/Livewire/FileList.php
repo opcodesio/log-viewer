@@ -3,12 +3,12 @@
 namespace Arukompas\BetterLogViewer\Http\Livewire;
 
 use Arukompas\BetterLogViewer\FileListReader;
-use Arukompas\BetterLogViewer\LogFile;
 use Livewire\Component;
 
 class FileList extends Component
 {
     public bool $shouldLoadFiles = false;
+
     public string $file = '';
 
     protected $queryString = [
@@ -26,7 +26,7 @@ class FileList extends Component
     {
         $this->shouldLoadFiles = true;
 
-        if (!empty($this->file)) {
+        if (! empty($this->file)) {
             $this->emit('fileSelected', $this->file);
         }
     }

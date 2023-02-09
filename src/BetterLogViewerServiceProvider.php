@@ -6,7 +6,6 @@ use Arukompas\BetterLogViewer\Commands\BetterLogViewerCommand;
 use Arukompas\BetterLogViewer\Events\LogFileDeleted;
 use Arukompas\BetterLogViewer\Http\Livewire\FileList;
 use Arukompas\BetterLogViewer\Http\Livewire\LogList;
-use Closure;
 use Illuminate\Support\Facades\Event;
 use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;

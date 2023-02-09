@@ -9,7 +9,7 @@ class Benchmark
      *
      * @var array
      */
-    static array $tests = [];
+    public static array $tests = [];
 
     /**
      * Begin a test instance with a given name
@@ -19,7 +19,7 @@ class Benchmark
      */
     public static function time(string $name): void
     {
-        if (!array_key_exists($name, static::$tests)) {
+        if (! array_key_exists($name, static::$tests)) {
             static::$tests[$name] = [
                 'current' => [
                     'start' => null,
@@ -58,7 +58,7 @@ class Benchmark
         $current = static::$tests[$name]['current'];
 
         static::$tests[$name]['history'][] = array_merge($current, [
-            'duration' => $current['end'] - $current['start']
+            'duration' => $current['end'] - $current['start'],
         ]);
 
         return $current['end'] - $current['start'];
@@ -108,6 +108,7 @@ class Benchmark
     {
         if ($name) {
             dump(self::results($name));
+
             return;
         }
 
@@ -134,7 +135,7 @@ class Benchmark
 
         $results = [];
 
-        foreach(static::$tests as $testName => $testData) {
+        foreach (static::$tests as $testName => $testData) {
             $results[] = [
                 'name' => $testName,
                 'number_of_runs' => count($testData['history']),

@@ -13,6 +13,7 @@ class LogList extends Component
     use WithPagination;
 
     public string $selectedFileName = '';
+
     public string $query = '';
 
     protected $queryString = [
@@ -35,8 +36,8 @@ class LogList extends Component
         $levels = $logQuery?->getLevelCounts();
         $logs = $logQuery?->paginate(50);
 
-        $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2) . ' MB';
-        $requestTime = number_format((microtime(true) - LARAVEL_START) * 1000, 0) . 'ms';
+        $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2).' MB';
+        $requestTime = number_format((microtime(true) - LARAVEL_START) * 1000, 0).'ms';
 
         return view('better-log-viewer::livewire.log-list', [
             'file' => $file,
