@@ -7,7 +7,7 @@ use function Pest\Laravel\get;
 test('testing route', function ($route) {
     get(route($route))->assertOK();
 })->with([
-    'blv.index',
+    'log-viewer.index',
 ]);
 
 test('the default url can be changed', function () {
@@ -15,9 +15,9 @@ test('the default url can be changed', function () {
 
     reloadRoutes();
 
-    expect(route('blv.index'))->toContain('new-log-route');
+    expect(route('log-viewer.index'))->toContain('new-log-route');
 
-    get(route('blv.index'))->assertOK();
+    get(route('log-viewer.index'))->assertOK();
 });
 
 test('a domain can be set', function () {
@@ -26,9 +26,9 @@ test('a domain can be set', function () {
 
     reloadRoutes();
 
-    expect(route('blv.index'))->toBe('http://logs.domain.test');
+    expect(route('log-viewer.index'))->toBe('http://logs.domain.test');
 
-    get(route('blv.index'))->assertOK();
+    get(route('log-viewer.index'))->assertOK();
 });
 
 test('a domain is optional', function () {
@@ -36,9 +36,9 @@ test('a domain is optional', function () {
 
     reloadRoutes();
 
-    expect(route('blv.index'))->toBe('http://localhost');
+    expect(route('log-viewer.index'))->toBe('http://localhost');
 
-    get(route('blv.index'))->assertOk();
+    get(route('log-viewer.index'))->assertOk();
 });
 
 /*

@@ -12,6 +12,7 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @see \Opcodes\LogViewer\LogViewerService
  *
  * @method static string version()
+ * @method static bool assetsAreCurrent()
  * @method static LogFolder[]|LogFolderCollection getFilesGroupedByFolder()
  * @method static LogFolder|null getFolder(?string $folderIdentifier)
  * @method static LogFile[]|LogFileCollection getFiles()

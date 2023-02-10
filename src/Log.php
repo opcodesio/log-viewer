@@ -123,6 +123,6 @@ class Log
 
     public function url(): string
     {
-        return route('blv.index', ['file' => $this->fileIdentifier, 'query' => 'log-index:'.$this->index]);
+        return route('log-viewer.index', ['file' => $this->fileIdentifier, 'query' => 'log-index:'.$this->index]);
     }
 }

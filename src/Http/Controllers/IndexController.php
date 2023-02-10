@@ -10,12 +10,11 @@ class IndexController
     {
         LogViewer::auth();
 
-        $selectedFile = LogViewer::getFile(request()->query('file', ''));
-
         return view('log-viewer::index', [
-            'jsPath' => __DIR__.'/../../../public/app.js',
-            'cssPath' => __DIR__.'/../../../public/app.css',
-            'selectedFile' => $selectedFile,
+            'assetsAreCurrent' => LogViewer::assetsAreCurrent(),
+            'logViewerScriptVariables' => [
+                'path' => config('log-viewer.route_path'),
+            ],
         ]);
     }
 }

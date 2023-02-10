@@ -5,13 +5,11 @@ namespace Opcodes\LogViewer;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
 use Opcodes\LogViewer\Console\Commands\GenerateDummyLogsCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Http\Livewire\FileList;
-use Opcodes\LogViewer\Http\Livewire\LogList;
 
 class LogViewerServiceProvider extends ServiceProvider
 {
@@ -44,19 +42,47 @@ class LogViewerServiceProvider extends ServiceProvider
             return;
         }
 
-        // registering routes
-        $this->loadRoutesFrom($this->basePath('/routes/web.php'));
-
-        // registering views
-        $this->loadViewsFrom($this->basePath('/resources/views'), $this->name);
-
-        Livewire::component('log-viewer::file-list', FileList::class);
-        Livewire::component('log-viewer::log-list', LogList::class);
+        $this->registerRoutes();
+        $this->registerResources();
+        $this->defineAssetPublishing();
+        $this->defineDefaultGates();
 
         Event::listen(LogFileDeleted::class, function (LogFileDeleted $event) {
             LogViewer::clearFileCache();
         });
+    }
 
+    /**
+     * Register the Log Viewer routes.
+     *
+     * @return void
+     */
+    protected function registerRoutes()
+    {
+        Route::group([
+            'domain' => config('log-viewer.route_domain', null),
+            'prefix' => config('log-viewer.route_path'),
+            'namespace' => 'Opcodes\LogViewer\Http\Controllers',
+            'middleware' => config('log-viewer.middleware', 'web'),
+        ], function () {
+            $this->loadRoutesFrom($this->basePath('/routes/web.php'));
+        });
+    }
+
+    protected function registerResources()
+    {
+        $this->loadViewsFrom($this->basePath('/resources/views'), 'log-viewer');
+    }
+
+    protected function defineAssetPublishing()
+    {
+        $this->publishes([
+            $this->basePath('/public') => public_path('vendor/log-viewer'),
+        ], ['log-viewer-assets', 'laravel-assets']);
+    }
+
+    protected function defineDefaultGates()
+    {
         if (! Gate::has('downloadLogFile')) {
             Gate::define('downloadLogFile', fn (mixed $user, LogFile $file) => true);
         }
