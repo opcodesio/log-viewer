@@ -15,6 +15,7 @@ export const useLogViewerStore = defineStore({
     stacksInView: [],
     stackTops: {},
     containerTop: 0,
+    showLevelsDropdown: true,
   }),
 
   getters: {

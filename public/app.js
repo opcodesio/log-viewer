@@ -19000,7 +19000,8 @@ var useLogViewerStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__.defineStore)({
       stacksOpen: [],
       stacksInView: [],
       stackTops: {},
-      containerTop: 0
+      containerTop: 0,
+      showLevelsDropdown: true
     };
   },
   getters: {
