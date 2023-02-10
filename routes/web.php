@@ -10,6 +10,8 @@ use Opcodes\LogViewer\Http\Controllers\ScanFilesController;
 use Opcodes\LogViewer\Http\Controllers\SearchProgressController;
 
 Route::prefix('api')->group(function () {
+    Route::get('folders', 'LogFileController@folders')->name('log-viwer.folders');
+
     Route::get('file/{fileIdentifier}/download', DownloadFileController::class)->name('blv.download-file');
     Route::get('folder/{folderIdentifier}/download', DownloadFolderController::class)->name('blv.download-folder');
 

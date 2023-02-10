@@ -1,6 +1,10 @@
 import moment from 'moment-timezone';
 
 export default {
+    computed: {
+      LogViewer: () => window.LogViewer,
+    },
+
     methods: {
         /**
          * Format the given date with respect to timezone.

@@ -1,0 +1,198 @@
+<template>
+  <nav class="flex flex-col h-full py-5">
+    <div class="mx-3 mb-2">
+      <h1 class="font-semibold text-emerald-800 dark:text-emerald-600 text-2xl flex items-center">
+        Log Viewer
+        <a href="https://www.github.com/opcodesio/log-viewer" target="_blank"
+           class="rounded ml-3 text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700 p-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+            <use href="#icon-github" />
+          </svg>
+        </a>
+      </h1>
+
+      <a v-if="LogViewer.back_to_system_url" :href="LogViewer.back_to_system_url"
+         class="rounded inline-flex items-center text-sm text-gray-400 hover:text-emerald-800 dark:hover:text-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700 mt-3">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1.5" viewBox="0 0 20 20" fill="currentColor">
+          <use href="#icon-arrow-left" />
+        </svg>
+        {{ LogViewer.back_to_system_label || `Back to ${LogViewer.app_name}` }}
+      </a>
+
+      <div class="flex justify-between mt-4 mr-1">
+        <div class="relative">
+          <div v-show="scanInProgress"
+               class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline spin mr-1" fill="currentColor">
+              <use href="#icon-spinner" />
+            </svg>
+            Indexing logs...
+          </div>
+        </div>
+        <div class="text-sm text-gray-500 dark:text-gray-400">
+          <label for="file-sort-direction" class="sr-only">Sort direction</label>
+          <select id="file-sort-direction" v-model="direction"
+                  class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
+            <option value="desc">Newest first</option>
+            <option value="asc">Oldest first</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-flow-col pr-4 mt-2"
+         :class="[fileViewerStore.hasFilesChecked ? 'justify-between' : 'justify-end']"
+         v-show="fileViewerStore.checkBoxesVisibility">
+      <button v-show="fileViewerStore.hasFilesChecked"
+              @click.stop="confirmDeleteSelectedFiles"
+              class="button inline-flex">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-5 mr-1" fill="currentColor">
+          <use href="#icon-trashcan" />
+        </svg>
+        Delete selected files
+      </button>
+      <button class="button inline-flex"
+              @click.stop="fileViewerStore.toggleCheckboxVisibility(); fileViewerStore.resetChecks()">
+        Cancel
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" class="w-5 ml-1" fill="currentColor">
+          <use href="#icon-cross" />
+        </svg>
+      </button>
+    </div>
+
+    <div id="file-list-container" class="relative h-full overflow-hidden">
+      <div class="pointer-events-none absolute z-10 top-0 h-4 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
+
+      <div class="file-list" ref="fileList" @scroll="(event) => fileViewerStore.onScroll(event)">
+        <div v-for="folder in fileViewerStore.folders"
+             :key="folder.identifier"
+             :id="`folder-${folder.identifier}`"
+             class="relative folder-container"
+        >
+          <Menu as="div" class="folder-item-container"
+                @click="fileViewerStore.toggle(folder)"
+                :class="[fileViewerStore.isOpen(folder) ? 'active-folder' : '', fileViewerStore.shouldBeSticky(folder) ? 'sticky ' + (open ? 'z-20' : 'z-10') : '' ]"
+                :style="{ top: fileViewerStore.isOpen(folder) ? (fileViewerStore.folderTops[folder] || 0) : 0 }"
+          >
+            <div class="file-item">
+              <div class="file-icon">
+                <svg v-show="!fileViewerStore.isOpen(folder)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-folder" /></svg>
+                <svg v-show="fileViewerStore.isOpen(folder)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><use href="#icon-folder-open" /></svg>
+              </div>
+              <div class="file-name">
+                <span v-if="String(folder.clean_path || '').startsWith('root')">
+                  <span class="text-gray-500 dark:text-gray-400">root</span>{{ String(folder.clean_path).substring(4) }}
+                </span>
+                <span v-else>{{ folder.clean_path }}</span>
+              </div>
+
+              <MenuButton @click.stop>
+                <button type="button" class="file-dropdown-toggle">
+                  <EllipsisVerticalIcon class="w-5 h-5" />
+                </button>
+              </MenuButton>
+            </div>
+
+            <MenuItems as="div" class="dropdown down w-48">
+              <div class="py-2">
+                <MenuItem>
+                  <button @click="clearCacheForFolder(folder)">
+                    <CircleStackIcon v-show="!clearingCache" class="w-4 h-4 mr-2"/>
+                    <!-- TODO: replace with a spinner component -->
+                    <svg v-show="clearingCache" xmlns="http://www.w3.org/2000/svg" class="spin" fill="currentColor">
+                      <use href="#icon-spinner" />
+                    </svg>
+                    <span v-show="!cacheRecentlyCleared && !clearingCache">Clear indices</span>
+                  </button>
+                </MenuItem>
+
+                <MenuItem v-if="folder.can_download">
+                  <a :href="folder.download_url" @click.stop="">
+                    <CloudArrowDownIcon class="w-4 h-4 mr-2"/>
+                    Download
+                  </a>
+                </MenuItem>
+
+                <template v-if="folder.can_delete">
+                  <div class="divider"></div>
+                  <MenuItem>
+                    <button @click.stop="confirmDeleteFolder(folder)" :disabled="deleting">
+                      <TrashIcon v-show="!deleting" class="w-4 h-4 mr-2" />
+                      <!-- TODO: replace with a spinner icon -->
+                      <svg v-show="deleting" xmlns="http://www.w3.org/2000/svg" class="spin" fill="currentColor">
+                        <use href="#icon-spinner" />
+                      </svg>
+                      Delete
+                    </button>
+                  </MenuItem>
+                </template>
+              </div>
+            </MenuItems>
+          </Menu>
+
+          <div class="folder-files pl-3 ml-1 border-l border-gray-200 dark:border-gray-800"
+               v-show="fileViewerStore.isOpen(folder)">
+            <file-list-item
+              v-for="logFile in (folder.files || [])"
+              :key="logFile.identifier"
+              :log-file="logFile"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="pointer-events-none absolute z-10 bottom-0 h-4 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
+    </div>
+  </nav>
+</template>
+
+<script setup>
+import { onMounted, ref } from 'vue';
+import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
+import { TrashIcon, CircleStackIcon, CloudArrowDownIcon, EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
+import { useFileViewerStore } from '../stores/fileViewer.js';
+import FileListItem from './FileListItem.vue';
+
+const emit = defineEmits(['selectFile']);
+
+const fileViewerStore = useFileViewerStore();
+const scanInProgress = ref(false);
+const direction = ref('desc');
+const fileList = ref(null);
+
+const cacheRecentlyCleared = ref(false);
+const clearingCache = ref(false);
+const clearCacheForFolder = (folder) => {
+  clearingCache.value = true;
+
+  // Clear cache
+
+  clearingCache.value = false;
+  cacheRecentlyCleared.value = true;
+  setTimeout(() => cacheRecentlyCleared.value = false, 2000);
+}
+
+const deleting = ref(false);
+const confirmDeleteFolder = (folder) => {
+  if (confirm(`Are you sure you want to delete the log folder '${folder.path}'? THIS ACTION CANNOT BE UNDONE.`)) {
+    deleting.value = true;
+
+    // Delete
+
+    deleting.value = false;
+  }
+}
+
+const confirmDeleteSelectedFiles = () => {
+  if (confirm('Are you sure you want to delete selected log files? THIS ACTION CANNOT BE UNDONE.')) {
+    // $wire.call('deleteMultipleFiles', fileViewerStore.filesChecked)
+  }
+}
+
+onMounted(() => {
+  fileViewerStore.loadFolders();
+})
+</script>
+
+<style scoped>
+
+</style>
