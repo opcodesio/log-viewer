@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Controllers\DownloadFileController;
 use Opcodes\LogViewer\Http\Controllers\DownloadFolderController;
 use Opcodes\LogViewer\Http\Controllers\IndexController;

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Gate;
 class LogFileResource extends JsonResource
 {
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)

@@ -19,7 +19,7 @@ class IndexController
                 'path' => config('log-viewer.route_path'),
                 'back_to_system_url' => config('log-viewer.back_to_system_url'),
                 'back_to_system_label' => config('log-viewer.back_to_system_label'),
-                'max_log_size_formatted' => Utils::bytesForHumans(LogViewer::maxLogSize())
+                'max_log_size_formatted' => Utils::bytesForHumans(LogViewer::maxLogSize()),
             ],
         ]);
     }
