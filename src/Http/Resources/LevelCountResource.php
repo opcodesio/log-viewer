@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class LevelCountResource extends JsonResource
 {
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     public function toArray($request)
