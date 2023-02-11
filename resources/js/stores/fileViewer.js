@@ -6,6 +6,7 @@ export const useFileViewerStore = defineStore({
 
   state: () => ({
     folders: [],
+    selectedFile: null,
     scanInProgress: false,
     checkBoxesVisibility: false,
     filesChecked: [],

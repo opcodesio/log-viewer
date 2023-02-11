@@ -11,6 +11,15 @@ export const useLogViewerStore = defineStore({
 
   state: () => ({
     theme: Theme.System,
+    shorterStackTraces: false,
+
+    // Log data
+    logs: [],
+    levelCounts: [],
+    totalResults: 0,
+    hasMoreResults: false,
+
+    // Log scrolling behaviour data
     stacksOpen: [],
     stacksInView: [],
     stackTops: {},
@@ -19,6 +28,16 @@ export const useLogViewerStore = defineStore({
   }),
 
   getters: {
+    levelsFound: (state) => (state.levelCounts || []).filter(level => level.count > 0),
+
+    levelsSelected() {
+      return this.levelsFound.filter(levelCount => levelCount.selected);
+    },
+
+    totalResultsSelected() {
+      return this.levelsFound.reduce((total, level) => total + level.count, 0);
+    },
+
     isOpen: (state) => (index) => state.stacksOpen.includes(index),
 
     shouldBeSticky(state) {

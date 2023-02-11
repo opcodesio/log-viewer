@@ -3,13 +3,17 @@
     <div class="flex flex-col h-full w-full mx-3 mb-4">
       <div class="px-4 mb-4 flex items-start">
         <div class="flex items-center mr-6">
-          <div v-if="logViewerStore.showLevelsDropdown">
-            @include('log-viewer::partials.log-list-level-buttons')
+          <div v-if="showLevelsDropdown">
+            <LevelButtons />
           </div>
         </div>
         <div class="flex-1 flex justify-end min-h-[38px]">
-          <div class="flex-1">@include('log-viewer::partials.search-input')</div>
-          <div class="ml-5">@include('log-viewer::partials.log-list-share-page-button')</div>
+          <SearchInput />
+          <div class="ml-5">
+            <button @click="reloadResults" title="Reload current results" class="menu-button">
+              <ArrowPathIcon class="w-5 h-5" />
+            </button>
+          </div>
           <div class="ml-2">@include('log-viewer::partials.site-settings-dropdown')</div>
         </div>
       </div>
@@ -152,11 +156,14 @@
 
 <script setup>
 import { useLogViewerStore } from '../stores/logViewer.js';
-import { onMounted, ref } from 'vue';
-import { ExclamationCircleIcon, ExclamationTriangleIcon, InformationCircleIcon } from '@heroicons/vue/24/solid';
+import { computed, onMounted, ref } from 'vue';
+import { ExclamationCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, ArrowPathIcon } from '@heroicons/vue/24/solid';
 import { highlightSearchResult } from '../helpers.js';
 import { useSearchStore } from '../stores/search.js';
 import Pagination from './Pagination.vue';
+import LevelButtons from './LevelButtons.vue';
+import { useFileViewerStore } from '../stores/fileViewer.js';
+import SearchInput from './SearchInput.vue';
 
 const props = defineProps({
   expandAutomatically: {
@@ -164,12 +171,21 @@ const props = defineProps({
     default: false,
   },
 })
+const fileViewerStore = useFileViewerStore();
 const logViewerStore = useLogViewerStore();
 const searchStore = useSearchStore();
 
 const loading = ref(false);
 const perPage = ref(25);
 const direction = ref('desc');
+
+const showLevelsDropdown = computed(() => {
+  return fileViewerStore.selectedFile && String(searchStore.query || '').trim().length > 0;
+});
+
+const reloadResults = () => {
+  //
+}
 
 onMounted(() => {
   logViewerStore.reset();

@@ -584,6 +584,12 @@ video {
 .mr-2 {
   margin-right: 0.5rem;
 }
+.mr-5 {
+  margin-right: 1.25rem;
+}
+.mr-2\.5 {
+  margin-right: 0.625rem;
+}
 .mb-4 {
   margin-bottom: 1rem;
 }
@@ -601,12 +607,6 @@ video {
 }
 .mt-6 {
   margin-top: 1.5rem;
-}
-.mr-5 {
-  margin-right: 1.25rem;
-}
-.mr-2\.5 {
-  margin-right: 0.625rem;
 }
 .-mr-1 {
   margin-right: -0.25rem;
@@ -650,11 +650,11 @@ video {
 .h-4 {
   height: 1rem;
 }
-.h-\[18px\] {
-  height: 18px;
-}
 .h-14 {
   height: 3.5rem;
+}
+.h-\[18px\] {
+  height: 18px;
 }
 .h-0 {
   height: 0px;
@@ -683,9 +683,6 @@ video {
 .w-48 {
   width: 12rem;
 }
-.w-\[18px\] {
-  width: 18px;
-}
 .w-\[60px\] {
   width: 60px;
 }
@@ -701,11 +698,14 @@ video {
 .w-14 {
   width: 3.5rem;
 }
-.min-w-full {
-  min-width: 100%;
+.w-\[18px\] {
+  width: 18px;
 }
 .min-w-\[200px\] {
   min-width: 200px;
+}
+.min-w-full {
+  min-width: 100%;
 }
 .max-w-full {
   max-width: 100%;
@@ -919,6 +919,10 @@ video {
   --tw-text-opacity: 1;
   color: rgb(16 185 129 / var(--tw-text-opacity));
 }
+.text-sky-700 {
+  --tw-text-opacity: 1;
+  color: rgb(3 105 161 / var(--tw-text-opacity));
+}
 .text-gray-900 {
   --tw-text-opacity: 1;
   color: rgb(24 24 27 / var(--tw-text-opacity));
@@ -930,10 +934,6 @@ video {
 .text-gray-800 {
   --tw-text-opacity: 1;
   color: rgb(39 39 42 / var(--tw-text-opacity));
-}
-.text-sky-700 {
-  --tw-text-opacity: 1;
-  color: rgb(3 105 161 / var(--tw-text-opacity));
 }
 .text-green-600 {
   --tw-text-opacity: 1;
@@ -2505,14 +2505,14 @@ button.button:hover,  a.button:hover {
   border-color: rgb(39 39 42 / var(--tw-border-opacity));
 }
 
-.dark .dark\:border-gray-600 {
-  --tw-border-opacity: 1;
-  border-color: rgb(82 82 91 / var(--tw-border-opacity));
-}
-
 .dark .dark\:border-gray-700 {
   --tw-border-opacity: 1;
   border-color: rgb(63 63 70 / var(--tw-border-opacity));
+}
+
+.dark .dark\:border-gray-600 {
+  --tw-border-opacity: 1;
+  border-color: rgb(82 82 91 / var(--tw-border-opacity));
 }
 
 .dark .dark\:bg-gray-900 {
@@ -2551,6 +2551,11 @@ button.button:hover,  a.button:hover {
   color: rgb(5 150 105 / var(--tw-text-opacity));
 }
 
+.dark .dark\:text-sky-500 {
+  --tw-text-opacity: 1;
+  color: rgb(14 165 233 / var(--tw-text-opacity));
+}
+
 .dark .dark\:text-gray-200 {
   --tw-text-opacity: 1;
   color: rgb(228 228 231 / var(--tw-text-opacity));
@@ -2564,11 +2569,6 @@ button.button:hover,  a.button:hover {
 .dark .dark\:text-gray-500 {
   --tw-text-opacity: 1;
   color: rgb(113 113 122 / var(--tw-text-opacity));
-}
-
-.dark .dark\:text-sky-500 {
-  --tw-text-opacity: 1;
-  color: rgb(14 165 233 / var(--tw-text-opacity));
 }
 
 .dark .dark\:text-green-500 {
