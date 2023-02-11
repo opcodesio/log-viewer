@@ -207,6 +207,7 @@ class LogViewerService
 
     /**
      * Determine if Log Viewer's published assets are up-to-date.
+     *
      * @throws \RuntimeException
      */
     public function assetsAreCurrent(): bool
