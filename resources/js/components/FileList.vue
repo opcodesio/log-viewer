@@ -21,10 +21,7 @@
         <div class="relative">
           <div v-show="scanInProgress"
                class="flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <!-- TODO: replace with a spinner component -->
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline spin mr-1" fill="currentColor">
-              <use href="#icon-spinner" />
-            </svg>
+            <SpinnerIcon class="h-4 w-4 inline spin mr-1" />
             Indexing logs...
           </div>
         </div>
@@ -93,10 +90,7 @@
                 <MenuItem>
                   <button @click="clearCacheForFolder(folder)">
                     <CircleStackIcon v-show="!clearingCache" class="w-4 h-4 mr-2"/>
-                    <!-- TODO: replace with a spinner component -->
-                    <svg v-show="clearingCache" xmlns="http://www.w3.org/2000/svg" class="spin" fill="currentColor">
-                      <use href="#icon-spinner" />
-                    </svg>
+                    <SpinnerIcon v-show="clearingCache" class="spin" />
                     <span v-show="!cacheRecentlyCleared && !clearingCache">Clear indices</span>
                   </button>
                 </MenuItem>
@@ -113,10 +107,7 @@
                   <MenuItem>
                     <button @click.stop="confirmDeleteFolder(folder)" :disabled="deleting">
                       <TrashIcon v-show="!deleting" class="w-4 h-4 mr-2" />
-                      <!-- TODO: replace with a spinner icon -->
-                      <svg v-show="deleting" xmlns="http://www.w3.org/2000/svg" class="spin" fill="currentColor">
-                        <use href="#icon-spinner" />
-                      </svg>
+                      <SpinnerIcon v-show="deleting" class="spin" />
                       Delete
                     </button>
                   </MenuItem>
@@ -146,6 +137,7 @@ import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import { XMarkIcon, FolderIcon, FolderOpenIcon, ArrowLeftIcon, TrashIcon, CircleStackIcon, CloudArrowDownIcon, EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { useFileViewerStore } from '../stores/fileViewer.js';
 import FileListItem from './FileListItem.vue';
+import SpinnerIcon from './SpinnerIcon.vue';
 
 const emit = defineEmits(['selectFile']);
 

@@ -2,20 +2,11 @@
   <nav class="pagination" :key="`pagination-next-${paginator.current_page}`">
     <div class="previous">
       <button v-if="paginator.current_page !== 1" @click="previousPage" :disabled="loading" rel="prev">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <use href="#icon-arrow-left" />
-        </svg>
+        <ArrowLeftIcon class="h-5 w-5" />
       </button>
     </div>
     <div class="pages">
-<!--      @php-->
-<!--      $links = $paginator->toArray()['links'];-->
-<!--      // To get rid of the "previous" and "next" links-->
-<!--      array_shift($links);-->
-<!--      array_pop($links);-->
-<!--      @endphp-->
-
-      <template v-for="link in paginator.links">
+      <template v-for="link in links">
         <button v-if="link.active" class="border-emerald-500 text-emerald-600 dark:border-emerald-600 dark:text-emerald-500"
                 aria-current="page">
           {{ Number(link.label).toLocaleString() }}
@@ -29,9 +20,7 @@
     </div>
     <div class="next">
       <button v-if="paginator.has_more_pages" @click="nextPage" :disabled="loading" rel="next">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <use href="#icon-arrow-right" />
-        </svg>
+        <ArrowRightIcon class="h-5 w-5" />
       </button>
     </div>
   </nav>
@@ -39,6 +28,9 @@
 </template>
 
 <script setup>
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/vue/24/outline';
+import { computed } from 'vue';
+
 const props = defineProps({
   paginator: {
     type: Object,
@@ -49,4 +41,6 @@ const props = defineProps({
     required: true,
   },
 })
+
+const links = computed(() => (props.paginator.links || []).slice(1, -1));
 </script>

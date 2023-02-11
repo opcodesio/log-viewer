@@ -4,11 +4,7 @@
       <div class="prefix-icon">
         <label for="query" class="sr-only">Search</label>
         <MagnifyingGlassIcon v-show="!searchStore.searching" class="h-4 w-4" />
-        <!-- TODO: replace with a spinner component -->
-        <svg v-show="searchStore.searching" xmlns="http://www.w3.org/2000/svg"
-             class="spin w-5 h-5 -mr-1" viewBox="0 0 24 24" fill="currentColor">
-          <use href="#icon-spinner" />
-        </svg>
+        <SpinnerIcon v-show="searchStore.searching" class="spin w-5 h-5 -mr-1" />
       </div>
       <div class="relative flex-1 m-1">
         <input v-model.lazy="searchStore.query" name="query" id="query" type="text" />
@@ -42,6 +38,7 @@ import { MagnifyingGlassIcon, XMarkIcon, ArrowRightIcon } from '@heroicons/vue/2
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { useFileViewerStore } from '../stores/fileViewer.js';
 import { computed } from 'vue';
+import SpinnerIcon from './SpinnerIcon.vue';
 
 const searchStore = useSearchStore();
 const logViewerStore = useLogViewerStore();

@@ -52,6 +52,14 @@ export const useFileViewerStore = defineStore({
   },
 
   actions: {
+    selectFile(logFile) {
+      if (logFile && this.selectedFile?.identifier === logFile?.identifier) {
+        this.selectedFile = null;
+      } else {
+        this.selectedFile = logFile;
+      }
+    },
+
     initScanCheck(routeScanCheck, routeScan) {
       if (this.scanInProgress) return;
       fetch(routeScanCheck)

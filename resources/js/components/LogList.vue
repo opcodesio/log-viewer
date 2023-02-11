@@ -10,17 +10,19 @@
         <div class="flex-1 flex justify-end min-h-[38px]">
           <SearchInput />
           <div class="ml-5">
-            <button @click="reloadResults" title="Reload current results" class="menu-button">
+            <button @click="logViewerStore.loadLogs()" title="Reload current results" class="menu-button">
               <ArrowPathIcon class="w-5 h-5" />
             </button>
           </div>
-          <div class="ml-2">@include('log-viewer::partials.site-settings-dropdown')</div>
+          <div class="ml-2"><SiteSettingsDropdown /></div>
         </div>
       </div>
 
-      @if(isset($logs) && ($logs->isNotEmpty() || !$hasMoreResults))
-      <div class="relative overflow-hidden text-sm h-full">
-        <div id="log-item-container" class="log-item-container h-full overflow-y-auto px-4"
+      <div id="log-item-container" class="relative">
+
+      </div>
+      <div v-if="logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults)" class="relative overflow-hidden text-sm h-full">
+        <div class="log-item-container h-full overflow-y-auto px-4"
              @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
             <table class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
@@ -35,7 +37,7 @@
                     <span>Description</span>
                     <div>
                       <label for="log-sort-direction" class="sr-only">Sort direction</label>
-                      <select id="log-sort-direction" v-model="direction"
+                      <select id="log-sort-direction" v-model="logViewerStore.direction"
                               class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
                         <option value="desc">Newest first</option>
                         <option value="asc">Oldest first</option>
@@ -57,8 +59,8 @@
               </tr>
               </thead>
 
-              <template v-if="logs && logs.length > 0">
-                <tbody v-for="(log, index) in logs" :key="index"
+              <template v-if="logViewerStore.logs && logViewerStore.logs.length > 0">
+                <tbody v-for="(log, index) in logViewerStore.logs" :key="index"
                        :class="[index === 0 ? 'first' : '', 'log-group']"
                        :id="`tbody-${index}`" :data-index="index"
                 >
@@ -68,7 +70,7 @@
                 >
                   <td class="log-level log-level-icon">
                     <ExclamationCircleIcon v-if="log.level_class === 'danger'" class="w-4 h-4" />
-                    <ExclamationTriangleIcon v-if="log.level_class === 'warning'" class="w-4 h-4" />
+                    <ExclamationTriangleIcon v-else-if="log.level_class === 'warning'" class="w-4 h-4" />
                     <InformationCircleIcon v-else class="w-4 h-4" />
                   </td>
                   <td class="log-level truncate hidden lg:table-cell">{{ log.level_name }}</td>
@@ -79,7 +81,7 @@
                   <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90"
                       v-html="highlightSearchResult(log.text, searchStore.query)"></td>
                   <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs">
-                    @include('log-viewer::partials.log-list-link-button')
+                    <LogCopyButton :log="log" />
                   </td>
                 </tr>
                 <tr v-show="logViewerStore.isOpen(index)">
@@ -108,8 +110,7 @@
                         class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
                         @click.prevent="fileStore.selectFile(null)">Search all files
                       </button>
-                      @if(isset($levels) && count(array_filter($levels, fn ($level) => $level->count > 0 &&
-                      $level->selected)) === 0 && count(array_filter($levels, fn ($level) => $level->count > 0)) > 0)
+                      @if(isset($levels) && count(array_filter($levels, fn ($level) => $level->count > 0 && $level->selected)) === 0 && count(array_filter($levels, fn ($level) => $level->count > 0)) > 0)
                       <button
                         class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
                         @click="selectAllLevels">Select all severities
@@ -127,21 +128,17 @@
         <div class="absolute inset-0 top-9 px-4 z-20" v-show="loading">
           <div
             class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 spin" fill="currentColor">
-              <use href="#icon-spinner" />
-            </svg>
+            <SpinnerIcon class="w-14 h-14 spin" />
           </div>
         </div>
       </div>
-      @else
-      <div class="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
-        <span v-if="has_more_results">Searching...</span>
+      <div v-else class="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
+        <span v-if="logViewerStore.hasMoreResults">Searching...</span>
         <span v-else>Select a file or start searching...</span>
       </div>
-      @endisset
 
-      <div v-if="paginator" class="px-4">
-        <Pagination :paginator="paginator" :loading="false" />
+      <div v-if="logViewerStore.paginator" class="px-4">
+        <Pagination :paginator="logViewerStore.paginator" :loading="false" />
       </div>
 
       <div class="grow flex flex-col justify-end text-right px-4 mt-3">
@@ -156,7 +153,7 @@
 
 <script setup>
 import { useLogViewerStore } from '../stores/logViewer.js';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { ExclamationCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, ArrowPathIcon } from '@heroicons/vue/24/solid';
 import { highlightSearchResult } from '../helpers.js';
 import { useSearchStore } from '../stores/search.js';
@@ -164,34 +161,26 @@ import Pagination from './Pagination.vue';
 import LevelButtons from './LevelButtons.vue';
 import { useFileViewerStore } from '../stores/fileViewer.js';
 import SearchInput from './SearchInput.vue';
+import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
+import SpinnerIcon from './SpinnerIcon.vue';
+import LogCopyButton from './LogCopyButton.vue';
 
-const props = defineProps({
-  expandAutomatically: {
-    type: Boolean,
-    default: false,
-  },
-})
 const fileViewerStore = useFileViewerStore();
 const logViewerStore = useLogViewerStore();
 const searchStore = useSearchStore();
 
 const loading = ref(false);
 const perPage = ref(25);
-const direction = ref('desc');
 
 const showLevelsDropdown = computed(() => {
   return fileViewerStore.selectedFile && String(searchStore.query || '').trim().length > 0;
 });
 
-const reloadResults = () => {
-  //
-}
+watch(() => fileViewerStore.selectedFile, () => {
+  logViewerStore.loadLogs();
+});
 
 onMounted(() => {
-  logViewerStore.reset();
-
-  if (props.expandAutomatically) {
-    logViewerStore.stacksOpen.push(0);
-  }
+  logViewerStore.loadLogs();
 })
 </script>

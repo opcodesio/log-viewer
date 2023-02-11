@@ -1,7 +1,7 @@
 <template>
   <div class="file-item-container flex"
-       :class="[logFile.selected ? 'active' : '']"
-       @click="emit('selectFile', logFile)"
+       :class="[isSelected ? 'active' : '']"
+       @click="fileViewerStore.selectFile(logFile)"
   >
     <Menu>
       <div class="file-item grow">
@@ -22,21 +22,18 @@
 
       <MenuItems as="div" class="dropdown down w-48">
         <div class="py-2">
-          <MenuItem>
-            <button @click="clearCacheForFile">
+          <MenuItem @click.stop.prevent="clearCacheForFile">
+            <button>
               <CircleStackIcon v-show="!loading" class="h-4 w-4 mr-2" />
-              <!-- TODO: replace this with a spinner component -->
-              <svg v-show="loading" xmlns="http://www.w3.org/2000/svg" class="spin" fill="currentColor">
-                <use href="#icon-spinner" />
-              </svg>
+              <SpinnerIcon v-show="loading" class="spin" />
               <span v-show="!cacheRecentlyCleared && !loading">Clear index</span>
               <span v-show="!cacheRecentlyCleared && loading">Clearing...</span>
               <span v-show="cacheRecentlyCleared" class="text-emerald-500">Index cleared</span>
             </button>
           </MenuItem>
 
-          <MenuItem v-if="logFile.can_download">
-            <a :href="logFile.download_url" @click.stop="">
+          <MenuItem v-if="logFile.can_download" @click.stop.prevent>
+            <a :href="logFile.download_url">
               <CloudArrowDownIcon class="w-4 h-4 mr-2" />
               Download
             </a>
@@ -45,15 +42,15 @@
           <template v-if="logFile.can_delete">
             <div class="divider"></div>
 
-            <MenuItem>
-              <button @click.stop="confirmDeletion">
+            <MenuItem @click.stop.prevent="confirmDeletion">
+              <button>
                 <TrashIcon class="w-4 h-4 mr-2" />
                 Delete
               </button>
             </MenuItem>
 
-            <MenuItem>
-              <button @click.stop="deleteMultiple">
+            <MenuItem @click.stop.prevent="deleteMultiple">
+              <button>
                 <TrashIcon class="w-4 h-4 mr-2" />
                 Delete Multiple
               </button>
@@ -66,10 +63,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import { TrashIcon, CloudArrowDownIcon, EllipsisVerticalIcon, CircleStackIcon } from '@heroicons/vue/24/outline';
 import { useFileViewerStore } from '../stores/fileViewer.js';
+import SpinnerIcon from './SpinnerIcon.vue';
 
 const props = defineProps({
   logFile: {
@@ -87,6 +85,9 @@ const fileViewerStore = useFileViewerStore();
 // data
 const loading = ref(false);
 const cacheRecentlyCleared = ref(false);
+const isSelected = computed(() => {
+  return fileViewerStore.selectedFile && fileViewerStore.selectedFile.identifier === props.logFile.identifier;
+})
 
 const confirmDeletion = () => {
   if (confirm(`Are you sure you want to delete the log file '${props.logFile.name}'? THIS ACTION CANNOT BE UNDONE.`)) {

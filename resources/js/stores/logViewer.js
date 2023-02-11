@@ -1,4 +1,8 @@
 import { defineStore } from 'pinia';
+import { useFileViewerStore } from './fileViewer.js';
+import axios from 'axios';
+import { useSearchStore } from './search.js';
+import { nextTick } from 'vue';
 
 export const Theme = {
   System: 'System',
@@ -12,9 +16,12 @@ export const useLogViewerStore = defineStore({
   state: () => ({
     theme: Theme.System,
     shorterStackTraces: false,
+    direction: 'desc',
 
     // Log data
+    loading: false,
     logs: [],
+    paginator: {},
     levelCounts: [],
     totalResults: 0,
     hasMoreResults: false,
@@ -28,6 +35,11 @@ export const useLogViewerStore = defineStore({
   }),
 
   getters: {
+    selectedFile() {
+      const fileViewerStore = useFileViewerStore();
+      return fileViewerStore.selectedFile;
+    },
+
     levelsFound: (state) => (state.levelCounts || []).filter(level => level.count > 0),
 
     levelsSelected() {
@@ -74,12 +86,17 @@ export const useLogViewerStore = defineStore({
     toggleTheme() {
       switch (this.theme) {
         case Theme.System:
-          return this.theme = Theme.Light;
+          this.theme = Theme.Light;
+          break;
         case Theme.Light:
-          return this.theme = Theme.Dark;
+          this.theme = Theme.Dark;
+          break;
         default:
-          return this.theme = Theme.System;
+          this.theme = Theme.System;
+          break;
       }
+
+      this.syncTheme();
     },
 
     syncTheme() {
@@ -123,6 +140,39 @@ export const useLogViewerStore = defineStore({
       const container = document.getElementById('log-item-container');
       this.containerTop = container.getBoundingClientRect().top;
       container.scrollTo(0, 0);
+    },
+
+    loadLogs() {
+      const searchStore = useSearchStore();
+      const params = {
+        file: this.selectedFile?.identifier,
+        direction: this.direction,
+        query: searchStore.query,
+      };
+
+      this.loading = true;
+
+      axios.get(`${LogViewer.path}/api/logs`, { params })
+        .then(({ data }) => {
+          this.logs = data.logs;
+          this.paginator = data.paginator;
+          this.levelCounts = data.levelCounts;
+          this.hasMoreResults = data.hasMoreResults;
+          this.percentScanned = data.percentScanned;
+
+          if (data.expandAutomatically) {
+            this.stacksOpen.push(0);
+          }
+
+          nextTick(() => {
+            this.reset();
+          })
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.loading = false;
+          console.error(error);
+        });
     },
   },
 })

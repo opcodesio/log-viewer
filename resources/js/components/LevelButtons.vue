@@ -1,6 +1,6 @@
 <template>
   <div class="flex items-center">
-    <Menu class="mr-5 relative log-levels-selector">
+    <Menu as="div" class="mr-5 relative log-levels-selector">
 
       <MenuButton>
         <button type="button" class="dropdown-toggle badge none" :class="levelsSelected.length > 0 ? 'active' : ''">
