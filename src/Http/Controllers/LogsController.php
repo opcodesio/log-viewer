@@ -15,6 +15,7 @@ use Opcodes\LogViewer\PreferenceStore;
 class LogsController
 {
     const OLDEST_FIRST = 'asc';
+
     const NEWEST_FIRST = 'desc';
 
     public function index(Request $request)
