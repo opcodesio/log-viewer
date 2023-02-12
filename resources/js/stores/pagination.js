@@ -11,9 +11,9 @@ export const usePaginationStore = defineStore({
   getters: {
     currentPage: (state) => state.page !== 1 ? Number(state.page) : null,
 
-    links: (state) => (state.pagination.links || []).slice(1, -1),
+    links: (state) => (state.pagination?.links || []).slice(1, -1),
 
-    hasPages: (state) => state.pagination?.links?.length > 2,
+    hasPages: (state) => state.pagination?.last_page > 1,
 
     hasMorePages: (state) => state.pagination?.next_page_url !== null,
   },
@@ -21,6 +21,10 @@ export const usePaginationStore = defineStore({
   actions: {
     setPagination(pagination) {
       this.pagination = pagination;
+
+      if (this.pagination?.last_page < this.page) {
+        this.page = this.pagination?.last_page;
+      }
     },
 
     gotoPage(page) {

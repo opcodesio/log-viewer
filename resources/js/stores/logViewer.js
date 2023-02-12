@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
-import { useFileViewerStore } from './fileViewer.js';
+import { useFileStore } from './files.js';
 import axios from 'axios';
 import { useSearchStore } from './search.js';
 import { nextTick } from 'vue';
 import { usePaginationStore } from './pagination.js';
 import { useSeverityStore } from './severity.js';
+import { useLocalStorage } from '@vueuse/core';
 
 export const Theme = {
   System: 'System',
@@ -18,7 +19,7 @@ export const useLogViewerStore = defineStore({
   state: () => ({
     theme: Theme.System,
     shorterStackTraces: false,
-    direction: 'desc',
+    direction: useLocalStorage('logViewerDirection', 'desc'),
 
     // Log data
     loading: false,
@@ -36,8 +37,8 @@ export const useLogViewerStore = defineStore({
 
   getters: {
     selectedFile() {
-      const fileViewerStore = useFileViewerStore();
-      return fileViewerStore.selectedFile;
+      const fileStore = useFileStore();
+      return fileStore.selectedFile;
     },
 
     isOpen: (state) => (index) => state.stacksOpen.includes(index),
@@ -142,6 +143,7 @@ export const useLogViewerStore = defineStore({
         direction: this.direction,
         query: searchStore.query,
         page: paginationStore.currentPage,
+        levels: severityStore.selectedLevels,
       };
 
       this.loading = true;
@@ -167,10 +169,6 @@ export const useLogViewerStore = defineStore({
           this.loading = false;
           console.error(error);
         });
-    },
-
-    selectAllLevels() {
-
     },
   },
 })

@@ -1,24 +1,24 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Opcodes\LogViewer\Http\Controllers\DownloadFileController;
-use Opcodes\LogViewer\Http\Controllers\DownloadFolderController;
+use Opcodes\LogViewer\Http\Controllers\FilesController;
 use Opcodes\LogViewer\Http\Controllers\IndexController;
 use Opcodes\LogViewer\Http\Controllers\IsScanRequiredController;
 use Opcodes\LogViewer\Http\Controllers\ScanFilesController;
 use Opcodes\LogViewer\Http\Controllers\SearchProgressController;
 
 Route::prefix('api')->group(function () {
-    Route::get('folders', 'LogFileController@folders')->name('log-viwer.folders');
+    Route::get('folders', 'FoldersController@index')->name('log-viewer.folders');
+    Route::get('folders/{folderIdentifier}/download', 'FoldersController@download')->name('log-viewer.download-folder');
+
+    Route::get('files/{fileIdentifier}/download', 'FilesController@download')->name('log-viewer.download-file');
+
     Route::get('logs', 'LogsController@index')->name('log-viewer.logs');
 
-    Route::get('file/{fileIdentifier}/download', DownloadFileController::class)->name('blv.download-file');
-    Route::get('folder/{folderIdentifier}/download', DownloadFolderController::class)->name('blv.download-folder');
+    Route::get('is-scan-required', IsScanRequiredController::class)->name('log-viewer.is-scan-required');
+    Route::get('scan-files', ScanFilesController::class)->name('log-viewer.scan-files');
 
-    Route::get('is-scan-required', IsScanRequiredController::class)->name('blv.is-scan-required');
-    Route::get('scan-files', ScanFilesController::class)->name('blv.scan-files');
-
-    Route::get('search-progress', SearchProgressController::class)->name('blv.search-more');
+    Route::get('search-progress', SearchProgressController::class)->name('log-viewer.search-more');
 });
 
 // Catch all route

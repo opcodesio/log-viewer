@@ -17,13 +17,13 @@ class LogsController
     const OLDEST_FIRST = 'asc';
     const NEWEST_FIRST = 'desc';
 
-    public function index(Request $request, PreferenceStore $preferenceStore)
+    public function index(Request $request)
     {
         $fileIdentifier = $request->query('file', '');
         $query = $request->query('query', '');
         $direction = $request->query('direction', 'desc');
         $log = $request->query('log', null);
-        $selectedLevels = $preferenceStore->get('selected_levels', LogReader::getDefaultLevels());
+        $selectedLevels = $request->query('levels', []);
         $perPage = $request->query('per_page', 25);
         $hasMoreResults = false;
         $percentScanned = 0;

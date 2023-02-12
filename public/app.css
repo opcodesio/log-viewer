@@ -508,6 +508,9 @@ video {
 .pointer-events-none {
   pointer-events: none;
 }
+.static {
+  position: static;
+}
 .absolute {
   position: absolute;
 }

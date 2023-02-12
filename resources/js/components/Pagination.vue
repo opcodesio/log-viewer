@@ -29,6 +29,8 @@
 <script setup>
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/vue/24/outline';
 import { usePaginationStore } from '../stores/pagination.js';
+import { useRoute, useRouter } from 'vue-router';
+import { watch } from 'vue';
 
 const props = defineProps({
   loading: {
@@ -38,4 +40,21 @@ const props = defineProps({
 })
 
 const paginationStore = usePaginationStore();
+const router = useRouter();
+const route = useRoute();
+
+watch(
+  () => paginationStore.currentPage,
+  (newPage) => {
+    const query = { ... route.query };
+
+    if (newPage === 1) {
+      delete query.page;
+    } else {
+      query.page = newPage;
+    }
+
+    router.push({ name: 'home', query });
+  }
+)
 </script>

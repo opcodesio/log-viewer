@@ -1,13 +1,19 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { usePaginationStore } from './pagination.js';
+import { useLocalStorage } from '@vueuse/core';
 
-export const useFileViewerStore = defineStore({
-  id: 'fileViewer',
+export const useFileStore = defineStore({
+  id: 'fileStore',
 
   state: () => ({
+    // data
     folders: [],
+    direction: useLocalStorage('fileViewerDirection', 'desc'),
     selectedFile: null,
+
+    // control variables
+    loading: false,
     scanInProgress: false,
     checkBoxesVisibility: false,
     filesChecked: [],
@@ -55,8 +61,13 @@ export const useFileViewerStore = defineStore({
   },
 
   actions: {
+    setDirection(direction) {
+      this.direction = direction;
+    },
+
     selectFile(logFileIdentifier) {
       const paginationStore = usePaginationStore();
+      const originalSelectedFile = this.selectedFile;
 
       if (logFileIdentifier && this.selectedFile?.identifier === logFileIdentifier) {
         this.selectedFile = null;
@@ -64,7 +75,21 @@ export const useFileViewerStore = defineStore({
         this.selectedFile = this.files.find(file => file.identifier === logFileIdentifier);
       }
 
-      paginationStore.reset();
+      this.openFolderForActiveFile();
+
+      if (originalSelectedFile && originalSelectedFile !== this.selectedFile) {
+        paginationStore.reset();
+      }
+    },
+
+    openFolderForActiveFile() {
+      if (this.selectedFile) {
+        const folder = this.folders.find(folder => folder.files.some(file => file.identifier === this.selectedFile.identifier));
+
+        if (!this.isOpen(folder)) {
+          this.toggle(folder);
+        }
+      }
     },
 
     initScanCheck(routeScanCheck, routeScan) {
@@ -89,13 +114,18 @@ export const useFileViewerStore = defineStore({
     },
 
     loadFolders() {
+      this.loading = true;
+
       // load the folders from the server
-      axios.get(`${LogViewer.path}/api/folders`)
+      return axios.get(`${LogViewer.path}/api/folders`, { params: { direction: this.direction }})
         .then(({ data }) => {
           this.folders = data;
+          this.loading = false;
+          this.openFolderForActiveFile();
         })
-        .catch(() => {
-          //
+        .catch((error) => {
+          this.loading = false;
+          console.error(error);
         })
     },
 

@@ -104,14 +104,14 @@
                         class="px-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
                         @click="searchStore.clearQuery">Clear search query
                       </button>
-                      <button v-if="searchStore.query?.length > 0 && fileViewerStore.selectedFile"
+                      <button v-if="searchStore.query?.length > 0 && fileStore.selectedFile"
                         class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
-                        @click.prevent="fileViewerStore.selectFile(null)">Search all files
+                        @click.prevent="fileStore.selectFile(null)">Search all files
                       </button>
                       <button
                         v-if="severityStore.levelsFound.length > 0 && severityStore.levelsSelected.length === 0"
                         class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
-                        @click="logViewerStore.selectAllLevels">Select all severities
+                        @click="severityStore.selectAllLevels">Select all severities
                       </button>
                     </div>
                   </div>
@@ -150,13 +150,13 @@
 
 <script setup>
 import { useLogViewerStore } from '../stores/logViewer.js';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { ExclamationCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, ArrowPathIcon } from '@heroicons/vue/24/solid';
 import { highlightSearchResult } from '../helpers.js';
 import { useSearchStore } from '../stores/search.js';
 import Pagination from './Pagination.vue';
 import LevelButtons from './LevelButtons.vue';
-import { useFileViewerStore } from '../stores/fileViewer.js';
+import { useFileStore } from '../stores/files.js';
 import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
@@ -164,7 +164,7 @@ import LogCopyButton from './LogCopyButton.vue';
 import { usePaginationStore } from '../stores/pagination.js';
 import { useSeverityStore } from '../stores/severity.js';
 
-const fileViewerStore = useFileViewerStore();
+const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
 const searchStore = useSearchStore();
 const paginationStore = usePaginationStore();
@@ -174,17 +174,11 @@ const loading = ref(false);
 const perPage = ref(25);
 
 const showLevelsDropdown = computed(() => {
-  return fileViewerStore.selectedFile || String(searchStore.query || '').trim().length > 0;
+  return fileStore.selectedFile || String(searchStore.query || '').trim().length > 0;
 });
 
-watch([
-  () => fileViewerStore.selectedFile,
-  () => paginationStore.currentPage,
-], () => {
-  logViewerStore.loadLogs();
-});
-
-onMounted(() => {
-  logViewerStore.loadLogs();
-})
+watch(
+  () => logViewerStore.direction,
+  () => logViewerStore.loadLogs()
+)
 </script>

@@ -27,7 +27,7 @@
         </div>
         <div class="text-sm text-gray-500 dark:text-gray-400">
           <label for="file-sort-direction" class="sr-only">Sort direction</label>
-          <select id="file-sort-direction" v-model="direction"
+          <select id="file-sort-direction" v-model="fileStore.direction"
                   class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
             <option value="desc">Newest first</option>
             <option value="asc">Oldest first</option>
@@ -37,16 +37,16 @@
     </div>
 
     <div class="grid grid-flow-col pr-4 mt-2"
-         :class="[fileViewerStore.hasFilesChecked ? 'justify-between' : 'justify-end']"
-         v-show="fileViewerStore.checkBoxesVisibility">
-      <button v-show="fileViewerStore.hasFilesChecked"
+         :class="[fileStore.hasFilesChecked ? 'justify-between' : 'justify-end']"
+         v-show="fileStore.checkBoxesVisibility">
+      <button v-show="fileStore.hasFilesChecked"
               @click.stop="confirmDeleteSelectedFiles"
               class="button inline-flex">
         <TrashIcon class="w-5 mr-1" />
         Delete selected files
       </button>
       <button class="button inline-flex"
-              @click.stop="fileViewerStore.toggleCheckboxVisibility(); fileViewerStore.resetChecks()">
+              @click.stop="fileStore.toggleCheckboxVisibility(); fileStore.resetChecks()">
         Cancel
         <XMarkIcon class="w-5 ml-1" />
       </button>
@@ -55,74 +55,76 @@
     <div id="file-list-container" class="relative h-full overflow-hidden">
       <div class="pointer-events-none absolute z-10 top-0 h-4 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
 
-      <div class="file-list" ref="fileList" @scroll="(event) => fileViewerStore.onScroll(event)">
-        <div v-for="folder in fileViewerStore.folders"
+      <div class="file-list" ref="fileList" @scroll="(event) => fileStore.onScroll(event)">
+        <div v-for="folder in fileStore.folders"
              :key="folder.identifier"
              :id="`folder-${folder.identifier}`"
              class="relative folder-container"
         >
-          <Menu as="div" class="folder-item-container"
-                @click="fileViewerStore.toggle(folder)"
-                :class="[fileViewerStore.isOpen(folder) ? 'active-folder' : '', fileViewerStore.shouldBeSticky(folder) ? 'sticky ' + (open ? 'z-20' : 'z-10') : '' ]"
-                :style="{ top: fileViewerStore.isOpen(folder) ? (fileViewerStore.folderTops[folder] || 0) : 0 }"
-          >
-            <div class="file-item">
-              <div class="file-icon">
-                <FolderIcon v-show="!fileViewerStore.isOpen(folder)" class="w-5 h-5" />
-                <FolderOpenIcon v-show="fileViewerStore.isOpen(folder)" class="w-5 h-5" />
-              </div>
-              <div class="file-name">
-                <span v-if="String(folder.clean_path || '').startsWith('root')">
-                  <span class="text-gray-500 dark:text-gray-400">root</span>{{ String(folder.clean_path).substring(4) }}
-                </span>
-                <span v-else>{{ folder.clean_path }}</span>
-              </div>
+          <Menu v-slot="{ open }">
+            <div class="folder-item-container"
+                 @click="fileStore.toggle(folder)"
+                 :class="[fileStore.isOpen(folder) ? 'active-folder' : '', fileStore.shouldBeSticky(folder) ? 'sticky ' + (open ? 'z-20' : 'z-10') : '' ]"
+                 :style="{ top: fileStore.isOpen(folder) ? (fileStore.folderTops[folder] || 0) : 0 }"
+            >
+              <div class="file-item">
+                <div class="file-icon">
+                  <FolderIcon v-show="!fileStore.isOpen(folder)" class="w-5 h-5" />
+                  <FolderOpenIcon v-show="fileStore.isOpen(folder)" class="w-5 h-5" />
+                </div>
+                <div class="file-name">
+                  <span v-if="String(folder.clean_path || '').startsWith('root')">
+                    <span class="text-gray-500 dark:text-gray-400">root</span>{{ String(folder.clean_path).substring(4) }}
+                  </span>
+                  <span v-else>{{ folder.clean_path }}</span>
+                </div>
 
-              <MenuButton @click.stop>
-                <button type="button" class="file-dropdown-toggle">
-                  <EllipsisVerticalIcon class="w-5 h-5" />
-                </button>
-              </MenuButton>
-            </div>
-
-            <MenuItems as="div" class="dropdown down w-48">
-              <div class="py-2">
-                <MenuItem>
-                  <button @click="clearCacheForFolder(folder)">
-                    <CircleStackIcon v-show="!clearingCache" class="w-4 h-4 mr-2"/>
-                    <SpinnerIcon v-show="clearingCache" class="spin" />
-                    <span v-show="!cacheRecentlyCleared && !clearingCache">Clear indices</span>
+                <MenuButton @click.stop>
+                  <button type="button" class="file-dropdown-toggle">
+                    <EllipsisVerticalIcon class="w-5 h-5" />
                   </button>
-                </MenuItem>
+                </MenuButton>
+              </div>
 
-                <MenuItem v-if="folder.can_download">
-                  <a :href="folder.download_url" @click.stop="">
-                    <CloudArrowDownIcon class="w-4 h-4 mr-2"/>
-                    Download
-                  </a>
-                </MenuItem>
-
-                <template v-if="folder.can_delete">
-                  <div class="divider"></div>
+              <MenuItems static v-show="open" as="div" class="dropdown down w-48">
+                <div class="py-2">
                   <MenuItem>
-                    <button @click.stop="confirmDeleteFolder(folder)" :disabled="deleting">
-                      <TrashIcon v-show="!deleting" class="w-4 h-4 mr-2" />
-                      <SpinnerIcon v-show="deleting" class="spin" />
-                      Delete
+                    <button @click="clearCacheForFolder(folder)">
+                      <CircleStackIcon v-show="!clearingCache" class="w-4 h-4 mr-2"/>
+                      <SpinnerIcon v-show="clearingCache" class="spin" />
+                      <span v-show="!cacheRecentlyCleared && !clearingCache">Clear indices</span>
                     </button>
                   </MenuItem>
-                </template>
-              </div>
-            </MenuItems>
+
+                  <MenuItem v-if="folder.can_download">
+                    <a :href="folder.download_url" @click.stop="">
+                      <CloudArrowDownIcon class="w-4 h-4 mr-2"/>
+                      Download
+                    </a>
+                  </MenuItem>
+
+                  <template v-if="folder.can_delete">
+                    <div class="divider"></div>
+                    <MenuItem>
+                      <button @click.stop="confirmDeleteFolder(folder)" :disabled="deleting">
+                        <TrashIcon v-show="!deleting" class="w-4 h-4 mr-2" />
+                        <SpinnerIcon v-show="deleting" class="spin" />
+                        Delete
+                      </button>
+                    </MenuItem>
+                  </template>
+                </div>
+              </MenuItems>
+            </div>
           </Menu>
 
           <div class="folder-files pl-3 ml-1 border-l border-gray-200 dark:border-gray-800"
-               v-show="fileViewerStore.isOpen(folder)">
+               v-show="fileStore.isOpen(folder)">
             <file-list-item
               v-for="logFile in (folder.files || [])"
               :key="logFile.identifier"
               :log-file="logFile"
-              @click="selectFile(logFile)"
+              @click="fileStore.selectFile(logFile.identifier)"
             />
           </div>
         </div>
@@ -136,39 +138,20 @@
 import { onMounted, ref, watch } from 'vue';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import { XMarkIcon, FolderIcon, FolderOpenIcon, ArrowLeftIcon, TrashIcon, CircleStackIcon, CloudArrowDownIcon, EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
-import { useFileViewerStore } from '../stores/fileViewer.js';
+import { useFileStore } from '../stores/files.js';
 import FileListItem from './FileListItem.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import { useRoute, useRouter } from 'vue-router';
-
-const emit = defineEmits(['selectFile']);
+import { useSearchStore } from '../stores/search.js';
+import { useLogViewerStore } from '../stores/logViewer.js';
 
 const router = useRouter();
 const route = useRoute();
-const fileViewerStore = useFileViewerStore();
+const fileStore = useFileStore();
+const searchStore = useSearchStore();
+const logViewerStore = useLogViewerStore();
 const scanInProgress = ref(false);
-const direction = ref('desc');
 const fileList = ref(null);
-
-const selectFile = (logFile) => {
-  const query = { ...route.query };
-
-  if (logFile && logFile.identifier === fileViewerStore.selectedFile?.identifier) {
-    delete query.file;
-  } else {
-    query.file = logFile.identifier;
-  }
-
-  router.push({ name: 'home', query })
-};
-
-watch(
-  () => route.query.file,
-  (file) => {
-    console.log(file);
-    fileViewerStore.selectFile(file);
-  }
-)
 
 const cacheRecentlyCleared = ref(false);
 const clearingCache = ref(false);
@@ -195,13 +178,27 @@ const confirmDeleteFolder = (folder) => {
 
 const confirmDeleteSelectedFiles = () => {
   if (confirm('Are you sure you want to delete selected log files? THIS ACTION CANNOT BE UNDONE.')) {
-    // $wire.call('deleteMultipleFiles', fileViewerStore.filesChecked)
+    // $wire.call('deleteMultipleFiles', fileStore.filesChecked)
   }
 }
 
-onMounted(() => {
-  fileViewerStore.loadFolders();
-})
+onMounted(async () => {
+  const route = useRoute();
+  await fileStore.loadFolders();
+
+  if (route.query.file) {
+    fileStore.selectFile(route.query.file);
+  }
+
+  if (fileStore.selectedFile || searchStore.hasQuery) {
+    logViewerStore.loadLogs();
+  }
+});
+
+watch(
+  () => fileStore.direction,
+  () => fileStore.loadFolders()
+)
 </script>
 
 <style scoped>

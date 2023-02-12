@@ -63,7 +63,7 @@
 import { computed, ref } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { CircleStackIcon, CloudArrowDownIcon, EllipsisVerticalIcon, TrashIcon } from '@heroicons/vue/24/outline';
-import { useFileViewerStore } from '../stores/fileViewer.js';
+import { useFileStore } from '../stores/files.js';
 import SpinnerIcon from './SpinnerIcon.vue';
 
 const props = defineProps({
@@ -77,13 +77,13 @@ const props = defineProps({
   },
 })
 const emit = defineEmits(['selectForDeletion']);
-const fileViewerStore = useFileViewerStore();
+const fileStore = useFileStore();
 
 // data
 const loading = ref(false);
 const cacheRecentlyCleared = ref(false);
 const isSelected = computed(() => {
-  return fileViewerStore.selectedFile && fileViewerStore.selectedFile.identifier === props.logFile.identifier;
+  return fileStore.selectedFile && fileStore.selectedFile.identifier === props.logFile.identifier;
 })
 
 const confirmDeletion = () => {
@@ -93,8 +93,8 @@ const confirmDeletion = () => {
 }
 
 const deleteMultiple = () => {
-  fileViewerStore.toggleCheckboxVisibility();
-  fileViewerStore.checkBoxToggle(props.logFile.identifier);
+  fileStore.toggleCheckboxVisibility();
+  fileStore.checkBoxToggle(props.logFile.identifier);
 }
 
 const clearCacheForFile = () => {

@@ -5,9 +5,9 @@ namespace Opcodes\LogViewer\Http\Controllers;
 use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
 
-class DownloadFileController
+class FilesController
 {
-    public function __invoke(string $fileIdentifier)
+    public function download(string $fileIdentifier)
     {
         LogViewer::auth();
 

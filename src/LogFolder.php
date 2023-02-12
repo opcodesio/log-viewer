@@ -98,7 +98,7 @@ class LogFolder
 
     public function downloadUrl(): string
     {
-        return route('blv.download-folder', $this->identifier);
+        return route('log-viewer.download-folder', $this->identifier);
     }
 
     public function download(): BinaryFileResponse

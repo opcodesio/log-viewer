@@ -16,13 +16,7 @@
 </head>
 <body class="h-full px-5 bg-gray-100 dark:bg-gray-900">
 <div id="log-viewer" class="flex h-full max-h-screen max-w-full">
-    <div class="hidden md:flex md:w-88 md:flex-col md:fixed md:inset-y-0">
-        <file-list></file-list>
-    </div>
-
-    <div class="md:pl-88 flex flex-col flex-1 min-h-screen max-h-screen max-w-full">
-        <log-list></log-list>
-    </div>
+    <router-view></router-view>
 </div>
 
 <!-- Global LogViewer Object -->
