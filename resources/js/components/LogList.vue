@@ -2,10 +2,8 @@
   <div class="h-full w-full py-5 log-list">
     <div class="flex flex-col h-full w-full mx-3 mb-4">
       <div class="px-4 mb-4 flex items-start">
-        <div class="flex items-center mr-6">
-          <div v-if="showLevelsDropdown">
-            <LevelButtons />
-          </div>
+        <div class="flex items-center mr-5" v-if="showLevelsDropdown">
+          <LevelButtons />
         </div>
         <div class="flex-1 flex justify-end min-h-[38px]">
           <SearchInput />
@@ -14,14 +12,14 @@
               <ArrowPathIcon class="w-5 h-5" />
             </button>
           </div>
-          <div class="ml-2"><SiteSettingsDropdown /></div>
+          <SiteSettingsDropdown class="ml-2" />
         </div>
       </div>
 
       <div id="log-item-container" class="relative">
 
       </div>
-      <div v-if="logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults)" class="relative overflow-hidden text-sm h-full">
+      <div v-if="logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery)" class="relative overflow-hidden text-sm h-full">
         <div class="log-item-container h-full overflow-y-auto px-4"
              @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
@@ -106,16 +104,15 @@
                         class="px-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
                         @click="searchStore.clearQuery">Clear search query
                       </button>
-                      <button v-if="searchStore.query?.length > 0 && fileStore.selectedFile"
+                      <button v-if="searchStore.query?.length > 0 && fileViewerStore.selectedFile"
                         class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
-                        @click.prevent="fileStore.selectFile(null)">Search all files
+                        @click.prevent="fileViewerStore.selectFile(null)">Search all files
                       </button>
-                      @if(isset($levels) && count(array_filter($levels, fn ($level) => $level->count > 0 && $level->selected)) === 0 && count(array_filter($levels, fn ($level) => $level->count > 0)) > 0)
                       <button
+                        v-if="severityStore.levelsFound.length > 0 && severityStore.levelsSelected.length === 0"
                         class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
-                        @click="selectAllLevels">Select all severities
+                        @click="logViewerStore.selectAllLevels">Select all severities
                       </button>
-                      @endif
                     </div>
                   </div>
                 </td>
@@ -137,8 +134,8 @@
         <span v-else>Select a file or start searching...</span>
       </div>
 
-      <div v-if="logViewerStore.paginator" class="px-4">
-        <Pagination :paginator="logViewerStore.paginator" :loading="false" />
+      <div v-if="paginationStore.hasPages" class="px-4">
+        <Pagination :loading="false" />
       </div>
 
       <div class="grow flex flex-col justify-end text-right px-4 mt-3">
@@ -164,19 +161,26 @@ import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import LogCopyButton from './LogCopyButton.vue';
+import { usePaginationStore } from '../stores/pagination.js';
+import { useSeverityStore } from '../stores/severity.js';
 
 const fileViewerStore = useFileViewerStore();
 const logViewerStore = useLogViewerStore();
 const searchStore = useSearchStore();
+const paginationStore = usePaginationStore();
+const severityStore = useSeverityStore();
 
 const loading = ref(false);
 const perPage = ref(25);
 
 const showLevelsDropdown = computed(() => {
-  return fileViewerStore.selectedFile && String(searchStore.query || '').trim().length > 0;
+  return fileViewerStore.selectedFile || String(searchStore.query || '').trim().length > 0;
 });
 
-watch(() => fileViewerStore.selectedFile, () => {
+watch([
+  () => fileViewerStore.selectedFile,
+  () => paginationStore.currentPage,
+], () => {
   logViewerStore.loadLogs();
 });
 

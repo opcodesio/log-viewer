@@ -3,6 +3,8 @@ import { useFileViewerStore } from './fileViewer.js';
 import axios from 'axios';
 import { useSearchStore } from './search.js';
 import { nextTick } from 'vue';
+import { usePaginationStore } from './pagination.js';
+import { useSeverityStore } from './severity.js';
 
 export const Theme = {
   System: 'System',
@@ -21,9 +23,7 @@ export const useLogViewerStore = defineStore({
     // Log data
     loading: false,
     logs: [],
-    paginator: {},
     levelCounts: [],
-    totalResults: 0,
     hasMoreResults: false,
 
     // Log scrolling behaviour data
@@ -38,16 +38,6 @@ export const useLogViewerStore = defineStore({
     selectedFile() {
       const fileViewerStore = useFileViewerStore();
       return fileViewerStore.selectedFile;
-    },
-
-    levelsFound: (state) => (state.levelCounts || []).filter(level => level.count > 0),
-
-    levelsSelected() {
-      return this.levelsFound.filter(levelCount => levelCount.selected);
-    },
-
-    totalResultsSelected() {
-      return this.levelsFound.reduce((total, level) => total + level.count, 0);
     },
 
     isOpen: (state) => (index) => state.stacksOpen.includes(index),
@@ -144,10 +134,14 @@ export const useLogViewerStore = defineStore({
 
     loadLogs() {
       const searchStore = useSearchStore();
+      const paginationStore = usePaginationStore();
+      const severityStore = useSeverityStore();
+
       const params = {
         file: this.selectedFile?.identifier,
         direction: this.direction,
         query: searchStore.query,
+        page: paginationStore.currentPage,
       };
 
       this.loading = true;
@@ -155,24 +149,28 @@ export const useLogViewerStore = defineStore({
       axios.get(`${LogViewer.path}/api/logs`, { params })
         .then(({ data }) => {
           this.logs = data.logs;
-          this.paginator = data.paginator;
-          this.levelCounts = data.levelCounts;
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;
+          severityStore.setLevelCounts(data.levelCounts);
+          paginationStore.setPagination(data.pagination);
 
           if (data.expandAutomatically) {
             this.stacksOpen.push(0);
           }
 
+          this.loading = false;
           nextTick(() => {
             this.reset();
-          })
-          this.loading = false;
+          });
         })
         .catch((error) => {
           this.loading = false;
           console.error(error);
         });
+    },
+
+    selectAllLevels() {
+
     },
   },
 })

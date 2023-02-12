@@ -54,7 +54,7 @@ class LogsController
                 $logQuery->scan(LogViewer::lazyScanChunkSize());
                 $logQuery->setLevels($selectedLevels);
                 $logs = $logQuery->paginate($perPage);
-                $levels = $logQuery->getLevelCounts();
+                $levels = array_values($logQuery->getLevelCounts());
 
                 if ($logs->lastPage() < $request->input('page', 1)) {
                     $request->replace(['page' => $logs->lastPage() ?? 1]);
@@ -73,7 +73,7 @@ class LogsController
             'file' => isset($file) ? new LogFileResource($file) : null,
             'levelCounts' => LevelCountResource::collection($levels ?? []),
             'logs' => LogResource::collection($logs ?? []),
-            'paginator' => isset($logs) ? [
+            'pagination' => isset($logs) ? [
                 'current_page' => $logs->currentPage(),
                 'first_page_url' => $logs->url(1),
                 'from' => $logs->firstItem(),

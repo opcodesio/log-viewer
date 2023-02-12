@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import { usePaginationStore } from './pagination.js';
 
 export const useFileViewerStore = defineStore({
   id: 'fileViewer',
@@ -17,6 +18,8 @@ export const useFileViewerStore = defineStore({
   }),
 
   getters: {
+    files: (state) => state.folders.flatMap((folder) => folder.files),
+
     isOpen: (state) => (folder) => state.foldersOpen.includes(folder),
 
     isChecked: (state) => (file) => state.filesChecked.includes(file),
@@ -52,12 +55,16 @@ export const useFileViewerStore = defineStore({
   },
 
   actions: {
-    selectFile(logFile) {
-      if (logFile && this.selectedFile?.identifier === logFile?.identifier) {
+    selectFile(logFileIdentifier) {
+      const paginationStore = usePaginationStore();
+
+      if (logFileIdentifier && this.selectedFile?.identifier === logFileIdentifier) {
         this.selectedFile = null;
       } else {
-        this.selectedFile = logFile;
+        this.selectedFile = this.files.find(file => file.identifier === logFileIdentifier);
       }
+
+      paginationStore.reset();
     },
 
     initScanCheck(routeScanCheck, routeScan) {

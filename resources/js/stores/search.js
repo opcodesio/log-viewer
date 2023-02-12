@@ -11,9 +11,21 @@ export const useSearchStore = defineStore({
     error: null,
   }),
 
+  getters: {
+    hasQuery: (state) => String(state.query).trim() !== '',
+  },
+
   actions: {
     init() {
       this.checkSearchProgress();
+    },
+
+    setQuery(query) {
+      this.query = query;
+    },
+
+    clearQuery() {
+      this.query = '';
     },
 
     update(query, error, searchMoreRoute, searching = false, percentScanned = 0) {

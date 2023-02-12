@@ -1,8 +1,8 @@
-import { createApp } from 'vue';
+import { createApp, markRaw } from 'vue';
 import { createPinia } from 'pinia';
 import Base from './base';
 import axios from 'axios';
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory, useRoute } from 'vue-router';
 import VueJsonPretty from 'vue-json-pretty';
 import FileList from './components/FileList.vue';
 import LogList from './components/LogList.vue';
@@ -26,21 +26,26 @@ if (window.LogViewer.path === '' || window.LogViewer.path === '/') {
 
 const router = createRouter({
   routes: [{
-    path: '/',
+    path: `/${LogViewer.path}`,
     name: 'home',
     component: require('./home').default,
   }],
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   base: routerBasePath,
 });
+const route = useRoute();
 const pinia = createPinia();
+pinia.use(({ store }) => {
+  store.$router = markRaw(router);
+  store.$route = route;
+})
 
 const app = createApp({
   router,
 
-  mounted() {
-    const logViewerStore = useLogViewerStore();
+  setup() {
     // This makes sure we react to device's dark mode changes
+    const logViewerStore = useLogViewerStore();
     setInterval(logViewerStore.syncTheme, 1000);
   },
 });

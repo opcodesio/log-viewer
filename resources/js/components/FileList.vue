@@ -122,6 +122,7 @@
               v-for="logFile in (folder.files || [])"
               :key="logFile.identifier"
               :log-file="logFile"
+              @click="selectFile(logFile)"
             />
           </div>
         </div>
@@ -132,19 +133,42 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
 import { XMarkIcon, FolderIcon, FolderOpenIcon, ArrowLeftIcon, TrashIcon, CircleStackIcon, CloudArrowDownIcon, EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
 import { useFileViewerStore } from '../stores/fileViewer.js';
 import FileListItem from './FileListItem.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
+import { useRoute, useRouter } from 'vue-router';
 
 const emit = defineEmits(['selectFile']);
 
+const router = useRouter();
+const route = useRoute();
 const fileViewerStore = useFileViewerStore();
 const scanInProgress = ref(false);
 const direction = ref('desc');
 const fileList = ref(null);
+
+const selectFile = (logFile) => {
+  const query = { ...route.query };
+
+  if (logFile && logFile.identifier === fileViewerStore.selectedFile?.identifier) {
+    delete query.file;
+  } else {
+    query.file = logFile.identifier;
+  }
+
+  router.push({ name: 'home', query })
+};
+
+watch(
+  () => route.query.file,
+  (file) => {
+    console.log(file);
+    fileViewerStore.selectFile(file);
+  }
+)
 
 const cacheRecentlyCleared = ref(false);
 const clearingCache = ref(false);

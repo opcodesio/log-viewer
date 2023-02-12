@@ -1,8 +1,5 @@
 <template>
-  <div class="file-item-container flex"
-       :class="[isSelected ? 'active' : '']"
-       @click="fileViewerStore.selectFile(logFile)"
-  >
+  <div class="file-item-container flex" :class="[isSelected ? 'active' : '']">
     <Menu>
       <div class="file-item grow">
         <div v-if="logFile.can_delete" class="my-auto mr-2" v-show="showSelectToggle">
@@ -64,8 +61,8 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
-import { TrashIcon, CloudArrowDownIcon, EllipsisVerticalIcon, CircleStackIcon } from '@heroicons/vue/24/outline';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import { CircleStackIcon, CloudArrowDownIcon, EllipsisVerticalIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { useFileViewerStore } from '../stores/fileViewer.js';
 import SpinnerIcon from './SpinnerIcon.vue';
 
