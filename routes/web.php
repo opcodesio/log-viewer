@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Opcodes\LogViewer\Http\Controllers\FilesController;
 use Opcodes\LogViewer\Http\Controllers\IndexController;
 use Opcodes\LogViewer\Http\Controllers\IsScanRequiredController;
 use Opcodes\LogViewer\Http\Controllers\ScanFilesController;
