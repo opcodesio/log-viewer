@@ -124,7 +124,7 @@
               v-for="logFile in (folder.files || [])"
               :key="logFile.identifier"
               :log-file="logFile"
-              @click="fileStore.selectFile(logFile.identifier)"
+              @click="selectFile(logFile.identifier)"
             />
           </div>
         </div>
@@ -144,6 +144,7 @@ import SpinnerIcon from './SpinnerIcon.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSearchStore } from '../stores/search.js';
 import { useLogViewerStore } from '../stores/logViewer.js';
+import { replaceQuery } from '../helpers.js';
 
 const router = useRouter();
 const route = useRoute();
@@ -195,12 +196,22 @@ onMounted(async () => {
   }
 });
 
+const selectFile = (fileIdentifier) => {
+  if (route.query.file && route.query.file === fileIdentifier) {
+    replaceQuery(router, 'file', null);
+  } else {
+    replaceQuery(router, 'file', fileIdentifier);
+  }
+};
+
+watch(
+  () => route.query.file,
+  (file) => fileStore.selectFile(file),
+  { immediate: true }
+);
+
 watch(
   () => fileStore.direction,
   () => fileStore.loadFolders()
-)
+);
 </script>
-
-<style scoped>
-
-</style>

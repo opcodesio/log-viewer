@@ -75,7 +75,7 @@ class LogFile
 
     public function downloadUrl(): string
     {
-        return route('log-viewer.download-file', $this->identifier);
+        return route('log-viewer.files.download', $this->identifier);
     }
 
     public function download(): BinaryFileResponse

@@ -18,6 +18,8 @@ class FoldersController
 
         if ($request->query('direction', 'desc') === 'asc') {
             $folders = $folders->sortByEarliestFirstIncludingFiles();
+        } else {
+            $folders = $folders->sortByLatestFirstIncludingFiles();
         }
 
         return LogFolderResource::collection($folders);

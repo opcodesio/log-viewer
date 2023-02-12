@@ -665,11 +665,11 @@ video {
 .max-h-screen {
   max-height: 100vh;
 }
-.min-h-screen {
-  min-height: 100vh;
-}
 .min-h-\[38px\] {
   min-height: 38px;
+}
+.min-h-screen {
+  min-height: 100vh;
 }
 .w-\[18px\] {
   width: 18px;

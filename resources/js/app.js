@@ -4,6 +4,7 @@ import Base from './base';
 import axios from 'axios';
 import { createRouter, createWebHistory, useRoute } from 'vue-router';
 import VueJsonPretty from 'vue-json-pretty';
+import Home from './pages/Home.vue';
 
 let token = document.head.querySelector('meta[name="csrf-token"]');
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -25,7 +26,7 @@ const router = createRouter({
   routes: [{
     path: `/${LogViewer.path}`,
     name: 'home',
-    component: require('./home').default,
+    component: Home,
   }],
   history: createWebHistory(),
   base: routerBasePath,

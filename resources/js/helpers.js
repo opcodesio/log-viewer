@@ -1,3 +1,5 @@
+import { useRoute, useRouter } from 'vue-router';
+
 export const highlightSearchResult = (text, query = null) => {
   if (query) {
     if (!query.endsWith('/i')) {
@@ -48,4 +50,21 @@ export const copyToClipboard = (str) => {
     document.getSelection().removeAllRanges();
     document.getSelection().addRange(selected);
   }
+};
+
+export const replaceQuery = (router, key, value) => {
+  const route = router.currentRoute.value;
+  const query = {
+    file: route.query.file || undefined,
+    query: route.query.query || undefined,
+    page: route.query.page || undefined,
+  };
+
+  if (value) {
+    query[key] = value;
+  } else {
+    delete query[key];
+  }
+
+  router.push({ name: 'home', query });
 };

@@ -9,9 +9,10 @@ use Opcodes\LogViewer\Http\Controllers\SearchProgressController;
 
 Route::prefix('api')->group(function () {
     Route::get('folders', 'FoldersController@index')->name('log-viewer.folders');
-    Route::get('folders/{folderIdentifier}/download', 'FoldersController@download')->name('log-viewer.download-folder');
+    Route::get('folders/{folderIdentifier}/download', 'FoldersController@download')->name('log-viewer.folders.download');
 
-    Route::get('files/{fileIdentifier}/download', 'FilesController@download')->name('log-viewer.download-file');
+    Route::get('files', 'FilesController@index')->name('log-viewer.files');
+    Route::get('files/{fileIdentifier}/download', 'FilesController@download')->name('log-viewer.files.download');
 
     Route::get('logs', 'LogsController@index')->name('log-viewer.logs');
 

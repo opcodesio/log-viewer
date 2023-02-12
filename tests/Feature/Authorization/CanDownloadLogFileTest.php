@@ -7,13 +7,13 @@ use function Pest\Laravel\get;
 test('can download every file by default', function () {
     generateLogFiles([$fileName = 'laravel.log']);
 
-    get(route('log-viewer.download-file', $fileName))
+    get(route('log-viewer.files.download', $fileName))
         ->assertOk()
         ->assertDownload($fileName);
 });
 
 test('cannot download a file that\'s not found', function () {
-    get(route('log-viewer.download-file', 'notfound.log'))
+    get(route('log-viewer.files.download', 'notfound.log'))
         ->assertNotFound();
 });
 
@@ -21,13 +21,13 @@ test('"downloadLogFile" gate can prevent file download', function () {
     generateLogFiles([$fileName = 'laravel.log']);
     Gate::define('downloadLogFile', fn (mixed $user) => false);
 
-    get(route('log-viewer.download-file', $fileName))
+    get(route('log-viewer.files.download', $fileName))
         ->assertForbidden();
 
     // now let's allow access again
     Gate::define('downloadLogFile', fn (mixed $user) => true);
 
-    get(route('log-viewer.download-file', $fileName))
+    get(route('log-viewer.files.download', $fileName))
         ->assertOk()
         ->assertDownload($fileName);
 });
@@ -44,7 +44,7 @@ test('"downloadLogFile" gate is supplied with a log file object', function () {
         return true;
     });
 
-    get(route('log-viewer.download-file', $fileName))
+    get(route('log-viewer.files.download', $fileName))
         ->assertOk()
         ->assertDownload($fileName);
 
