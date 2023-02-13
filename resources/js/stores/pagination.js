@@ -27,20 +27,8 @@ export const usePaginationStore = defineStore({
       }
     },
 
-    gotoPage(page) {
-      this.page = page;
-    },
-
-    nextPage() {
-      this.page += 1;
-    },
-
-    previousPage() {
-      this.page -= 1;
-    },
-
-    reset() {
-      this.page = 1;
+    setPage(page) {
+      this.page = Number(page);
     },
   },
 })

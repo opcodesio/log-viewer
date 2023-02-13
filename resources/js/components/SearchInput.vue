@@ -7,11 +7,11 @@
         <SpinnerIcon v-show="searchStore.searching" class="spin w-5 h-5 -mr-1" />
       </div>
       <div class="relative flex-1 m-1">
-        <input v-model="searchStore.tempQuery" name="query" id="query" type="text"
-               @keydown.enter="searchStore.submitQuery"
+        <input v-model="tempQuery" name="query" id="query" type="text"
+               @keydown.enter="submitQuery"
         />
         <div v-show="searchStore.hasQuery" class="clear-search">
-          <button @click="searchStore.clearQuery">
+          <button @click="clearQuery">
             <XMarkIcon class="h-4 w-4" />
           </button>
         </div>
@@ -20,7 +20,7 @@
         <button v-if="logViewerStore.hasMoreResults" disabled="disabled">
           <span>Searching {{ selectedFile ? selectedFile.name : 'all files' }}...</span>
         </button>
-        <button v-else @click="searchStore.submitQuery">
+        <button v-else @click="submitQuery">
           <span>Search {{ selectedFile ? 'in "' + selectedFile.name + '"' : 'all files' }}</span>
           <ArrowRightIcon class="h-4 w-4" />
         </button>
@@ -36,15 +36,29 @@
 
 <script setup>
 import { useSearchStore } from '../stores/search.js';
-import { MagnifyingGlassIcon, XMarkIcon, ArrowRightIcon } from '@heroicons/vue/24/outline';
+import { ArrowRightIcon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import { useLogViewerStore } from '../stores/logViewer.js';
-import { useFileStore } from '../stores/files.js';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import SpinnerIcon from './SpinnerIcon.vue';
+import { replaceQuery } from '../helpers.js';
+import { useRoute, useRouter } from 'vue-router';
 
 const searchStore = useSearchStore();
 const logViewerStore = useLogViewerStore();
-const fileStore = useFileStore();
+const router = useRouter();
+const route = useRoute();
 
-const selectedFile = computed(() => fileStore.selectedFile);
+const selectedFile = computed(() => logViewerStore.selectedFile);
+
+const tempQuery = ref(route.query.query || '');
+const submitQuery = () => replaceQuery(router, 'query', tempQuery.value === '' ? null : tempQuery.value);
+const clearQuery = () => {
+  tempQuery.value = '';
+  submitQuery();
+}
+
+watch(
+  () => route.query.query,
+  (query) => tempQuery.value = query || '',
+)
 </script>

@@ -134,9 +134,13 @@ export const useLogViewerStore = defineStore({
     },
 
     loadLogs() {
+      const fileStore = useFileStore();
       const searchStore = useSearchStore();
       const paginationStore = usePaginationStore();
       const severityStore = useSeverityStore();
+
+      // abort if the files are not ready yet
+      if (fileStore.folders.length === 0) return;
 
       const params = {
         file: this.selectedFile?.identifier,

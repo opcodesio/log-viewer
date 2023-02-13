@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
-import { usePaginationStore } from './pagination.js';
 import { useLocalStorage } from '@vueuse/core';
 
 export const useFileStore = defineStore({
@@ -10,14 +9,14 @@ export const useFileStore = defineStore({
     // data
     folders: [],
     direction: useLocalStorage('fileViewerDirection', 'desc'),
-    selectedFile: null,
+    selectedFileIdentifier: null,
 
     // control variables
     loading: false,
     scanInProgress: false,
     checkBoxesVisibility: false,
     filesChecked: [],
-    foldersOpen: [],
+    openFolderIdentifiers: [],
     foldersInView: [],
     folderTops: {},
     containerTop: 0,
@@ -26,7 +25,15 @@ export const useFileStore = defineStore({
   getters: {
     files: (state) => state.folders.flatMap((folder) => folder.files),
 
-    isOpen: (state) => (folder) => state.foldersOpen.includes(folder),
+    selectedFile: (state) => state.files.find((file) => file.identifier === state.selectedFileIdentifier),
+
+    foldersOpen(state) {
+      return state.openFolderIdentifiers.map((identifier) => state.folders.find((folder) => folder.identifier === identifier));
+    },
+
+    isOpen() {
+      return (folder) => this.foldersOpen.includes(folder);
+    },
 
     isChecked: (state) => (file) => state.filesChecked.includes(file),
 
@@ -66,20 +73,10 @@ export const useFileStore = defineStore({
     },
 
     selectFile(logFileIdentifier) {
-      const paginationStore = usePaginationStore();
-      const originalSelectedFile = this.selectedFile;
+      if (this.selectedFileIdentifier === logFileIdentifier) return;
 
-      if (logFileIdentifier && this.selectedFile?.identifier === logFileIdentifier) {
-        this.selectedFile = null;
-      } else {
-        this.selectedFile = this.files.find(file => file.identifier === logFileIdentifier);
-      }
-
+      this.selectedFileIdentifier = logFileIdentifier;
       this.openFolderForActiveFile();
-
-      if (originalSelectedFile && originalSelectedFile !== this.selectedFile) {
-        paginationStore.reset();
-      }
     },
 
     openFolderForActiveFile() {
@@ -122,6 +119,10 @@ export const useFileStore = defineStore({
           this.folders = data;
           this.loading = false;
           this.openFolderForActiveFile();
+
+          if (this.openFolderIdentifiers.length === 0 && this.folders.length > 0) {
+            this.openFolderIdentifiers.push(this.folders[0].identifier);
+          }
         })
         .catch((error) => {
           this.loading = false;
@@ -131,9 +132,9 @@ export const useFileStore = defineStore({
 
     toggle(folder) {
       if (this.isOpen(folder)) {
-        this.foldersOpen = this.foldersOpen.filter(f => f !== folder);
+        this.openFolderIdentifiers = this.openFolderIdentifiers.filter(f => f !== folder.identifier);
       } else {
-        this.foldersOpen.push(folder);
+        this.openFolderIdentifiers.push(folder.identifier);
       }
       this.onScroll();
     },
@@ -154,7 +155,7 @@ export const useFileStore = defineStore({
     },
 
     reset() {
-      this.foldersOpen = [];
+      this.openFolderIdentifiers = [];
       this.foldersInView = [];
       this.folderTops = {};
       const container = document.getElementById('file-list-container');

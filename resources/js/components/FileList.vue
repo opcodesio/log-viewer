@@ -136,8 +136,17 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
-import { XMarkIcon, FolderIcon, FolderOpenIcon, ArrowLeftIcon, TrashIcon, CircleStackIcon, CloudArrowDownIcon, EllipsisVerticalIcon } from '@heroicons/vue/24/outline';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import {
+  ArrowLeftIcon,
+  CircleStackIcon,
+  CloudArrowDownIcon,
+  EllipsisVerticalIcon,
+  FolderIcon,
+  FolderOpenIcon,
+  TrashIcon,
+  XMarkIcon,
+} from '@heroicons/vue/24/outline';
 import { useFileStore } from '../stores/files.js';
 import FileListItem from './FileListItem.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
@@ -184,12 +193,7 @@ const confirmDeleteSelectedFiles = () => {
 }
 
 onMounted(async () => {
-  const route = useRoute();
   await fileStore.loadFolders();
-
-  if (route.query.file) {
-    fileStore.selectFile(route.query.file);
-  }
 
   if (fileStore.selectedFile || searchStore.hasQuery) {
     logViewerStore.loadLogs();
@@ -203,12 +207,6 @@ const selectFile = (fileIdentifier) => {
     replaceQuery(router, 'file', fileIdentifier);
   }
 };
-
-watch(
-  () => route.query.file,
-  (file) => fileStore.selectFile(file),
-  { immediate: true }
-);
 
 watch(
   () => fileStore.direction,

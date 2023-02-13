@@ -59,7 +59,13 @@ import { ChevronDownIcon } from '@heroicons/vue/24/outline';
 import Checkmark from './Checkmark.vue';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { useSeverityStore } from '../stores/severity.js';
+import { watch } from 'vue';
 
 const logViewerStore = useLogViewerStore();
 const severityStore = useSeverityStore();
+
+watch(
+  () => severityStore.selectedLevels,
+  () => logViewerStore.loadLogs()
+);
 </script>

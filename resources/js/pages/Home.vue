@@ -15,45 +15,30 @@ import { useLogViewerStore } from '../stores/logViewer.js';
 import { useFileStore } from '../stores/files.js';
 import { useSearchStore } from '../stores/search.js';
 import { usePaginationStore } from '../stores/pagination.js';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { onMounted, watch } from 'vue';
-import { useSeverityStore } from '../stores/severity.js';
-import { replaceQuery } from '../helpers.js';
 
 const logViewerStore = useLogViewerStore();
 const fileStore = useFileStore();
 const searchStore = useSearchStore();
 const paginationStore = usePaginationStore();
-const severityStore = useSeverityStore();
-const router = useRouter();
 const route = useRoute();
 
 onMounted(() => {
-  const query = { ...route.query };
-
-  // First, let's set the default values from the query string
-  if (query.query) {
-    searchStore.query = query.query;
-    searchStore.tempQuery = query.query;
-  }
-
-  if (query.page) {
-    paginationStore.page = parseInt(query.page);
-  }
-
   // This makes sure we react to device's dark mode changes
   setInterval(logViewerStore.syncTheme, 1000);
 })
 
+// watch for URL query changes and update the store values
 watch(
-  () => searchStore.query,
-  (query) => replaceQuery(router, 'query', query)
-);
-
-watch([
   () => route.query,
-  () => severityStore.selectedLevels,
-], () => {
-  logViewerStore.loadLogs();
-});
+  (query) => {
+    fileStore.selectFile(query.file || null);
+    paginationStore.setPage(query.page || 1);
+    searchStore.setQuery(query.query || '');
+
+    logViewerStore.loadLogs();
+  },
+  { immediate: true }
+)
 </script>

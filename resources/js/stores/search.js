@@ -5,7 +5,6 @@ export const useSearchStore = defineStore({
 
   state: () => ({
     query: '',
-    tempQuery: '',
     searchMoreRoute: null,
     searching: false,
     percentScanned: 0,
@@ -23,15 +22,6 @@ export const useSearchStore = defineStore({
 
     setQuery(query) {
       this.query = query;
-    },
-
-    submitQuery() {
-      this.query = this.tempQuery;
-    },
-
-    clearQuery() {
-      this.query = '';
-      this.tempQuery = '';
     },
 
     update(query, error, searchMoreRoute, searching = false, percentScanned = 0) {

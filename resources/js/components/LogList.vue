@@ -106,7 +106,7 @@
                       </button>
                       <button v-if="searchStore.query?.length > 0 && fileStore.selectedFile"
                         class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
-                        @click.prevent="fileStore.selectFile(null)">Search all files
+                        @click.prevent="clearSelectedFile">Search all files
                       </button>
                       <button
                         v-if="severityStore.levelsFound.length > 0 && severityStore.levelsSelected.length === 0"
@@ -151,8 +151,13 @@
 <script setup>
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { computed, ref, watch } from 'vue';
-import { ExclamationCircleIcon, ExclamationTriangleIcon, InformationCircleIcon, ArrowPathIcon } from '@heroicons/vue/24/solid';
-import { highlightSearchResult } from '../helpers.js';
+import {
+  ArrowPathIcon,
+  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+} from '@heroicons/vue/24/solid';
+import { highlightSearchResult, replaceQuery } from '../helpers.js';
 import { useSearchStore } from '../stores/search.js';
 import Pagination from './Pagination.vue';
 import LevelButtons from './LevelButtons.vue';
@@ -163,7 +168,9 @@ import SpinnerIcon from './SpinnerIcon.vue';
 import LogCopyButton from './LogCopyButton.vue';
 import { usePaginationStore } from '../stores/pagination.js';
 import { useSeverityStore } from '../stores/severity.js';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
 const searchStore = useSearchStore();
@@ -176,6 +183,10 @@ const perPage = ref(25);
 const showLevelsDropdown = computed(() => {
   return fileStore.selectedFile || String(searchStore.query || '').trim().length > 0;
 });
+
+const clearSelectedFile = () => {
+  replaceQuery(router, 'file', null);
+}
 
 watch(
   () => logViewerStore.direction,

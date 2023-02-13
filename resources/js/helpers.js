@@ -1,11 +1,5 @@
-import { useRoute, useRouter } from 'vue-router';
-
 export const highlightSearchResult = (text, query = null) => {
   if (query) {
-    if (!query.endsWith('/i')) {
-      query = '/' + query + '/i';
-    }
-
     try {
       text = text.replace(new RegExp(query, 'gi'), '<mark>$&</mark>');
     } catch (e) {
@@ -60,11 +54,13 @@ export const replaceQuery = (router, key, value) => {
     page: route.query.page || undefined,
   };
 
-  if (value) {
-    query[key] = value;
-  } else {
-    delete query[key];
+  // maybe this logic shouldn't be here, but that's what works for now.
+  // calling `replaceQuery` twice in a single "tick" can cause previous change to be reverted.
+  if (key === 'file' && query.page !== undefined) {
+    query.page = undefined;
   }
+
+  query[key] = value ? String(value) : undefined;
 
   router.push({ name: 'home', query });
 };
