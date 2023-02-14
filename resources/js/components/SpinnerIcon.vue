@@ -1,20 +1,8 @@
 <template>
-  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-    <path d="M12 4.75V6.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round"></path>
-    <path d="M17.1266 6.87347L16.0659 7.93413" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round"></path>
-    <path d="M19.25 12L17.75 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round"></path>
-    <path d="M17.1266 17.1265L16.0659 16.0659" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round"></path>
-    <path d="M12 17.75V19.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round"></path>
-    <path d="M7.9342 16.0659L6.87354 17.1265" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round"></path>
-    <path d="M6.25 12L4.75 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round"></path>
-    <path d="M7.9342 7.93413L6.87354 6.87347" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
-          stroke-linejoin="round"></path>
+  <svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none"
+       viewBox="0 0 24 24">
+    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    <path class="opacity-75" fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
   </svg>
 </template>

@@ -23,7 +23,7 @@
         <MenuItem @click.stop.prevent="clearCacheAll">
           <button>
             <CircleStackIcon v-show="!clearingCache" class="w-4 h-4 mr-1.5" />
-            <SpinnerIcon v-show="clearingCache" class="w-4 h-4 mr-1.5 spin" />
+            <SpinnerIcon v-show="clearingCache" class="w-4 h-4 mr-1.5" />
             <span v-show="!cacheRecentlyCleared && !clearingCache">Clear indices for all files</span>
             <span v-show="!cacheRecentlyCleared && clearingCache">Please wait...</span>
             <span v-show="cacheRecentlyCleared" class="text-emerald-500">File indices cleared</span>
@@ -62,13 +62,22 @@
 </template>
 
 <script setup>
-import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue';
-import { QuestionMarkCircleIcon, CircleStackIcon, Cog8ToothIcon, ShareIcon, ComputerDesktopIcon, SunIcon, MoonIcon } from '@heroicons/vue/24/outline';
-import { useLogViewerStore, Theme } from '../stores/logViewer.js';
-import { ref } from 'vue';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import {
+  CircleStackIcon,
+  Cog8ToothIcon,
+  ComputerDesktopIcon,
+  MoonIcon,
+  QuestionMarkCircleIcon,
+  ShareIcon,
+  SunIcon,
+} from '@heroicons/vue/24/outline';
+import { Theme, useLogViewerStore } from '../stores/logViewer.js';
+import { ref, watch } from 'vue';
 import Checkmark from './Checkmark.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import { copyToClipboard } from '../helpers.js';
+import axios from 'axios';
 
 const logViewerStore = useLogViewerStore();
 
@@ -82,9 +91,20 @@ const copyUrlToClipboard = () => {
 const clearingCache = ref(false);
 const cacheRecentlyCleared = ref(false);
 const clearCacheAll = () => {
-  //
-
   cacheRecentlyCleared.value = true;
-  setTimeout(() => cacheRecentlyCleared.value = false, 2000);
+
+  axios.post(`${LogViewer.path}/api/clear-cache-all`)
+    .then(() => {
+      cacheRecentlyCleared.value = true;
+      setTimeout(() => cacheRecentlyCleared.value = false, 2000);
+      logViewerStore.loadLogs();
+    })
+    .catch((error) => console.error(error))
+    .finally(() => clearingCache.value = false);
 }
+
+watch(
+  () => logViewerStore.shorterStackTraces,
+  () => logViewerStore.loadLogs()
+);
 </script>

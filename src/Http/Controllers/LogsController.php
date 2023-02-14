@@ -24,6 +24,7 @@ class LogsController
         $log = $request->query('log', null);
         $selectedLevels = $request->query('levels', []);
         $perPage = $request->query('per_page', 25);
+        session()->put('log-viewer:shorter-stack-traces', $request->boolean('shorter_stack_traces', false));
         $hasMoreResults = false;
         $percentScanned = 0;
 

@@ -617,6 +617,9 @@ video {
 .mr-6 {
   margin-right: 1.5rem;
 }
+.-ml-1 {
+  margin-left: -0.25rem;
+}
 .inline-block {
   display: inline-block;
 }
@@ -727,6 +730,15 @@ video {
 }
 .border-separate {
   border-collapse: separate;
+}
+@keyframes spin {
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 .cursor-pointer {
   cursor: pointer;
@@ -942,11 +954,21 @@ video {
   --tw-text-opacity: 1;
   color: rgb(220 38 38 / var(--tw-text-opacity));
 }
+.text-white {
+  --tw-text-opacity: 1;
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+}
 .opacity-90 {
   opacity: 0.9;
 }
 .opacity-0 {
   opacity: 0;
+}
+.opacity-25 {
+  opacity: 0.25;
+}
+.opacity-75 {
+  opacity: 0.75;
 }
 .outline-none {
   outline: 2px solid transparent;

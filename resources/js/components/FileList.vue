@@ -21,7 +21,7 @@
         <div class="relative">
           <div v-show="scanInProgress"
                class="flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <SpinnerIcon class="h-4 w-4 inline spin mr-1" />
+            <SpinnerIcon class="h-4 w-4 inline mr-1" />
             Indexing logs...
           </div>
         </div>
@@ -36,20 +36,22 @@
       </div>
     </div>
 
-    <div class="grid grid-flow-col pr-4 mt-2"
-         :class="[fileStore.hasFilesChecked ? 'justify-between' : 'justify-end']"
-         v-show="fileStore.checkBoxesVisibility">
-      <button v-show="fileStore.hasFilesChecked"
-              @click.stop="confirmDeleteSelectedFiles"
-              class="button inline-flex">
-        <TrashIcon class="w-5 mr-1" />
-        Delete selected files
-      </button>
-      <button class="button inline-flex"
-              @click.stop="fileStore.toggleCheckboxVisibility(); fileStore.resetChecks()">
-        Cancel
-        <XMarkIcon class="w-5 ml-1" />
-      </button>
+    <div v-show="fileStore.checkBoxesVisibility">
+      <p class="text-sm text-gray-600 dark:text-gray-400">Please select files to delete and confirm or cancel deletion.</p>
+      <div class="grid grid-flow-col pr-4 mt-2"
+           :class="[fileStore.hasFilesChecked ? 'justify-between' : 'justify-end']"
+      >
+        <button v-show="fileStore.hasFilesChecked"
+                @click.stop="confirmDeleteSelectedFiles"
+                class="button inline-flex">
+          <TrashIcon class="w-5 mr-1" />
+          Delete selected files
+        </button>
+        <button class="button inline-flex" @click.stop="fileStore.resetChecks()">
+          Cancel
+          <XMarkIcon class="w-5 ml-1" />
+        </button>
+      </div>
     </div>
 
     <div id="file-list-container" class="relative h-full overflow-hidden">
@@ -88,16 +90,16 @@
 
               <MenuItems static v-show="open" as="div" class="dropdown down w-48">
                 <div class="py-2">
-                  <MenuItem>
-                    <button @click="clearCacheForFolder(folder)">
-                      <CircleStackIcon v-show="!clearingCache" class="w-4 h-4 mr-2"/>
-                      <SpinnerIcon v-show="clearingCache" class="spin" />
-                      <span v-show="!cacheRecentlyCleared && !clearingCache">Clear indices</span>
-                    </button>
+                  <MenuItem as="button" @click.stop.prevent="clearCacheForFolder(folder)">
+                    <CircleStackIcon v-show="!clearingCache[folder.identifier]" class="w-4 h-4 mr-2"/>
+                    <SpinnerIcon v-show="clearingCache[folder.identifier]" class="w-4 h-4 mr-2" />
+                    <span v-show="!cacheRecentlyCleared[folder.identifier] && !clearingCache[folder.identifier]">Clear indices</span>
+                    <span v-show="!cacheRecentlyCleared[folder.identifier] && clearingCache[folder.identifier]">Clearing...</span>
+                    <span v-show="cacheRecentlyCleared[folder.identifier]" class="text-emerald-500">Indices cleared</span>
                   </MenuItem>
 
                   <MenuItem v-if="folder.can_download">
-                    <a :href="folder.download_url" @click.stop="">
+                    <a :href="folder.download_url" download @click.stop>
                       <CloudArrowDownIcon class="w-4 h-4 mr-2"/>
                       Download
                     </a>
@@ -106,9 +108,9 @@
                   <template v-if="folder.can_delete">
                     <div class="divider"></div>
                     <MenuItem>
-                      <button @click.stop="confirmDeleteFolder(folder)" :disabled="deleting">
-                        <TrashIcon v-show="!deleting" class="w-4 h-4 mr-2" />
-                        <SpinnerIcon v-show="deleting" class="spin" />
+                      <button @click.stop="confirmDeleteFolder(folder)" :disabled="deleting[folder.identifier]">
+                        <TrashIcon v-show="!deleting[folder.identifier]" class="w-4 h-4 mr-2" />
+                        <SpinnerIcon v-show="deleting[folder.identifier]" />
                         Delete
                       </button>
                     </MenuItem>
@@ -154,6 +156,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useSearchStore } from '../stores/search.js';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { replaceQuery } from '../helpers.js';
+import axios from 'axios';
 
 const router = useRouter();
 const route = useRoute();
@@ -163,32 +166,59 @@ const logViewerStore = useLogViewerStore();
 const scanInProgress = ref(false);
 const fileList = ref(null);
 
-const cacheRecentlyCleared = ref(false);
-const clearingCache = ref(false);
+const cacheRecentlyCleared = ref({});
+const clearingCache = ref({});
 const clearCacheForFolder = (folder) => {
-  clearingCache.value = true;
+  clearingCache.value[folder.identifier] = true;
 
-  // Clear cache
+  axios.post(`${LogViewer.path}/api/folders/${folder.identifier}/clear-cache`)
+    .then(() => {
+      if (folder.files.some(file => file.identifier === fileStore.selectedFileIdentifier)) {
+        logViewerStore.loadLogs();
+      }
 
-  clearingCache.value = false;
-  cacheRecentlyCleared.value = true;
-  setTimeout(() => cacheRecentlyCleared.value = false, 2000);
+      cacheRecentlyCleared.value[folder.identifier] = true;
+      setTimeout(() => cacheRecentlyCleared.value[folder.identifier] = false, 2000);
+    })
+    .catch((error) => console.error(error))
+    .finally(() => {
+      clearingCache.value[folder.identifier] = false;
+    })
+
 }
 
-const deleting = ref(false);
+const deleting = ref({});
 const confirmDeleteFolder = (folder) => {
   if (confirm(`Are you sure you want to delete the log folder '${folder.path}'? THIS ACTION CANNOT BE UNDONE.`)) {
-    deleting.value = true;
+    deleting.value[folder.identifier] = true;
 
-    // Delete
+    axios.delete(`${LogViewer.path}/api/folders/${folder.identifier}`)
+      .then(() => {
+        if (folder.files.some(file => file.identifier === fileStore.selectedFileIdentifier)) {
+          replaceQuery(router, 'file', null);
+        }
 
-    deleting.value = false;
+        fileStore.loadFolders();
+      })
+      .catch((error) => console.error(error))
+      .finally(() => {
+        deleting.value[folder.identifier] = false;
+      })
   }
 }
 
 const confirmDeleteSelectedFiles = () => {
   if (confirm('Are you sure you want to delete selected log files? THIS ACTION CANNOT BE UNDONE.')) {
-    // $wire.call('deleteMultipleFiles', fileStore.filesChecked)
+    axios.post(`${LogViewer.path}/api/delete-multiple-files`, {
+      files: fileStore.filesChecked
+    }).then(() => {
+      if (fileStore.filesChecked.includes(fileStore.selectedFileIdentifier)) {
+        replaceQuery(router, 'file', null);
+      }
+
+      fileStore.resetChecks();
+      fileStore.loadFolders();
+    });
   }
 }
 

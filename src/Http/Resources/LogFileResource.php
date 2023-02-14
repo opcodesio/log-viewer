@@ -29,6 +29,9 @@ class LogFileResource extends JsonResource
 
             'can_download' => Gate::check('downloadLogFile', $this->resource),
             'can_delete' => Gate::check('deleteLogFile', $this->resource),
+
+            'loading' => false, // helper for frontend
+            'selected_for_deletion' => false, // helper for frontend
         ];
     }
 }

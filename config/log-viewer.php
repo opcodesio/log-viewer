@@ -70,6 +70,7 @@ return [
 
     'include_files' => [
         '*.log',
+        '**/*.log',
     ],
 
     /*

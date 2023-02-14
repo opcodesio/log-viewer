@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LogFolderResource;
+use Opcodes\LogViewer\LogFile;
 
 class FoldersController
 {
@@ -36,5 +37,37 @@ class FoldersController
         Gate::authorize('downloadLogFolder', $folder);
 
         return $folder->download();
+    }
+
+    public function clearCache(string $folderIdentifier)
+    {
+        LogViewer::auth();
+
+        $folder = LogViewer::getFolder($folderIdentifier);
+
+        abort_if(is_null($folder), 404);
+
+        $folder?->files()->each->clearCache();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function destroy(string $folderIdentifier)
+    {
+        LogViewer::auth();
+
+        $folder = LogViewer::getFolder($folderIdentifier);
+
+        abort_if(is_null($folder), 404);
+
+        Gate::authorize('deleteLogFolder', $folder);
+
+        $folder->files()->each(function (LogFile $file) {
+            if (Gate::check('deleteLogFile', $file)) {
+                $file->delete();
+            }
+        });
+
+        return response()->json(['success' => true]);
     }
 }

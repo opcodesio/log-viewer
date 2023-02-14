@@ -4,7 +4,7 @@
       <div class="prefix-icon">
         <label for="query" class="sr-only">Search</label>
         <MagnifyingGlassIcon v-show="!searchStore.searching" class="h-4 w-4" />
-        <SpinnerIcon v-show="searchStore.searching" class="spin w-5 h-5 -mr-1" />
+        <SpinnerIcon v-show="searchStore.searching" class="w-5 h-5 -mr-1" />
       </div>
       <div class="relative flex-1 m-1">
         <input v-model="tempQuery" name="query" id="query" type="text"

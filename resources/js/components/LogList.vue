@@ -41,7 +41,7 @@
                         <option value="asc">Oldest first</option>
                       </select>
                       <label for="items-per-page" class="sr-only">Items per page</label>
-                      <select id="items-per-page" v-model="perPage"
+                      <select id="items-per-page" v-model="logViewerStore.resultsPerPage"
                               class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
                         <option value="10">10 items per page</option>
                         <option value="25">25 items per page</option>
@@ -102,7 +102,7 @@
                     <div class="text-center mt-6">
                       <button v-if="searchStore.query?.length > 0"
                         class="px-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
-                        @click="searchStore.clearQuery">Clear search query
+                        @click="clearQuery">Clear search query
                       </button>
                       <button v-if="searchStore.query?.length > 0 && fileStore.selectedFile"
                         class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
@@ -122,10 +122,10 @@
           </div>
         </div>
 
-        <div class="absolute inset-0 top-9 px-4 z-20" v-show="loading">
+        <div class="absolute inset-0 top-9 px-4 z-20" v-show="logViewerStore.loading">
           <div
             class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
-            <SpinnerIcon class="w-14 h-14 spin" />
+            <SpinnerIcon class="w-14 h-14" />
           </div>
         </div>
       </div>
@@ -135,7 +135,7 @@
       </div>
 
       <div v-if="paginationStore.hasPages" class="px-4">
-        <Pagination :loading="false" />
+        <Pagination :loading="logViewerStore.loading" />
       </div>
 
       <div class="grow flex flex-col justify-end text-right px-4 mt-3">
@@ -150,7 +150,7 @@
 
 <script setup>
 import { useLogViewerStore } from '../stores/logViewer.js';
-import { computed, ref, watch } from 'vue';
+import { computed, watch } from 'vue';
 import {
   ArrowPathIcon,
   ExclamationCircleIcon,
@@ -177,9 +177,6 @@ const searchStore = useSearchStore();
 const paginationStore = usePaginationStore();
 const severityStore = useSeverityStore();
 
-const loading = ref(false);
-const perPage = ref(25);
-
 const showLevelsDropdown = computed(() => {
   return fileStore.selectedFile || String(searchStore.query || '').trim().length > 0;
 });
@@ -188,8 +185,15 @@ const clearSelectedFile = () => {
   replaceQuery(router, 'file', null);
 }
 
+const clearQuery = () => {
+  replaceQuery(router, 'query', null);
+}
+
 watch(
-  () => logViewerStore.direction,
+  [
+    () => logViewerStore.direction,
+    () => logViewerStore.resultsPerPage,
+  ],
   () => logViewerStore.loadLogs()
 )
 </script>

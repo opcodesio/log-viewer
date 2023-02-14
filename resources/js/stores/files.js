@@ -35,7 +35,9 @@ export const useFileStore = defineStore({
       return (folder) => this.foldersOpen.includes(folder);
     },
 
-    isChecked: (state) => (file) => state.filesChecked.includes(file),
+    isChecked: (state) => (file) => state.filesChecked.includes(
+      typeof file === 'string' ? file : file.identifier
+    ),
 
     shouldBeSticky(state) {
       return (folder) => this.isOpen(folder) && state.foldersInView.includes(folder);
@@ -83,9 +85,15 @@ export const useFileStore = defineStore({
       if (this.selectedFile) {
         const folder = this.folders.find(folder => folder.files.some(file => file.identifier === this.selectedFile.identifier));
 
-        if (!this.isOpen(folder)) {
+        if (folder && !this.isOpen(folder)) {
           this.toggle(folder);
         }
+      }
+    },
+
+    openFolderIfNoneOpen() {
+      if (this.openFolderIdentifiers.length === 0 && this.folders.length > 0) {
+        this.openFolderIdentifiers.push(this.folders[0].identifier);
       }
     },
 
@@ -119,10 +127,7 @@ export const useFileStore = defineStore({
           this.folders = data;
           this.loading = false;
           this.openFolderForActiveFile();
-
-          if (this.openFolderIdentifiers.length === 0 && this.folders.length > 0) {
-            this.openFolderIdentifiers.push(this.folders[0].identifier);
-          }
+          this.openFolderIfNoneOpen();
         })
         .catch((error) => {
           this.loading = false;

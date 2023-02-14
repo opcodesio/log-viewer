@@ -12,6 +12,8 @@ class FilesController
 {
     public function index(Request $request)
     {
+        LogViewer::auth();
+
         JsonResource::withoutWrapping();
 
         $files = LogViewer::getFiles();
@@ -36,5 +38,69 @@ class FilesController
         Gate::authorize('downloadLogFile', $file);
 
         return $file->download();
+    }
+
+    public function clearCache(string $fileIdentifier)
+    {
+        LogViewer::auth();
+
+        $file = LogViewer::getFile($fileIdentifier);
+
+        abort_if(is_null($file), 404);
+
+        $file->clearCache();
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
+    public function clearCacheAll()
+    {
+        LogViewer::auth();
+
+        LogViewer::getFiles()->each->clearCache();
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
+    public function destroy(string $fileIdentifier)
+    {
+        LogViewer::auth();
+
+        $file = LogViewer::getFile($fileIdentifier);
+
+        abort_if(is_null($file), 404);
+
+        Gate::authorize('deleteLogFile', $file);
+
+        $file->delete();
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
+    public function deleteMultipleFiles(Request $request)
+    {
+        LogViewer::auth();
+
+        $selectedFilesArray = $request->input('files', []);
+
+        foreach ($selectedFilesArray as $fileIdentifier) {
+            $file = LogViewer::getFile($fileIdentifier);
+
+            if (! $file || ! Gate::check('deleteLogFile', $file)) {
+                continue;
+            }
+
+            $file->delete();
+        }
+
+        return response()->json([
+            'success' => true,
+        ]);
     }
 }

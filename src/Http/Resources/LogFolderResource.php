@@ -27,6 +27,7 @@ class LogFolderResource extends JsonResource
 
             'can_download' => Gate::check('downloadLogFolder', $this->resource),
             'can_delete' => Gate::check('deleteLogFolder', $this->resource),
+            'loading' => false, // helper for frontend
         ];
     }
 }

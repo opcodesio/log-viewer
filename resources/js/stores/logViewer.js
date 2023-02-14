@@ -6,6 +6,7 @@ import { nextTick } from 'vue';
 import { usePaginationStore } from './pagination.js';
 import { useSeverityStore } from './severity.js';
 import { useLocalStorage } from '@vueuse/core';
+import { debounce } from 'lodash';
 
 export const Theme = {
   System: 'System',
@@ -18,8 +19,9 @@ export const useLogViewerStore = defineStore({
 
   state: () => ({
     theme: Theme.System,
-    shorterStackTraces: false,
+    shorterStackTraces: useLocalStorage('logViewerShorterStackTraces', false),
     direction: useLocalStorage('logViewerDirection', 'desc'),
+    resultsPerPage: useLocalStorage('logViewerResultsPerPage', 25),
 
     // Log data
     loading: false,
@@ -133,7 +135,7 @@ export const useLogViewerStore = defineStore({
       container.scrollTo(0, 0);
     },
 
-    loadLogs() {
+    loadLogs: debounce(function () {
       const fileStore = useFileStore();
       const searchStore = useSearchStore();
       const paginationStore = usePaginationStore();
@@ -147,7 +149,9 @@ export const useLogViewerStore = defineStore({
         direction: this.direction,
         query: searchStore.query,
         page: paginationStore.currentPage,
+        per_page: this.resultsPerPage,
         levels: severityStore.selectedLevels,
+        shorter_stack_traces: this.shorterStackTraces,
       };
 
       this.loading = true;
@@ -173,6 +177,6 @@ export const useLogViewerStore = defineStore({
           this.loading = false;
           console.error(error);
         });
-    },
+    }, 10),
   },
 })
