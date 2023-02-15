@@ -25,9 +25,12 @@ export const useLogViewerStore = defineStore({
 
     // Log data
     loading: false,
+    error: null,
     logs: [],
     levelCounts: [],
     hasMoreResults: false,
+    percentScanned: 100,
+    abortController: null,
 
     // Log scrolling behaviour data
     stacksOpen: [],
@@ -135,7 +138,7 @@ export const useLogViewerStore = defineStore({
       container.scrollTo(0, 0);
     },
 
-    loadLogs: debounce(function () {
+    loadLogs: debounce(function ({ silently = false } = {}) {
       const fileStore = useFileStore();
       const searchStore = useSearchStore();
       const paginationStore = usePaginationStore();
@@ -143,6 +146,13 @@ export const useLogViewerStore = defineStore({
 
       // abort if the files are not ready yet
       if (fileStore.folders.length === 0) return;
+
+      // abort the previous request which might now be outdated
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+
+      this.abortController = new AbortController();
 
       const params = {
         file: this.selectedFile?.identifier,
@@ -154,13 +164,16 @@ export const useLogViewerStore = defineStore({
         shorter_stack_traces: this.shorterStackTraces,
       };
 
-      this.loading = true;
+      if (!silently) {
+        this.loading = true;
+      }
 
-      axios.get(`${LogViewer.path}/api/logs`, { params })
+      axios.get(`${LogViewer.path}/api/logs`, { params, signal: this.abortController.signal })
         .then(({ data }) => {
           this.logs = data.logs;
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;
+          this.error = data.error || null;
           severityStore.setLevelCounts(data.levelCounts);
           paginationStore.setPagination(data.pagination);
 
@@ -169,9 +182,14 @@ export const useLogViewerStore = defineStore({
           }
 
           this.loading = false;
-          nextTick(() => {
-            this.reset();
-          });
+
+          if (!silently) {
+            nextTick(() => this.reset());
+          }
+
+          if (this.hasMoreResults) {
+            this.loadLogs({ silently: true });
+          }
         })
         .catch((error) => {
           this.loading = false;

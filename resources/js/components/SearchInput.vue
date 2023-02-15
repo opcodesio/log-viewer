@@ -1,10 +1,10 @@
 <template>
   <div class="flex-1">
-    <div class="search" :class="{'has-error': searchStore.error}">
+    <div class="search" :class="{'has-error': logViewerStore.error}">
       <div class="prefix-icon">
         <label for="query" class="sr-only">Search</label>
-        <MagnifyingGlassIcon v-show="!searchStore.searching" class="h-4 w-4" />
-        <SpinnerIcon v-show="searchStore.searching" class="w-5 h-5 -mr-1" />
+        <MagnifyingGlassIcon v-show="!logViewerStore.hasMoreResults" class="h-4 w-4" />
+        <SpinnerIcon v-show="logViewerStore.hasMoreResults" class="w-4 h-4" />
       </div>
       <div class="relative flex-1 m-1">
         <input v-model="tempQuery" name="query" id="query" type="text"
@@ -27,10 +27,10 @@
       </div>
     </div>
     <div class="relative h-0 w-full overflow-visible">
-      <div class="search-progress-bar" v-show="searchStore.searching"
-           :style="{ width: searchStore.percentScanned + '%' }"></div>
+      <div class="search-progress-bar" v-show="logViewerStore.hasMoreResults"
+           :style="{ width: logViewerStore.percentScanned + '%' }"></div>
     </div>
-    <p class="mt-1 text-red-600 text-xs" v-show="searchStore.error" v-html="searchStore.error"></p>
+    <p class="mt-1 text-red-600 text-xs" v-show="logViewerStore.error" v-html="logViewerStore.error"></p>
   </div>
 </template>
 

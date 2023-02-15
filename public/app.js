@@ -20596,13 +20596,13 @@ var _hoisted_10 = ["innerHTML"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["search", {
-      'has-error': $setup.searchStore.error
+      'has-error': $setup.logViewerStore.error
     }])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["MagnifyingGlassIcon"], {
     "class": "h-4 w-4"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$setup.searchStore.searching]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["SpinnerIcon"], {
-    "class": "w-5 h-5 -mr-1"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.searchStore.searching]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$setup.logViewerStore.hasMoreResults]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["SpinnerIcon"], {
+    "class": "w-4 h-4"
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.logViewerStore.hasMoreResults]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
       return $setup.tempQuery = $event;
     }),
@@ -20622,12 +20622,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   })]))])], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "search-progress-bar",
     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-      width: $setup.searchStore.percentScanned + '%'
+      width: $setup.logViewerStore.percentScanned + '%'
     })
-  }, null, 4 /* STYLE */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.searchStore.searching]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  }, null, 4 /* STYLE */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.logViewerStore.hasMoreResults]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "mt-1 text-red-600 text-xs",
-    innerHTML: $setup.searchStore.error
-  }, null, 8 /* PROPS */, _hoisted_10), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.searchStore.error]])]);
+    innerHTML: $setup.logViewerStore.error
+  }, null, 8 /* PROPS */, _hoisted_10), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.logViewerStore.error]])]);
 }
 
 /***/ }),
@@ -21302,9 +21302,12 @@ var useLogViewerStore = (0,pinia__WEBPACK_IMPORTED_MODULE_6__.defineStore)({
       resultsPerPage: (0,_vueuse_core__WEBPACK_IMPORTED_MODULE_7__.useLocalStorage)('logViewerResultsPerPage', 25),
       // Log data
       loading: false,
+      error: null,
       logs: [],
       levelCounts: [],
       hasMoreResults: false,
+      percentScanned: 100,
+      abortController: null,
       // Log scrolling behaviour data
       stacksOpen: [],
       stacksInView: [],
@@ -21414,6 +21417,9 @@ var useLogViewerStore = (0,pinia__WEBPACK_IMPORTED_MODULE_6__.defineStore)({
     loadLogs: (0,lodash__WEBPACK_IMPORTED_MODULE_5__.debounce)(function () {
       var _this$selectedFile,
         _this4 = this;
+      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref$silently = _ref.silently,
+        silently = _ref$silently === void 0 ? false : _ref$silently;
       var fileStore = (0,_files_js__WEBPACK_IMPORTED_MODULE_0__.useFileStore)();
       var searchStore = (0,_search_js__WEBPACK_IMPORTED_MODULE_1__.useSearchStore)();
       var paginationStore = (0,_pagination_js__WEBPACK_IMPORTED_MODULE_3__.usePaginationStore)();
@@ -21421,6 +21427,12 @@ var useLogViewerStore = (0,pinia__WEBPACK_IMPORTED_MODULE_6__.defineStore)({
 
       // abort if the files are not ready yet
       if (fileStore.folders.length === 0) return;
+
+      // abort the previous request which might now be outdated
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+      this.abortController = new AbortController();
       var params = {
         file: (_this$selectedFile = this.selectedFile) === null || _this$selectedFile === void 0 ? void 0 : _this$selectedFile.identifier,
         direction: this.direction,
@@ -21430,23 +21442,34 @@ var useLogViewerStore = (0,pinia__WEBPACK_IMPORTED_MODULE_6__.defineStore)({
         levels: severityStore.selectedLevels,
         shorter_stack_traces: this.shorterStackTraces
       };
-      this.loading = true;
+      if (!silently) {
+        this.loading = true;
+      }
       axios__WEBPACK_IMPORTED_MODULE_8__["default"].get("".concat(LogViewer.path, "/api/logs"), {
-        params: params
-      }).then(function (_ref) {
-        var data = _ref.data;
+        params: params,
+        signal: this.abortController.signal
+      }).then(function (_ref2) {
+        var data = _ref2.data;
         _this4.logs = data.logs;
         _this4.hasMoreResults = data.hasMoreResults;
         _this4.percentScanned = data.percentScanned;
+        _this4.error = data.error || null;
         severityStore.setLevelCounts(data.levelCounts);
         paginationStore.setPagination(data.pagination);
         if (data.expandAutomatically) {
           _this4.stacksOpen.push(0);
         }
         _this4.loading = false;
-        (0,vue__WEBPACK_IMPORTED_MODULE_2__.nextTick)(function () {
-          _this4.reset();
-        });
+        if (!silently) {
+          (0,vue__WEBPACK_IMPORTED_MODULE_2__.nextTick)(function () {
+            return _this4.reset();
+          });
+        }
+        if (_this4.hasMoreResults) {
+          _this4.loadLogs({
+            silently: true
+          });
+        }
       })["catch"](function (error) {
         _this4.loading = false;
         console.error(error);
