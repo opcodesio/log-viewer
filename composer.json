@@ -21,14 +21,14 @@
     ],
     "require": {
         "php": "^8.0",
-        "illuminate/contracts": "^8.0|^9.0",
+        "illuminate/contracts": "^8.0|^9.0|^10.0",
         "livewire/livewire": "^2.10"
     },
     "require-dev": {
         "itsgoingd/clockwork": "^5.1",
         "laravel/pint": "^1.0",
-        "nunomaduro/collision": "^6.0",
-        "orchestra/testbench": "^7.6",
+        "nunomaduro/collision": "^7.0",
+        "orchestra/testbench": "^8.0",
         "pestphp/pest": "^1.21",
         "pestphp/pest-plugin-laravel": "^1.1",
         "phpunit/phpunit": "^9.5",
