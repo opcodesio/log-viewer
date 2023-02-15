@@ -10,10 +10,6 @@ class Utils
     /**
      * Highlights search query results and escapes HTML.
      * Safe to use within {!! !!} in Blade.
-     *
-     * @param  string  $text
-     * @param  string|null  $query
-     * @return string
      */
     public static function highlightSearchResult(string $text, string $query = null): string
     {
