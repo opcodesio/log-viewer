@@ -57,7 +57,7 @@
     <div id="file-list-container" class="relative h-full overflow-hidden">
       <div class="pointer-events-none absolute z-10 top-0 h-4 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
 
-      <div class="file-list" ref="fileList" @scroll="(event) => fileStore.onScroll(event)">
+      <div class="file-list" @scroll="(event) => fileStore.onScroll(event)">
         <div v-for="folder in fileStore.folders"
              :key="folder.identifier"
              :id="`folder-${folder.identifier}`"
@@ -81,14 +81,14 @@
                   <span v-else>{{ folder.clean_path }}</span>
                 </div>
 
-                <MenuButton @click.stop>
-                  <button type="button" class="file-dropdown-toggle">
-                    <EllipsisVerticalIcon class="w-5 h-5" />
+                <MenuButton @click.stop="calculateDropdownDirection($event.target)">
+                  <button type="button" class="file-dropdown-toggle" :data-toggle-id="folder.identifier">
+                    <EllipsisVerticalIcon class="w-5 h-5 pointer-events-none" />
                   </button>
                 </MenuButton>
               </div>
 
-              <MenuItems static v-show="open" as="div" class="dropdown down w-48">
+              <MenuItems static v-show="open" as="div" class="dropdown w-48" :class="[dropdownDirections[folder.identifier]]">
                 <div class="py-2">
                   <MenuItem as="button" @click.stop.prevent="clearCacheForFolder(folder)">
                     <CircleStackIcon v-show="!clearingCache[folder.identifier]" class="w-4 h-4 mr-2"/>
@@ -155,7 +155,7 @@ import SpinnerIcon from './SpinnerIcon.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSearchStore } from '../stores/search.js';
 import { useLogViewerStore } from '../stores/logViewer.js';
-import { replaceQuery } from '../helpers.js';
+import { replaceQuery, useDropdownDirection } from '../helpers.js';
 import axios from 'axios';
 
 const router = useRouter();
@@ -164,7 +164,7 @@ const fileStore = useFileStore();
 const searchStore = useSearchStore();
 const logViewerStore = useLogViewerStore();
 const scanInProgress = ref(false);
-const fileList = ref(null);
+const { dropdownDirections, calculateDropdownDirection } = useDropdownDirection();
 
 const cacheRecentlyCleared = ref({});
 const clearingCache = ref({});
@@ -222,14 +222,6 @@ const confirmDeleteSelectedFiles = () => {
   }
 }
 
-onMounted(async () => {
-  await fileStore.loadFolders();
-
-  if (fileStore.selectedFile || searchStore.hasQuery) {
-    logViewerStore.loadLogs();
-  }
-});
-
 const selectFile = (fileIdentifier) => {
   if (route.query.file && route.query.file === fileIdentifier) {
     replaceQuery(router, 'file', null);
@@ -237,6 +229,14 @@ const selectFile = (fileIdentifier) => {
     replaceQuery(router, 'file', fileIdentifier);
   }
 };
+
+onMounted(async () => {
+  await fileStore.loadFolders();
+
+  if (fileStore.selectedFile || searchStore.hasQuery) {
+    logViewerStore.loadLogs();
+  }
+});
 
 watch(
   () => fileStore.direction,

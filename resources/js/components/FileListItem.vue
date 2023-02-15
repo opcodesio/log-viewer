@@ -12,14 +12,14 @@
         <p class="file-name">{{ logFile.name }}</p>
         <span class="file-size">{{ logFile.size_formatted }}</span>
 
-        <MenuButton @click.stop>
-          <button type="button" class="file-dropdown-toggle">
-            <EllipsisVerticalIcon class="w-5 h-5" />
+        <MenuButton @click.stop="calculateDropdownDirection($event.target)">
+          <button type="button" class="file-dropdown-toggle" :data-toggle-id="logFile.identifier">
+            <EllipsisVerticalIcon class="w-5 h-5 pointer-events-none" />
           </button>
         </MenuButton>
       </div>
 
-      <MenuItems as="div" class="dropdown down w-48">
+      <MenuItems as="div" class="dropdown w-48" :class="[dropdownDirections[logFile.identifier]]">
         <div class="py-2">
           <MenuItem @click.stop.prevent="clearCacheForFile">
             <button>
@@ -69,7 +69,7 @@ import { useFileStore } from '../stores/files.js';
 import SpinnerIcon from './SpinnerIcon.vue';
 import axios from 'axios';
 import { useLogViewerStore } from '../stores/logViewer.js';
-import { replaceQuery } from '../helpers.js';
+import { replaceQuery, useDropdownDirection } from '../helpers.js';
 import { useRouter } from 'vue-router';
 
 const props = defineProps({
@@ -86,6 +86,7 @@ const emit = defineEmits(['selectForDeletion']);
 const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
 const router = useRouter();
+const { dropdownDirections, calculateDropdownDirection } = useDropdownDirection();
 
 // data
 const clearingCache = ref(false);

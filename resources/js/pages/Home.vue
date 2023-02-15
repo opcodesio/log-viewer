@@ -16,13 +16,15 @@ import { useFileStore } from '../stores/files.js';
 import { useSearchStore } from '../stores/search.js';
 import { usePaginationStore } from '../stores/pagination.js';
 import { useRoute } from 'vue-router';
-import { onMounted, watch } from 'vue';
+import { onBeforeMount, onMounted, watch } from 'vue';
 
 const logViewerStore = useLogViewerStore();
 const fileStore = useFileStore();
 const searchStore = useSearchStore();
 const paginationStore = usePaginationStore();
 const route = useRoute();
+
+onBeforeMount(() => logViewerStore.syncTheme());
 
 onMounted(() => {
   // This makes sure we react to device's dark mode changes

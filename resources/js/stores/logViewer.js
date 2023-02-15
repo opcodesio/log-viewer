@@ -18,7 +18,7 @@ export const useLogViewerStore = defineStore({
   id: 'logViewer',
 
   state: () => ({
-    theme: Theme.System,
+    theme: useLocalStorage('logViewerTheme', Theme.System),
     shorterStackTraces: useLocalStorage('logViewerShorterStackTraces', false),
     direction: useLocalStorage('logViewerDirection', 'desc'),
     resultsPerPage: useLocalStorage('logViewerResultsPerPage', 25),

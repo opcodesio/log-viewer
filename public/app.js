@@ -18625,7 +18625,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var searchStore = (0,_stores_search_js__WEBPACK_IMPORTED_MODULE_4__.useSearchStore)();
     var logViewerStore = (0,_stores_logViewer_js__WEBPACK_IMPORTED_MODULE_5__.useLogViewerStore)();
     var scanInProgress = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
-    var fileList = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(null);
+    var _useDropdownDirection = (0,_helpers_js__WEBPACK_IMPORTED_MODULE_6__.useDropdownDirection)(),
+      dropdownDirections = _useDropdownDirection.dropdownDirections,
+      calculateDropdownDirection = _useDropdownDirection.calculateDropdownDirection;
     var cacheRecentlyCleared = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)({});
     var clearingCache = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)({});
     var clearCacheForFolder = function clearCacheForFolder(folder) {
@@ -18677,6 +18679,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         });
       }
     };
+    var selectFile = function selectFile(fileIdentifier) {
+      if (route.query.file && route.query.file === fileIdentifier) {
+        (0,_helpers_js__WEBPACK_IMPORTED_MODULE_6__.replaceQuery)(router, 'file', null);
+      } else {
+        (0,_helpers_js__WEBPACK_IMPORTED_MODULE_6__.replaceQuery)(router, 'file', fileIdentifier);
+      }
+    };
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
@@ -18693,13 +18702,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       }, _callee);
     })));
-    var selectFile = function selectFile(fileIdentifier) {
-      if (route.query.file && route.query.file === fileIdentifier) {
-        (0,_helpers_js__WEBPACK_IMPORTED_MODULE_6__.replaceQuery)(router, 'file', null);
-      } else {
-        (0,_helpers_js__WEBPACK_IMPORTED_MODULE_6__.replaceQuery)(router, 'file', fileIdentifier);
-      }
-    };
     (0,vue__WEBPACK_IMPORTED_MODULE_0__.watch)(function () {
       return fileStore.direction;
     }, function () {
@@ -18712,7 +18714,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       searchStore: searchStore,
       logViewerStore: logViewerStore,
       scanInProgress: scanInProgress,
-      fileList: fileList,
+      dropdownDirections: dropdownDirections,
+      calculateDropdownDirection: calculateDropdownDirection,
       cacheRecentlyCleared: cacheRecentlyCleared,
       clearingCache: clearingCache,
       clearCacheForFolder: clearCacheForFolder,
@@ -18778,6 +18781,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       },
       get replaceQuery() {
         return _helpers_js__WEBPACK_IMPORTED_MODULE_6__.replaceQuery;
+      },
+      get useDropdownDirection() {
+        return _helpers_js__WEBPACK_IMPORTED_MODULE_6__.useDropdownDirection;
       },
       get axios() {
         return axios__WEBPACK_IMPORTED_MODULE_8__["default"];
@@ -18850,6 +18856,9 @@ __webpack_require__.r(__webpack_exports__);
     var fileStore = (0,_stores_files_js__WEBPACK_IMPORTED_MODULE_1__.useFileStore)();
     var logViewerStore = (0,_stores_logViewer_js__WEBPACK_IMPORTED_MODULE_3__.useLogViewerStore)();
     var router = (0,vue_router__WEBPACK_IMPORTED_MODULE_5__.useRouter)();
+    var _useDropdownDirection = (0,_helpers_js__WEBPACK_IMPORTED_MODULE_4__.useDropdownDirection)(),
+      dropdownDirections = _useDropdownDirection.dropdownDirections,
+      calculateDropdownDirection = _useDropdownDirection.calculateDropdownDirection;
 
     // data
     var clearingCache = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)(false);
@@ -18896,6 +18905,8 @@ __webpack_require__.r(__webpack_exports__);
       fileStore: fileStore,
       logViewerStore: logViewerStore,
       router: router,
+      dropdownDirections: dropdownDirections,
+      calculateDropdownDirection: calculateDropdownDirection,
       clearingCache: clearingCache,
       cacheRecentlyCleared: cacheRecentlyCleared,
       isSelected: isSelected,
@@ -18941,6 +18952,9 @@ __webpack_require__.r(__webpack_exports__);
       },
       get replaceQuery() {
         return _helpers_js__WEBPACK_IMPORTED_MODULE_4__.replaceQuery;
+      },
+      get useDropdownDirection() {
+        return _helpers_js__WEBPACK_IMPORTED_MODULE_4__.useDropdownDirection;
       },
       get useRouter() {
         return vue_router__WEBPACK_IMPORTED_MODULE_5__.useRouter;
@@ -19607,6 +19621,9 @@ __webpack_require__.r(__webpack_exports__);
     var searchStore = (0,_stores_search_js__WEBPACK_IMPORTED_MODULE_4__.useSearchStore)();
     var paginationStore = (0,_stores_pagination_js__WEBPACK_IMPORTED_MODULE_5__.usePaginationStore)();
     var route = (0,vue_router__WEBPACK_IMPORTED_MODULE_7__.useRoute)();
+    (0,vue__WEBPACK_IMPORTED_MODULE_6__.onBeforeMount)(function () {
+      return logViewerStore.syncTheme();
+    });
     (0,vue__WEBPACK_IMPORTED_MODULE_6__.onMounted)(function () {
       // This makes sure we react to device's dark mode changes
       setInterval(logViewerStore.syncTheme, 1000);
@@ -19646,6 +19663,7 @@ __webpack_require__.r(__webpack_exports__);
       get useRoute() {
         return vue_router__WEBPACK_IMPORTED_MODULE_7__.useRoute;
       },
+      onBeforeMount: vue__WEBPACK_IMPORTED_MODULE_6__.onBeforeMount,
       onMounted: vue__WEBPACK_IMPORTED_MODULE_6__.onMounted,
       watch: vue__WEBPACK_IMPORTED_MODULE_6__.watch
     };
@@ -19773,10 +19791,7 @@ var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_24 = {
   key: 1
 };
-var _hoisted_25 = {
-  type: "button",
-  "class": "file-dropdown-toggle"
-};
+var _hoisted_25 = ["data-toggle-id"];
 var _hoisted_26 = {
   "class": "py-2"
 };
@@ -19826,7 +19841,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "w-5 ml-1"
   })])], 2 /* CLASS */)], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.fileStore.checkBoxesVisibility]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [_hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "file-list",
-    ref: "fileList",
     onScroll: _cache[4] || (_cache[4] = function (event) {
       return $setup.fileStore.onScroll(event);
     })
@@ -19851,18 +19865,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$setup.fileStore.isOpen(folder)]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["FolderOpenIcon"], {
           "class": "w-5 h-5"
         }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.fileStore.isOpen(folder)]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [String(folder.clean_path || '').startsWith('root') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_22, [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(String(folder.clean_path).substring(4)), 1 /* TEXT */)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(folder.clean_path), 1 /* TEXT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["MenuButton"], {
-          onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
+          onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+            return $setup.calculateDropdownDirection($event.target);
+          }, ["stop"]))
         }, {
           "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["EllipsisVerticalIcon"], {
-              "class": "w-5 h-5"
-            })])];
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+              type: "button",
+              "class": "file-dropdown-toggle",
+              "data-toggle-id": folder.identifier
+            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["EllipsisVerticalIcon"], {
+              "class": "w-5 h-5 pointer-events-none"
+            })], 8 /* PROPS */, _hoisted_25)];
           }),
-          _: 1 /* STABLE */
-        })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["MenuItems"], {
+          _: 2 /* DYNAMIC */
+        }, 1024 /* DYNAMIC_SLOTS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["MenuItems"], {
           "static": "",
           as: "div",
-          "class": "dropdown down w-48"
+          "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["dropdown w-48", [$setup.dropdownDirections[folder.identifier]]])
         }, {
           "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
             return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["MenuItem"], {
@@ -19909,7 +19929,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             }, 1024 /* DYNAMIC_SLOTS */)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
           }),
           _: 2 /* DYNAMIC */
-        }, 1536 /* NEED_PATCH, DYNAMIC_SLOTS */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, open]])], 14 /* CLASS, STYLE, PROPS */, _hoisted_18)];
+        }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["class"]), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, open]])], 14 /* CLASS, STYLE, PROPS */, _hoisted_18)];
       }),
       _: 2 /* DYNAMIC */
     }, 1024 /* DYNAMIC_SLOTS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(folder.files || [], function (logFile) {
@@ -19921,7 +19941,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, null, 8 /* PROPS */, ["log-file", "onClick"]);
     }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.fileStore.isOpen(folder)]])], 8 /* PROPS */, _hoisted_17);
-  }), 128 /* KEYED_FRAGMENT */))], 544 /* HYDRATE_EVENTS, NEED_PATCH */), _hoisted_32])]);
+  }), 128 /* KEYED_FRAGMENT */))], 32 /* HYDRATE_EVENTS */), _hoisted_32])]);
 }
 
 /***/ }),
@@ -19953,10 +19973,7 @@ var _hoisted_4 = {
 var _hoisted_5 = {
   "class": "file-size"
 };
-var _hoisted_6 = {
-  type: "button",
-  "class": "file-dropdown-toggle"
-};
+var _hoisted_6 = ["data-toggle-id"];
 var _hoisted_7 = {
   "class": "py-2"
 };
@@ -19979,17 +19996,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         checked: $setup.fileStore.isChecked($props.logFile),
         value: $setup.fileStore.isChecked($props.logFile)
       }, null, 8 /* PROPS */, _hoisted_3)], 512 /* NEED_PATCH */)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $setup.fileStore.checkBoxesVisibility]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.logFile.name), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.logFile.size_formatted), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["MenuButton"], {
-        onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
+        onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+          return $setup.calculateDropdownDirection($event.target);
+        }, ["stop"]))
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["EllipsisVerticalIcon"], {
-            "class": "w-5 h-5"
-          })])];
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+            type: "button",
+            "class": "file-dropdown-toggle",
+            "data-toggle-id": $props.logFile.identifier
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["EllipsisVerticalIcon"], {
+            "class": "w-5 h-5 pointer-events-none"
+          })], 8 /* PROPS */, _hoisted_6)];
         }),
         _: 1 /* STABLE */
       })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["MenuItems"], {
         as: "div",
-        "class": "dropdown down w-48"
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["dropdown w-48", [$setup.dropdownDirections[$props.logFile.identifier]]])
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["MenuItem"], {
@@ -20037,9 +20060,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, 8 /* PROPS */, ["onClick"])], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
         }),
         _: 1 /* STABLE */
-      })];
+      }, 8 /* PROPS */, ["class"])];
     }),
-
     _: 1 /* STABLE */
   })], 2 /* CLASS */);
 }
@@ -20928,8 +20950,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "copyToClipboard": () => (/* binding */ copyToClipboard),
 /* harmony export */   "escapeHtml": () => (/* binding */ escapeHtml),
 /* harmony export */   "highlightSearchResult": () => (/* binding */ highlightSearchResult),
-/* harmony export */   "replaceQuery": () => (/* binding */ replaceQuery)
+/* harmony export */   "replaceQuery": () => (/* binding */ replaceQuery),
+/* harmony export */   "useDropdownDirection": () => (/* binding */ useDropdownDirection)
 /* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
 var highlightSearchResult = function highlightSearchResult(text) {
   var query = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
   if (query) {
@@ -20990,6 +21015,22 @@ var replaceQuery = function replaceQuery(router, key, value) {
     name: 'home',
     query: query
   });
+};
+var useDropdownDirection = function useDropdownDirection() {
+  var dropdownDirections = (0,vue__WEBPACK_IMPORTED_MODULE_0__.ref)({});
+  var getDropdownDirection = function getDropdownDirection(buttonElement) {
+    var viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    var boundingRect = buttonElement.getBoundingClientRect();
+    return boundingRect.bottom + 190 < viewportHeight ? 'down' : 'up';
+  };
+  var calculateDropdownDirection = function calculateDropdownDirection(toggleButton) {
+    dropdownDirections.value[toggleButton.dataset.toggleId] = getDropdownDirection(toggleButton);
+  };
+  return {
+    dropdownDirections: dropdownDirections,
+    calculateDropdownDirection: calculateDropdownDirection
+  };
 };
 
 /***/ }),
@@ -21255,7 +21296,7 @@ var useLogViewerStore = (0,pinia__WEBPACK_IMPORTED_MODULE_6__.defineStore)({
   id: 'logViewer',
   state: function state() {
     return {
-      theme: Theme.System,
+      theme: (0,_vueuse_core__WEBPACK_IMPORTED_MODULE_7__.useLocalStorage)('logViewerTheme', Theme.System),
       shorterStackTraces: (0,_vueuse_core__WEBPACK_IMPORTED_MODULE_7__.useLocalStorage)('logViewerShorterStackTraces', false),
       direction: (0,_vueuse_core__WEBPACK_IMPORTED_MODULE_7__.useLocalStorage)('logViewerDirection', 'desc'),
       resultsPerPage: (0,_vueuse_core__WEBPACK_IMPORTED_MODULE_7__.useLocalStorage)('logViewerResultsPerPage', 25),

@@ -1,3 +1,5 @@
+import { ref } from 'vue';
+
 export const highlightSearchResult = (text, query = null) => {
   if (query) {
     try {
@@ -64,3 +66,21 @@ export const replaceQuery = (router, key, value) => {
 
   router.push({ name: 'home', query });
 };
+
+export const useDropdownDirection = () => {
+  const dropdownDirections = ref({});
+
+  const getDropdownDirection = (buttonElement) => {
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const boundingRect = buttonElement.getBoundingClientRect();
+
+    return (boundingRect.bottom + 190) < viewportHeight ? 'down' : 'up';
+  }
+
+  const calculateDropdownDirection = (toggleButton) => {
+    dropdownDirections.value[toggleButton.dataset.toggleId] = getDropdownDirection(toggleButton);
+  }
+
+  return { dropdownDirections, calculateDropdownDirection };
+}
