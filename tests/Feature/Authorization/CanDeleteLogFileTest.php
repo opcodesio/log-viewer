@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Gate;
-use Livewire\Livewire;
 use Opcodes\LogViewer\LogFile;
 
 test('can delete every file by default', function () {

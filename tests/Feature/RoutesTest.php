@@ -1,9 +1,5 @@
 <?php
 
-use Illuminate\Routing\RouteCollection;
-use Illuminate\Support\Facades\Route;
-use function Pest\Laravel\get;
-
 test('the default url can be changed', function () {
     config()->set('log-viewer.route_path', 'new-log-route');
 

@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Gate;
-use Livewire\Livewire;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFolder;
