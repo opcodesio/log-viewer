@@ -54,8 +54,7 @@ test('can clear cache of all files from the Livewire component', function () {
     Cache::put($cacheKey = 'some-cache-key', 'some value');
     $this->file->addRelatedCacheKey($cacheKey);
 
-    \Livewire\Livewire::test('log-viewer::log-list')
-        ->call('clearCacheAll')
+    $this->postJson(route('log-viewer.files.clear-cache-all'))
         ->assertOk();
 
     expect(Cache::has($cacheKey))->toBeFalse();

@@ -52,13 +52,15 @@ class FoldersController
         return response()->json(['success' => true]);
     }
 
-    public function destroy(string $folderIdentifier)
+    public function delete(string $folderIdentifier)
     {
         LogViewer::auth();
 
         $folder = LogViewer::getFolder($folderIdentifier);
 
-        abort_if(is_null($folder), 404);
+        if (is_null($folder)) {
+            return response()->json(['success' => true]);
+        }
 
         Gate::authorize('deleteLogFolder', $folder);
 

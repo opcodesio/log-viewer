@@ -66,13 +66,15 @@ class FilesController
         ]);
     }
 
-    public function destroy(string $fileIdentifier)
+    public function delete(string $fileIdentifier)
     {
         LogViewer::auth();
 
         $file = LogViewer::getFile($fileIdentifier);
 
-        abort_if(is_null($file), 404);
+        if (is_null($file)) {
+            return response()->json(['success' => true]);
+        }
 
         Gate::authorize('deleteLogFile', $file);
 

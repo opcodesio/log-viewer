@@ -8,41 +8,39 @@ use Opcodes\LogViewer\LogFolder;
 
 test('can delete every folder by default', function () {
     generateLogFiles([$fileName = 'laravel.log']);
+    $folder = LogViewer::getFolder('');
 
-    Livewire::test('log-viewer::file-list')
-        ->call('deleteFolder', '')
+    $this->deleteJson(route('log-viewer.folders.delete', $folder->identifier))
         ->assertOk();
 
     test()->assertFileDoesNotExist(storage_path('logs/'.$fileName));
 });
 
 test('deleting a folder that\'s not found still returns a successful response', function () {
-    Livewire::test('log-viewer::file-list')
-        ->call('deleteFolder', 'notfound')
+    $this->deleteJson(route('log-viewer.folders.delete', 'notfound'))
         ->assertOk();
 });
 
 test('"deleteLogFolder" gate can prevent folder deletion', function () {
     generateLogFiles([$fileName = 'laravel.log']);
+    $folder = LogViewer::getFolder('');
     Gate::define('deleteLogFolder', fn (mixed $user, ?LogFolder $folder = null) => false);
 
-    Livewire::test('log-viewer::file-list')
-        ->call('deleteFolder', '')
+    $this->deleteJson(route('log-viewer.folders.delete', $folder->identifier))
         ->assertForbidden();
     test()->assertFileExists(storage_path('logs/'.$fileName));
 
     // now let's allow access again
     Gate::define('deleteLogFolder', fn (mixed $user, ?LogFolder $folder = null) => true);
 
-    Livewire::test('log-viewer::file-list')
-        ->call('deleteFolder', '')
+    $this->deleteJson(route('log-viewer.folders.delete', $folder->identifier))
         ->assertOk();
     test()->assertFileDoesNotExist(storage_path('logs/'.$fileName));
 });
 
 test('"deleteLogFolder" gate is supplied with a log folder object', function () {
     generateLogFiles([$fileName = 'laravel.log']);
-    $expectedFolder = LogViewer::getFolder($folderIdentifier = '');
+    $expectedFolder = LogViewer::getFolder('');
     $gateChecked = false;
 
     //                                              we use "mixed" here because we don't have a real User object in our tests
@@ -54,10 +52,9 @@ test('"deleteLogFolder" gate is supplied with a log folder object', function () 
         return true;
     });
 
-    Livewire::test('log-viewer::file-list')
-        ->call('deleteFolder', $folderIdentifier);
+    $this->deleteJson(route('log-viewer.folders.delete', $expectedFolder->identifier))
+        ->assertOk();
     test()->assertFileDoesNotExist(storage_path('logs/'.$fileName));
-
     expect($gateChecked)->toBeTrue();
 });
 
@@ -66,9 +63,8 @@ test('individual file deletion gate is also checked before deleting the files', 
     $folder = LogViewer::getFolder('');
     Gate::define('deleteLogFile', fn (mixed $user, ?LogFile $file) => $file->name !== $notAllowed);
 
-    Livewire::test('log-viewer::file-list')
-        ->call('deleteFolder', '')
-        ->assertOk();   // because deleting folders is allowed.
+    $this->deleteJson(route('log-viewer.folders.delete', $folder->identifier))
+        ->assertOk();
 
     test()->assertFileDoesNotExist(storage_path('logs/'.$allowed));
     test()->assertFileExists(storage_path('logs/'.$notAllowed));
