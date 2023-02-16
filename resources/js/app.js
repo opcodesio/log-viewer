@@ -1,8 +1,7 @@
-import { createApp, markRaw } from 'vue';
+import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import Base from './base';
 import axios from 'axios';
-import { createRouter, createWebHistory, useRoute } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import VueJsonPretty from 'vue-json-pretty';
 import Home from './pages/Home.vue';
 
@@ -31,12 +30,7 @@ const router = createRouter({
   history: createWebHistory(),
   base: routerBasePath,
 });
-const route = useRoute();
 const pinia = createPinia();
-pinia.use(({ store }) => {
-  store.$router = markRaw(router);
-  store.$route = route;
-})
 
 const app = createApp({
   router,
@@ -44,7 +38,11 @@ const app = createApp({
 
 app.use(router);
 app.use(pinia);
-app.mixin(Base);
+app.mixin({
+  computed: {
+    LogViewer: () => window.LogViewer,
+  },
+});
 app.component('vue-json-pretty', VueJsonPretty);
 app.provide('$http', axios.create());
 

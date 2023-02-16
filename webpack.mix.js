@@ -1,5 +1,4 @@
 const mix = require('laravel-mix');
-const webpack = require('webpack');
 const path = require('path');
 
 mix.options({
@@ -24,12 +23,6 @@ mix.options({
                 '@': path.resolve(__dirname, 'resources/js/'),
             },
         },
-        // plugins: [
-        //     new webpack.IgnorePlugin({
-        //         resourceRegExp: /^\.\/locale$/,
-        //         contextRegExp: /moment$/,
-        //     }),
-        // ],
     });
 
 mix.disableSuccessNotifications();

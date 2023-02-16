@@ -71,6 +71,7 @@ return [
     'include_files' => [
         '*.log',
         '**/*.log',
+        // '/absolute/paths/supported',
     ],
 
     /*
@@ -82,7 +83,7 @@ return [
     */
 
     'exclude_files' => [
-        //'my_secret.log'
+        // 'my_secret.log'
     ],
 
     /*

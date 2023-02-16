@@ -93,7 +93,7 @@ const cacheRecentlyCleared = ref(false);
 const clearCacheAll = () => {
   cacheRecentlyCleared.value = true;
 
-  axios.post(`${LogViewer.path}/api/clear-cache-all`)
+  axios.post(`${LogViewer.basePath}/api/clear-cache-all`)
     .then(() => {
       cacheRecentlyCleared.value = true;
       setTimeout(() => cacheRecentlyCleared.value = false, 2000);

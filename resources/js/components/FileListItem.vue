@@ -97,7 +97,7 @@ const isSelected = computed(() => {
 
 const confirmDeletion = () => {
   if (confirm(`Are you sure you want to delete the log file '${props.logFile.name}'? THIS ACTION CANNOT BE UNDONE.`)) {
-    axios.post(`${LogViewer.path}/api/files/${props.logFile.identifier}`)
+    axios.post(`${LogViewer.basePath}/api/files/${props.logFile.identifier}`)
       .then(() => {
         if (props.logFile.identifier === fileStore.selectedFileIdentifier) {
           replaceQuery(router, 'file', null);
@@ -120,7 +120,7 @@ const deleteMultiple = () => {
 const clearCacheForFile = () => {
   clearingCache.value = true;
 
-  axios.post(`${LogViewer.path}/api/files/${props.logFile.identifier}/clear-cache`)
+  axios.post(`${LogViewer.basePath}/api/files/${props.logFile.identifier}/clear-cache`)
     .then(() => {
       cacheRecentlyCleared.value = true;
       if (props.logFile.identifier === fileStore.selectedFileIdentifier) {

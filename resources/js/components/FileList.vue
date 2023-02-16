@@ -171,7 +171,7 @@ const clearingCache = ref({});
 const clearCacheForFolder = (folder) => {
   clearingCache.value[folder.identifier] = true;
 
-  axios.post(`${LogViewer.path}/api/folders/${folder.identifier}/clear-cache`)
+  axios.post(`${LogViewer.basePath}/api/folders/${folder.identifier}/clear-cache`)
     .then(() => {
       if (folder.files.some(file => file.identifier === fileStore.selectedFileIdentifier)) {
         logViewerStore.loadLogs();
@@ -192,7 +192,7 @@ const confirmDeleteFolder = (folder) => {
   if (confirm(`Are you sure you want to delete the log folder '${folder.path}'? THIS ACTION CANNOT BE UNDONE.`)) {
     deleting.value[folder.identifier] = true;
 
-    axios.delete(`${LogViewer.path}/api/folders/${folder.identifier}`)
+    axios.delete(`${LogViewer.basePath}/api/folders/${folder.identifier}`)
       .then(() => {
         if (folder.files.some(file => file.identifier === fileStore.selectedFileIdentifier)) {
           replaceQuery(router, 'file', null);
@@ -209,7 +209,7 @@ const confirmDeleteFolder = (folder) => {
 
 const confirmDeleteSelectedFiles = () => {
   if (confirm('Are you sure you want to delete selected log files? THIS ACTION CANNOT BE UNDONE.')) {
-    axios.post(`${LogViewer.path}/api/delete-multiple-files`, {
+    axios.post(`${LogViewer.basePath}/api/delete-multiple-files`, {
       files: fileStore.filesChecked
     }).then(() => {
       if (fileStore.filesChecked.includes(fileStore.selectedFileIdentifier)) {

@@ -168,7 +168,7 @@ export const useLogViewerStore = defineStore({
         this.loading = true;
       }
 
-      axios.get(`${LogViewer.path}/api/logs`, { params, signal: this.abortController.signal })
+      axios.get(`${LogViewer.basePath}/api/logs`, { params, signal: this.abortController.signal })
         .then(({ data }) => {
           this.logs = data.logs;
           this.hasMoreResults = data.hasMoreResults;

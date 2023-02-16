@@ -24,8 +24,6 @@
         "laravel-mix": "^6.0.49",
         "loader-utils": ">=2.0.3",
         "lodash": "^4.17.21",
-        "moment": "^2.29.4",
-        "moment-timezone": "^0.5.40",
         "pinia": "^2.0.30",
         "postcss": "^8.4.14",
         "resolve-url-loader": "^5.0.0",

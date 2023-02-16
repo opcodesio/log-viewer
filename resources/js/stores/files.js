@@ -122,7 +122,7 @@ export const useFileStore = defineStore({
       this.loading = true;
 
       // load the folders from the server
-      return axios.get(`${LogViewer.path}/api/folders`, { params: { direction: this.direction }})
+      return axios.get(`${LogViewer.basePath}/api/folders`, { params: { direction: this.direction }})
         .then(({ data }) => {
           this.folders = data;
           this.loading = false;
