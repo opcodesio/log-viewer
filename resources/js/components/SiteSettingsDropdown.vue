@@ -50,9 +50,27 @@
         </MenuItem>
 
         <MenuItem>
+          <a href="https://log-viewer.opcodes.io/docs" target="_blank">
+            <QuestionMarkCircleIcon class="w-4 h-4" />
+            Documentation
+          </a>
+        </MenuItem>
+
+        <MenuItem>
           <a href="https://www.github.com/opcodesio/log-viewer" target="_blank">
             <QuestionMarkCircleIcon class="w-4 h-4" />
             Help
+          </a>
+        </MenuItem>
+
+        <div class="divider"></div>
+
+        <MenuItem>
+          <a href="https://www.buymeacoffee.com/arunas" target="_blank">
+            <div class="w-4 h-4 mr-3 flex flex-col items-center">
+              <img src="/vendor/log-viewer/img/bmc-logo.png" alt="Support me by buying me a coffee!" class="h-4">
+            </div>
+            <strong class="text-yellow-500">Buy me a coffee</strong>
           </a>
         </MenuItem>
       </div>

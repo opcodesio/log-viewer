@@ -137,12 +137,6 @@
       <div v-if="paginationStore.hasPages" class="px-4">
         <Pagination :loading="logViewerStore.loading" />
       </div>
-
-      <div class="grow flex flex-col justify-end text-right px-4 mt-3">
-        <p class="text-xs text-gray-400 dark:text-gray-500">
-          <span>Version: <span class="font-semibold">{{ LogViewer.version }}</span></span>
-        </p>
-      </div>
     </div>
   </div>
 

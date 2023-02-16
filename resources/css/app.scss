@@ -7,6 +7,16 @@ html.dark {
     color-scheme: dark
 }
 
+#bmc-wbtn {
+    height: 48px !important;
+    width: 48px !important;
+
+    &>img {
+        height: 32px !important;
+        width: 32px !important;
+    }
+}
+
 .log-levels-selector {
     .dropdown-toggle {
         @apply whitespace-nowrap;

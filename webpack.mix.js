@@ -15,7 +15,7 @@ mix.options({
     .vue()
     .sass('resources/css/app.scss', 'public')
     .version()
-    // .copy('resources/img', 'public/img')
+    .copy('resources/img', 'public/img')
     .webpackConfig({
         resolve: {
             symlinks: false,

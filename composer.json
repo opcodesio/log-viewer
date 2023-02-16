@@ -1,6 +1,6 @@
 {
     "name": "opcodesio/log-viewer",
-    "version": "v1.9.0",
+    "version": "v2.0.0",
     "description": "Fast and easy-to-use log viewer for your Laravel application",
     "keywords": [
         "arukompas",
@@ -21,8 +21,7 @@
     ],
     "require": {
         "php": "^8.0",
-        "illuminate/contracts": "^8.0|^9.0|^10.0",
-        "livewire/livewire": "^2.10"
+        "illuminate/contracts": "^8.0|^9.0|^10.0"
     },
     "require-dev": {
         "itsgoingd/clockwork": "^5.1",

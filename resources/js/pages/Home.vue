@@ -4,7 +4,7 @@
   </div>
 
   <div class="md:pl-88 flex flex-col flex-1 min-h-screen max-h-screen max-w-full">
-      <log-list></log-list>
+      <log-list class="pb-12"></log-list>
   </div>
 </template>
 
