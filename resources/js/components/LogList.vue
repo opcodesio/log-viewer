@@ -36,13 +36,13 @@
                     <div>
                       <label for="log-sort-direction" class="sr-only">Sort direction</label>
                       <select id="log-sort-direction" v-model="logViewerStore.direction"
-                              class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
+                              class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700">
                         <option value="desc">Newest first</option>
                         <option value="asc">Oldest first</option>
                       </select>
                       <label for="items-per-page" class="sr-only">Items per page</label>
                       <select id="items-per-page" v-model="logViewerStore.resultsPerPage"
-                              class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-700">
+                              class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700">
                         <option value="10">10 items per page</option>
                         <option value="25">25 items per page</option>
                         <option value="50">50 items per page</option>
@@ -101,16 +101,16 @@
                     <div class="text-center font-semibold">No results</div>
                     <div class="text-center mt-6">
                       <button v-if="searchStore.query?.length > 0"
-                        class="px-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
+                        class="px-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-brand-600 dark:hover:border-brand-700 rounded-md"
                         @click="clearQuery">Clear search query
                       </button>
                       <button v-if="searchStore.query?.length > 0 && fileStore.selectedFile"
-                        class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
+                        class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-brand-600 dark:hover:border-brand-700 rounded-md"
                         @click.prevent="clearSelectedFile">Search all files
                       </button>
                       <button
                         v-if="severityStore.levelsFound.length > 0 && severityStore.levelsSelected.length === 0"
-                        class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-emerald-600 dark:hover:border-emerald-700 rounded-md"
+                        class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-brand-600 dark:hover:border-brand-700 rounded-md"
                         @click="severityStore.selectAllLevels">Select all severities
                       </button>
                     </div>

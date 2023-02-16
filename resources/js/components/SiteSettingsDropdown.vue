@@ -26,7 +26,7 @@
             <SpinnerIcon v-show="clearingCache" class="w-4 h-4 mr-1.5" />
             <span v-show="!cacheRecentlyCleared && !clearingCache">Clear indices for all files</span>
             <span v-show="!cacheRecentlyCleared && clearingCache">Please wait...</span>
-            <span v-show="cacheRecentlyCleared" class="text-emerald-500">File indices cleared</span>
+            <span v-show="cacheRecentlyCleared" class="text-brand-500">File indices cleared</span>
           </button>
         </MenuItem>
 
@@ -34,7 +34,7 @@
           <button>
             <ShareIcon class="w-4 h-4" />
             <span v-show="!copied">Share this page</span>
-            <span v-show="copied" class="text-emerald-500">Link copied!</span>
+            <span v-show="copied" class="text-brand-500">Link copied!</span>
           </button>
         </MenuItem>
 
@@ -70,7 +70,8 @@
             <div class="w-4 h-4 mr-3 flex flex-col items-center">
               <img src="/vendor/log-viewer/img/bmc-logo.png" alt="Support me by buying me a coffee!" class="h-4">
             </div>
-            <strong class="text-yellow-500">Buy me a coffee</strong>
+            <strong class="text-brand-500">Show your support</strong>
+            <ArrowTopRightOnSquareIcon class="ml-2 w-4 h-4 opacity-75" />
           </a>
         </MenuItem>
       </div>
@@ -89,6 +90,7 @@ import {
   QuestionMarkCircleIcon,
   ShareIcon,
   SunIcon,
+  ArrowTopRightOnSquareIcon,
 } from '@heroicons/vue/24/outline';
 import { Theme, useLogViewerStore } from '../stores/logViewer.js';
 import { ref, watch } from 'vue';

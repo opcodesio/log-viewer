@@ -25,9 +25,9 @@
             Severity
             <template v-if="severityStore.levelsFound.length > 0">
               <span v-if="severityStore.levelsSelected.length === severityStore.levelsFound.length" @click.stop="severityStore.deselectAllLevels"
-                    class="cursor-pointer text-sky-700 dark:text-sky-500 font-normal hover:text-sky-800 dark:hover:text-sky-400">Deselect all</span>
+                    class="cursor-pointer text-brand-700 dark:text-brand-500 font-normal hover:text-brand-800 dark:hover:text-brand-400">Deselect all</span>
               <span v-else @click.stop="severityStore.selectAllLevels"
-                    class="cursor-pointer text-sky-700 dark:text-sky-500 font-normal hover:text-sky-800 dark:hover:text-sky-400">Select all</span>
+                    class="cursor-pointer text-brand-700 dark:text-brand-500 font-normal hover:text-brand-800 dark:hover:text-brand-400">Select all</span>
             </template>
           </div>
 

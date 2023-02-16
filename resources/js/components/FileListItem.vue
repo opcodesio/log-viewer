@@ -27,7 +27,7 @@
               <SpinnerIcon v-show="clearingCache" />
               <span v-show="!cacheRecentlyCleared && !clearingCache">Clear index</span>
               <span v-show="!cacheRecentlyCleared && clearingCache">Clearing...</span>
-              <span v-show="cacheRecentlyCleared" class="text-emerald-500">Index cleared</span>
+              <span v-show="cacheRecentlyCleared" class="text-brand-500">Index cleared</span>
             </button>
           </MenuItem>
 

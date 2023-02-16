@@ -7,7 +7,7 @@
     </div>
     <div class="pages">
       <template v-for="link in paginationStore.links">
-        <button v-if="link.active" class="border-emerald-500 text-emerald-600 dark:border-emerald-600 dark:text-emerald-500"
+        <button v-if="link.active" class="border-brand-500 text-brand-600 dark:border-brand-600 dark:text-brand-500"
                 aria-current="page">
           {{ Number(link.label).toLocaleString() }}
         </button>
