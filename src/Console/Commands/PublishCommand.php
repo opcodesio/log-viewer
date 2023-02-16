@@ -2,10 +2,10 @@
 
 namespace Opcodes\LogViewer\Console\Commands;
 
-use Illuminate\Support\Str;
-use Spatie\Watcher\Watch;
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use Opcodes\LogViewer\LogViewerServiceProvider;
+use Spatie\Watcher\Watch;
 
 class PublishCommand extends Command
 {
@@ -24,6 +24,7 @@ class PublishCommand extends Command
             if (! class_exists(Watch::class)) {
                 $this->error('Please install the spatie/file-system-watcher package to use the --watch option.');
                 $this->info('Learn more at https://github.com/spatie/file-system-watcher');
+
                 return;
             }
 
