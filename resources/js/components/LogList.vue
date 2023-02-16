@@ -1,38 +1,45 @@
 <template>
   <div class="h-full w-full py-5 log-list">
-    <div class="flex flex-col h-full w-full mx-3 mb-4">
-      <div class="px-4 mb-4 flex items-start">
-        <div class="flex items-center mr-5" v-if="showLevelsDropdown">
+    <div class="flex flex-col h-full w-full md:mx-3 mb-4">
+      <div class="md:px-4 mb-4 flex flex-col-reverse md:flex-row items-start">
+        <div class="flex items-center mr-5 mt-3 md:mt-0" v-if="showLevelsDropdown">
           <LevelButtons />
         </div>
-        <div class="flex-1 flex justify-end min-h-[38px]">
+        <div class="w-full md:w-auto flex-1 flex justify-end min-h-[38px]">
           <SearchInput />
-          <div class="ml-5">
+          <div class="hidden md:block ml-5">
             <button @click="logViewerStore.loadLogs()" title="Reload current results" class="menu-button">
               <ArrowPathIcon class="w-5 h-5" />
             </button>
           </div>
-          <SiteSettingsDropdown class="ml-2" />
+          <div class="hidden md:block">
+            <SiteSettingsDropdown class="ml-2" />
+          </div>
+          <div class="md:hidden">
+            <button type="button" class="menu-button">
+              <Bars3Icon class="w-5 h-5 ml-2" @click="fileStore.toggleSidebar" />
+            </button>
+          </div>
         </div>
       </div>
 
-      <div id="log-item-container" class="relative">
+      <!-- Dummy element to make fancy scrolling work -->
+      <div id="log-item-container" class="relative"></div>
 
-      </div>
       <div v-if="logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery)" class="relative overflow-hidden text-sm h-full">
-        <div class="log-item-container h-full overflow-y-auto px-4"
+        <div class="h-full overflow-y-auto md:px-4"
              @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
             <table class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
               <thead class="bg-gray-50">
               <tr>
-                <th scope="col" class="w-[60px] pl-4 pr-2 sm:pl-6 lg:pl-8"><span class="sr-only">Level icon</span></th>
+                <th scope="col" class="w-[60px] pl-4 pr-2 sm:pl-6 lg:pl-8 hidden sm:table-cell"><span class="sr-only">Level icon</span></th>
                 <th scope="col" class="w-[90px] hidden lg:table-cell">Level</th>
                 <th scope="col" class="w-[180px] hidden sm:table-cell">Time</th>
                 <th scope="col" class="w-[110px] hidden lg:table-cell">Env</th>
-                <th scope="col">
-                  <div class="flex justify-between">
-                    <span>Description</span>
+                <th scope="col" :colspan="headerColspan">
+                  <div class="flex justify-end sm:justify-between">
+                    <span class="hidden sm:inline-block">Description</span>
                     <div>
                       <label for="log-sort-direction" class="sr-only">Sort direction</label>
                       <select id="log-sort-direction" v-model="logViewerStore.direction"
@@ -53,7 +60,7 @@
                     </div>
                   </div>
                 </th>
-                <th scope="col"><span class="sr-only">Log index</span></th>
+                <th scope="col" class="hidden sm:table-cell"><span class="sr-only">Log index</span></th>
               </tr>
               </thead>
 
@@ -72,7 +79,7 @@
                     <InformationCircleIcon v-else class="w-4 h-4" />
                   </td>
                   <td class="log-level truncate hidden lg:table-cell">{{ log.level_name }}</td>
-                  <td class="whitespace-nowrap text-gray-900 dark:text-gray-200"
+                  <td class="whitespace-nowrap text-gray-900 dark:text-gray-200 hidden sm:table-cell"
                       v-html="highlightSearchResult(log.time, searchStore.query)"></td>
                   <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 hidden lg:table-cell"
                       v-html="highlightSearchResult(log.environment, searchStore.query)"></td>
@@ -122,7 +129,7 @@
           </div>
         </div>
 
-        <div class="absolute inset-0 top-9 px-4 z-20" v-show="logViewerStore.loading">
+        <div class="absolute inset-0 top-9 md:px-4 z-20" v-show="logViewerStore.loading">
           <div
             class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
             <SpinnerIcon class="w-14 h-14" />
@@ -134,7 +141,7 @@
         <span v-else>Select a file or start searching...</span>
       </div>
 
-      <div v-if="paginationStore.hasPages" class="px-4">
+      <div v-if="paginationStore.hasPages" class="md:px-4">
         <Pagination :loading="logViewerStore.loading" />
       </div>
     </div>
@@ -150,6 +157,7 @@ import {
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
+  Bars3Icon,
 } from '@heroicons/vue/24/solid';
 import { highlightSearchResult, replaceQuery } from '../helpers.js';
 import { useSearchStore } from '../stores/search.js';
@@ -182,6 +190,10 @@ const clearSelectedFile = () => {
 const clearQuery = () => {
   replaceQuery(router, 'query', null);
 }
+
+const headerColspan = computed(() => {
+  return window.matchMedia('(max-width: 640px)').matches ? 3 : 1;
+});
 
 watch(
   [

@@ -324,7 +324,10 @@ html.dark {
 
         .log-link {
             @apply flex items-center w-full;
-            min-width: 40px;
+            margin-right: 0.5rem;
+            @screen sm {
+                min-width: 40px;
+            }
 
             & > svg {
                 @apply h-4 w-4 ml-1 transition duration-200;
@@ -339,10 +342,10 @@ html.dark {
 }
 
 .pagination {
-    @apply mt-2 px-4 w-full flex items-center justify-center sm:px-0;
+    @apply md:mt-2 px-4 w-full flex items-center justify-center sm:px-0;
 
     .previous {
-        @apply -mt-px w-0 flex-1 flex justify-end;
+        @apply -mt-px w-0 flex-1 flex justify-start md:justify-end;
 
         button {
             @apply border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;
@@ -357,7 +360,7 @@ html.dark {
     }
 
     .next {
-        @apply -mt-px w-0 flex-1 flex justify-start;
+        @apply -mt-px w-0 flex-1 flex justify-end md:justify-start;
 
         button {
             @apply border-t-2 border-transparent pt-4 pl-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;

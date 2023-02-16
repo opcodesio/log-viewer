@@ -3,6 +3,7 @@
     <div class="previous">
       <button v-if="paginationStore.page !== 1" @click="previousPage" :disabled="loading" rel="prev">
         <ArrowLeftIcon class="h-5 w-5" />
+        <span class="md:hidden">Previous page</span>
       </button>
     </div>
     <div class="pages">
@@ -20,6 +21,7 @@
     </div>
     <div class="next">
       <button v-if="paginationStore.hasMorePages" @click="nextPage" :disabled="loading" rel="next">
+        <span class="md:hidden">Next page</span>
         <ArrowRightIcon class="h-5 w-5" />
       </button>
     </div>

@@ -20,6 +20,7 @@ export const useFileStore = defineStore({
     foldersInView: [],
     folderTops: {},
     containerTop: 0,
+    sidebarOpen: false,
   }),
 
   getters: {
@@ -166,6 +167,10 @@ export const useFileStore = defineStore({
       const container = document.getElementById('file-list-container');
       this.containerTop = container.getBoundingClientRect().top;
       container.scrollTo(0, 0);
+    },
+
+    toggleSidebar() {
+      this.sidebarOpen = !this.sidebarOpen;
     },
 
     checkBoxToggle(file) {

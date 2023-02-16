@@ -541,6 +541,9 @@ video {
 .top-9 {
   top: 2.25rem;
 }
+.bottom-10 {
+  bottom: 2.5rem;
+}
 .z-10 {
   z-index: 10;
 }
@@ -558,14 +561,23 @@ video {
   margin-top: auto;
   margin-bottom: auto;
 }
-.mr-20 {
-  margin-right: 5rem;
+.mr-5 {
+  margin-right: 1.25rem;
+}
+.-mb-0\.5 {
+  margin-bottom: -0.125rem;
+}
+.-mb-0 {
+  margin-bottom: -0px;
 }
 .mb-2 {
   margin-bottom: 0.5rem;
 }
 .ml-3 {
   margin-left: 0.75rem;
+}
+.ml-2 {
+  margin-left: 0.5rem;
 }
 .mt-3 {
   margin-top: 0.75rem;
@@ -588,9 +600,6 @@ video {
 .mr-2 {
   margin-right: 0.5rem;
 }
-.mr-5 {
-  margin-right: 1.25rem;
-}
 .mr-2\.5 {
   margin-right: 0.625rem;
 }
@@ -600,9 +609,6 @@ video {
 .ml-5 {
   margin-left: 1.25rem;
 }
-.ml-2 {
-  margin-left: 0.5rem;
-}
 .mr-3 {
   margin-right: 0.75rem;
 }
@@ -611,15 +617,6 @@ video {
 }
 .mt-1 {
   margin-top: 0.25rem;
-}
-.-mb-1 {
-  margin-bottom: -0.25rem;
-}
-.-mb-0\.5 {
-  margin-bottom: -0.125rem;
-}
-.-mb-0 {
-  margin-bottom: -0px;
 }
 .inline-block {
   display: inline-block;
@@ -648,6 +645,9 @@ video {
 .h-full {
   height: 100%;
 }
+.h-6 {
+  height: 1.5rem;
+}
 .h-\[18px\] {
   height: 18px;
 }
@@ -665,9 +665,6 @@ video {
 }
 .h-0 {
   height: 0px;
-}
-.h-6 {
-  height: 1.5rem;
 }
 .max-h-screen {
   max-height: 100vh;
@@ -750,11 +747,11 @@ video {
 .grid-flow-col {
   grid-auto-flow: column;
 }
-.flex-row-reverse {
-  flex-direction: row-reverse;
-}
 .flex-col {
   flex-direction: column;
+}
+.flex-col-reverse {
+  flex-direction: column-reverse;
 }
 .items-start {
   align-items: flex-start;
@@ -859,10 +856,6 @@ video {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
 }
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -889,6 +882,12 @@ video {
 }
 .pb-12 {
   padding-bottom: 3rem;
+}
+.pb-16 {
+  padding-bottom: 4rem;
+}
+.pb-14 {
+  padding-bottom: 3.5rem;
 }
 .text-center {
   text-align: center;
@@ -960,15 +959,8 @@ video {
   --tw-text-opacity: 1;
   color: rgb(220 38 38 / var(--tw-text-opacity));
 }
-.text-\[\#FFDD04\] {
-  --tw-text-opacity: 1;
-  color: rgb(255 221 4 / var(--tw-text-opacity));
-}
 .opacity-90 {
   opacity: 0.9;
-}
-.opacity-0 {
-  opacity: 0;
 }
 .opacity-75 {
   opacity: 0.75;
@@ -1758,7 +1750,12 @@ html.dark {
   display: flex;
   width: 100%;
   align-items: center;
-  min-width: 40px;
+  margin-right: 0.5rem;
+}
+@media (min-width: 640px) {
+  .log-list .log-group .log-link {
+    min-width: 40px;
+  }
 }
 .log-list .log-group .log-link > svg {
   margin-left: 0.25rem;
@@ -1789,7 +1786,6 @@ html.dark {
 }
 
 .pagination {
-  margin-top: 0.5rem;
   display: flex;
   width: 100%;
   align-items: center;
@@ -1805,12 +1801,25 @@ html.dark {
     padding-right: 0px;
   }
 }
+
+@media (min-width: 768px) {
+
+  .pagination {
+    margin-top: 0.5rem;
+  }
+}
 .pagination .previous {
   margin-top: -1px;
   display: flex;
   width: 0px;
   flex: 1 1 0%;
-  justify-content: flex-end;
+  justify-content: flex-start;
+}
+@media (min-width: 768px) {
+
+  .pagination .previous {
+    justify-content: flex-end;
+  }
 }
 .pagination .previous button {
   display: inline-flex;
@@ -1852,7 +1861,13 @@ html.dark {
   display: flex;
   width: 0px;
   flex: 1 1 0%;
-  justify-content: flex-start;
+  justify-content: flex-end;
+}
+@media (min-width: 768px) {
+
+  .pagination .next {
+    justify-content: flex-start;
+  }
 }
 .pagination .next button {
   display: inline-flex;
@@ -2635,8 +2650,16 @@ button.button:hover,  a.button:hover {
 
 @media (min-width: 640px) {
 
+  .sm\:inline-block {
+    display: inline-block;
+  }
+
   .sm\:table-cell {
     display: table-cell;
+  }
+
+  .sm\:justify-between {
+    justify-content: space-between;
   }
 
   .sm\:pl-6 {
@@ -2655,20 +2678,62 @@ button.button:hover,  a.button:hover {
     bottom: 0px;
   }
 
+  .md\:mx-3 {
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+  }
+
+  .md\:mt-0 {
+    margin-top: 0px;
+  }
+
+  .md\:block {
+    display: block;
+  }
+
+  .md\:inline {
+    display: inline;
+  }
+
   .md\:flex {
     display: flex;
+  }
+
+  .md\:hidden {
+    display: none;
+  }
+
+  .md\:w-auto {
+    width: auto;
   }
 
   .md\:w-88 {
     width: 22rem;
   }
 
+  .md\:flex-row {
+    flex-direction: row;
+  }
+
   .md\:flex-col {
     flex-direction: column;
   }
 
+  .md\:px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
   .md\:pl-88 {
     padding-left: 22rem;
+  }
+
+  .md\:pb-12 {
+    padding-bottom: 3rem;
+  }
+
+  .md\:opacity-0 {
+    opacity: 0;
   }
 }
 
