@@ -14,6 +14,7 @@
 {{--    <link href="https://fonts.bunny.net/css?family=figtree:300,400,500,600" rel="stylesheet" />--}}
     <link href="{{ asset(mix('app.css', 'vendor/log-viewer')) }}" rel="stylesheet">
 </head>
+
 <body class="h-full px-5 bg-gray-100 dark:bg-gray-900">
 <div id="log-viewer" class="flex h-full max-h-screen max-w-full">
     <router-view></router-view>
@@ -23,9 +24,6 @@
 <script>
     window.LogViewer = @json($logViewerScriptVariables);
 </script>
-
 <script src="{{ asset(mix('app.js', 'vendor/log-viewer')) }}"></script>
-
-@include('log-viewer::icons')
 </body>
 </html>

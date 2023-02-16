@@ -23,7 +23,6 @@ class LogViewerServiceProvider extends ServiceProvider
         $this->app->bind('log-viewer-cache', function () {
             return Cache::driver(config('log-viewer.cache_driver'));
         });
-        $this->app->singleton(PreferenceStore::class, PreferenceStore::class);
     }
 
     public function boot()
