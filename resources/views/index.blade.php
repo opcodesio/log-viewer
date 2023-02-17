@@ -11,23 +11,24 @@
     <title>Log Viewer{{ config('app.name') ? ' - ' . config('app.name') : '' }}</title>
 
     <!-- Style sheets-->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600" rel="stylesheet" />
     <link href="{{ asset(mix('app.css', 'vendor/log-viewer')) }}" rel="stylesheet">
 </head>
 
-<body class="h-full px-3 lg:px-5 bg-gray-100 dark:bg-gray-900 font-sans">
+<body class="h-full px-3 lg:px-5 bg-gray-100 dark:bg-gray-900">
 <div id="log-viewer" class="flex h-full max-h-screen max-w-full">
     <router-view></router-view>
 </div>
 
+@php $showSupportLink = config('log-viewer.show_support_link', true) @endphp
 <div class="absolute bottom-4 right-4 flex items-center">
-    <p class="text-xs text-gray-400 dark:text-gray-500 mr-5 -mb-0.5">
+    <p class="text-xs text-gray-400 dark:text-gray-500 @if($showSupportLink) mr-5 -mb-0.5 @endif">
         <span>Version: <span class="font-semibold">{{ \Opcodes\LogViewer\Facades\LogViewer::version() }}</span></span>
     </p>
+    @if($showSupportLink)
     <a href="https://www.buymeacoffee.com/arunas" target="_blank">
         <img src="{{ asset(mix('img/bmc.png', 'vendor/log-viewer')) }}" class="h-6" alt="Support me by buying me a cup of coffee ❤️" />
     </a>
+    @endif
 </div>
 
 <!-- Global LogViewer Object -->

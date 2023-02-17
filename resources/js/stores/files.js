@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useLocalStorage } from '@vueuse/core';
 
 export const useFileStore = defineStore({
-  id: 'fileStore',
+  id: 'files',
 
   state: () => ({
     // data
@@ -13,7 +13,6 @@ export const useFileStore = defineStore({
 
     // control variables
     loading: false,
-    scanInProgress: false,
     checkBoxesVisibility: false,
     filesChecked: [],
     openFolderIdentifiers: [],
@@ -96,27 +95,6 @@ export const useFileStore = defineStore({
       if (this.openFolderIdentifiers.length === 0 && this.folders.length > 0) {
         this.openFolderIdentifiers.push(this.folders[0].identifier);
       }
-    },
-
-    initScanCheck(routeScanCheck, routeScan) {
-      if (this.scanInProgress) return;
-      fetch(routeScanCheck)
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.requires_scan) {
-            this.scanInProgress = true;
-            fetch(routeScan)
-              .then((response) => response.json())
-              .then((data) => {
-                this.scanInProgress = false;
-                window.dispatchEvent(new CustomEvent('reload-files'));
-              })
-              .catch((error) => {
-                console.error(error);
-                this.scanInProgress = false;
-              })
-          }
-        })
     },
 
     loadFolders() {

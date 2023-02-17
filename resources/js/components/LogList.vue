@@ -203,7 +203,7 @@ const clearQuery = () => {
 }
 
 const isMobile = ref(window.matchMedia('(max-width: 640px)').matches);
-const headerColspan = computed(() => isMobile ? 4 : 1);
+const headerColspan = computed(() => isMobile.value ? 4 : 1);
 
 watch(
   [

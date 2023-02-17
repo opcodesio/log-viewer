@@ -24,13 +24,6 @@
       </a>
 
       <div class="flex justify-between mt-4 mr-1">
-        <div class="relative">
-          <div v-show="scanInProgress"
-               class="flex items-center text-sm text-gray-500 dark:text-gray-400">
-            <SpinnerIcon class="h-4 w-4 inline mr-1" />
-            Indexing logs...
-          </div>
-        </div>
         <div class="text-sm text-gray-500 dark:text-gray-400">
           <label for="file-sort-direction" class="sr-only">Sort direction</label>
           <select id="file-sort-direction" v-model="fileStore.direction"
@@ -170,7 +163,6 @@ const route = useRoute();
 const fileStore = useFileStore();
 const searchStore = useSearchStore();
 const logViewerStore = useLogViewerStore();
-const scanInProgress = ref(false);
 const { dropdownDirections, calculateDropdownDirection } = useDropdownDirection();
 
 const cacheRecentlyCleared = ref({});
