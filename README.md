@@ -5,9 +5,9 @@
 </div>
 
 <p align="center">
+    <a href="https://log-viewer.opcodes.io/">Documentation</a> |
     <a href="#features">Features</a> |
     <a href="#installation">Installation</a> |
-    <a href="https://log-viewer.opcodes.io/">Documentation</a> |
     <a href="#troubleshooting">Troubleshooting</a> |
     <a href="#credits">Credits</a>
 </p>
@@ -37,8 +37,10 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 - 🎚 **Filter** by log level (error, info, debug, etc.),
 - 🔗 **Sharable links** to individual log entries,
 - 🌑 **Dark mode**
+- ?? **Mobile-friendly** UI,
 - 💾 **Download & delete** log files from the UI,
-- ☑️ **Horizon** log support (up to Horizon v9.20)
+- ☑️ **Horizon** log support (up to Horizon v9.20),
+- ☎️ **API access** for folders, files & log entries,
 - and more...
 
 ### Documentation
@@ -60,6 +62,12 @@ To install the package via composer, Run:
 composer require opcodesio/log-viewer
 ```
 
+After installing the package, publish the front-end assets by running:
+
+```bash
+php artisan log-viewer:publish
+```
+
 ### Usage
 
 Once the installation is complete, you will be able to access **Log Viewer** directly in your browser.
@@ -75,23 +83,6 @@ Please visit the **[Log Viewer Docs](https://log-viewer.opcodes.io/docs)** to le
 ## Troubleshooting
 
 Here are some common problems and solutions.
-
-### Problem: "Livewire not defined" or other errors in the browser's console
-
-This is most often caused by your project being served from a sub-folder, like `example.com/your-laravel-project/log-viewer`.
-
-Livewire by default tries to load its resources from the root of the domain, like `example.com/livewire/livewire.js`, but if that's outside your project's sub-folder, then you need to set a different asset_url. You can [read more about it here](https://laravel-livewire.com/docs/2.x/installation#configuring-the-asset-base-url).
-
-Fortunately, the fix is easy:
-
-1. Publish the Livewire config:
-```shell
-php artisan livewire:publish --config
-```
-2. Set the `asset_url` option in the `config/livewire.php` file to your app's subdomain:
-```php
-    'asset_url' => '/your-laravel-project',
-```
 
 ### Problem: Logs not loading
 

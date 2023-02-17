@@ -50,7 +50,7 @@ test('retains related cache keys after object re-initialisation', function () {
     expect(Cache::has($cacheKey))->toBeFalse();
 });
 
-test('can clear cache of all files from the Livewire component', function () {
+test('can clear cache of all files', function () {
     Cache::put($cacheKey = 'some-cache-key', 'some value');
     $this->file->addRelatedCacheKey($cacheKey);
 
