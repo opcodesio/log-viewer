@@ -70,7 +70,7 @@ class LogViewerServiceProvider extends ServiceProvider
     {
         Route::group([
             'domain' => config('log-viewer.route_domain', null),
-            'prefix' => Str::finish(config('log-viewer.route_path'), '/') . 'api',
+            'prefix' => Str::finish(config('log-viewer.route_path'), '/').'api',
             'namespace' => 'Opcodes\LogViewer\Http\Controllers',
             'middleware' => config('log-viewer.api_middleware', null),
         ], function () {
