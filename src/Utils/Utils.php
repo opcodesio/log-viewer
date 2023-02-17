@@ -2,7 +2,6 @@
 
 namespace Opcodes\LogViewer\Utils;
 
-use Illuminate\Support\Str;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 
 class Utils
