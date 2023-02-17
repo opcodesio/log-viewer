@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Opcodes\LogViewer\Console\Commands\GenerateDummyLogsCommand;
 use Opcodes\LogViewer\Console\Commands\PublishCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
@@ -69,9 +70,18 @@ class LogViewerServiceProvider extends ServiceProvider
     {
         Route::group([
             'domain' => config('log-viewer.route_domain', null),
+            'prefix' => Str::finish(config('log-viewer.route_path'), '/') . 'api',
+            'namespace' => 'Opcodes\LogViewer\Http\Controllers',
+            'middleware' => config('log-viewer.api_middleware', null),
+        ], function () {
+            $this->loadRoutesFrom(self::basePath('/routes/api.php'));
+        });
+
+        Route::group([
+            'domain' => config('log-viewer.route_domain', null),
             'prefix' => config('log-viewer.route_path'),
             'namespace' => 'Opcodes\LogViewer\Http\Controllers',
-            'middleware' => config('log-viewer.middleware', 'web'),
+            'middleware' => config('log-viewer.middleware', null),
         ], function () {
             $this->loadRoutesFrom(self::basePath('/routes/web.php'));
         });

@@ -127,8 +127,11 @@ export const useFileStore = defineStore({
         .then(({ data }) => {
           this.folders = data;
           this.loading = false;
-          this.openFolderForActiveFile();
-          this.openFolderIfNoneOpen();
+
+          if (this.openFolderIdentifiers.length === 0) {
+            this.openFolderForActiveFile();
+            this.openFolderIfNoneOpen();
+          }
         })
         .catch((error) => {
           this.loading = false;

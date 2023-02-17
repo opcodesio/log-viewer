@@ -23,11 +23,8 @@
         </div>
       </div>
 
-      <!-- Dummy element to make fancy scrolling work -->
-      <div id="log-item-container" class="relative"></div>
-
-      <div v-if="logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery)" class="relative overflow-hidden h-full">
-        <div class="h-full overflow-y-auto md:px-4"
+      <div v-if="logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery)" class="relative overflow-hidden h-full text-sm">
+        <div class="log-item-container h-full overflow-y-auto md:px-4"
              @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
             <table class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">

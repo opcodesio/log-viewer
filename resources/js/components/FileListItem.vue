@@ -97,7 +97,7 @@ const isSelected = computed(() => {
 
 const confirmDeletion = () => {
   if (confirm(`Are you sure you want to delete the log file '${props.logFile.name}'? THIS ACTION CANNOT BE UNDONE.`)) {
-    axios.post(`${LogViewer.basePath}/api/files/${props.logFile.identifier}`)
+    axios.delete(`${LogViewer.basePath}/api/files/${props.logFile.identifier}`)
       .then(() => {
         if (props.logFile.identifier === fileStore.selectedFileIdentifier) {
           replaceQuery(router, 'file', null);

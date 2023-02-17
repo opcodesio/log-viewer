@@ -54,12 +54,22 @@ return [
     |--------------------------------------------------------------------------
     | Log Viewer route middleware.
     |--------------------------------------------------------------------------
-    | The middleware should enable session and cookies support in order for the Log Viewer to work.
-    | The 'web' middleware will be applied automatically if empty.
+    | Optional middleware to use when loading the initial Log Viewer page.
     |
     */
 
-    'middleware' => ['web'],
+    'middleware' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Log Viewer API middleware.
+    |--------------------------------------------------------------------------
+    | Optional middleware to use on every API request. The same API is also
+    | used from within the Log Viewer user interface.
+    |
+    */
+
+    'api_middleware' => [],
 
     /*
     |--------------------------------------------------------------------------
@@ -129,18 +139,6 @@ return [
                 .')?: (.*?)( in [\/].*?:[0-9]+)?$/is',
         ],
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Eager-scan log files
-    |--------------------------------------------------------------------------
-    | Whether to eagerly scan all log files configured with the Log Viewer.
-    | Scanning a log file will create an index for it, which will
-    | speed up further navigation of that log file.
-    |
-    */
-
-    'eager_scan' => env('LOG_VIEWER_EAGER_SCAN', true),
 
     /*
     |--------------------------------------------------------------------------

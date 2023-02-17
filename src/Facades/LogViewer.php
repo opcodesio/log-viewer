@@ -25,7 +25,6 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @method static void setMaxLogSize(int $bytes)
  * @method static int maxLogSize()
  * @method static int lazyScanChunkSize()
- * @method static bool shouldEagerScanLogFiles()
  * @method static string laravelRegexPattern()
  * @method static string logMatchPattern()
  * @method static string basePathForLogs()

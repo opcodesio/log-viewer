@@ -133,7 +133,7 @@ export const useLogViewerStore = defineStore({
       this.stacksOpen = [];
       this.stacksInView = [];
       this.stackTops = {};
-      const container = document.getElementById('log-item-container');
+      const container = document.querySelector('.log-item-container');
       this.containerTop = container.getBoundingClientRect().top;
       container.scrollTo(0, 0);
     },
