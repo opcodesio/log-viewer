@@ -2,7 +2,6 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import axios from 'axios';
 import { createRouter, createWebHistory } from 'vue-router';
-import VueJsonPretty from 'vue-json-pretty';
 import Home from './pages/Home.vue';
 
 let token = document.head.querySelector('meta[name="csrf-token"]');
@@ -43,7 +42,5 @@ app.mixin({
     LogViewer: () => window.LogViewer,
   },
 });
-app.component('vue-json-pretty', VueJsonPretty);
-app.provide('$http', axios.create());
 
 app.mount('#log-viewer');

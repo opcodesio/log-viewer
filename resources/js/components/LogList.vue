@@ -161,27 +161,27 @@
 </template>
 
 <script setup>
-import { useLogViewerStore } from '../stores/logViewer.js';
 import { computed, onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
+import { highlightSearchResult, replaceQuery } from '../helpers.js';
 import {
   ArrowPathIcon,
+  Bars3Icon,
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
-  Bars3Icon,
 } from '@heroicons/vue/24/solid';
-import { highlightSearchResult, replaceQuery } from '../helpers.js';
+import { useLogViewerStore } from '../stores/logViewer.js';
 import { useSearchStore } from '../stores/search.js';
+import { useFileStore } from '../stores/files.js';
+import { usePaginationStore } from '../stores/pagination.js';
+import { useSeverityStore } from '../stores/severity.js';
 import Pagination from './Pagination.vue';
 import LevelButtons from './LevelButtons.vue';
-import { useFileStore } from '../stores/files.js';
 import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import LogCopyButton from './LogCopyButton.vue';
-import { usePaginationStore } from '../stores/pagination.js';
-import { useSeverityStore } from '../stores/severity.js';
-import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const fileStore = useFileStore();

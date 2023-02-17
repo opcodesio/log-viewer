@@ -1,7 +1,6 @@
 <template>
   <div class="absolute z-20 top-0 bottom-10 bg-gray-100 dark:bg-gray-900 md:left-0 md:flex md:w-88 md:flex-col md:fixed md:inset-y-0"
        :class="[fileStore.sidebarOpen ? 'left-0 right-0 md:left-auto md:right-auto' : '-left-[100%] right-[100%] md:left-auto md:right-auto']"
-
   >
     <file-list></file-list>
   </div>

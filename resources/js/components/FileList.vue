@@ -143,6 +143,7 @@
 </template>
 
 <script setup>
+import axios from 'axios';
 import { onMounted, ref, watch } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import {
@@ -156,13 +157,12 @@ import {
   XMarkIcon,
 } from '@heroicons/vue/24/outline';
 import { useFileStore } from '../stores/files.js';
-import FileListItem from './FileListItem.vue';
-import SpinnerIcon from './SpinnerIcon.vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSearchStore } from '../stores/search.js';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { replaceQuery, useDropdownDirection } from '../helpers.js';
-import axios from 'axios';
+import FileListItem from './FileListItem.vue';
+import SpinnerIcon from './SpinnerIcon.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 
 const router = useRouter();
