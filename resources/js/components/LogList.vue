@@ -1,11 +1,11 @@
 <template>
   <div class="h-full w-full py-5 log-list">
     <div class="flex flex-col h-full w-full md:mx-3 mb-4">
-      <div class="md:px-4 mb-4 flex flex-col-reverse md:flex-row items-start">
+      <div class="md:px-4 mb-4 flex flex-col-reverse lg:flex-row items-start">
         <div class="flex items-center mr-5 mt-3 md:mt-0" v-if="showLevelsDropdown">
           <LevelButtons />
         </div>
-        <div class="w-full md:w-auto flex-1 flex justify-end min-h-[38px]">
+        <div class="w-full lg:w-auto flex-1 flex justify-end min-h-[38px]">
           <SearchInput />
           <div class="hidden md:block ml-5">
             <button @click="logViewerStore.loadLogs()" title="Reload current results" class="menu-button">
@@ -26,20 +26,20 @@
       <!-- Dummy element to make fancy scrolling work -->
       <div id="log-item-container" class="relative"></div>
 
-      <div v-if="logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery)" class="relative overflow-hidden text-sm h-full">
+      <div v-if="logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery)" class="relative overflow-hidden h-full">
         <div class="h-full overflow-y-auto md:px-4"
              @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
             <table class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
               <thead class="bg-gray-50">
               <tr>
-                <th scope="col" class="w-[60px] pl-4 pr-2 sm:pl-6 lg:pl-8 hidden sm:table-cell"><span class="sr-only">Level icon</span></th>
+                <th scope="col" class="w-[60px] pl-4 pr-2 lg:pl-6 lg:pl-8 hidden lg:table-cell"><span class="sr-only">Level icon</span></th>
                 <th scope="col" class="w-[90px] hidden lg:table-cell">Level</th>
-                <th scope="col" class="w-[180px] hidden sm:table-cell">Time</th>
+                <th scope="col" class="w-[180px] hidden lg:table-cell">Time</th>
                 <th scope="col" class="w-[110px] hidden lg:table-cell">Env</th>
                 <th scope="col" :colspan="headerColspan">
-                  <div class="flex justify-end sm:justify-between">
-                    <span class="hidden sm:inline-block">Description</span>
+                  <div class="flex justify-end lg:justify-between">
+                    <span class="hidden lg:inline-block">Description</span>
                     <div>
                       <label for="log-sort-direction" class="sr-only">Sort direction</label>
                       <select id="log-sort-direction" v-model="logViewerStore.direction"
@@ -60,7 +60,7 @@
                     </div>
                   </div>
                 </th>
-                <th scope="col" class="hidden sm:table-cell"><span class="sr-only">Log index</span></th>
+                <th scope="col" class="hidden lg:table-cell"><span class="sr-only">Log index</span></th>
               </tr>
               </thead>
 
@@ -79,18 +79,27 @@
                     <InformationCircleIcon v-else class="w-4 h-4" />
                   </td>
                   <td class="log-level truncate hidden lg:table-cell">{{ log.level_name }}</td>
-                  <td class="whitespace-nowrap text-gray-900 dark:text-gray-200 hidden sm:table-cell"
-                      v-html="highlightSearchResult(log.time, searchStore.query)"></td>
+                  <td class="whitespace-nowrap text-gray-900 dark:text-gray-200">
+                    <span class="hidden lg:inline" v-html="highlightSearchResult(log.datetime, searchStore.query)"></span>
+                    <span class="lg:hidden">{{ log.time }}</span>
+                  </td>
                   <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 hidden lg:table-cell"
                       v-html="highlightSearchResult(log.environment, searchStore.query)"></td>
                   <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90"
                       v-html="highlightSearchResult(log.text, searchStore.query)"></td>
-                  <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs">
+                  <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs hidden lg:table-cell">
                     <LogCopyButton :log="log" />
                   </td>
                 </tr>
                 <tr v-show="logViewerStore.isOpen(index)">
                   <td colspan="6">
+                    <div class="lg:hidden flex justify-between px-2 pt-2 pb-1 text-xs">
+                      <div class="flex-1"><span class="font-semibold">Time:</span> {{ log.datetime }}</div>
+                      <div class="flex-1"><span class="font-semibold">Env:</span> {{ log.environment }}</div>
+                      <div>
+                        <LogCopyButton :log="log" />
+                      </div>
+                    </div>
                     <pre class="log-stack" v-html="highlightSearchResult(log.full_text, searchStore.query)"></pre>
                     <div v-if="log.full_text_incomplete" class="py-4 px-8 text-gray-500 italic">
                       The contents of this log have been cut short to the first {{ LogViewer.max_log_size_formatted }}.
@@ -142,7 +151,12 @@
       </div>
 
       <div v-if="paginationStore.hasPages" class="md:px-4">
-        <Pagination :loading="logViewerStore.loading" />
+        <div class="hidden lg:block">
+          <Pagination :loading="logViewerStore.loading" />
+        </div>
+        <div class="lg:hidden">
+          <Pagination :loading="logViewerStore.loading" :short="true" />
+        </div>
       </div>
     </div>
   </div>
@@ -151,7 +165,7 @@
 
 <script setup>
 import { useLogViewerStore } from '../stores/logViewer.js';
-import { computed, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import {
   ArrowPathIcon,
   ExclamationCircleIcon,
@@ -191,9 +205,8 @@ const clearQuery = () => {
   replaceQuery(router, 'query', null);
 }
 
-const headerColspan = computed(() => {
-  return window.matchMedia('(max-width: 640px)').matches ? 3 : 1;
-});
+const isMobile = ref(window.matchMedia('(max-width: 640px)').matches);
+const headerColspan = computed(() => isMobile ? 4 : 1);
 
 watch(
   [
@@ -202,4 +215,10 @@ watch(
   ],
   () => logViewerStore.loadLogs()
 )
+
+onMounted(() => {
+  window.onresize = function () {
+    isMobile.value = window.matchMedia('(max-width: 640px)').matches;
+  };
+})
 </script>

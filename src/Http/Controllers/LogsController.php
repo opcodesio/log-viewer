@@ -80,6 +80,7 @@ class LogsController
                 'last_page' => $logs->lastPage(),
                 'last_page_url' => $logs->url($logs->lastPage()),
                 'links' => $logs->linkCollection()->toArray(),
+                'links_short' => $logs->onEachSide(0)->linkCollection()->toArray(),
                 'next_page_url' => $logs->nextPageUrl(),
                 'path' => $logs->path(),
                 'per_page' => $logs->perPage(),

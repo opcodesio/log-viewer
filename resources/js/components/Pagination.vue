@@ -3,11 +3,14 @@
     <div class="previous">
       <button v-if="paginationStore.page !== 1" @click="previousPage" :disabled="loading" rel="prev">
         <ArrowLeftIcon class="h-5 w-5" />
-        <span class="md:hidden">Previous page</span>
+        <span class="sm:hidden">Previous page</span>
       </button>
     </div>
+    <div class="lg:hidden border-transparent text-gray-500 dark:text-gray-400 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium">
+      <span>{{ paginationStore.page }}</span>
+    </div>
     <div class="pages">
-      <template v-for="link in paginationStore.links">
+      <template v-for="link in (short ? paginationStore.linksShort : paginationStore.links)">
         <button v-if="link.active" class="border-brand-500 text-brand-600 dark:border-brand-600 dark:text-brand-500"
                 aria-current="page">
           {{ Number(link.label).toLocaleString() }}
@@ -21,7 +24,7 @@
     </div>
     <div class="next">
       <button v-if="paginationStore.hasMorePages" @click="nextPage" :disabled="loading" rel="next">
-        <span class="md:hidden">Next page</span>
+        <span class="sm:hidden">Next page</span>
         <ArrowRightIcon class="h-5 w-5" />
       </button>
     </div>
@@ -40,6 +43,10 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  short: {
+    type: Boolean,
+    default: false,
+  }
 })
 
 const paginationStore = usePaginationStore();

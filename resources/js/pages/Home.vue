@@ -1,15 +1,13 @@
 <template>
-  <div class="absolute z-20 top-0 bottom-10 bg-gray-100 dark:bg-gray-900 md:flex md:w-88 md:flex-col md:fixed md:inset-y-0"
-      :style="{
-        left: fileStore.sidebarOpen ? '16px' : '-100%',
-        right: fileStore.sidebarOpen ? '8px' : '100%',
-      }"
+  <div class="absolute z-20 top-0 bottom-10 bg-gray-100 dark:bg-gray-900 md:left-0 md:flex md:w-88 md:flex-col md:fixed md:inset-y-0"
+       :class="[fileStore.sidebarOpen ? 'left-0 right-0 md:left-auto md:right-auto' : '-left-[100%] right-[100%] md:left-auto md:right-auto']"
+
   >
     <file-list></file-list>
   </div>
 
   <div class="md:pl-88 flex flex-col flex-1 min-h-screen max-h-screen max-w-full">
-    <log-list class="pb-14 md:pb-12"></log-list>
+    <log-list class="pb-16 md:pb-12"></log-list>
   </div>
 </template>
 

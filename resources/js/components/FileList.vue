@@ -10,6 +10,7 @@
           </svg>
         </a>
         <span class="md:hidden flex-1 flex justify-end">
+          <SiteSettingsDropdown class="ml-2" />
           <button type="button" class="menu-button">
             <XMarkIcon class="w-5 h-5 ml-2" @click="fileStore.toggleSidebar" />
           </button>
@@ -162,6 +163,7 @@ import { useSearchStore } from '../stores/search.js';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { replaceQuery, useDropdownDirection } from '../helpers.js';
 import axios from 'axios';
+import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 
 const router = useRouter();
 const route = useRoute();

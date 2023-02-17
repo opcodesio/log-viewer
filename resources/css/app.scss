@@ -301,11 +301,11 @@ html.dark {
         @apply bg-white dark:bg-gray-800 dark:text-gray-200 relative;
 
         .log-item > td {
-            @apply border-t border-gray-200 dark:border-gray-700 px-2 py-2 text-sm;
+            @apply border-t border-gray-200 dark:border-gray-700 px-1 lg:px-2 py-1 lg:py-2 text-xs lg:text-sm;
         }
 
         .log-item > td.log-level-icon {
-            @apply whitespace-nowrap border-t border-gray-200 dark:border-gray-700 py-2 pl-4 pr-2 sm:pl-6 lg:pl-8;
+            @apply whitespace-nowrap border-t border-gray-200 dark:border-gray-700 py-1 lg:py-2 pl-2 lg:pl-4 lg:pr-2 lg:pl-6 lg:pl-8;
             & > svg {
                 @apply opacity-75 h-5 w-5;
             }
@@ -319,7 +319,7 @@ html.dark {
         }
 
         .log-stack {
-            @apply px-4 py-2 sm:px-6 lg:px-8 border-gray-200 dark:border-gray-700 text-xs whitespace-pre-wrap break-all;
+            @apply px-2 lg:px-4 py-1 lg:py-2 lg:px-6 lg:px-8 border-gray-200 dark:border-gray-700 text-[10px] lg:text-xs whitespace-pre-wrap break-all;
         }
 
         .log-link {
@@ -342,7 +342,7 @@ html.dark {
 }
 
 .pagination {
-    @apply md:mt-2 px-4 w-full flex items-center justify-center sm:px-0;
+    @apply md:mt-2 px-4 w-full flex items-center justify-center lg:px-0;
 
     .previous {
         @apply -mt-px w-0 flex-1 flex justify-start md:justify-end;
@@ -375,7 +375,7 @@ html.dark {
     }
 
     .pages {
-        @apply hidden md:-mt-px md:flex;
+        @apply hidden sm:-mt-px sm:flex;
 
         span {
             @apply border-transparent text-gray-500 dark:text-gray-400 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium;
@@ -476,7 +476,7 @@ html.dark {
 // Dark border (hover): border-brand-700
 
 .file-list {
-    @apply relative h-full overflow-y-auto pt-2 pb-4 pr-4;
+    @apply relative h-full overflow-y-auto pl-3 sm:pl-0 pt-2 pb-4 pr-3 sm:pr-4;
 
     .file-item-container,
     .folder-item-container {

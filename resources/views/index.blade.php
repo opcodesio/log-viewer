@@ -16,7 +16,7 @@
     <link href="{{ asset(mix('app.css', 'vendor/log-viewer')) }}" rel="stylesheet">
 </head>
 
-<body class="h-full px-5 bg-gray-100 dark:bg-gray-900 font-sans">
+<body class="h-full px-3 lg:px-5 bg-gray-100 dark:bg-gray-900 font-sans">
 <div id="log-viewer" class="flex h-full max-h-screen max-w-full">
     <router-view></router-view>
 </div>

@@ -13,6 +13,8 @@ export const usePaginationStore = defineStore({
 
     links: (state) => (state.pagination?.links || []).slice(1, -1),
 
+    linksShort: (state) => (state.pagination?.links_short || []).slice(1, -1),
+
     hasPages: (state) => state.pagination?.last_page > 1,
 
     hasMorePages: (state) => state.pagination?.next_page_url !== null,

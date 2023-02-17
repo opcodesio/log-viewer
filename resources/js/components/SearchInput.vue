@@ -18,10 +18,10 @@
       </div>
       <div class="submit-search">
         <button v-if="logViewerStore.hasMoreResults" disabled="disabled">
-          <span>Searching<span class="hidden md:inline"> {{ selectedFile ? selectedFile.name : 'all files' }}</span>...</span>
+          <span>Searching<span class="hidden lg:inline ml-1"> {{ selectedFile ? selectedFile.name : 'all files' }}</span>...</span>
         </button>
         <button v-else @click="submitQuery">
-          <span>Search<span class="hidden md:inline"> {{ selectedFile ? 'in "' + selectedFile.name + '"' : 'all files' }}</span></span>
+          <span>Search<span class="hidden lg:inline ml-1"> {{ selectedFile ? 'in "' + selectedFile.name + '"' : 'all files' }}</span></span>
           <ArrowRightIcon class="h-4 w-4" />
         </button>
       </div>

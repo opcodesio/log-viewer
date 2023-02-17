@@ -177,14 +177,15 @@ export const useLogViewerStore = defineStore({
           severityStore.setLevelCounts(data.levelCounts);
           paginationStore.setPagination(data.pagination);
 
-          if (data.expandAutomatically) {
-            this.stacksOpen.push(0);
-          }
-
           this.loading = false;
 
           if (!silently) {
-            nextTick(() => this.reset());
+            nextTick(() => {
+              this.reset();
+              if (data.expandAutomatically) {
+                this.stacksOpen.push(0);
+              }
+            });
           }
 
           if (this.hasMoreResults) {
