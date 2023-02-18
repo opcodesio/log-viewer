@@ -64,4 +64,13 @@ class Utils
 
         return true;
     }
+
+    public static function shortMd5(string $content, int $length = 8): string
+    {
+        if ($length > 32) {
+            $length = 32;
+        }
+
+        return substr(md5($content), -$length, $length);
+    }
 }

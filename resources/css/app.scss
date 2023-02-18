@@ -319,7 +319,7 @@ html.dark {
         }
 
         .log-stack {
-            @apply px-2 lg:px-4 py-1 lg:py-2 lg:px-6 lg:px-8 border-gray-200 dark:border-gray-700 text-[10px] lg:text-xs whitespace-pre-wrap break-all;
+            @apply px-2 lg:px-4 py-1 lg:py-2 lg:px-6 lg:px-8 border-gray-200 dark:border-gray-700 text-[10px] leading-3 lg:text-xs lg:leading-4 whitespace-pre-wrap break-all;
         }
 
         .log-link {

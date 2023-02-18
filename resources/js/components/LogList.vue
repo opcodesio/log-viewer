@@ -202,8 +202,8 @@ const clearQuery = () => {
   replaceQuery(router, 'query', null);
 }
 
-const isMobile = ref(window.matchMedia('(max-width: 640px)').matches);
-const headerColspan = computed(() => isMobile.value ? 4 : 1);
+const calculateColspan = () => window.matchMedia('(max-width: 1024px)').matches ? 4 : 1;
+const headerColspan = ref(calculateColspan());
 
 watch(
   [
@@ -215,7 +215,7 @@ watch(
 
 onMounted(() => {
   window.onresize = function () {
-    isMobile.value = window.matchMedia('(max-width: 640px)').matches;
+    headerColspan.value = calculateColspan();
   };
 })
 </script>

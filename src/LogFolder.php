@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Utils\Utils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogFolder
@@ -17,7 +18,7 @@ class LogFolder
         public string $path,
         mixed $files,
     ) {
-        $this->identifier = Str::substr(md5($path), -8, 8);
+        $this->identifier = Utils::shortMd5($path);
         $this->files = new LogFileCollection($files);
     }
 

@@ -28,7 +28,7 @@ class LogFile
     {
         $this->path = $path;
         $this->name = basename($path);
-        $this->identifier = Str::substr(md5($path), -8, 8).'-'.$this->name;
+        $this->identifier = Utils::shortMd5($path).'-'.$this->name;
 
         // Let's remove the file name because we already know it.
         $this->subFolder = str_replace($this->name, '', $path);
@@ -70,7 +70,7 @@ class LogFile
 
     public function subFolderIdentifier(): string
     {
-        return Str::substr(md5($this->subFolder), -8, 8);
+        return Utils::shortMd5($this->subFolder);
     }
 
     public function downloadUrl(): string

@@ -13,7 +13,7 @@ class GenerateCacheKey
         $key = '';
 
         if ($object instanceof LogFile) {
-            $key = self::baseKey().':file:'.md5($object->path);
+            $key = self::baseKey().':file:'.$object->identifier;
         }
 
         if ($object instanceof LogIndex) {
@@ -33,6 +33,6 @@ class GenerateCacheKey
 
     protected static function baseKey(): string
     {
-        return 'log-viewer:'.LogViewer::version();
+        return 'lv:'.LogViewer::version();
     }
 }
