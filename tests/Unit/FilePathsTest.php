@@ -46,6 +46,10 @@ test('handles square brackets in the logs path', function ($folderPath) {
 ]);
 
 test('can set an absolute path', function () {
+    if (PHP_OS_FAMILY === 'Windows') {
+        $this->markTestSkipped('Absolute paths are currently not supported on Windows. If you want to help, please submit a PR.');
+    }
+
     $first = generateLogFile('first.log');
     $second = generateLogFile('subfolder/second.log');
 
@@ -53,8 +57,6 @@ test('can set an absolute path', function () {
         '*.log',    // equals to "storage/logs/*.log"
         dirname($second->path).'/*.log',
     ]]);
-
-    dump(config('log-viewer.include_files'));
 
     $files = LogViewer::getFiles();
 

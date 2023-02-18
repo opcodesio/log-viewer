@@ -134,6 +134,7 @@ export const useLogViewerStore = defineStore({
       this.stacksInView = [];
       this.stackTops = {};
       const container = document.querySelector('.log-item-container');
+      if (!container) return;
       this.containerTop = container.getBoundingClientRect().top;
       container.scrollTo(0, 0);
     },
@@ -194,6 +195,12 @@ export const useLogViewerStore = defineStore({
         })
         .catch((error) => {
           this.loading = false;
+          this.error = error.message;
+
+          if (error.response?.data?.message) {
+            this.error += ': ' + error.response.data.message;
+          }
+
           console.error(error);
         });
     }, 10),
