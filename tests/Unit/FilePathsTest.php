@@ -54,6 +54,8 @@ test('can set an absolute path', function () {
         dirname($second->path).'/*.log',
     ]]);
 
+    dump(config('log-viewer.include_files'));
+
     $files = LogViewer::getFiles();
 
     expect($files)->toHaveCount(2)
