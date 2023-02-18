@@ -3,7 +3,6 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Utils\Utils;

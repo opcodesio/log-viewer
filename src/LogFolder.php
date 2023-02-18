@@ -3,7 +3,6 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Utils\Utils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;

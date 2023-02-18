@@ -3,7 +3,6 @@
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\Utils\GenerateCacheKey;
-use Opcodes\LogViewer\Utils\Utils;
 
 it('can generate a cache key for a LogFile', function () {
     $file = new LogFile('test.log');
@@ -11,7 +10,7 @@ it('can generate a cache key for a LogFile', function () {
     $result = GenerateCacheKey::for($file);
 
     expect($result)->toBe(
-        'lv:'.LogViewer::version().':file:'. $file->identifier
+        'lv:'.LogViewer::version().':file:'.$file->identifier
     );
 });
 
