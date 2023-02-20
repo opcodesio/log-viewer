@@ -10,7 +10,7 @@ it('can generate a cache key for a LogFile', function () {
     $result = GenerateCacheKey::for($file);
 
     expect($result)->toBe(
-        'log-viewer:'.LogViewer::version().':file:'.md5($file->path)
+        'lv:'.LogViewer::version().':file:'.$file->identifier
     );
 });
 
@@ -39,5 +39,5 @@ it('can generate a cache key for an arbitrary string', function () {
 
     $result = GenerateCacheKey::for($string);
 
-    expect($result)->toBe('log-viewer:'.LogViewer::version().':'.$string);
+    expect($result)->toBe('lv:'.LogViewer::version().':'.$string);
 });

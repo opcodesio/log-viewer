@@ -4,6 +4,7 @@ namespace Opcodes\LogViewer;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use Opcodes\LogViewer\Utils\Utils;
 
 class LogIndex
 {
@@ -28,7 +29,7 @@ class LogIndex
         public LogFile $file,
         protected ?string $query = null
     ) {
-        $this->identifier = md5($this->query ?? '');
+        $this->identifier = Utils::shortMd5($this->query ?? '');
         $this->loadMetadata();
     }
 

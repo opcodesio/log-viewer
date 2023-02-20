@@ -3,6 +3,7 @@
 namespace Opcodes\LogViewer\Http\Controllers;
 
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Utils\Utils;
 
 class IndexController
 {
@@ -10,12 +11,16 @@ class IndexController
     {
         LogViewer::auth();
 
-        $selectedFile = LogViewer::getFile(request()->query('file', ''));
-
         return view('log-viewer::index', [
-            'jsPath' => __DIR__.'/../../../public/app.js',
-            'cssPath' => __DIR__.'/../../../public/app.css',
-            'selectedFile' => $selectedFile,
+            'assetsAreCurrent' => LogViewer::assetsAreCurrent(),
+            'logViewerScriptVariables' => [
+                'version' => LogViewer::version(),
+                'app_name' => config('app.name'),
+                'path' => config('log-viewer.route_path'),
+                'back_to_system_url' => config('log-viewer.back_to_system_url'),
+                'back_to_system_label' => config('log-viewer.back_to_system_label'),
+                'max_log_size_formatted' => Utils::bytesForHumans(LogViewer::maxLogSize()),
+            ],
         ]);
     }
 }

@@ -1,53 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Logs - {{ config('app.name') }}</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="shortcut icon" href="{{ asset(mix('img/log-viewer-32.png', 'vendor/log-viewer')) }}">
 
-    <style>[x-cloak] { display: none !important; }</style>
-    @isset($cssPath)
-        <style>{!! file_get_contents($cssPath) !!}</style>
-    @endisset
-    @livewireStyles
+    <title>Log Viewer{{ config('app.name') ? ' - ' . config('app.name') : '' }}</title>
+
+    <!-- Style sheets-->
+    <link href="{{ asset(mix('app.css', 'vendor/log-viewer')) }}" rel="stylesheet">
 </head>
-<body class="h-full px-5 bg-gray-100 dark:bg-gray-900"
-    x-data="{
-        selectedFileIdentifier: @isset($selectedFile) '{{ $selectedFile->identifier }}' @else null @endisset,
-        selectFile(name) {
-            if (name && name === this.selectedFileIdentifier) {
-                this.selectedFileIdentifier = null;
-            } else {
-                this.selectedFileIdentifier = name;
-            }
-            this.$dispatch('file-selected', this.selectedFileIdentifier);
-        }
-    }"
-    @files-deleted.window = "$store.fileViewer.resetChecks()"
-    @scan-files.window="$store.fileViewer.initScanCheck('{{ route('blv.is-scan-required') }}', '{{ route('blv.scan-files') }}')"
-    x-init="$nextTick(() => {
-        $store.fileViewer.reset();
-        @if(\Opcodes\LogViewer\Facades\LogViewer::shouldEagerScanLogFiles()) $dispatch('scan-files'); @endif
-        @if(isset($selectedFile)) $store.fileViewer.foldersOpen.push('{{ $selectedFile->subFolderIdentifier() }}'); @endif
-    })"
->
-<div class="flex h-full max-h-screen max-w-full">
-    <div class="hidden md:flex md:w-88 md:flex-col md:fixed md:inset-y-0">
-        @livewire('log-viewer::file-list', ['selectedFileIdentifier' => isset($selectedFile) ? $selectedFile->identifier : null])
-    </div>
 
-    <div class="md:pl-88 flex flex-col flex-1 min-h-screen max-h-screen max-w-full">
-        @livewire('log-viewer::log-list')
-    </div>
+<body class="h-full px-3 lg:px-5 bg-gray-100 dark:bg-gray-900">
+<div id="log-viewer" class="flex h-full max-h-screen max-w-full">
+    <router-view></router-view>
 </div>
 
-@livewireScripts
-@isset($jsPath)
-    <script>{!! file_get_contents($jsPath) !!}</script>
-@endisset
+@php $showSupportLink = config('log-viewer.show_support_link', true) @endphp
+<div class="absolute bottom-4 right-4 flex items-center">
+    <p class="text-xs text-gray-400 dark:text-gray-500 @if($showSupportLink) mr-5 -mb-0.5 @endif">
+        <span>Version: <span class="font-semibold">{{ \Opcodes\LogViewer\Facades\LogViewer::version() }}</span></span>
+    </p>
+    @if($showSupportLink)
+    <a href="https://www.buymeacoffee.com/arunas" target="_blank">
+        <img src="{{ asset(mix('img/bmc.png', 'vendor/log-viewer')) }}" class="h-6" alt="Support me by buying me a cup of coffee ❤️" />
+    </a>
+    @endif
+</div>
 
-@include('log-viewer::icons')
+<!-- Global LogViewer Object -->
+<script>
+    window.LogViewer = @json($logViewerScriptVariables);
+</script>
+<script src="{{ asset(mix('app.js', 'vendor/log-viewer')) }}"></script>
 </body>
 </html>

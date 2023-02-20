@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Composer\InstalledVersions;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 
@@ -101,9 +102,6 @@ class LogViewerService
 
     /**
      * Find the file with the given identifier or file name.
-     *
-     * @param  string|null  $fileIdentifier
-     * @return LogFile|null
      */
     public function getFile(?string $fileIdentifier): ?LogFile
     {
@@ -174,15 +172,8 @@ class LogViewerService
         return intval(config('log-viewer.lazy_scan_chunk_size_in_mb', 100)) * 1024 * 1024;
     }
 
-    public function shouldEagerScanLogFiles(): bool
-    {
-        return config('log-viewer.eager_scan', false);
-    }
-
     /**
      * Get the maximum number of bytes of the log that we should display.
-     *
-     * @return int
      */
     public function maxLogSize(): int
     {
@@ -202,6 +193,22 @@ class LogViewerService
     public function logMatchPattern(): string
     {
         return config('log-viewer.patterns.laravel.log_matching_regex');
+    }
+
+    /**
+     * Determine if Log Viewer's published assets are up-to-date.
+     *
+     * @throws \RuntimeException
+     */
+    public function assetsAreCurrent(): bool
+    {
+        $publishedPath = public_path('vendor/log-viewer/mix-manifest.json');
+
+        if (! File::exists($publishedPath)) {
+            throw new \RuntimeException('Log Viewer assets are not published. Please run: php artisan vendor:publish --tag=log-viewer-assets --force');
+        }
+
+        return File::get($publishedPath) === File::get(__DIR__.'/../public/mix-manifest.json');
     }
 
     /**

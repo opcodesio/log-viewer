@@ -1,19 +1,15 @@
 <?php
 
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogIndex;
 use Opcodes\LogViewer\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);
-uses()
-    ->afterEach(fn () => clearGeneratedLogFiles())
-    ->in('Feature');
-
-uses()
-    ->afterEach(fn () => clearGeneratedLogFiles())
-    ->in('Unit');
+uses()->afterEach(fn () => clearGeneratedLogFiles())->in('Feature', 'Unit');
+uses()->beforeEach(fn () => Artisan::call('log-viewer:publish'))->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

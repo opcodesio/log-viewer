@@ -2,48 +2,10 @@
 
 namespace Opcodes\LogViewer\Utils;
 
-use Illuminate\Support\Str;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 
 class Utils
 {
-    /**
-     * Highlights search query results and escapes HTML.
-     * Safe to use within {!! !!} in Blade.
-     *
-     * @param  string  $text
-     * @param  string|null  $query
-     * @return string
-     */
-    public static function highlightSearchResult(string $text, string $query = null): string
-    {
-        if (! empty($query)) {
-            if (! Str::endsWith($query, '/i')) {
-                $query = '/'.$query.'/i';
-            }
-
-            try {
-                $text = preg_replace_callback(
-                    $query,
-                    function ($matches) {
-                        return '<mark>'.$matches[0].'</mark>';
-                    },
-                    $text
-                );
-            } catch (\Exception $e) {
-                // in case the regex is invalid, we want to just continue without marking any text.
-            }
-        }
-
-        // Let's return the <mark> tags which we use for highlighting the search results
-        // while escaping the rest of the HTML entities
-        return str_replace(
-            [htmlspecialchars('<mark>'), htmlspecialchars('</mark>')],
-            ['<mark>', '</mark>'],
-            htmlspecialchars($text)
-        );
-    }
-
     /**
      * Get a human-friendly readable string of the number of bytes provided.
      */
@@ -101,5 +63,14 @@ class Utils
         }
 
         return true;
+    }
+
+    public static function shortMd5(string $content, int $length = 8): string
+    {
+        if ($length > 32) {
+            $length = 32;
+        }
+
+        return substr(md5($content), -$length, $length);
     }
 }

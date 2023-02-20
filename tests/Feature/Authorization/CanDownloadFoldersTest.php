@@ -9,13 +9,13 @@ test('can download every folder by default', function () {
     generateLogFiles([$fileName = 'laravel.log']);
     $folder = LogViewer::getFolder('');
 
-    get(route('blv.download-folder', $folder->identifier))
+    get(route('log-viewer.folders.download', $folder->identifier))
         ->assertOk()
         ->assertDownload('root.zip');
 });
 
 test('cannot download a folder that\'s not found', function () {
-    get(route('blv.download-folder', 'notfound'))
+    get(route('log-viewer.folders.download', 'notfound'))
         ->assertNotFound();
 });
 
@@ -24,13 +24,13 @@ test('"downloadLogFolder" gate can prevent folder download', function () {
     $folder = LogViewer::getFolder('');
     Gate::define('downloadLogFolder', fn (mixed $user) => false);
 
-    get(route('blv.download-folder', $folder->identifier))
+    get(route('log-viewer.folders.download', $folder->identifier))
         ->assertForbidden();
 
     // now let's allow access again
     Gate::define('downloadLogFolder', fn (mixed $user) => true);
 
-    get(route('blv.download-folder', $folder->identifier))
+    get(route('log-viewer.folders.download', $folder->identifier))
         ->assertOk()
         ->assertDownload('root.zip');
 });
@@ -48,7 +48,7 @@ test('"downloadLogFolder" gate is supplied with a log folder object', function (
         return true;
     });
 
-    get(route('blv.download-folder', $expectedFolder->identifier))
+    get(route('log-viewer.folders.download', $expectedFolder->identifier))
         ->assertOk()
         ->assertDownload('root.zip');
 

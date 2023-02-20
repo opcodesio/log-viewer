@@ -5,27 +5,31 @@ namespace Opcodes\LogViewer;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
+use Illuminate\Support\Str;
 use Opcodes\LogViewer\Console\Commands\GenerateDummyLogsCommand;
+use Opcodes\LogViewer\Console\Commands\PublishCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Http\Livewire\FileList;
-use Opcodes\LogViewer\Http\Livewire\LogList;
 
 class LogViewerServiceProvider extends ServiceProvider
 {
     private string $name = 'log-viewer';
 
+    public static function basePath(string $path): string
+    {
+        return __DIR__.'/..'.$path;
+    }
+
     public function register()
     {
-        $this->mergeConfigFrom($this->basePath("/config/{$this->name}.php"), $this->name);
+        $this->mergeConfigFrom(self::basePath("/config/{$this->name}.php"), $this->name);
 
         $this->app->bind('log-viewer', LogViewerService::class);
         $this->app->bind('log-viewer-cache', function () {
             return Cache::driver(config('log-viewer.cache_driver'));
         });
-        $this->app->singleton(PreferenceStore::class, PreferenceStore::class);
     }
 
     public function boot()
@@ -33,30 +37,70 @@ class LogViewerServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             // publishing the config
             $this->publishes([
-                $this->basePath("/config/{$this->name}.php") => config_path("{$this->name}.php"),
+                self::basePath("/config/{$this->name}.php") => config_path("{$this->name}.php"),
             ], "{$this->name}-config");
 
             // registering the command
-            $this->commands([GenerateDummyLogsCommand::class]);
+            $this->commands([
+                PublishCommand::class,
+                GenerateDummyLogsCommand::class,
+            ]);
         }
 
         if (! $this->isEnabled()) {
             return;
         }
 
-        // registering routes
-        $this->loadRoutesFrom($this->basePath('/routes/web.php'));
-
-        // registering views
-        $this->loadViewsFrom($this->basePath('/resources/views'), $this->name);
-
-        Livewire::component('log-viewer::file-list', FileList::class);
-        Livewire::component('log-viewer::log-list', LogList::class);
+        $this->registerRoutes();
+        $this->registerResources();
+        $this->defineAssetPublishing();
+        $this->defineDefaultGates();
 
         Event::listen(LogFileDeleted::class, function (LogFileDeleted $event) {
             LogViewer::clearFileCache();
         });
+    }
 
+    /**
+     * Register the Log Viewer routes.
+     *
+     * @return void
+     */
+    protected function registerRoutes()
+    {
+        Route::group([
+            'domain' => config('log-viewer.route_domain', null),
+            'prefix' => Str::finish(config('log-viewer.route_path'), '/').'api',
+            'namespace' => 'Opcodes\LogViewer\Http\Controllers',
+            'middleware' => config('log-viewer.api_middleware', null),
+        ], function () {
+            $this->loadRoutesFrom(self::basePath('/routes/api.php'));
+        });
+
+        Route::group([
+            'domain' => config('log-viewer.route_domain', null),
+            'prefix' => config('log-viewer.route_path'),
+            'namespace' => 'Opcodes\LogViewer\Http\Controllers',
+            'middleware' => config('log-viewer.middleware', null),
+        ], function () {
+            $this->loadRoutesFrom(self::basePath('/routes/web.php'));
+        });
+    }
+
+    protected function registerResources()
+    {
+        $this->loadViewsFrom(self::basePath('/resources/views'), 'log-viewer');
+    }
+
+    protected function defineAssetPublishing()
+    {
+        $this->publishes([
+            self::basePath('/public') => public_path('vendor/log-viewer'),
+        ], ['log-viewer-assets', 'laravel-assets']);
+    }
+
+    protected function defineDefaultGates()
+    {
         if (! Gate::has('downloadLogFile')) {
             Gate::define('downloadLogFile', fn (mixed $user, LogFile $file) => true);
         }
@@ -72,11 +116,6 @@ class LogViewerServiceProvider extends ServiceProvider
         if (! Gate::has('deleteLogFolder')) {
             Gate::define('deleteLogFolder', fn (mixed $user, LogFolder $folder) => true);
         }
-    }
-
-    private function basePath(string $path): string
-    {
-        return __DIR__.'/..'.$path;
     }
 
     private function isEnabled(): bool

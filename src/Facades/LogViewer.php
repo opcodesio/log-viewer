@@ -12,6 +12,7 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @see \Opcodes\LogViewer\LogViewerService
  *
  * @method static string version()
+ * @method static bool assetsAreCurrent()
  * @method static LogFolder[]|LogFolderCollection getFilesGroupedByFolder()
  * @method static LogFolder|null getFolder(?string $folderIdentifier)
  * @method static LogFile[]|LogFileCollection getFiles()
@@ -24,7 +25,6 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @method static void setMaxLogSize(int $bytes)
  * @method static int maxLogSize()
  * @method static int lazyScanChunkSize()
- * @method static bool shouldEagerScanLogFiles()
  * @method static string laravelRegexPattern()
  * @method static string logMatchPattern()
  * @method static string basePathForLogs()

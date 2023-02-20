@@ -4,7 +4,6 @@ namespace Opcodes\LogViewer\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
-use Livewire\LivewireServiceProvider;
 use Opcodes\LogViewer\LogViewerServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
@@ -26,7 +25,6 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
-            LivewireServiceProvider::class,
             LogViewerServiceProvider::class,
             RouteServiceProvider::class,
         ];
