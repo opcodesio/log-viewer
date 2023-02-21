@@ -56,7 +56,7 @@ trait CanFilterIndex
         }
 
         if (is_array($levels)) {
-            $this->filterLevels = array_map('strtolower', $levels);
+            $this->filterLevels = array_map('strtolower', array_filter($levels));
         } else {
             $this->filterLevels = null;
         }
