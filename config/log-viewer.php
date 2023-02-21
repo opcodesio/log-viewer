@@ -159,5 +159,5 @@ return [
     |
     */
 
-    'lazy_scan_chunk_size_in_mb' => 200,
+    'lazy_scan_chunk_size_in_mb' => 50,
 ];
