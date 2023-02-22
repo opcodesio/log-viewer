@@ -24,6 +24,7 @@
         "illuminate/contracts": "^8.0|^9.0|^10.0"
     },
     "require-dev": {
+        "guzzlehttp/guzzle": "^7.5",
         "itsgoingd/clockwork": "^5.1",
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^6.0",

@@ -132,6 +132,17 @@ class LogViewerService
             });
     }
 
+    public function getHosts(): HostCollection
+    {
+        return HostCollection::fromConfig(config('log-viewer.hosts', []));
+    }
+
+    public function getHost(?string $hostIdentifier): ?Host
+    {
+        return $this->getHosts()
+            ->first(fn(Host $host) => $host->identifier === $hostIdentifier);
+    }
+
     public function clearFileCache(): void
     {
         $this->_cachedFiles = null;

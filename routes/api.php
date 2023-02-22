@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+Route::get('hosts', 'HostsController@index')->name('log-viewer.hosts');
+Route::get('hosts/{hostIdentifier}/health-check', 'HostsController@healthCheck')->name('log-viewer.hosts.health-check');
+
 Route::get('folders', 'FoldersController@index')->name('log-viewer.folders');
 Route::get('folders/{folderIdentifier}/download', 'FoldersController@download')->name('log-viewer.folders.download');
 Route::post('folders/{folderIdentifier}/clear-cache', 'FoldersController@clearCache')->name('log-viewer.folders.clear-cache');

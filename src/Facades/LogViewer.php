@@ -3,6 +3,8 @@
 namespace Opcodes\LogViewer\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Opcodes\LogViewer\Host;
+use Opcodes\LogViewer\HostCollection;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFileCollection;
 use Opcodes\LogViewer\LogFolder;
@@ -13,6 +15,8 @@ use Opcodes\LogViewer\LogFolderCollection;
  *
  * @method static string version()
  * @method static bool assetsAreCurrent()
+ * @method static Host[]|HostCollection getHosts()
+ * @method static Host|null getHost(?string $hostIdentifier)
  * @method static LogFolder[]|LogFolderCollection getFilesGroupedByFolder()
  * @method static LogFolder|null getFolder(?string $folderIdentifier)
  * @method static LogFile[]|LogFileCollection getFiles()

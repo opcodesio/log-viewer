@@ -71,6 +71,15 @@ return [
 
     'api_middleware' => [],
 
+    'hosts' => [
+        [
+            'host' => 'http://blog8.test/log-viewer',
+            'headers' => [
+                'Authentication' => 'Bearer 1234567890',
+            ],
+        ]
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Include file patterns
