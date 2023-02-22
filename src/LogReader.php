@@ -12,14 +12,9 @@ class LogReader
 {
     /**
      * Cached LogReader instances.
-     *
-     * @var array
      */
     public static array $_instances = [];
 
-    /**
-     * @var LogFile
-     */
     protected LogFile $file;
 
     /**
@@ -74,7 +69,6 @@ class LogReader
      * @alias setLevels
      *
      * @param  string|array|null  $levels
-     * @return self
      */
     public function only($levels = null): self
     {
@@ -85,7 +79,6 @@ class LogReader
      * Load only the provided log levels
      *
      * @param  string|array|null  $levels
-     * @return self
      */
     public function setLevels($levels = null): self
     {
@@ -418,7 +411,6 @@ class LogReader
     }
 
     /**
-     * @param  int|null  $limit
      * @return array|Log[]
      */
     public function get(int $limit = null)
@@ -523,9 +515,6 @@ class LogReader
     }
 
     /**
-     * @param  int  $index
-     * @param  int  $position
-     * @param  bool  $fullText
      * @return array|null Returns an array, [$level, $text, $position]
      *
      * @throws \Exception
