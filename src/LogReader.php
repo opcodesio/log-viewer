@@ -118,7 +118,7 @@ class LogReader
         $levels = null;
 
         if (is_array($levels)) {
-            $levels = array_map('strtolower', $levels);
+            $levels = array_map('strtolower', array_filter($levels));
             $levels = array_diff(self::getDefaultLevels(), $levels);
         } elseif (is_string($levels)) {
             $level = strtolower($levels);
