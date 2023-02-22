@@ -77,7 +77,7 @@ return [
             'headers' => [
                 'Authentication' => 'Bearer 1234567890',
             ],
-        ]
+        ],
     ],
 
     /*

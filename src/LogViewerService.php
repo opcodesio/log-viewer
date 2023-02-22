@@ -140,7 +140,7 @@ class LogViewerService
     public function getHost(?string $hostIdentifier): ?Host
     {
         return $this->getHosts()
-            ->first(fn(Host $host) => $host->identifier === $hostIdentifier);
+            ->first(fn (Host $host) => $host->identifier === $hostIdentifier);
     }
 
     public function clearFileCache(): void

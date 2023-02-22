@@ -24,7 +24,7 @@ class Host
     public function healthCheck(): bool
     {
         return Http::withHeaders($this->headers)
-            ->get($this->host . '/health-check')
+            ->get($this->host.'/health-check')
             ->throw()
             ->ok();
     }

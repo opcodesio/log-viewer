@@ -11,11 +11,11 @@ it('can get a list of hosts from configuration', function () {
             'host' => 'https://example.com/log-viewer',
             'headers' => [
                 'Authorization' => 'Bearer 1234',
-            ]
+            ],
         ],
         [
             'host' => 'https://test.org/log-viewer-2',
-        ]
+        ],
     ]]);
 
     $hosts = LogViewer::getHosts();
@@ -44,11 +44,11 @@ it('can get an individual host by its identifier', function () {
             'host' => 'https://example.com/log-viewer',
             'headers' => [
                 'Authorization' => 'Bearer 1234',
-            ]
+            ],
         ],
         [
             'host' => 'https://test.org/log-viewer-2',
-        ]
+        ],
     ]]);
     $secondHostIdentifier = Utils::shortMd5($hostConfigs[1]['host']);
 

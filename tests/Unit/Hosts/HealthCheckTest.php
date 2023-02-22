@@ -1,7 +1,7 @@
 <?php
 
-use Opcodes\LogViewer\Facades\LogViewer;
 use Illuminate\Support\Facades\Http;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 beforeEach(function () {
     config(['log-viewer.hosts' => $hostConfigs = [
@@ -9,7 +9,7 @@ beforeEach(function () {
             'host' => 'https://example.com/log-viewer',
             'headers' => [
                 'Authorization' => 'Bearer 1234',
-            ]
+            ],
         ],
     ]]);
 });
@@ -21,9 +21,9 @@ it('can fire and handle a successful health check to a host', function () {
 
     expect($host->healthCheck())->toBeTrue();
 
-    Http::assertSent(function (\Illuminate\Http\Client\Request $request) use ($host) {
-        return $request->url() === $host->host . '/health-check'
+    Http::assertSent(function (Illuminate\Http\Client\Request $request) use ($host) {
+        return $request->url() === $host->host.'/health-check'
             && $request->method() === 'GET'
-            && collect($host->headers)->every(fn($value, $key) => $request->hasHeader($key, $value));
+            && collect($host->headers)->every(fn ($value, $key) => $request->hasHeader($key, $value));
     });
 });
