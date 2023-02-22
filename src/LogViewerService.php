@@ -101,9 +101,6 @@ class LogViewerService
 
     /**
      * Find the file with the given identifier or file name.
-     *
-     * @param  string|null  $fileIdentifier
-     * @return LogFile|null
      */
     public function getFile(?string $fileIdentifier): ?LogFile
     {
@@ -181,8 +178,6 @@ class LogViewerService
 
     /**
      * Get the maximum number of bytes of the log that we should display.
-     *
-     * @return int
      */
     public function maxLogSize(): int
     {

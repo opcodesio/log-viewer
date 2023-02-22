@@ -6,16 +6,11 @@ class Benchmark
 {
     /**
      * The list of various tests benchmarked
-     *
-     * @var array
      */
     public static array $tests = [];
 
     /**
      * Begin a test instance with a given name
-     *
-     * @param  string  $name
-     * @return void
      */
     public static function time(string $name): void
     {
@@ -36,9 +31,6 @@ class Benchmark
 
     /**
      * An alias for 'time'
-     *
-     * @param  string  $name
-     * @return void
      */
     public static function start(string $name): void
     {
@@ -47,9 +39,6 @@ class Benchmark
 
     /**
      * End a test instance for a given name and return the latest test duration.
-     *
-     * @param  string  $name
-     * @return float
      */
     public static function endTime(string $name): float
     {
@@ -66,9 +55,6 @@ class Benchmark
 
     /**
      * An alias for 'endTime'
-     *
-     * @param  string  $name
-     * @return float
      */
     public static function end(string $name): float
     {
@@ -77,9 +63,6 @@ class Benchmark
 
     /**
      * Get the total runtime for a given test category
-     *
-     * @param  string  $name
-     * @return float
      */
     public static function getTotal(string $name): float
     {
@@ -92,9 +75,6 @@ class Benchmark
 
     /**
      * Get the average runtime for a given test category
-     *
-     * @param  string  $name
-     * @return float
      */
     public static function getAverage(string $name): float
     {
