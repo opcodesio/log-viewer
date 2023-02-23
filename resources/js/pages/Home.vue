@@ -8,6 +8,21 @@
   <div class="md:pl-88 flex flex-col flex-1 min-h-screen max-h-screen max-w-full">
     <log-list class="pb-16 md:pb-12"></log-list>
   </div>
+
+  <div class="absolute bottom-4 right-4 flex items-center">
+    <p class="text-xs text-gray-400 dark:text-gray-500 @if($showSupportLink) mr-5 -mb-0.5 @endif">
+      <template v-if="logViewerStore.performance?.requestTime">
+        <span>Memory: <span class="font-semibold">{{ logViewerStore.performance.memoryUsage }}</span></span>
+        <span class="mx-1.5">&middot;</span>
+        <span>Duration: <span class="font-semibold">{{ logViewerStore.performance.requestTime }}</span></span>
+        <span class="mx-1.5">&middot;</span>
+      </template>
+      <span>Version: <span class="font-semibold">{{ LogViewer.version }}</span></span>
+    </p>
+    <a href="https://www.buymeacoffee.com/arunas" target="_blank" v-if="LogViewer.show_support_link">
+      <bmc-logo class="h-6 w-auto" title="Support me by buying me a cup of coffee ❤️" />
+    </a>
+  </div>
 </template>
 
 <script setup>
@@ -19,6 +34,7 @@ import { useSearchStore } from '../stores/search.js';
 import { usePaginationStore } from '../stores/pagination.js';
 import { useRoute } from 'vue-router';
 import { onBeforeMount, onMounted, watch } from 'vue';
+import BmcLogo from '../components/BmcLogo.vue';
 
 const logViewerStore = useLogViewerStore();
 const fileStore = useFileStore();

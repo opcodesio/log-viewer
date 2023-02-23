@@ -103,10 +103,23 @@ git checkout -b feature/feature-new_about_page
 
 Now, you can work on this newly created branch.
 
-> 💡 Tip: While developing, you may run the command `npm run watch` to automatically rebuild any CSS and JavaScript files.
-
-
 ### 📌 Step 4
+
+If you're working on the front-end of Log Viewer, you want to run the command `npm run watch` to automatically rebuild any CSS and JavaScript files.
+
+Keep in mind that any front-end changes will need to be re-published to your Laravel application:
+
+```shell
+php artisan log-viewer:publish
+```
+
+The command also takes an additional parameter, `--watch` which continuously watches for new front-end changes and re-publishes them.
+
+```shell
+php artisan log-viewer:publish --watch
+```
+
+### 📌 Step 5
 
 After you are done coding, please run Laravel Pint for code formatting:
 
@@ -120,7 +133,7 @@ Finally, run the Pest PHP for tests:
 composer test
 ```
 
-### 📌 Step 5
+### 📌 Step 6
 
 You may want to install your modified version of Log Viewer inside a Laravel application, and test if it performs as expected.
 
@@ -148,7 +161,7 @@ Example:
 
 Proceed with `composer require opcodesio/log-viewer`.
 
-### 📌 Step 6
+### 📌 Step 7
 
 If you changed any CSS or JavaScript files, you must build the assets for production before committing.
 
@@ -158,7 +171,7 @@ Run the command:
 npm run production
 ```
 
-### 📌 Step 7
+### 📌 Step 8
 
 Commit your changes. Please send short and descriptive commits.
 
@@ -168,7 +181,7 @@ For example:
 git commit -m "adds route for about page"
 ```
 
-### 📌 Step 8
+### 📌 Step 9
 
 If all tests are ✅ passing, you may push your code and submit a Pull Request.
 

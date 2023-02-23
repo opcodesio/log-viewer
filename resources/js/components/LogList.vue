@@ -37,16 +37,14 @@
                 <th scope="col" :colspan="headerColspan">
                   <div class="flex justify-end lg:justify-between">
                     <span class="hidden lg:inline-block">Description</span>
-                    <div>
+                    <div class="-mt-1">
                       <label for="log-sort-direction" class="sr-only">Sort direction</label>
-                      <select id="log-sort-direction" v-model="logViewerStore.direction"
-                              class="bg-gray-100 dark:bg-gray-900 px-2 font-normal mr-3 outline-none rounded focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700">
+                      <select id="log-sort-direction" v-model="logViewerStore.direction" class="select mr-3">
                         <option value="desc">Newest first</option>
                         <option value="asc">Oldest first</option>
                       </select>
                       <label for="items-per-page" class="sr-only">Items per page</label>
-                      <select id="items-per-page" v-model="logViewerStore.resultsPerPage"
-                              class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700">
+                      <select id="items-per-page" v-model="logViewerStore.resultsPerPage" class="select">
                         <option value="10">10 items per page</option>
                         <option value="25">25 items per page</option>
                         <option value="50">50 items per page</option>

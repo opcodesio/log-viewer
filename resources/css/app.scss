@@ -565,3 +565,11 @@ button.button, a.button {
 button.button:hover, a.button:hover {
     @apply bg-gray-50 dark:bg-gray-700;
 }
+
+.select {
+    @apply bg-gray-50 dark:bg-gray-800 dark:bg-opacity-50 px-3 py-0.5 border dark:border-gray-700 rounded-md font-normal outline-none
+}
+
+.select:focus {
+    @apply ring-2 ring-brand-500 dark:ring-brand-700;
+}

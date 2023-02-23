@@ -91,9 +91,11 @@ export const useFileStore = defineStore({
       }
     },
 
-    openFolderIfNoneOpen() {
-      if (this.openFolderIdentifiers.length === 0 && this.folders.length > 0) {
-        this.openFolderIdentifiers.push(this.folders[0].identifier);
+    openRootFolderIfNoneOpen() {
+      const rootFolder = this.folders.find(folder => folder.is_root);
+
+      if (rootFolder && this.openFolderIdentifiers.length === 0) {
+        this.openFolderIdentifiers.push(rootFolder.identifier);
       }
     },
 
@@ -108,7 +110,7 @@ export const useFileStore = defineStore({
 
           if (this.openFolderIdentifiers.length === 0) {
             this.openFolderForActiveFile();
-            this.openFolderIfNoneOpen();
+            this.openRootFolderIfNoneOpen();
           }
         })
         .catch((error) => {
