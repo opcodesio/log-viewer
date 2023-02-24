@@ -20,7 +20,7 @@ class Host
 
     public static function fromConfig(string|int $identifier, array $config = []): self
     {
-        if (!is_string($config['host']) || empty($config['host'])) {
+        if (! is_string($config['host']) || empty($config['host'])) {
             throw new \InvalidArgumentException('Host configuration must contain a valid host URL in the "host" key.');
         }
 
@@ -34,7 +34,7 @@ class Host
 
     public function isRemote(): bool
     {
-        return !is_null($this->host);
+        return ! is_null($this->host);
     }
 
     public function healthCheck(): bool
