@@ -8,7 +8,7 @@ beforeEach(function () {
         'remote' => [
             'host' => 'https://example.com/log-viewer-remote',
             'headers' => ['Authorization' => 'Bearer 1234567890'],
-        ]
+        ],
     ]]);
     $this->remoteHost = LogViewer::getHosts()->first(fn ($host) => $host->isRemote());
 });
@@ -19,7 +19,7 @@ it('can forward request to a different host', function ($routeName) {
     $response = $this->getJson(route($routeName, ['host' => 'remote', 'foo' => 'bar']));
     $response->assertOk()->assertJson($proxiedResponseBody);
 
-    Http::assertSent(function (\Illuminate\Http\Client\Request $request) use ($routeName) {
+    Http::assertSent(function (Illuminate\Http\Client\Request $request) use ($routeName) {
         $expectedNewPath = Str::replaceFirst(
             route('log-viewer.index'),  // http://localhost/log-viewer
             $this->remoteHost->host,                      // https://example.com/log-viewer-remote

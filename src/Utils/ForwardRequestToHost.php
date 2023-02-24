@@ -23,7 +23,7 @@ class ForwardRequestToHost
         $actionPath = Str::replaceFirst(config('log-viewer.route_path'), '', $request->path());
 
         $response = Http::withHeaders($host->headers ?? [])
-            ->get($host->host . $actionPath, http_build_query($query));
+            ->get($host->host.$actionPath, http_build_query($query));
 
         return $response->json();
     }
