@@ -112,6 +112,8 @@ export const useFileStore = defineStore({
             this.openFolderForActiveFile();
             this.openRootFolderIfNoneOpen();
           }
+
+          this.onScroll();
         })
         .catch((error) => {
           this.loading = false;

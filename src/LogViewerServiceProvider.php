@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -12,6 +13,7 @@ use Opcodes\LogViewer\Console\Commands\GenerateDummyLogsCommand;
 use Opcodes\LogViewer\Console\Commands\PublishCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 class LogViewerServiceProvider extends ServiceProvider
 {
@@ -55,6 +57,7 @@ class LogViewerServiceProvider extends ServiceProvider
         $this->registerResources();
         $this->defineAssetPublishing();
         $this->defineDefaultGates();
+        $this->configureMiddleware();
 
         Event::listen(LogFileDeleted::class, function (LogFileDeleted $event) {
             LogViewer::clearFileCache();
@@ -116,6 +119,16 @@ class LogViewerServiceProvider extends ServiceProvider
         if (! Gate::has('deleteLogFolder')) {
             Gate::define('deleteLogFolder', fn (mixed $user, LogFolder $folder) => true);
         }
+    }
+
+    /**
+     * Configure the Log Viewer middleware and priority.
+     */
+    protected function configureMiddleware(): void
+    {
+        $kernel = app()->make(Kernel::class);
+
+        $kernel->prependToMiddlewarePriority(EnsureFrontendRequestsAreStateful::class);
     }
 
     private function isEnabled(): bool

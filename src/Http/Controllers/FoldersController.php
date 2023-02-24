@@ -28,8 +28,6 @@ class FoldersController
 
     public function download(string $folderIdentifier)
     {
-        LogViewer::auth();
-
         $folder = LogViewer::getFolder($folderIdentifier);
 
         abort_if(is_null($folder), 404);
@@ -41,8 +39,6 @@ class FoldersController
 
     public function clearCache(string $folderIdentifier)
     {
-        LogViewer::auth();
-
         $folder = LogViewer::getFolder($folderIdentifier);
 
         abort_if(is_null($folder), 404);
@@ -54,8 +50,6 @@ class FoldersController
 
     public function delete(string $folderIdentifier)
     {
-        LogViewer::auth();
-
         $folder = LogViewer::getFolder($folderIdentifier);
 
         if (is_null($folder)) {
