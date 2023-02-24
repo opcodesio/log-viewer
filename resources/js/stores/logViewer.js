@@ -28,6 +28,7 @@ export const useLogViewerStore = defineStore({
     error: null,
     logs: [],
     levelCounts: [],
+    performance: {},
     hasMoreResults: false,
     percentScanned: 100,
     abortController: null,
@@ -175,6 +176,7 @@ export const useLogViewerStore = defineStore({
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;
           this.error = data.error || null;
+          this.performance = data.performance || {};
           severityStore.setLevelCounts(data.levelCounts);
           paginationStore.setPagination(data.pagination);
 

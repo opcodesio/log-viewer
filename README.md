@@ -99,7 +99,8 @@ If your logs are structured differently, then you'll have to wait until we ship 
 
 ## Screenshots
 
-Read the **[release blog post](https://arunas.dev/log-viewer-for-laravel/)**  for screenshots and more information about Log Viewer's features.
+Read the **[release blog post](https://arunas.dev/log-viewer-for-laravel/)** for screenshots and more information about Log Viewer's features.
+The **[release of v2](https://arunas.dev/log-viewer-v2/)** also includes a few new features.
 
 ## Changelog
 

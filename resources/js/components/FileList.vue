@@ -17,17 +17,21 @@
         </span>
       </h1>
 
+      <div v-if="LogViewer.assets_outdated" class="bg-yellow-100 dark:bg-yellow-900 bg-opacity-75 dark:bg-opacity-40 border border-yellow-300 dark:border-yellow-800 rounded-md px-2 py-1 mt-2 text-xs leading-5 text-yellow-700 dark:text-yellow-400">
+        <ExclamationTriangleIcon class="h-4 w-4 mr-1 inline" />
+        Front-end assets are outdated. To update, please run <code class="font-mono px-2 py-1 bg-gray-100 dark:bg-gray-900 rounded">php artisan log-viewer:publish</code>
+      </div>
+
       <a v-if="LogViewer.back_to_system_url" :href="LogViewer.back_to_system_url"
          class="rounded inline-flex items-center text-sm text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700 mt-3">
         <ArrowLeftIcon class="h-3 w-3 mr-1.5" />
         {{ LogViewer.back_to_system_label || `Back to ${LogViewer.app_name}` }}
       </a>
 
-      <div class="flex justify-between mt-4 mr-1">
+      <div class="flex justify-end mt-4 mr-1">
         <div class="text-sm text-gray-500 dark:text-gray-400">
           <label for="file-sort-direction" class="sr-only">Sort direction</label>
-          <select id="file-sort-direction" v-model="fileStore.direction"
-                  class="bg-gray-100 dark:bg-gray-900 px-2 font-normal outline-none rounded focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700">
+          <select id="file-sort-direction" class="select" v-model="fileStore.direction">
             <option value="desc">Newest first</option>
             <option value="asc">Oldest first</option>
           </select>
@@ -148,6 +152,7 @@ import {
   FolderOpenIcon,
   TrashIcon,
   XMarkIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline';
 import { useFileStore } from '../stores/files.js';
 import { useRoute, useRouter } from 'vue-router';

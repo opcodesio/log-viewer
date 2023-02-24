@@ -19,18 +19,6 @@
     <router-view></router-view>
 </div>
 
-@php $showSupportLink = config('log-viewer.show_support_link', true) @endphp
-<div class="absolute bottom-4 right-4 flex items-center">
-    <p class="text-xs text-gray-400 dark:text-gray-500 @if($showSupportLink) mr-5 -mb-0.5 @endif">
-        <span>Version: <span class="font-semibold">{{ \Opcodes\LogViewer\Facades\LogViewer::version() }}</span></span>
-    </p>
-    @if($showSupportLink)
-    <a href="https://www.buymeacoffee.com/arunas" target="_blank">
-        <img src="{{ asset(mix('img/bmc.png', 'vendor/log-viewer')) }}" class="h-6" alt="Support me by buying me a cup of coffee ❤️" />
-    </a>
-    @endif
-</div>
-
 <!-- Global LogViewer Object -->
 <script>
     window.LogViewer = @json($logViewerScriptVariables);

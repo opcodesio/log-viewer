@@ -68,7 +68,7 @@
         <MenuItem>
           <a href="https://www.buymeacoffee.com/arunas" target="_blank">
             <div class="w-4 h-4 mr-3 flex flex-col items-center">
-              <img src="/vendor/log-viewer/img/bmc-logo.png" alt="Support me by buying me a coffee!" class="h-4">
+              <bmc-icon class="h-4 w-auto" />
             </div>
             <strong class="text-brand-500">Show your support</strong>
             <ArrowTopRightOnSquareIcon class="ml-2 w-4 h-4 opacity-75" />
@@ -98,6 +98,7 @@ import Checkmark from './Checkmark.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import { copyToClipboard } from '../helpers.js';
 import axios from 'axios';
+import BmcIcon from './BmcIcon.vue';
 
 const logViewerStore = useLogViewerStore();
 
