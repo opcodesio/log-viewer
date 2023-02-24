@@ -9,8 +9,6 @@ class IndexController
 {
     public function __invoke()
     {
-        LogViewer::auth();
-
         return view('log-viewer::index', [
             'logViewerScriptVariables' => [
                 'assets_outdated' => ! LogViewer::assetsAreCurrent(),

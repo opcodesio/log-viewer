@@ -12,8 +12,6 @@ class FilesController
 {
     public function index(Request $request)
     {
-        LogViewer::auth();
-
         JsonResource::withoutWrapping();
 
         $files = LogViewer::getFiles();
@@ -29,8 +27,6 @@ class FilesController
 
     public function download(string $fileIdentifier)
     {
-        LogViewer::auth();
-
         $file = LogViewer::getFile($fileIdentifier);
 
         abort_if(is_null($file), 404);
@@ -42,8 +38,6 @@ class FilesController
 
     public function clearCache(string $fileIdentifier)
     {
-        LogViewer::auth();
-
         $file = LogViewer::getFile($fileIdentifier);
 
         abort_if(is_null($file), 404);
@@ -57,8 +51,6 @@ class FilesController
 
     public function clearCacheAll()
     {
-        LogViewer::auth();
-
         LogViewer::getFiles()->each->clearCache();
 
         return response()->json([
@@ -68,8 +60,6 @@ class FilesController
 
     public function delete(string $fileIdentifier)
     {
-        LogViewer::auth();
-
         $file = LogViewer::getFile($fileIdentifier);
 
         if (is_null($file)) {
@@ -87,8 +77,6 @@ class FilesController
 
     public function deleteMultipleFiles(Request $request)
     {
-        LogViewer::auth();
-
         $selectedFilesArray = $request->input('files', []);
 
         foreach ($selectedFilesArray as $fileIdentifier) {
