@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div v-if="logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery)" class="relative overflow-hidden h-full text-sm">
+      <div v-if="displayLogs" class="relative overflow-hidden h-full text-sm">
         <div class="log-item-container h-full overflow-y-auto md:px-4"
              @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
@@ -145,7 +145,7 @@
         <span v-else>Select a file or start searching...</span>
       </div>
 
-      <div v-if="paginationStore.hasPages" class="md:px-4">
+      <div v-if="displayLogs && paginationStore.hasPages" class="md:px-4">
         <div class="hidden lg:block">
           <Pagination :loading="logViewerStore.loading" />
         </div>
@@ -190,6 +190,10 @@ const severityStore = useSeverityStore();
 
 const showLevelsDropdown = computed(() => {
   return fileStore.selectedFile || String(searchStore.query || '').trim().length > 0;
+});
+
+const displayLogs = computed(() => {
+  return logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery);
 });
 
 const clearSelectedFile = () => {

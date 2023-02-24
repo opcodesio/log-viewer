@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useLocalStorage } from '@vueuse/core';
+import { useHostStore } from './hosts.js';
 
 export const useFileStore = defineStore({
   id: 'files',
@@ -51,11 +52,7 @@ export const useFileStore = defineStore({
       return (folder) => {
         let aboveFold = this.pixelsAboveFold(folder);
 
-        if (aboveFold < 0) {
-          return Math.max(0, -8 + aboveFold) + 'px';
-        }
-
-        return '-8px';
+        return 0;
       }
     },
 
@@ -100,10 +97,18 @@ export const useFileStore = defineStore({
     },
 
     loadFolders() {
+      if (this.loading) return;
+
+      const hostStore = useHostStore();
       this.loading = true;
 
+      const params = {
+        host: hostStore.selectedHostIdentifier || undefined,
+        direction: this.direction,
+      }
+
       // load the folders from the server
-      return axios.get(`${LogViewer.basePath}/api/folders`, { params: { direction: this.direction }})
+      return axios.get(`${LogViewer.basePath}/api/folders`, { params })
         .then(({ data }) => {
           this.folders = data;
           this.loading = false;
@@ -150,8 +155,10 @@ export const useFileStore = defineStore({
       this.foldersInView = [];
       this.folderTops = {};
       const container = document.getElementById('file-list-container');
-      this.containerTop = container.getBoundingClientRect().top;
-      container.scrollTo(0, 0);
+      if (container) {
+        this.containerTop = container.getBoundingClientRect().top;
+        container.scrollTo(0, 0);
+      }
     },
 
     toggleSidebar() {

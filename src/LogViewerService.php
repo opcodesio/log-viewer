@@ -132,9 +132,17 @@ class LogViewerService
             });
     }
 
+    public function supportsHostsFeature(): bool
+    {
+        return class_exists(\GuzzleHttp\Client::class);
+    }
+
     public function getHosts(): HostCollection
     {
-        return HostCollection::fromConfig(config('log-viewer.hosts', []));
+        $collection = HostCollection::fromConfig(config('log-viewer.hosts', []));
+        $collection->prepend(new Host(null, 'Local', null));
+
+        return $collection;
     }
 
     public function getHost(?string $hostIdentifier): ?Host

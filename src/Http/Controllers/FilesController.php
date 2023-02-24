@@ -7,11 +7,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
+use Opcodes\LogViewer\Utils\ForwardRequestToHost;
 
 class FilesController
 {
     public function index(Request $request)
     {
+        if ($request->has('host')) {
+            return ForwardRequestToHost::forward($request);
+        }
+
         JsonResource::withoutWrapping();
 
         $files = LogViewer::getFiles();

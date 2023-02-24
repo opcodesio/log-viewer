@@ -28,19 +28,23 @@
 <script setup>
 import FileList from '../components/FileList.vue';
 import LogList from '../components/LogList.vue';
+import { useHostStore } from '../stores/hosts.js';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { useFileStore } from '../stores/files.js';
 import { useSearchStore } from '../stores/search.js';
 import { usePaginationStore } from '../stores/pagination.js';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { onBeforeMount, onMounted, watch } from 'vue';
 import BmcLogo from '../components/BmcLogo.vue';
+import { replaceQuery } from '../helpers.js';
 
+const hostStore = useHostStore();
 const logViewerStore = useLogViewerStore();
 const fileStore = useFileStore();
 const searchStore = useSearchStore();
 const paginationStore = usePaginationStore();
 const route = useRoute();
+const router = useRouter();
 
 onBeforeMount(() => logViewerStore.syncTheme());
 
@@ -57,6 +61,23 @@ watch(
     paginationStore.setPage(query.page || 1);
     searchStore.setQuery(query.query || '');
 
+    logViewerStore.loadLogs();
+  },
+  { immediate: true },
+)
+
+watch(
+  () => route.query.host,
+  async (newHost) => {
+    hostStore.selectHost(newHost || null);
+
+    if (newHost && !hostStore.selectedHostIdentifier) {
+      // the host no longer exists, remove it from the URL
+      replaceQuery(router, 'host', null);
+    }
+
+    fileStore.reset();
+    await fileStore.loadFolders();
     logViewerStore.loadLogs();
   },
   { immediate: true },

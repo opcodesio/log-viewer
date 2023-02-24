@@ -7,6 +7,7 @@ import { usePaginationStore } from './pagination.js';
 import { useSeverityStore } from './severity.js';
 import { useLocalStorage } from '@vueuse/core';
 import { debounce } from 'lodash';
+import { useHostStore } from './hosts.js';
 
 export const Theme = {
   System: 'System',
@@ -141,6 +142,7 @@ export const useLogViewerStore = defineStore({
     },
 
     loadLogs: debounce(function ({ silently = false } = {}) {
+      const hostStore = useHostStore();
       const fileStore = useFileStore();
       const searchStore = useSearchStore();
       const paginationStore = usePaginationStore();
@@ -154,9 +156,13 @@ export const useLogViewerStore = defineStore({
         this.abortController.abort();
       }
 
+      // abort if there's no selected file and no query
+      if (!this.selectedFile && !searchStore.hasQuery) return;
+
       this.abortController = new AbortController();
 
       const params = {
+        host: hostStore.selectedHostIdentifier,
         file: this.selectedFile?.identifier,
         direction: this.direction,
         query: searchStore.query,
@@ -172,7 +178,16 @@ export const useLogViewerStore = defineStore({
 
       axios.get(`${LogViewer.basePath}/api/logs`, { params, signal: this.abortController.signal })
         .then(({ data }) => {
-          this.logs = data.logs;
+          if (params.host) {
+            // because the host is different, we need to update the log links to be local instead of remote.
+            this.logs = data.logs.map(log => {
+              const queryParams = { host: params.host, file: log.file_identifier, query: `log-index:${log.index}` };
+              log.url = `${window.location.host}${LogViewer.basePath}?${new URLSearchParams(queryParams)}`;
+              return log;
+            })
+          } else {
+            this.logs = data.logs;
+          }
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;
           this.error = data.error || null;
@@ -197,6 +212,13 @@ export const useLogViewerStore = defineStore({
         })
         .catch((error) => {
           this.loading = false;
+
+          if (error.code === 'ERR_CANCELED') {
+            this.hasMoreResults = false;
+            this.percentScanned = 100;
+            return;
+          }
+
           this.error = error.message;
 
           if (error.response?.data?.message) {

@@ -77,13 +77,32 @@ return [
         \Opcodes\LogViewer\Http\Middleware\AuthorizeLogViewer::class,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Log Viewer Remote hosts.
+    |--------------------------------------------------------------------------
+    | Log Viewer supports viewing Laravel logs from remote hosts. They must
+    | be running Log Viewer as well. Below you can define the hosts you
+    | would like to show in this Log Viewer instance.
+    |
+    */
+
     'hosts' => [
-        [
-            'host' => 'http://blog8.test/log-viewer',
-            'headers' => [
-                'Authentication' => 'Bearer 1234567890',
-            ],
-        ],
+        // 'staging' => [
+        //     'name' => 'Staging',
+        //     'host' => 'http://staging.example.com/log-viewer',
+        //     'headers' => [
+        //         'Authentication' => 'Bearer 1234567890',
+        //     ],
+        // ],
+        //
+        // 'production' => [
+        //     'name' => 'Production',
+        //     'host' => 'http://example.com/log-viewer',
+        //     'headers' => [
+        //         'Authentication' => 'Bearer 1234567890',
+        //     ],
+        // ],
     ],
 
     /*

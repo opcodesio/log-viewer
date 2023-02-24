@@ -28,7 +28,12 @@
         {{ LogViewer.back_to_system_label || `Back to ${LogViewer.app_name}` }}
       </a>
 
-      <div class="flex justify-end mt-4 mr-1">
+      <template v-if="hostStore.supportsHosts && hostStore.hasRemoteHosts">
+        <host-selector class="mb-6 mt-3 mr-1" />
+      </template>
+
+      <div class="flex justify-between items-baseline mt-4 mr-1">
+        <div class="block text-sm font-semibold text-brand-700">Browse log files</div>
         <div class="text-sm text-gray-500 dark:text-gray-400">
           <label for="file-sort-direction" class="sr-only">Sort direction</label>
           <select id="file-sort-direction" class="select" v-model="fileStore.direction">
@@ -58,8 +63,6 @@
     </div>
 
     <div id="file-list-container" class="relative h-full overflow-hidden">
-      <div class="pointer-events-none absolute z-10 top-0 h-4 w-full bg-gradient-to-b from-gray-100 dark:from-gray-900 to-transparent"></div>
-
       <div class="file-list" @scroll="(event) => fileStore.onScroll(event)">
         <div v-for="folder in fileStore.folders"
              :key="folder.identifier"
@@ -154,6 +157,7 @@ import {
   XMarkIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline';
+import { useHostStore } from '../stores/hosts.js';
 import { useFileStore } from '../stores/files.js';
 import { useRoute, useRouter } from 'vue-router';
 import { useSearchStore } from '../stores/search.js';
@@ -162,9 +166,11 @@ import { replaceQuery, useDropdownDirection } from '../helpers.js';
 import FileListItem from './FileListItem.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
+import HostSelector from './HostSelector.vue';
 
 const router = useRouter();
 const route = useRoute();
+const hostStore = useHostStore();
 const fileStore = useFileStore();
 const searchStore = useSearchStore();
 const logViewerStore = useLogViewerStore();
@@ -235,11 +241,7 @@ const selectFile = (fileIdentifier) => {
 };
 
 onMounted(async () => {
-  await fileStore.loadFolders();
-
-  if (fileStore.selectedFile || searchStore.hasQuery) {
-    logViewerStore.loadLogs();
-  }
+  hostStore.selectHost(route.query.host || null);
 });
 
 watch(
