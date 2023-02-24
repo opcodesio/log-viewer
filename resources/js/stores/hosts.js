@@ -29,7 +29,7 @@ export const useHostStore = defineStore({
       }
 
       if (typeof host === 'string') {
-        host = this.hosts.find(host => host.identifier === host);
+        host = this.hosts.find(h => h.identifier === host);
       }
 
       this.selectedHostIdentifier = host?.identifier || null;
