@@ -10,28 +10,60 @@ beforeEach(function () {
             'headers' => ['Authorization' => 'Bearer 1234567890'],
         ],
     ]]);
-    $this->remoteHost = LogViewer::getHosts()->first(fn ($host) => $host->isRemote());
+    $this->remoteHost = LogViewer::getHosts()->remote()->first();
 });
 
-it('can forward request to a different host', function ($routeName) {
+function expectedNewUrl($originalUrl, \Opcodes\LogViewer\Host $host): string
+{
+    $newUrl = Str::replaceFirst(
+        route('log-viewer.index'), // http://localhost/log-viewer
+        $host->host,                     // https://example.com/log-viewer-remote
+        $originalUrl
+    );
+
+    $queryString = parse_url($newUrl, PHP_URL_QUERY);
+    parse_str($queryString, $queryParams);
+    unset($queryParams['host']);
+
+    // rebuild the newUrl with the new query params
+    $newUrl = Str::replaceFirst($queryString, http_build_query($queryParams), $newUrl);
+
+    return rtrim($newUrl, '?');
+}
+
+it('can forward request to a different host', function ($method, $routeName, $routeParams = []) {
     Http::fake(['*' => Http::response($proxiedResponseBody = ['files' => ['one', 'two']])]);
 
-    $response = $this->getJson(route($routeName, ['host' => 'remote', 'foo' => 'bar']));
-    $response->assertOk()->assertJson($proxiedResponseBody);
+    // First, the original URL, not being proxied
+    $url = route($routeName, $routeParams);
+    $this->json($method, $url)->assertJsonMissing(['message' => 'Host configuration not found.']);
 
-    Http::assertSent(function (Illuminate\Http\Client\Request $request) use ($routeName) {
-        $expectedNewPath = Str::replaceFirst(
-            route('log-viewer.index'),  // http://localhost/log-viewer
-            $this->remoteHost->host,                      // https://example.com/log-viewer-remote
-            route($routeName, ['foo' => 'bar'])   // no longer includes 'host' query param
-        );
+    Http::assertNothingSent();
 
-        return $request->url() === $expectedNewPath
-            && $request->method() === 'GET'
+    $newUrl = route($routeName, $routeParams + ['host' => $this->remoteHost->identifier]);
+
+    $this->json($method, $newUrl)
+        ->assertOk()
+        ->assertJson($proxiedResponseBody);
+
+    Http::assertSent(function (Illuminate\Http\Client\Request $request) use ($newUrl, $method) {
+        return $request->url() === expectedNewUrl($newUrl, $this->remoteHost)
+            && $request->method() === strtoupper($method)
             && collect($this->remoteHost->headers)->every(fn ($value, $key) => $request->hasHeader($key, $value));
     });
 })->with([
-    'log-viewer.folders',
-    'log-viewer.files',
-    'log-viewer.logs',
+    'folders index' => ['get', 'log-viewer.folders'],
+    'folder download' => ['get', 'log-viewer.folders.download', ['folderIdentifier' => 'folder']],
+    'folder clear cache' => ['post', 'log-viewer.folders.clear-cache', ['folderIdentifier' => 'folder']],
+    'folder delete' => ['delete', 'log-viewer.folders.delete', ['folderIdentifier' => 'folder']],
+
+    'files index' => ['get', 'log-viewer.files'],
+    'file download' => ['get', 'log-viewer.files.download', ['fileIdentifier' => 'file']],
+    'file clear cache' => ['post', 'log-viewer.files.clear-cache', ['fileIdentifier' => 'file']],
+    'file delete' => ['delete', 'log-viewer.files.delete', ['fileIdentifier' => 'file']],
+
+    'logs index' => ['get', 'log-viewer.logs'],
+
+    'clear cache all' => ['post', 'log-viewer.files.clear-cache-all'],
+    'delete multiple files' => ['post', 'log-viewer.files.delete-multiple-files'],
 ]);

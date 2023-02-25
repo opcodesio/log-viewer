@@ -14,4 +14,14 @@ class HostCollection extends Collection
             array_keys($config)
         ));
     }
+
+    public function remote(): self
+    {
+        return $this->filter(fn (Host $host) => $host->isRemote());
+    }
+
+    public function local(): self
+    {
+        return $this->filter(fn (Host $host) => !$host->isRemote());
+    }
 }

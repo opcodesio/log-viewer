@@ -9,7 +9,6 @@ use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LevelCountResource;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
 use Opcodes\LogViewer\Http\Resources\LogResource;
-use Opcodes\LogViewer\Utils\ForwardRequestToHost;
 
 class LogsController
 {
@@ -19,10 +18,6 @@ class LogsController
 
     public function index(Request $request)
     {
-        if ($request->has('host')) {
-            return ForwardRequestToHost::forward($request);
-        }
-
         $fileIdentifier = $request->query('file', '');
         $query = $request->query('query', '');
         $direction = $request->query('direction', 'desc');

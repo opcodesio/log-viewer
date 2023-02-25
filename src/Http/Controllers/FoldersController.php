@@ -8,16 +8,11 @@ use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LogFolderResource;
 use Opcodes\LogViewer\LogFile;
-use Opcodes\LogViewer\Utils\ForwardRequestToHost;
 
 class FoldersController
 {
     public function index(Request $request)
     {
-        if ($request->has('host')) {
-            return ForwardRequestToHost::forward($request);
-        }
-
         JsonResource::withoutWrapping();
 
         $folders = LogViewer::getFilesGroupedByFolder();
