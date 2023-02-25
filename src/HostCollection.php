@@ -22,6 +22,6 @@ class HostCollection extends Collection
 
     public function local(): self
     {
-        return $this->filter(fn (Host $host) => !$host->isRemote());
+        return $this->filter(fn (Host $host) => ! $host->isRemote());
     }
 }
