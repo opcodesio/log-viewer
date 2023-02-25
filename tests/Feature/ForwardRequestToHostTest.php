@@ -13,7 +13,7 @@ beforeEach(function () {
     $this->remoteHost = LogViewer::getHosts()->remote()->first();
 });
 
-function expectedNewUrl($originalUrl, \Opcodes\LogViewer\Host $host): string
+function expectedNewUrl($originalUrl, Opcodes\LogViewer\Host $host): string
 {
     $newUrl = Str::replaceFirst(
         route('log-viewer.index'), // http://localhost/log-viewer

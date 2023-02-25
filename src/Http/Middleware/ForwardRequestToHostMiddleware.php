@@ -3,7 +3,6 @@
 namespace Opcodes\LogViewer\Http\Middleware;
 
 use Closure;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -20,7 +19,7 @@ class ForwardRequestToHostMiddleware
 
         if ($host) {
             $actionPath = Str::replaceFirst(config('log-viewer.route_path'), '', $request->path());
-            $url = $host->host.$actionPath . (!empty($query) ? '?'.http_build_query($query) : '');
+            $url = $host->host.$actionPath.(! empty($query) ? '?'.http_build_query($query) : '');
             $headers = array_merge([
                 'X-Forwarded-Host' => $request->getHost(),
                 'X-Forwarded-Port' => $request->getPort(),
