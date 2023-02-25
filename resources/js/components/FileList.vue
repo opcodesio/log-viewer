@@ -96,12 +96,12 @@
 
               <MenuItems static v-show="open" as="div" class="dropdown w-48" :class="[dropdownDirections[folder.identifier]]">
                 <div class="py-2">
-                  <MenuItem as="button" @click.stop.prevent="clearCacheForFolder(folder)">
-                    <CircleStackIcon v-show="!clearingCache[folder.identifier]" class="w-4 h-4 mr-2"/>
-                    <SpinnerIcon v-show="clearingCache[folder.identifier]" class="w-4 h-4 mr-2" />
-                    <span v-show="!cacheRecentlyCleared[folder.identifier] && !clearingCache[folder.identifier]">Clear indices</span>
-                    <span v-show="!cacheRecentlyCleared[folder.identifier] && clearingCache[folder.identifier]">Clearing...</span>
-                    <span v-show="cacheRecentlyCleared[folder.identifier]" class="text-brand-500">Indices cleared</span>
+                  <MenuItem as="button" @click.stop.prevent="fileStore.clearCacheForFolder(folder)">
+                    <CircleStackIcon v-show="!fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2"/>
+                    <SpinnerIcon v-show="fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2" />
+                    <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && !fileStore.clearingCache[folder.identifier]">Clear indices</span>
+                    <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && fileStore.clearingCache[folder.identifier]">Clearing...</span>
+                    <span v-show="fileStore.cacheRecentlyCleared[folder.identifier]" class="text-brand-500">Indices cleared</span>
                   </MenuItem>
 
                   <MenuItem v-if="folder.can_download">
@@ -114,9 +114,9 @@
                   <template v-if="folder.can_delete">
                     <div class="divider"></div>
                     <MenuItem>
-                      <button @click.stop="confirmDeleteFolder(folder)" :disabled="deleting[folder.identifier]">
-                        <TrashIcon v-show="!deleting[folder.identifier]" class="w-4 h-4 mr-2" />
-                        <SpinnerIcon v-show="deleting[folder.identifier]" />
+                      <button @click.stop="confirmDeleteFolder(folder)" :disabled="fileStore.deleting[folder.identifier]">
+                        <TrashIcon v-show="!fileStore.deleting[folder.identifier]" class="w-4 h-4 mr-2" />
+                        <SpinnerIcon v-show="fileStore.deleting[folder.identifier]" />
                         Delete
                       </button>
                     </MenuItem>
@@ -143,25 +143,22 @@
 </template>
 
 <script setup>
-import axios from 'axios';
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, watch } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import {
   ArrowLeftIcon,
   CircleStackIcon,
   CloudArrowDownIcon,
   EllipsisVerticalIcon,
+  ExclamationTriangleIcon,
   FolderIcon,
   FolderOpenIcon,
   TrashIcon,
   XMarkIcon,
-  ExclamationTriangleIcon,
 } from '@heroicons/vue/24/outline';
 import { useHostStore } from '../stores/hosts.js';
 import { useFileStore } from '../stores/files.js';
 import { useRoute, useRouter } from 'vue-router';
-import { useSearchStore } from '../stores/search.js';
-import { useLogViewerStore } from '../stores/logViewer.js';
 import { replaceQuery, useDropdownDirection } from '../helpers.js';
 import FileListItem from './FileListItem.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
@@ -172,63 +169,28 @@ const router = useRouter();
 const route = useRoute();
 const hostStore = useHostStore();
 const fileStore = useFileStore();
-const searchStore = useSearchStore();
-const logViewerStore = useLogViewerStore();
 const { dropdownDirections, calculateDropdownDirection } = useDropdownDirection();
 
-const cacheRecentlyCleared = ref({});
-const clearingCache = ref({});
-const clearCacheForFolder = (folder) => {
-  clearingCache.value[folder.identifier] = true;
-
-  axios.post(`${LogViewer.basePath}/api/folders/${folder.identifier}/clear-cache`)
-    .then(() => {
-      if (folder.files.some(file => file.identifier === fileStore.selectedFileIdentifier)) {
-        logViewerStore.loadLogs();
-      }
-
-      cacheRecentlyCleared.value[folder.identifier] = true;
-      setTimeout(() => cacheRecentlyCleared.value[folder.identifier] = false, 2000);
-    })
-    .catch((error) => console.error(error))
-    .finally(() => {
-      clearingCache.value[folder.identifier] = false;
-    })
-
-}
-
-const deleting = ref({});
-const confirmDeleteFolder = (folder) => {
+const confirmDeleteFolder = async (folder) => {
   if (confirm(`Are you sure you want to delete the log folder '${folder.path}'? THIS ACTION CANNOT BE UNDONE.`)) {
-    deleting.value[folder.identifier] = true;
+    await fileStore.deleteFolder(folder);
 
-    axios.delete(`${LogViewer.basePath}/api/folders/${folder.identifier}`)
-      .then(() => {
-        if (folder.files.some(file => file.identifier === fileStore.selectedFileIdentifier)) {
-          replaceQuery(router, 'file', null);
-        }
-
-        fileStore.loadFolders();
-      })
-      .catch((error) => console.error(error))
-      .finally(() => {
-        deleting.value[folder.identifier] = false;
-      })
+    if (folder.files.some(file => file.identifier === fileStore.selectedFileIdentifier)) {
+      replaceQuery(router, 'file', null);
+    }
   }
 }
 
-const confirmDeleteSelectedFiles = () => {
+const confirmDeleteSelectedFiles = async () => {
   if (confirm('Are you sure you want to delete selected log files? THIS ACTION CANNOT BE UNDONE.')) {
-    axios.post(`${LogViewer.basePath}/api/delete-multiple-files`, {
-      files: fileStore.filesChecked
-    }).then(() => {
-      if (fileStore.filesChecked.includes(fileStore.selectedFileIdentifier)) {
-        replaceQuery(router, 'file', null);
-      }
+    await fileStore.deleteSelectedFiles();
 
-      fileStore.resetChecks();
-      fileStore.loadFolders();
-    });
+    if (fileStore.filesChecked.includes(fileStore.selectedFileIdentifier)) {
+      replaceQuery(router, 'file', null);
+    }
+
+    fileStore.resetChecks();
+    await fileStore.loadFolders();
   }
 }
 

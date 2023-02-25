@@ -21,13 +21,13 @@
 
       <MenuItems as="div" class="dropdown w-48" :class="[dropdownDirections[logFile.identifier]]">
         <div class="py-2">
-          <MenuItem @click.stop.prevent="clearCacheForFile">
+          <MenuItem @click.stop.prevent="fileStore.clearCacheForFile(logFile)">
             <button>
-              <CircleStackIcon v-show="!clearingCache" class="h-4 w-4 mr-2" />
-              <SpinnerIcon v-show="clearingCache" />
-              <span v-show="!cacheRecentlyCleared && !clearingCache">Clear index</span>
-              <span v-show="!cacheRecentlyCleared && clearingCache">Clearing...</span>
-              <span v-show="cacheRecentlyCleared" class="text-brand-500">Index cleared</span>
+              <CircleStackIcon v-show="!fileStore.clearingCache[logFile.identifier]" class="h-4 w-4 mr-2" />
+              <SpinnerIcon v-show="fileStore.clearingCache[logFile.identifier]" />
+              <span v-show="!fileStore.cacheRecentlyCleared[logFile.identifier] && !fileStore.clearingCache[logFile.identifier]">Clear index</span>
+              <span v-show="!fileStore.cacheRecentlyCleared[logFile.identifier] && fileStore.clearingCache[logFile.identifier]">Clearing...</span>
+              <span v-show="fileStore.cacheRecentlyCleared[logFile.identifier]" class="text-brand-500">Index cleared</span>
             </button>
           </MenuItem>
 
@@ -62,13 +62,11 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { CircleStackIcon, CloudArrowDownIcon, EllipsisVerticalIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { useFileStore } from '../stores/files.js';
 import SpinnerIcon from './SpinnerIcon.vue';
-import axios from 'axios';
-import { useLogViewerStore } from '../stores/logViewer.js';
 import { replaceQuery, useDropdownDirection } from '../helpers.js';
 import { useRouter } from 'vue-router';
 
@@ -84,27 +82,23 @@ const props = defineProps({
 })
 const emit = defineEmits(['selectForDeletion']);
 const fileStore = useFileStore();
-const logViewerStore = useLogViewerStore();
 const router = useRouter();
 const { dropdownDirections, calculateDropdownDirection } = useDropdownDirection();
 
 // data
-const clearingCache = ref(false);
-const cacheRecentlyCleared = ref(false);
 const isSelected = computed(() => {
   return fileStore.selectedFile && fileStore.selectedFile.identifier === props.logFile.identifier;
 })
 
-const confirmDeletion = () => {
+const confirmDeletion = async () => {
   if (confirm(`Are you sure you want to delete the log file '${props.logFile.name}'? THIS ACTION CANNOT BE UNDONE.`)) {
-    axios.delete(`${LogViewer.basePath}/api/files/${props.logFile.identifier}`)
-      .then(() => {
-        if (props.logFile.identifier === fileStore.selectedFileIdentifier) {
-          replaceQuery(router, 'file', null);
-        }
+    await fileStore.deleteFile(props.logFile);
 
-        fileStore.loadFolders();
-      })
+    if (props.logFile.identifier === fileStore.selectedFileIdentifier) {
+      replaceQuery(router, 'file', null);
+    }
+
+    await fileStore.loadFolders();
   }
 }
 
@@ -115,22 +109,5 @@ const toggleCheckbox = () => {
 const deleteMultiple = () => {
   fileStore.toggleCheckboxVisibility();
   toggleCheckbox();
-}
-
-const clearCacheForFile = () => {
-  clearingCache.value = true;
-
-  axios.post(`${LogViewer.basePath}/api/files/${props.logFile.identifier}/clear-cache`)
-    .then(() => {
-      cacheRecentlyCleared.value = true;
-      if (props.logFile.identifier === fileStore.selectedFileIdentifier) {
-        logViewerStore.loadLogs();
-      }
-      setTimeout(() => cacheRecentlyCleared.value = false, 2000);
-    })
-    .catch((error) => {
-      console.error(error);
-    })
-    .finally(() => clearingCache.value = false);
 }
 </script>

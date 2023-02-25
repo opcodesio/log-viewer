@@ -20,13 +20,13 @@
         <div class="divider"></div>
         <div class="label">Actions</div>
 
-        <MenuItem @click.stop.prevent="clearCacheAll">
+        <MenuItem @click.stop.prevent="fileStore.clearCacheForAllFiles">
           <button>
-            <CircleStackIcon v-show="!clearingCache" class="w-4 h-4 mr-1.5" />
-            <SpinnerIcon v-show="clearingCache" class="w-4 h-4 mr-1.5" />
-            <span v-show="!cacheRecentlyCleared && !clearingCache">Clear indices for all files</span>
-            <span v-show="!cacheRecentlyCleared && clearingCache">Please wait...</span>
-            <span v-show="cacheRecentlyCleared" class="text-brand-500">File indices cleared</span>
+            <CircleStackIcon v-show="!fileStore.clearingCache['*']" class="w-4 h-4 mr-1.5" />
+            <SpinnerIcon v-show="fileStore.clearingCache['*']" class="w-4 h-4 mr-1.5" />
+            <span v-show="!fileStore.cacheRecentlyCleared['*'] && !fileStore.clearingCache['*']">Clear indices for all files</span>
+            <span v-show="!fileStore.cacheRecentlyCleared['*'] && fileStore.clearingCache['*']">Please wait...</span>
+            <span v-show="fileStore.cacheRecentlyCleared['*']" class="text-brand-500">File indices cleared</span>
           </button>
         </MenuItem>
 
@@ -83,6 +83,7 @@
 <script setup>
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import {
+  ArrowTopRightOnSquareIcon,
   CircleStackIcon,
   Cog8ToothIcon,
   ComputerDesktopIcon,
@@ -90,17 +91,17 @@ import {
   QuestionMarkCircleIcon,
   ShareIcon,
   SunIcon,
-  ArrowTopRightOnSquareIcon,
 } from '@heroicons/vue/24/outline';
 import { Theme, useLogViewerStore } from '../stores/logViewer.js';
 import { ref, watch } from 'vue';
 import Checkmark from './Checkmark.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import { copyToClipboard } from '../helpers.js';
-import axios from 'axios';
 import BmcIcon from './BmcIcon.vue';
+import { useFileStore } from '../stores/files.js';
 
 const logViewerStore = useLogViewerStore();
+const fileStore = useFileStore();
 
 const copied = ref(false);
 const copyUrlToClipboard = () => {
@@ -108,21 +109,6 @@ const copyUrlToClipboard = () => {
   copied.value = true;
   setTimeout(() => copied.value = false, 2000);
 };
-
-const clearingCache = ref(false);
-const cacheRecentlyCleared = ref(false);
-const clearCacheAll = () => {
-  cacheRecentlyCleared.value = true;
-
-  axios.post(`${LogViewer.basePath}/api/clear-cache-all`)
-    .then(() => {
-      cacheRecentlyCleared.value = true;
-      setTimeout(() => cacheRecentlyCleared.value = false, 2000);
-      logViewerStore.loadLogs();
-    })
-    .catch((error) => console.error(error))
-    .finally(() => clearingCache.value = false);
-}
 
 watch(
   () => logViewerStore.shorterStackTraces,

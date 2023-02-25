@@ -14,6 +14,7 @@ class Host
         public string $name,
         public string|null $host = null,
         public array|null $headers = null,
+        public array|null $auth = null,
     ) {
         $this->is_remote = $this->isRemote();
     }
@@ -29,6 +30,7 @@ class Host
             $config['name'] ?? (is_string($identifier) ? $identifier : $config['host']),
             $config['host'],
             $config['headers'] ?? [],
+            $config['auth'] ?? [],
         );
     }
 

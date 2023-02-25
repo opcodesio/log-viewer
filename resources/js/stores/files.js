@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useLocalStorage } from '@vueuse/core';
 import { useHostStore } from './hosts.js';
+import { useLogViewerStore } from './logViewer.js';
 
 export const useFileStore = defineStore({
   id: 'files',
@@ -11,6 +12,10 @@ export const useFileStore = defineStore({
     folders: [],
     direction: useLocalStorage('fileViewerDirection', 'desc'),
     selectedFileIdentifier: null,
+
+    clearingCache: {},
+    cacheRecentlyCleared: {},
+    deleting: {},
 
     // control variables
     loading: false,
@@ -24,6 +29,11 @@ export const useFileStore = defineStore({
   }),
 
   getters: {
+    selectedHost(state) {
+      const hostStore = useHostStore();
+      return hostStore.selectedHost;
+    },
+
     files: (state) => state.folders.flatMap((folder) => folder.files),
 
     selectedFile: (state) => state.files.find((file) => file.identifier === state.selectedFileIdentifier),
@@ -99,11 +109,10 @@ export const useFileStore = defineStore({
     loadFolders() {
       if (this.loading) return;
 
-      const hostStore = useHostStore();
       this.loading = true;
 
       const params = {
-        host: hostStore.selectedHostIdentifier || undefined,
+        host: this.selectedHost?.identifier || undefined,
         direction: this.direction,
       }
 
@@ -180,6 +189,95 @@ export const useFileStore = defineStore({
     resetChecks() {
       this.filesChecked = [];
       this.checkBoxesVisibility = false;
+    },
+
+    clearCacheForFile(file) {
+      this.clearingCache[file.identifier] = true;
+      const params = {
+        host: this.selectedHost?.identifier || undefined,
+      }
+
+      return axios.post(`${LogViewer.basePath}/api/files/${file.identifier}/clear-cache`, {}, { params })
+        .then(() => {
+          if (file.identifier === this.selectedFileIdentifier) {
+            useLogViewerStore().loadLogs();
+          }
+
+          this.cacheRecentlyCleared[file.identifier] = true;
+          setTimeout(() => this.cacheRecentlyCleared[file.identifier] = false, 2000);
+        })
+        .catch((error) => console.error(error))
+        .finally(() => this.clearingCache[file.identifier] = false);
+    },
+
+    deleteFile(file) {
+      const params = {
+        host: this.selectedHost?.identifier || undefined,
+      }
+
+      return axios.delete(`${LogViewer.basePath}/api/files/${file.identifier}`, { params })
+        .then(() => this.loadFolders())
+    },
+
+    clearCacheForFolder(folder) {
+      this.clearingCache[folder.identifier] = true;
+      const params = {
+        host: this.selectedHost?.identifier || undefined,
+      }
+
+      return axios.post(`${LogViewer.basePath}/api/folders/${folder.identifier}/clear-cache`, {}, { params })
+        .then(() => {
+          if (folder.files.some(file => file.identifier === this.selectedFileIdentifier)) {
+            useLogViewerStore().loadLogs();
+          }
+
+          this.cacheRecentlyCleared[folder.identifier] = true;
+          setTimeout(() => this.cacheRecentlyCleared[folder.identifier] = false, 2000);
+        })
+        .catch((error) => console.error(error))
+        .finally(() => {
+          this.clearingCache[folder.identifier] = false;
+        })
+    },
+
+    deleteFolder(folder) {
+      this.deleting[folder.identifier] = true;
+      const params = {
+        host: this.selectedHost?.identifier || undefined,
+      }
+
+      return axios.delete(`${LogViewer.basePath}/api/folders/${folder.identifier}`, { params })
+        .then(() => this.loadFolders())
+        .catch((error) => console.error(error))
+        .finally(() => {
+          this.deleting[folder.identifier] = false;
+        })
+    },
+
+    deleteSelectedFiles() {
+      const params = {
+        host: this.selectedHost?.identifier || undefined,
+      }
+
+      return axios.post(`${LogViewer.basePath}/api/delete-multiple-files`, {
+        files: this.filesChecked
+      }, { params });
+    },
+
+    clearCacheForAllFiles() {
+      this.clearingCache['*'] = true;
+      const params = {
+        host: this.selectedHost?.identifier || undefined,
+      }
+
+      axios.post(`${LogViewer.basePath}/api/clear-cache-all`, {}, { params })
+        .then(() => {
+          this.cacheRecentlyCleared['*'] = true;
+          setTimeout(() => this.cacheRecentlyCleared['*'] = false, 2000);
+          useLogViewerStore().loadLogs();
+        })
+        .catch((error) => console.error(error))
+        .finally(() => this.clearingCache['*'] = false);
     },
   },
 })
