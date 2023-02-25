@@ -476,7 +476,7 @@ html.dark {
 // Dark border (hover): border-brand-700
 
 .file-list {
-    @apply relative h-full overflow-y-auto pl-3 sm:pl-0 pb-4 pr-3 sm:pr-4;
+    @apply relative h-full overflow-y-auto pb-4 pl-3 sm:pl-0 pr-3 lg:pr-0;
 
     .file-item-container,
     .folder-item-container {

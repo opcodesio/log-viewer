@@ -1,6 +1,6 @@
 <template>
   <nav class="flex flex-col h-full py-5">
-    <div class="mx-3 mb-2">
+    <div class="mx-3 lg:mx-0 mb-2">
       <h1 class="font-semibold text-brand-700 dark:text-brand-600 text-2xl flex items-center">
         Log Viewer
         <a href="https://www.github.com/opcodesio/log-viewer" target="_blank"
@@ -29,11 +29,11 @@
       </a>
 
       <template v-if="hostStore.supportsHosts && hostStore.hasRemoteHosts">
-        <host-selector class="mb-6 mt-3 mr-1" />
+        <host-selector class="mb-8 mt-6" />
       </template>
 
-      <div class="flex justify-between items-baseline mt-4 mr-1">
-        <div class="block text-sm font-semibold text-brand-700">Browse log files</div>
+      <div class="flex justify-between items-baseline mt-6">
+        <div class="ml-1 block text-sm font-semibold text-brand-700">Browse log files</div>
         <div class="text-sm text-gray-500 dark:text-gray-400">
           <label for="file-sort-direction" class="sr-only">Sort direction</label>
           <select id="file-sort-direction" class="select" v-model="fileStore.direction">
@@ -137,13 +137,15 @@
           </div>
         </div>
       </div>
+
+      <!-- gradient to hide the bottom of the file list -->
       <div class="pointer-events-none absolute z-10 bottom-0 h-4 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
 
-      <div class="absolute inset-0 z-20" v-show="fileStore.loading">
-          <div
-            class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
-            <SpinnerIcon class="w-14 h-14" />
-          </div>
+      <!-- loading state overlay -->
+      <div class="absolute inset-0 inset-x-3 lg:inset-x-0 z-20" v-show="fileStore.loading">
+        <div class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
+          <SpinnerIcon class="w-14 h-14" />
+        </div>
         </div>
     </div>
   </nav>

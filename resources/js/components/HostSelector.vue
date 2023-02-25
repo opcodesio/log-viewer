@@ -1,6 +1,6 @@
 <template>
   <Listbox as="div" v-model="hostStore.selectedHostIdentifier">
-    <ListboxLabel class="block text-sm font-semibold text-brand-700">Select host</ListboxLabel>
+    <ListboxLabel class="ml-1 block text-sm font-semibold text-brand-700">Select host</ListboxLabel>
 
     <div class="relative mt-1">
       <ListboxButton class="relative text-gray-800 dark:text-gray-200 w-full cursor-default rounded-md border border-gray-300 dark:border-gray-700 bg-white py-2 pl-4 pr-10 text-left focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 text-sm">

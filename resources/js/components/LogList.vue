@@ -133,7 +133,8 @@
           </div>
         </div>
 
-        <div class="absolute inset-0 top-9 md:px-4 z-20" v-show="logViewerStore.loading">
+        <!-- loading state for logs -->
+        <div class="absolute inset-0 top-9 md:px-4 z-20" v-show="logViewerStore.loading && (!isMobile || !fileStore.sidebarOpen)">
           <div
             class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
             <SpinnerIcon class="w-14 h-14" />
@@ -206,6 +207,8 @@ const clearQuery = () => {
 
 const calculateColspan = () => window.matchMedia('(max-width: 1024px)').matches ? 4 : 1;
 const headerColspan = ref(calculateColspan());
+
+const isMobile = computed(() => window.matchMedia('(max-width: 768px)').matches);
 
 watch(
   [
