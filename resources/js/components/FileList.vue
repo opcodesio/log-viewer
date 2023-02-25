@@ -138,6 +138,13 @@
         </div>
       </div>
       <div class="pointer-events-none absolute z-10 bottom-0 h-4 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
+
+      <div class="absolute inset-0 z-20" v-show="fileStore.loading">
+          <div
+            class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
+            <SpinnerIcon class="w-14 h-14" />
+          </div>
+        </div>
     </div>
   </nav>
 </template>
