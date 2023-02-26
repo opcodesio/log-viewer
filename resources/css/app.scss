@@ -50,9 +50,34 @@ html.dark {
                 @apply text-gray-700 dark:text-gray-400;
             }
         }
+
         .log-count {
             @apply text-gray-500 dark:text-gray-400 ml-8 whitespace-nowrap;
         }
+
+        button.active {
+            .log-level {
+                &.success {
+                    @apply text-emerald-100;
+                }
+                &.info {
+                    @apply text-sky-100;
+                }
+                &.warning {
+                    @apply text-amber-100;
+                }
+                &.danger {
+                    @apply text-rose-100;
+                }
+                &.none {
+                    @apply text-gray-100;
+                }
+            }
+            .log-count {
+                @apply text-gray-200 dark:text-gray-300;
+            }
+        }
+
         .no-results {
             @apply text-xs text-gray-500 dark:text-gray-400 text-center px-4 py-1;
         }
@@ -323,7 +348,7 @@ html.dark {
         }
 
         .log-link {
-            @apply flex items-center w-full;
+            @apply flex items-center w-full -my-0.5 py-0.5 -ml-1 pl-1 rounded;
             margin-right: 0.5rem;
             @screen sm {
                 min-width: 40px;
@@ -331,6 +356,10 @@ html.dark {
 
             & > svg {
                 @apply h-4 w-4 ml-1 transition duration-200;
+            }
+
+            &:focus {
+                @apply outline-none ring-2 ring-brand-500 dark:ring-brand-400;
             }
         }
 
@@ -353,6 +382,9 @@ html.dark {
                 @apply text-gray-700 border-gray-300
                   dark:text-gray-300 border-gray-400;
             }
+            &:focus {
+                @apply rounded-md outline-none ring-2 ring-brand-500 dark:ring-brand-400;
+            }
             svg {
                 @apply mx-3 h-5 w-5 text-current;
             }
@@ -367,6 +399,9 @@ html.dark {
             &:hover {
                 @apply text-gray-700 border-gray-300
                   dark:text-gray-300 border-gray-400;
+            }
+            &:focus {
+                @apply rounded-md outline-none ring-2 ring-brand-500 dark:ring-brand-400;
             }
             svg {
                 @apply mx-3 h-5 w-5 text-current;
@@ -383,6 +418,10 @@ html.dark {
 
         button {
             @apply border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium;
+
+            &:focus {
+                @apply rounded-md outline-none ring-2 ring-brand-500 dark:ring-brand-400;
+            }
         }
     }
 }
@@ -429,6 +468,10 @@ html.dark {
 .dropdown {
     @apply absolute top-full z-40 right-1 -mt-1 overflow-hidden text-gray-900 dark:text-gray-200 rounded-md bg-white border-gray-200 dark:bg-gray-800 border dark:border-gray-700 shadow-md;
 
+    &:focus {
+        @apply outline-none ring-1 ring-brand-500 ring-opacity-50 dark:ring-brand-700 dark:ring-opacity-50;
+    }
+
     transform-origin: top right !important;
 
     &.up {
@@ -448,7 +491,7 @@ html.dark {
         }
     }
 
-    button, a {
+    button:not(.inline-link), a:not(.inline-link) {
         @apply block flex items-center w-full px-4 py-2 text-left text-sm outline-brand-500 dark:outline-brand-800;
         & > svg {
             @apply w-4 h-4 mr-3 text-gray-400;
@@ -459,8 +502,16 @@ html.dark {
             }
         }
     }
-    button:hover, a:hover {
-        @apply bg-gray-50 dark:bg-gray-700;
+    button:hover, a:hover, button.active, a.active {
+        @apply text-white bg-brand-600;
+
+        & > .checkmark {
+            @apply bg-brand-600 dark:border-gray-300;
+        }
+
+        & > svg {
+            @apply text-white;
+        }
     }
 
     .divider {
@@ -480,7 +531,7 @@ html.dark {
 
     .file-item-container,
     .folder-item-container {
-        @apply relative mt-2 text-gray-800 dark:text-gray-200 rounded-md bg-white dark:bg-gray-800;
+        @apply relative mt-2 text-gray-800 dark:text-gray-200 rounded-md bg-white dark:bg-gray-800 top-0;
 
         .file-item {
             @apply relative flex justify-between items-center pl-4 pr-10 py-2 rounded-md border cursor-pointer border-transparent transition duration-100;

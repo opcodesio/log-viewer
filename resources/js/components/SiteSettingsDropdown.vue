@@ -1,9 +1,8 @@
 <template>
   <Menu as="div" class="relative">
-    <MenuButton>
-      <button type="button" class="menu-button">
-        <Cog8ToothIcon class="w-5 h-5" />
-      </button>
+    <MenuButton as="button" class="menu-button">
+      <span class="sr-only">Settings dropdown</span>
+      <Cog8ToothIcon class="w-5 h-5" />
     </MenuButton>
 
     <transition
@@ -18,8 +17,8 @@
         <div class="py-2">
           <div class="label">Settings</div>
 
-          <MenuItem @click.stop.prevent="logViewerStore.shorterStackTraces = !logViewerStore.shorterStackTraces">
-            <button>
+          <MenuItem v-slot="{ active }">
+            <button :class="[active ? 'active' : '']" @click.stop.prevent="logViewerStore.shorterStackTraces = !logViewerStore.shorterStackTraces">
               <Checkmark :checked="logViewerStore.shorterStackTraces" />
               <span class="ml-3">Shorter stack traces</span>
             </button>
@@ -28,8 +27,8 @@
           <div class="divider"></div>
           <div class="label">Actions</div>
 
-          <MenuItem @click.stop.prevent="fileStore.clearCacheForAllFiles">
-            <button>
+          <MenuItem @click.stop.prevent="fileStore.clearCacheForAllFiles" v-slot="{ active }">
+            <button :class="[active ? 'active' : '']">
               <CircleStackIcon v-show="!fileStore.clearingCache['*']" class="w-4 h-4 mr-1.5" />
               <SpinnerIcon v-show="fileStore.clearingCache['*']" class="w-4 h-4 mr-1.5" />
               <span v-show="!fileStore.cacheRecentlyCleared['*'] && !fileStore.clearingCache['*']">Clear indices for all files</span>
@@ -38,8 +37,8 @@
             </button>
           </MenuItem>
 
-          <MenuItem @click.stop.prevent="copyUrlToClipboard">
-            <button>
+          <MenuItem @click.stop.prevent="copyUrlToClipboard" v-slot="{ active }">
+            <button :class="[active ? 'active' : '']">
               <ShareIcon class="w-4 h-4" />
               <span v-show="!copied">Share this page</span>
               <span v-show="copied" class="text-brand-500">Link copied!</span>
@@ -48,8 +47,8 @@
 
           <div class="divider"></div>
 
-          <MenuItem @click.stop.prevent="logViewerStore.toggleTheme()">
-            <button>
+          <MenuItem @click.stop.prevent="logViewerStore.toggleTheme()" v-slot="{ active }">
+            <button :class="[active ? 'active' : '']">
               <ComputerDesktopIcon v-show="logViewerStore.theme === Theme.System" class="w-4 h-4" />
               <SunIcon v-show="logViewerStore.theme === Theme.Light" class="w-4 h-4" />
               <MoonIcon v-show="logViewerStore.theme === Theme.Dark" class="w-4 h-4" />
@@ -57,15 +56,15 @@
             </button>
           </MenuItem>
 
-          <MenuItem>
-            <a href="https://log-viewer.opcodes.io/docs" target="_blank">
+          <MenuItem v-slot="{ active }">
+            <a href="https://log-viewer.opcodes.io/docs" target="_blank" :class="[active ? 'active' : '']">
               <QuestionMarkCircleIcon class="w-4 h-4" />
               Documentation
             </a>
           </MenuItem>
 
-          <MenuItem>
-            <a href="https://www.github.com/opcodesio/log-viewer" target="_blank">
+          <MenuItem v-slot="{ active }">
+            <a href="https://www.github.com/opcodesio/log-viewer" target="_blank" :class="[active ? 'active' : '']">
               <QuestionMarkCircleIcon class="w-4 h-4" />
               Help
             </a>
@@ -73,12 +72,12 @@
 
           <div class="divider"></div>
 
-          <MenuItem>
-            <a href="https://www.buymeacoffee.com/arunas" target="_blank">
+          <MenuItem v-slot="{ active }">
+            <a href="https://www.buymeacoffee.com/arunas" target="_blank" :class="[active ? 'active' : '']">
               <div class="w-4 h-4 mr-3 flex flex-col items-center">
                 <bmc-icon class="h-4 w-auto" />
               </div>
-              <strong class="text-brand-500">Show your support</strong>
+              <strong :class="[active ? 'text-white' : 'text-brand-500']">Show your support</strong>
               <ArrowTopRightOnSquareIcon class="ml-2 w-4 h-4 opacity-75" />
             </a>
           </MenuItem>

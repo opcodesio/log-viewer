@@ -77,7 +77,6 @@
             <div class="folder-item-container"
                  @click="fileStore.toggle(folder)"
                  :class="[fileStore.isOpen(folder) ? 'active-folder' : '', fileStore.shouldBeSticky(folder) ? 'sticky ' + (open ? 'z-20' : 'z-10') : '' ]"
-                 :style="{ top: fileStore.isOpen(folder) ? (fileStore.folderTops[folder] || 0) : 0 }"
             >
               <div class="file-item">
                 <div class="file-icon">
@@ -91,10 +90,10 @@
                   <span v-else>{{ folder.clean_path }}</span>
                 </div>
 
-                <MenuButton @click.stop="calculateDropdownDirection($event.target)">
-                  <button type="button" class="file-dropdown-toggle" :data-toggle-id="folder.identifier">
-                    <EllipsisVerticalIcon class="w-5 h-5 pointer-events-none" />
-                  </button>
+                <MenuButton as="button" class="file-dropdown-toggle" :data-toggle-id="folder.identifier"
+                            @click.stop="calculateDropdownDirection($event.target)">
+                  <span class="sr-only">Open folder options</span>
+                  <EllipsisVerticalIcon class="w-5 h-5 pointer-events-none" />
                 </MenuButton>
               </div>
 
@@ -108,16 +107,18 @@
               >
                 <MenuItems static v-show="open" as="div" class="dropdown w-48" :class="[dropdownDirections[folder.identifier]]">
                   <div class="py-2">
-                    <MenuItem as="button" @click.stop.prevent="fileStore.clearCacheForFolder(folder)">
-                      <CircleStackIcon v-show="!fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2"/>
-                      <SpinnerIcon v-show="fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2" />
-                      <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && !fileStore.clearingCache[folder.identifier]">Clear indices</span>
-                      <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && fileStore.clearingCache[folder.identifier]">Clearing...</span>
-                      <span v-show="fileStore.cacheRecentlyCleared[folder.identifier]" class="text-brand-500">Indices cleared</span>
+                    <MenuItem @click.stop.prevent="fileStore.clearCacheForFolder(folder)" v-slot="{ active }">
+                      <button :class="[active ? 'active' : '']">
+                        <CircleStackIcon v-show="!fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2"/>
+                        <SpinnerIcon v-show="fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2" />
+                        <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && !fileStore.clearingCache[folder.identifier]">Clear indices</span>
+                        <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && fileStore.clearingCache[folder.identifier]">Clearing...</span>
+                        <span v-show="fileStore.cacheRecentlyCleared[folder.identifier]" class="text-brand-500">Indices cleared</span>
+                      </button>
                     </MenuItem>
 
-                    <MenuItem v-if="folder.can_download">
-                      <a :href="folder.download_url" download @click.stop>
+                    <MenuItem v-if="folder.can_download" v-slot="{ active }">
+                      <a :href="folder.download_url" download @click.stop :class="[active ? 'active' : '']">
                         <CloudArrowDownIcon class="w-4 h-4 mr-2"/>
                         Download
                       </a>
@@ -125,8 +126,8 @@
 
                     <template v-if="folder.can_delete">
                       <div class="divider"></div>
-                      <MenuItem>
-                        <button @click.stop="confirmDeleteFolder(folder)" :disabled="fileStore.deleting[folder.identifier]">
+                      <MenuItem v-slot="{ active }">
+                        <button @click.stop="confirmDeleteFolder(folder)" :disabled="fileStore.deleting[folder.identifier]" :class="[active ? 'active' : '']">
                           <TrashIcon v-show="!fileStore.deleting[folder.identifier]" class="w-4 h-4 mr-2" />
                           <SpinnerIcon v-show="fileStore.deleting[folder.identifier]" />
                           Delete

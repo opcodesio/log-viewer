@@ -25,7 +25,6 @@ export const useFileStore = defineStore({
     filesChecked: [],
     openFolderIdentifiers: [],
     foldersInView: [],
-    folderTops: {},
     containerTop: 0,
     sidebarOpen: false,
   }),
@@ -59,9 +58,6 @@ export const useFileStore = defineStore({
     isInViewport() {
       return (index) => this.pixelsAboveFold(index) > -36
     },
-
-    // TODO: cleanup, since the stick top position is now always zero.
-    stickTopPosition: () => 0,
 
     pixelsAboveFold: (state) => (folder) => {
       let folderContainer = document.getElementById('folder-' + folder);
@@ -163,10 +159,8 @@ export const useFileStore = defineStore({
           if (!vm.foldersInView.includes(folder)) {
             vm.foldersInView.push(folder);
           }
-          vm.folderTops[folder] = vm.stickTopPosition(folder);
         } else {
           vm.foldersInView = vm.foldersInView.filter(f => f !== folder);
-          delete vm.folderTops[folder];
         }
       })
     },
@@ -174,7 +168,6 @@ export const useFileStore = defineStore({
     reset() {
       this.openFolderIdentifiers = [];
       this.foldersInView = [];
-      this.folderTops = {};
       const container = document.getElementById('file-list-container');
       if (container) {
         this.containerTop = container.getBoundingClientRect().top;

@@ -12,10 +12,9 @@
         <p class="file-name">{{ logFile.name }}</p>
         <span class="file-size">{{ logFile.size_formatted }}</span>
 
-        <MenuButton @click.stop="calculateDropdownDirection($event.target)">
-          <button type="button" class="file-dropdown-toggle" :data-toggle-id="logFile.identifier">
-            <EllipsisVerticalIcon class="w-5 h-5 pointer-events-none" />
-          </button>
+        <MenuButton as="button" class="file-dropdown-toggle" :data-toggle-id="logFile.identifier"
+                    @click.stop="calculateDropdownDirection($event.target)">
+          <EllipsisVerticalIcon class="w-5 h-5 pointer-events-none" />
         </MenuButton>
       </div>
 
@@ -29,8 +28,8 @@
       >
         <MenuItems as="div" class="dropdown w-48" :class="[dropdownDirections[logFile.identifier]]">
           <div class="py-2">
-            <MenuItem @click.stop.prevent="fileStore.clearCacheForFile(logFile)">
-              <button>
+            <MenuItem @click.stop.prevent="fileStore.clearCacheForFile(logFile)" v-slot="{ active }">
+              <button :class="[active ? 'active' : '']">
                 <CircleStackIcon v-show="!fileStore.clearingCache[logFile.identifier]" class="h-4 w-4 mr-2" />
                 <SpinnerIcon v-show="fileStore.clearingCache[logFile.identifier]" />
                 <span v-show="!fileStore.cacheRecentlyCleared[logFile.identifier] && !fileStore.clearingCache[logFile.identifier]">Clear index</span>
@@ -39,8 +38,8 @@
               </button>
             </MenuItem>
 
-            <MenuItem v-if="logFile.can_download" @click.stop>
-              <a :href="logFile.download_url" download>
+            <MenuItem v-if="logFile.can_download" @click.stop v-slot="{ active }">
+              <a :href="logFile.download_url" download :class="[active ? 'active' : '']">
                 <CloudArrowDownIcon class="w-4 h-4 mr-2" />
                 Download
               </a>
@@ -49,15 +48,15 @@
             <template v-if="logFile.can_delete">
               <div class="divider"></div>
 
-              <MenuItem @click.stop.prevent="confirmDeletion">
-                <button>
+              <MenuItem @click.stop.prevent="confirmDeletion" v-slot="{ active }">
+                <button :class="[active ? 'active' : '']">
                   <TrashIcon class="w-4 h-4 mr-2" />
                   Delete
                 </button>
               </MenuItem>
 
-              <MenuItem @click.stop="deleteMultiple">
-                <button>
+              <MenuItem @click.stop="deleteMultiple" v-slot="{ active }">
+                <button :class="[active ? 'active' : '']">
                   <TrashIcon class="w-4 h-4 mr-2" />
                   Delete Multiple
                 </button>
