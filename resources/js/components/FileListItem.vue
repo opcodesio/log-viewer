@@ -19,44 +19,53 @@
         </MenuButton>
       </div>
 
-      <MenuItems as="div" class="dropdown w-48" :class="[dropdownDirections[logFile.identifier]]">
-        <div class="py-2">
-          <MenuItem @click.stop.prevent="fileStore.clearCacheForFile(logFile)">
-            <button>
-              <CircleStackIcon v-show="!fileStore.clearingCache[logFile.identifier]" class="h-4 w-4 mr-2" />
-              <SpinnerIcon v-show="fileStore.clearingCache[logFile.identifier]" />
-              <span v-show="!fileStore.cacheRecentlyCleared[logFile.identifier] && !fileStore.clearingCache[logFile.identifier]">Clear index</span>
-              <span v-show="!fileStore.cacheRecentlyCleared[logFile.identifier] && fileStore.clearingCache[logFile.identifier]">Clearing...</span>
-              <span v-show="fileStore.cacheRecentlyCleared[logFile.identifier]" class="text-brand-500">Index cleared</span>
-            </button>
-          </MenuItem>
-
-          <MenuItem v-if="logFile.can_download" @click.stop>
-            <a :href="logFile.download_url" download>
-              <CloudArrowDownIcon class="w-4 h-4 mr-2" />
-              Download
-            </a>
-          </MenuItem>
-
-          <template v-if="logFile.can_delete">
-            <div class="divider"></div>
-
-            <MenuItem @click.stop.prevent="confirmDeletion">
+      <transition
+        leave-active-class="transition ease-in duration-100"
+        leave-from-class="opacity-100 scale-100"
+        leave-to-class="opacity-0 scale-90"
+        enter-active-class="transition ease-out duration-100"
+        enter-from-class="opacity-0 scale-90"
+        enter-to-class="opacity-100 scale-100"
+      >
+        <MenuItems as="div" class="dropdown w-48" :class="[dropdownDirections[logFile.identifier]]">
+          <div class="py-2">
+            <MenuItem @click.stop.prevent="fileStore.clearCacheForFile(logFile)">
               <button>
-                <TrashIcon class="w-4 h-4 mr-2" />
-                Delete
+                <CircleStackIcon v-show="!fileStore.clearingCache[logFile.identifier]" class="h-4 w-4 mr-2" />
+                <SpinnerIcon v-show="fileStore.clearingCache[logFile.identifier]" />
+                <span v-show="!fileStore.cacheRecentlyCleared[logFile.identifier] && !fileStore.clearingCache[logFile.identifier]">Clear index</span>
+                <span v-show="!fileStore.cacheRecentlyCleared[logFile.identifier] && fileStore.clearingCache[logFile.identifier]">Clearing...</span>
+                <span v-show="fileStore.cacheRecentlyCleared[logFile.identifier]" class="text-brand-500">Index cleared</span>
               </button>
             </MenuItem>
 
-            <MenuItem @click.stop="deleteMultiple">
-              <button>
-                <TrashIcon class="w-4 h-4 mr-2" />
-                Delete Multiple
-              </button>
+            <MenuItem v-if="logFile.can_download" @click.stop>
+              <a :href="logFile.download_url" download>
+                <CloudArrowDownIcon class="w-4 h-4 mr-2" />
+                Download
+              </a>
             </MenuItem>
-          </template>
-        </div>
-      </MenuItems>
+
+            <template v-if="logFile.can_delete">
+              <div class="divider"></div>
+
+              <MenuItem @click.stop.prevent="confirmDeletion">
+                <button>
+                  <TrashIcon class="w-4 h-4 mr-2" />
+                  Delete
+                </button>
+              </MenuItem>
+
+              <MenuItem @click.stop="deleteMultiple">
+                <button>
+                  <TrashIcon class="w-4 h-4 mr-2" />
+                  Delete Multiple
+                </button>
+              </MenuItem>
+            </template>
+          </div>
+        </MenuItems>
+      </transition>
     </Menu>
   </div>
 </template>

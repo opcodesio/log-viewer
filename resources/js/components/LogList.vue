@@ -24,8 +24,25 @@
       </div>
 
       <div v-if="displayLogs" class="relative overflow-hidden h-full text-sm">
-        <div class="log-item-container h-full overflow-y-auto md:px-4"
-             @scroll="(event) => logViewerStore.onScroll(event)">
+        <!-- pagination settings -->
+        <div class="mx-2 mt-1 mb-2 text-right lg:mx-0 lg:mt-0 lg:mb-0 lg:absolute lg:top-2 lg:right-6 z-20 text-sm text-gray-500 dark:text-gray-400">
+          <label for="log-sort-direction" class="sr-only">Sort direction</label>
+          <select id="log-sort-direction" v-model="logViewerStore.direction" class="select mr-4">
+            <option value="desc">Newest first</option>
+            <option value="asc">Oldest first</option>
+          </select>
+          <label for="items-per-page" class="sr-only">Items per page</label>
+          <select id="items-per-page" v-model="logViewerStore.resultsPerPage" class="select">
+            <option value="10">10 items per page</option>
+            <option value="25">25 items per page</option>
+            <option value="50">50 items per page</option>
+            <option value="100">100 items per page</option>
+            <option value="250">250 items per page</option>
+            <option value="500">500 items per page</option>
+          </select>
+        </div>
+
+        <div class="log-item-container h-full overflow-y-auto md:px-4" @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
             <table class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
               <thead class="bg-gray-50">
@@ -34,27 +51,7 @@
                 <th scope="col" class="w-[90px] hidden lg:table-cell">Level</th>
                 <th scope="col" class="w-[180px] hidden lg:table-cell">Time</th>
                 <th scope="col" class="w-[110px] hidden lg:table-cell">Env</th>
-                <th scope="col" :colspan="headerColspan">
-                  <div class="flex justify-end lg:justify-between">
-                    <span class="hidden lg:inline-block">Description</span>
-                    <div class="-mt-1">
-                      <label for="log-sort-direction" class="sr-only">Sort direction</label>
-                      <select id="log-sort-direction" v-model="logViewerStore.direction" class="select mr-3">
-                        <option value="desc">Newest first</option>
-                        <option value="asc">Oldest first</option>
-                      </select>
-                      <label for="items-per-page" class="sr-only">Items per page</label>
-                      <select id="items-per-page" v-model="logViewerStore.resultsPerPage" class="select">
-                        <option value="10">10 items per page</option>
-                        <option value="25">25 items per page</option>
-                        <option value="50">50 items per page</option>
-                        <option value="100">100 items per page</option>
-                        <option value="250">250 items per page</option>
-                        <option value="500">500 items per page</option>
-                      </select>
-                    </div>
-                  </div>
-                </th>
+                <th scope="col" class="hidden lg:table-cell">Description</th>
                 <th scope="col" class="hidden lg:table-cell"><span class="sr-only">Log index</span></th>
               </tr>
               </thead>
@@ -134,7 +131,7 @@
         </div>
 
         <!-- loading state for logs -->
-        <div class="absolute inset-0 top-9 md:px-4 z-20" v-show="logViewerStore.loading && (!isMobile || !fileStore.sidebarOpen)">
+        <div class="absolute inset-0 top-9 md:px-4 z-20" v-show="logViewerStore.loading && (!logViewerStore.isMobile || !fileStore.sidebarOpen)">
           <div
             class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
             <SpinnerIcon class="w-14 h-14" />
@@ -160,7 +157,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { highlightSearchResult, replaceQuery } from '../helpers.js';
 import {
@@ -205,11 +202,6 @@ const clearQuery = () => {
   replaceQuery(router, 'query', null);
 }
 
-const calculateColspan = () => window.matchMedia('(max-width: 1024px)').matches ? 4 : 1;
-const headerColspan = ref(calculateColspan());
-
-const isMobile = computed(() => window.matchMedia('(max-width: 768px)').matches);
-
 watch(
   [
     () => logViewerStore.direction,
@@ -217,10 +209,4 @@ watch(
   ],
   () => logViewerStore.loadLogs()
 )
-
-onMounted(() => {
-  window.onresize = function () {
-    headerColspan.value = calculateColspan();
-  };
-})
 </script>

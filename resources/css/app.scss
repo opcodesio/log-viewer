@@ -476,7 +476,7 @@ html.dark {
 // Dark border (hover): border-brand-700
 
 .file-list {
-    @apply relative h-full overflow-y-auto pb-4 pl-3 sm:pl-0 pr-3 lg:pr-0;
+    @apply relative h-full overflow-y-auto pb-4 pl-3 sm:pl-0 pr-8 sm:pr-7 lg:pr-4;
 
     .file-item-container,
     .folder-item-container {
@@ -537,6 +537,10 @@ html.dark {
             }
         }
     }
+
+    .folder-container:first-child > .folder-item-container {
+        @apply mt-0;
+    }
 }
 
 .menu-button {
@@ -567,7 +571,7 @@ button.button:hover, a.button:hover {
 }
 
 .select {
-    @apply bg-gray-50 dark:bg-gray-800 dark:bg-opacity-50 px-3 py-0.5 border dark:border-gray-700 rounded-md font-normal outline-none
+    @apply bg-gray-100 dark:bg-gray-900 rounded font-normal outline-none;
 }
 
 .select:focus {

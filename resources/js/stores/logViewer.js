@@ -35,6 +35,8 @@ export const useLogViewerStore = defineStore({
     abortController: null,
 
     // Log scrolling behaviour data
+    viewportWidth: window.innerWidth,
+    viewportHeight: window.innerHeight,
     stacksOpen: [],
     stacksInView: [],
     stackTops: {},
@@ -50,6 +52,16 @@ export const useLogViewerStore = defineStore({
 
     isOpen: (state) => (index) => state.stacksOpen.includes(index),
 
+    isMobile: (state) => state.viewportWidth <= 768,
+
+    tableRowHeight() {
+      return this.isMobile ? 29 : 36;
+    },
+
+    headerHeight() {
+      return this.isMobile ? 0 : 36;
+    },
+
     shouldBeSticky(state) {
       return (index) => this.isOpen(index) && state.stacksInView.includes(index);
     },
@@ -59,10 +71,13 @@ export const useLogViewerStore = defineStore({
         let aboveFold = this.pixelsAboveFold(index);
 
         if (aboveFold < 0) {
-          return Math.max(0, 36 + aboveFold) + 'px';
+          return Math.max(
+            this.headerHeight - this.tableRowHeight,
+            this.headerHeight + aboveFold
+          ) + 'px';
         }
 
-        return '36px';
+        return this.headerHeight + 'px';
       }
     },
 
@@ -71,16 +86,26 @@ export const useLogViewerStore = defineStore({
         let tbody = document.getElementById('tbody-' + index);
         if (!tbody) return false;
         let row = tbody.getClientRects()[0];
-        return (row.top + row.height - 73) - state.containerTop;
+
+        return (row.top + row.height - this.tableRowHeight - this.headerHeight) - state.containerTop;
       }
     },
 
     isInViewport() {
-      return (index) => this.pixelsAboveFold(index) > -36;
+      return (index) => this.pixelsAboveFold(index) > -this.tableRowHeight;
     },
   },
 
   actions: {
+    setViewportDimensions(width, height) {
+      this.viewportWidth = width;
+      this.viewportHeight = height;
+      const container = document.querySelector('.log-item-container');
+      if (container) {
+        this.containerTop = container.getBoundingClientRect().top;
+      }
+    },
+
     toggleTheme() {
       switch (this.theme) {
         case Theme.System:
@@ -211,14 +236,14 @@ export const useLogViewerStore = defineStore({
           }
         })
         .catch((error) => {
-          this.loading = false;
-
+          // aborted, thus we don't need to display that as an error.
           if (error.code === 'ERR_CANCELED') {
             this.hasMoreResults = false;
             this.percentScanned = 100;
             return;
           }
 
+          this.loading = false;
           this.error = error.message;
 
           if (error.response?.data?.message) {

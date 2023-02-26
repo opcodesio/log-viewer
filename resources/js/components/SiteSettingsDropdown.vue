@@ -6,76 +6,85 @@
       </button>
     </MenuButton>
 
-    <MenuItems as="div" style="min-width: 250px;" class="dropdown">
-      <div class="py-2">
-        <div class="label">Settings</div>
+    <transition
+      leave-active-class="transition ease-in duration-100"
+      leave-from-class="opacity-100 scale-100"
+      leave-to-class="opacity-0 scale-90"
+      enter-active-class="transition ease-out duration-100"
+      enter-from-class="opacity-0 scale-90"
+      enter-to-class="opacity-100 scale-100"
+    >
+      <MenuItems as="div" style="min-width: 250px;" class="dropdown">
+        <div class="py-2">
+          <div class="label">Settings</div>
 
-        <MenuItem @click.stop.prevent="logViewerStore.shorterStackTraces = !logViewerStore.shorterStackTraces">
-          <button>
-            <Checkmark :checked="logViewerStore.shorterStackTraces" />
-            <span class="ml-3">Shorter stack traces</span>
-          </button>
-        </MenuItem>
+          <MenuItem @click.stop.prevent="logViewerStore.shorterStackTraces = !logViewerStore.shorterStackTraces">
+            <button>
+              <Checkmark :checked="logViewerStore.shorterStackTraces" />
+              <span class="ml-3">Shorter stack traces</span>
+            </button>
+          </MenuItem>
 
-        <div class="divider"></div>
-        <div class="label">Actions</div>
+          <div class="divider"></div>
+          <div class="label">Actions</div>
 
-        <MenuItem @click.stop.prevent="fileStore.clearCacheForAllFiles">
-          <button>
-            <CircleStackIcon v-show="!fileStore.clearingCache['*']" class="w-4 h-4 mr-1.5" />
-            <SpinnerIcon v-show="fileStore.clearingCache['*']" class="w-4 h-4 mr-1.5" />
-            <span v-show="!fileStore.cacheRecentlyCleared['*'] && !fileStore.clearingCache['*']">Clear indices for all files</span>
-            <span v-show="!fileStore.cacheRecentlyCleared['*'] && fileStore.clearingCache['*']">Please wait...</span>
-            <span v-show="fileStore.cacheRecentlyCleared['*']" class="text-brand-500">File indices cleared</span>
-          </button>
-        </MenuItem>
+          <MenuItem @click.stop.prevent="fileStore.clearCacheForAllFiles">
+            <button>
+              <CircleStackIcon v-show="!fileStore.clearingCache['*']" class="w-4 h-4 mr-1.5" />
+              <SpinnerIcon v-show="fileStore.clearingCache['*']" class="w-4 h-4 mr-1.5" />
+              <span v-show="!fileStore.cacheRecentlyCleared['*'] && !fileStore.clearingCache['*']">Clear indices for all files</span>
+              <span v-show="!fileStore.cacheRecentlyCleared['*'] && fileStore.clearingCache['*']">Please wait...</span>
+              <span v-show="fileStore.cacheRecentlyCleared['*']" class="text-brand-500">File indices cleared</span>
+            </button>
+          </MenuItem>
 
-        <MenuItem @click.stop.prevent="copyUrlToClipboard">
-          <button>
-            <ShareIcon class="w-4 h-4" />
-            <span v-show="!copied">Share this page</span>
-            <span v-show="copied" class="text-brand-500">Link copied!</span>
-          </button>
-        </MenuItem>
+          <MenuItem @click.stop.prevent="copyUrlToClipboard">
+            <button>
+              <ShareIcon class="w-4 h-4" />
+              <span v-show="!copied">Share this page</span>
+              <span v-show="copied" class="text-brand-500">Link copied!</span>
+            </button>
+          </MenuItem>
 
-        <div class="divider"></div>
+          <div class="divider"></div>
 
-        <MenuItem @click.stop.prevent="logViewerStore.toggleTheme()">
-          <button>
-            <ComputerDesktopIcon v-show="logViewerStore.theme === Theme.System" class="w-4 h-4" />
-            <SunIcon v-show="logViewerStore.theme === Theme.Light" class="w-4 h-4" />
-            <MoonIcon v-show="logViewerStore.theme === Theme.Dark" class="w-4 h-4" />
-            <span>Theme: <span v-html="logViewerStore.theme" class="font-semibold"></span></span>
-          </button>
-        </MenuItem>
+          <MenuItem @click.stop.prevent="logViewerStore.toggleTheme()">
+            <button>
+              <ComputerDesktopIcon v-show="logViewerStore.theme === Theme.System" class="w-4 h-4" />
+              <SunIcon v-show="logViewerStore.theme === Theme.Light" class="w-4 h-4" />
+              <MoonIcon v-show="logViewerStore.theme === Theme.Dark" class="w-4 h-4" />
+              <span>Theme: <span v-html="logViewerStore.theme" class="font-semibold"></span></span>
+            </button>
+          </MenuItem>
 
-        <MenuItem>
-          <a href="https://log-viewer.opcodes.io/docs" target="_blank">
-            <QuestionMarkCircleIcon class="w-4 h-4" />
-            Documentation
-          </a>
-        </MenuItem>
+          <MenuItem>
+            <a href="https://log-viewer.opcodes.io/docs" target="_blank">
+              <QuestionMarkCircleIcon class="w-4 h-4" />
+              Documentation
+            </a>
+          </MenuItem>
 
-        <MenuItem>
-          <a href="https://www.github.com/opcodesio/log-viewer" target="_blank">
-            <QuestionMarkCircleIcon class="w-4 h-4" />
-            Help
-          </a>
-        </MenuItem>
+          <MenuItem>
+            <a href="https://www.github.com/opcodesio/log-viewer" target="_blank">
+              <QuestionMarkCircleIcon class="w-4 h-4" />
+              Help
+            </a>
+          </MenuItem>
 
-        <div class="divider"></div>
+          <div class="divider"></div>
 
-        <MenuItem>
-          <a href="https://www.buymeacoffee.com/arunas" target="_blank">
-            <div class="w-4 h-4 mr-3 flex flex-col items-center">
-              <bmc-icon class="h-4 w-auto" />
-            </div>
-            <strong class="text-brand-500">Show your support</strong>
-            <ArrowTopRightOnSquareIcon class="ml-2 w-4 h-4 opacity-75" />
-          </a>
-        </MenuItem>
-      </div>
-    </MenuItems>
+          <MenuItem>
+            <a href="https://www.buymeacoffee.com/arunas" target="_blank">
+              <div class="w-4 h-4 mr-3 flex flex-col items-center">
+                <bmc-icon class="h-4 w-auto" />
+              </div>
+              <strong class="text-brand-500">Show your support</strong>
+              <ArrowTopRightOnSquareIcon class="ml-2 w-4 h-4 opacity-75" />
+            </a>
+          </MenuItem>
+        </div>
+      </MenuItems>
+    </transition>
   </Menu>
 
 </template>

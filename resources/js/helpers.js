@@ -88,3 +88,7 @@ export const useDropdownDirection = () => {
 
   return { dropdownDirections, calculateDropdownDirection };
 }
+
+export const isMobile = () => {
+  return window.matchMedia('(max-width: 768px)').matches;
+}

@@ -1,6 +1,12 @@
 <template>
   <nav class="flex flex-col h-full py-5">
     <div class="mx-3 lg:mx-0 mb-2">
+      <a v-if="LogViewer.back_to_system_url" :href="LogViewer.back_to_system_url"
+         class="rounded inline-flex items-center text-sm text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700">
+        <ArrowLeftIcon class="h-3 w-3 mr-1.5" />
+        {{ LogViewer.back_to_system_label || `Back to ${LogViewer.app_name}` }}
+      </a>
+
       <h1 class="font-semibold text-brand-700 dark:text-brand-600 text-2xl flex items-center">
         Log Viewer
         <a href="https://www.github.com/opcodesio/log-viewer" target="_blank"
@@ -22,18 +28,12 @@
         Front-end assets are outdated. To update, please run <code class="font-mono px-2 py-1 bg-gray-100 dark:bg-gray-900 rounded">php artisan log-viewer:publish</code>
       </div>
 
-      <a v-if="LogViewer.back_to_system_url" :href="LogViewer.back_to_system_url"
-         class="rounded inline-flex items-center text-sm text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700 mt-3">
-        <ArrowLeftIcon class="h-3 w-3 mr-1.5" />
-        {{ LogViewer.back_to_system_label || `Back to ${LogViewer.app_name}` }}
-      </a>
-
       <template v-if="hostStore.supportsHosts && hostStore.hasRemoteHosts">
         <host-selector class="mb-8 mt-6" />
       </template>
 
       <div class="flex justify-between items-baseline mt-6">
-        <div class="ml-1 block text-sm font-semibold text-brand-700">Browse log files</div>
+        <div class="ml-1 block text-sm text-gray-400 truncate">Log files on {{ fileStore.selectedHost?.name }}</div>
         <div class="text-sm text-gray-500 dark:text-gray-400">
           <label for="file-sort-direction" class="sr-only">Sort direction</label>
           <select id="file-sort-direction" class="select" v-model="fileStore.direction">
@@ -42,6 +42,10 @@
           </select>
         </div>
       </div>
+
+      <p v-if="fileStore.error" class="mx-1 mt-1 text-red-600 text-xs">
+        {{ fileStore.error }}
+      </p>
     </div>
 
     <div v-show="fileStore.checkBoxesVisibility">
@@ -62,7 +66,7 @@
       </div>
     </div>
 
-    <div id="file-list-container" class="relative h-full overflow-hidden">
+    <div id="file-list-container" class="relative h-full overflow-hidden -mr-4">
       <div class="file-list" @scroll="(event) => fileStore.onScroll(event)">
         <div v-for="folder in fileStore.folders"
              :key="folder.identifier"
@@ -94,35 +98,44 @@
                 </MenuButton>
               </div>
 
-              <MenuItems static v-show="open" as="div" class="dropdown w-48" :class="[dropdownDirections[folder.identifier]]">
-                <div class="py-2">
-                  <MenuItem as="button" @click.stop.prevent="fileStore.clearCacheForFolder(folder)">
-                    <CircleStackIcon v-show="!fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2"/>
-                    <SpinnerIcon v-show="fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2" />
-                    <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && !fileStore.clearingCache[folder.identifier]">Clear indices</span>
-                    <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && fileStore.clearingCache[folder.identifier]">Clearing...</span>
-                    <span v-show="fileStore.cacheRecentlyCleared[folder.identifier]" class="text-brand-500">Indices cleared</span>
-                  </MenuItem>
-
-                  <MenuItem v-if="folder.can_download">
-                    <a :href="folder.download_url" download @click.stop>
-                      <CloudArrowDownIcon class="w-4 h-4 mr-2"/>
-                      Download
-                    </a>
-                  </MenuItem>
-
-                  <template v-if="folder.can_delete">
-                    <div class="divider"></div>
-                    <MenuItem>
-                      <button @click.stop="confirmDeleteFolder(folder)" :disabled="fileStore.deleting[folder.identifier]">
-                        <TrashIcon v-show="!fileStore.deleting[folder.identifier]" class="w-4 h-4 mr-2" />
-                        <SpinnerIcon v-show="fileStore.deleting[folder.identifier]" />
-                        Delete
-                      </button>
+              <transition
+                leave-active-class="transition ease-in duration-100"
+                leave-from-class="opacity-100 scale-100"
+                leave-to-class="opacity-0 scale-90"
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="opacity-0 scale-90"
+                enter-to-class="opacity-100 scale-100"
+              >
+                <MenuItems static v-show="open" as="div" class="dropdown w-48" :class="[dropdownDirections[folder.identifier]]">
+                  <div class="py-2">
+                    <MenuItem as="button" @click.stop.prevent="fileStore.clearCacheForFolder(folder)">
+                      <CircleStackIcon v-show="!fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2"/>
+                      <SpinnerIcon v-show="fileStore.clearingCache[folder.identifier]" class="w-4 h-4 mr-2" />
+                      <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && !fileStore.clearingCache[folder.identifier]">Clear indices</span>
+                      <span v-show="!fileStore.cacheRecentlyCleared[folder.identifier] && fileStore.clearingCache[folder.identifier]">Clearing...</span>
+                      <span v-show="fileStore.cacheRecentlyCleared[folder.identifier]" class="text-brand-500">Indices cleared</span>
                     </MenuItem>
-                  </template>
-                </div>
-              </MenuItems>
+
+                    <MenuItem v-if="folder.can_download">
+                      <a :href="folder.download_url" download @click.stop>
+                        <CloudArrowDownIcon class="w-4 h-4 mr-2"/>
+                        Download
+                      </a>
+                    </MenuItem>
+
+                    <template v-if="folder.can_delete">
+                      <div class="divider"></div>
+                      <MenuItem>
+                        <button @click.stop="confirmDeleteFolder(folder)" :disabled="fileStore.deleting[folder.identifier]">
+                          <TrashIcon v-show="!fileStore.deleting[folder.identifier]" class="w-4 h-4 mr-2" />
+                          <SpinnerIcon v-show="fileStore.deleting[folder.identifier]" />
+                          Delete
+                        </button>
+                      </MenuItem>
+                    </template>
+                  </div>
+                </MenuItems>
+              </transition>
             </div>
           </Menu>
 
@@ -142,7 +155,7 @@
       <div class="pointer-events-none absolute z-10 bottom-0 h-4 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
 
       <!-- loading state overlay -->
-      <div class="absolute inset-0 inset-x-3 lg:inset-x-0 z-20" v-show="fileStore.loading">
+      <div class="absolute inset-y-0 left-3 right-7 lg:left-0 lg:right-4 z-10" v-show="fileStore.loading">
         <div class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
           <SpinnerIcon class="w-14 h-14" />
         </div>

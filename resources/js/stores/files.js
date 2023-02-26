@@ -13,9 +13,11 @@ export const useFileStore = defineStore({
     direction: useLocalStorage('fileViewerDirection', 'desc'),
     selectedFileIdentifier: null,
 
+    error: null,
     clearingCache: {},
     cacheRecentlyCleared: {},
     deleting: {},
+    abortController: null,
 
     // control variables
     loading: false,
@@ -29,7 +31,7 @@ export const useFileStore = defineStore({
   }),
 
   getters: {
-    selectedHost(state) {
+    selectedHost() {
       const hostStore = useHostStore();
       return hostStore.selectedHost;
     },
@@ -58,13 +60,8 @@ export const useFileStore = defineStore({
       return (index) => this.pixelsAboveFold(index) > -36
     },
 
-    stickTopPosition() {
-      return (folder) => {
-        let aboveFold = this.pixelsAboveFold(folder);
-
-        return 0;
-      }
-    },
+    // TODO: cleanup, since the stick top position is now always zero.
+    stickTopPosition: () => 0,
 
     pixelsAboveFold: (state) => (folder) => {
       let folderContainer = document.getElementById('folder-' + folder);
@@ -107,19 +104,25 @@ export const useFileStore = defineStore({
     },
 
     loadFolders() {
-      if (this.loading) return;
+      // abort the previous request which might now be outdated
+      if (this.abortController) {
+        this.abortController.abort();
+      }
 
-      this.loading = true;
+      this.abortController = new AbortController();
 
       const params = {
         host: this.selectedHost?.identifier || undefined,
         direction: this.direction,
       }
 
+      this.loading = true;
+
       // load the folders from the server
-      return axios.get(`${LogViewer.basePath}/api/folders`, { params })
+      return axios.get(`${LogViewer.basePath}/api/folders`, { params, signal: this.abortController.signal })
         .then(({ data }) => {
           this.folders = data;
+          this.error = data.error || null;
           this.loading = false;
 
           if (this.openFolderIdentifiers.length === 0) {
@@ -130,7 +133,16 @@ export const useFileStore = defineStore({
           this.onScroll();
         })
         .catch((error) => {
+          // aborted, thus we don't need to display that as an error.
+          if (error.code === 'ERR_CANCELED') return;
+
           this.loading = false;
+          this.error = error.message;
+
+          if (error.response?.data?.message) {
+            this.error += ': ' + error.response.data.message;
+          }
+
           console.error(error);
         })
     },
