@@ -622,7 +622,11 @@ button.button:hover, a.button:hover {
 }
 
 .select {
-    @apply bg-gray-100 dark:bg-gray-900 rounded font-normal outline-none;
+    @apply bg-gray-100 dark:bg-gray-900 rounded font-normal outline-none px-1 -my-0.5 py-0.5;
+}
+
+.select:hover {
+    @apply bg-gray-200 dark:bg-gray-800;
 }
 
 .select:focus {
