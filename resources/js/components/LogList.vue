@@ -47,8 +47,7 @@
             <table class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
               <thead class="bg-gray-50">
               <tr>
-                <th scope="col" class="w-[60px] pl-4 pr-2 lg:pl-6 lg:pl-8 hidden lg:table-cell"><span class="sr-only">Level icon</span></th>
-                <th scope="col" class="w-[90px] hidden lg:table-cell">Level</th>
+                <th scope="col" class="w-[120px] hidden lg:table-cell"><div class="pl-2">Level</div></th>
                 <th scope="col" class="w-[180px] hidden lg:table-cell">Time</th>
                 <th scope="col" class="w-[110px] hidden lg:table-cell">Env</th>
                 <th scope="col" class="hidden lg:table-cell">Description</th>
@@ -65,12 +64,16 @@
                     :class="['log-item', log.level_class, logViewerStore.isOpen(index) ? 'active' : '', logViewerStore.shouldBeSticky(index) ? 'sticky z-2' : '']"
                     :style="{ top: logViewerStore.stackTops[index] || 0 }"
                 >
-                  <td class="log-level log-level-icon">
-                    <ExclamationCircleIcon v-if="log.level_class === 'danger'" class="w-4 h-4" />
-                    <ExclamationTriangleIcon v-else-if="log.level_class === 'warning'" class="w-4 h-4" />
-                    <InformationCircleIcon v-else class="w-4 h-4" />
+                  <td class="log-level truncate">
+                    <div class="flex items-center lg:pl-2">
+                      <div class="log-level-icon mr-2 opacity-75 w-5 h-5 hidden lg:block">
+                        <ExclamationCircleIcon v-if="log.level_class === 'danger'" />
+                        <ExclamationTriangleIcon v-else-if="log.level_class === 'warning'" />
+                        <InformationCircleIcon v-else />
+                      </div>
+                      <span>{{ log.level_name }}</span>
+                    </div>
                   </td>
-                  <td class="log-level truncate hidden lg:table-cell">{{ log.level_name }}</td>
                   <td class="whitespace-nowrap text-gray-900 dark:text-gray-200">
                     <span class="hidden lg:inline" v-html="highlightSearchResult(log.datetime, searchStore.query)"></span>
                     <span class="lg:hidden">{{ log.time }}</span>
@@ -80,7 +83,7 @@
                   <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90"
                       v-html="highlightSearchResult(log.text, searchStore.query)"></td>
                   <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs hidden lg:table-cell">
-                    <LogCopyButton :log="log" />
+                    <LogCopyButton :log="log" class="pr-2" />
                   </td>
                 </tr>
                 <tr v-show="logViewerStore.isOpen(index)">

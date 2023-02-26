@@ -52,7 +52,7 @@ export const useLogViewerStore = defineStore({
 
     isOpen: (state) => (index) => state.stacksOpen.includes(index),
 
-    isMobile: (state) => state.viewportWidth <= 768,
+    isMobile: (state) => state.viewportWidth <= 1023,
 
     tableRowHeight() {
       return this.isMobile ? 29 : 36;

@@ -146,6 +146,10 @@ html.dark {
             @apply text-gray-700 dark:text-gray-400;
         }
     }
+
+    &:hover .log-level-icon {
+        @apply opacity-100;
+    }
 }
 
 /** Level Badges **/
@@ -326,19 +330,11 @@ html.dark {
         @apply bg-white dark:bg-gray-800 dark:text-gray-200 relative;
 
         .log-item > td {
-            @apply border-t border-gray-200 dark:border-gray-700 px-1 lg:px-2 py-1 lg:py-2 text-xs lg:text-sm;
-        }
-
-        .log-item > td.log-level-icon {
-            @apply whitespace-nowrap border-t border-gray-200 dark:border-gray-700 py-1 lg:py-2 pl-2 lg:pl-4 lg:pr-2 lg:pl-6 lg:pl-8;
-            & > svg {
-                @apply opacity-75 h-5 w-5;
-            }
+            @apply border-t border-gray-200 dark:border-gray-700 px-1 lg:px-2 py-1.5 lg:py-2 text-xs lg:text-sm;
         }
 
         &.first {
-            .log-item > td,
-            .log-item > td.log-level-icon {
+            .log-item > td {
                 @apply border-t-transparent;
             }
         }
@@ -348,8 +344,8 @@ html.dark {
         }
 
         .log-link {
-            @apply flex items-center w-full -my-0.5 py-0.5 -ml-1 pl-1 rounded;
-            margin-right: 0.5rem;
+            @apply flex items-center justify-between w-full -my-0.5 py-0.5 pl-1 rounded;
+
             @screen sm {
                 min-width: 40px;
             }
@@ -371,13 +367,13 @@ html.dark {
 }
 
 .pagination {
-    @apply md:mt-2 px-4 w-full flex items-center justify-center lg:px-0;
+    @apply sm:mt-2 sm:px-4 w-full flex items-center justify-center lg:px-0;
 
     .previous {
         @apply -mt-px w-0 flex-1 flex justify-start md:justify-end;
 
         button {
-            @apply border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;
+            @apply border-t-2 border-transparent pt-3 pr-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;
             &:hover {
                 @apply text-gray-700 border-gray-300
                   dark:text-gray-300 border-gray-400;
@@ -395,7 +391,7 @@ html.dark {
         @apply -mt-px w-0 flex-1 flex justify-end md:justify-start;
 
         button {
-            @apply border-t-2 border-transparent pt-4 pl-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;
+            @apply border-t-2 border-transparent pt-3 pl-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;
             &:hover {
                 @apply text-gray-700 border-gray-300
                   dark:text-gray-300 border-gray-400;
@@ -413,11 +409,11 @@ html.dark {
         @apply hidden sm:-mt-px sm:flex;
 
         span {
-            @apply border-transparent text-gray-500 dark:text-gray-400 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium;
+            @apply border-transparent text-gray-500 dark:text-gray-400 border-t-2 pt-3 px-4 inline-flex items-center text-sm font-medium;
         }
 
         button {
-            @apply border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium;
+            @apply border-t-2 pt-3 px-4 inline-flex items-center text-sm font-medium;
 
             &:focus {
                 @apply rounded-md outline-none ring-2 ring-brand-500 dark:ring-brand-400;
@@ -527,7 +523,7 @@ html.dark {
 // Dark border (hover): border-brand-700
 
 .file-list {
-    @apply relative h-full overflow-y-auto pb-4 pl-3 sm:pl-0 pr-8 sm:pr-7 lg:pr-4;
+    @apply relative h-full overflow-y-auto pb-4 px-3 md:pr-0 md:pl-0;
 
     .file-item-container,
     .folder-item-container {
