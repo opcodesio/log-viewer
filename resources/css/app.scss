@@ -344,10 +344,10 @@ html.dark {
         }
 
         .log-link {
-            @apply flex items-center justify-between w-full -my-0.5 py-0.5 pl-1 rounded;
+            @apply flex items-center justify-end w-full -my-0.5 py-0.5 pl-1 rounded;
 
             @screen sm {
-                min-width: 40px;
+                min-width: 50px;
             }
 
             & > svg {
@@ -618,7 +618,7 @@ button.button:hover, a.button:hover {
 }
 
 .select {
-    @apply bg-gray-100 dark:bg-gray-900 rounded font-normal outline-none px-1 -my-0.5 py-0.5;
+    @apply bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded font-normal outline-none px-1 -my-0.5 py-0.5;
 }
 
 .select:hover {

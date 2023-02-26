@@ -1,6 +1,6 @@
 <template>
   <nav class="flex flex-col h-full py-5">
-    <div class="mx-3 md:mx-0 mb-2">
+    <div class="mx-3 md:mx-0 mb-1">
       <div class="sm:flex sm:flex-col-reverse">
         <h1 class="font-semibold text-brand-700 dark:text-brand-600 text-2xl flex items-center">
           Log Viewer
@@ -19,7 +19,7 @@
         </h1>
 
         <a v-if="LogViewer.back_to_system_url" :href="LogViewer.back_to_system_url"
-           class="rounded inline-flex items-center text-sm text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700 mt-0">
+           class="rounded inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700 mt-0">
           <ArrowLeftIcon class="h-3 w-3 mr-1.5" />
           {{ LogViewer.back_to_system_label || `Back to ${LogViewer.app_name}` }}
         </a>
@@ -35,7 +35,7 @@
       </template>
 
       <div class="flex justify-between items-baseline mt-6">
-        <div class="ml-1 block text-sm text-gray-400 truncate">Log files on {{ fileStore.selectedHost?.name }}</div>
+        <div class="ml-1 block text-sm text-gray-500 dark:text-gray-400 truncate">Log files on {{ fileStore.selectedHost?.name }}</div>
         <div class="text-sm text-gray-500 dark:text-gray-400">
           <label for="file-sort-direction" class="sr-only">Sort direction</label>
           <select id="file-sort-direction" class="select" v-model="fileStore.direction">
@@ -158,7 +158,7 @@
       <div class="pointer-events-none absolute z-10 bottom-0 h-4 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"></div>
 
       <!-- loading state overlay -->
-      <div class="absolute inset-y-0 left-3 right-7 lg:left-0 lg:right-4 z-10" v-show="fileStore.loading">
+      <div class="absolute inset-y-0 left-3 right-7 lg:left-0 lg:right-0 z-10" v-show="fileStore.loading">
         <div class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center">
           <SpinnerIcon class="w-14 h-14" />
         </div>

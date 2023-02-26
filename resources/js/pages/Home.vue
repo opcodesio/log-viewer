@@ -10,7 +10,7 @@
   </div>
 
   <div class="absolute bottom-4 right-4 flex items-center">
-    <p class="text-xs text-gray-400 dark:text-gray-500 @if($showSupportLink) mr-5 -mb-0.5 @endif">
+    <p class="text-xs text-gray-500 dark:text-gray-400 mr-5 -mb-0.5">
       <template v-if="logViewerStore.performance?.requestTime">
         <span><span class="hidden md:inline">Memory: </span><span class="font-semibold">{{ logViewerStore.performance.memoryUsage }}</span></span>
         <span class="mx-1.5">&middot;</span>
