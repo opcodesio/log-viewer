@@ -92,7 +92,7 @@ return [
             'name' => 'Local',
             'host' => null,
             'auth' => [
-                'bearer' => env('LOG_VIEWER_AUTH_TOKEN', null)
+                'bearer' => env('LOG_VIEWER_AUTH_TOKEN', null),
             ],
             'headers' => [],
         ],
