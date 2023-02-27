@@ -61,16 +61,24 @@
                        :id="`tbody-${index}`" :data-index="index"
                 >
                 <tr @click="logViewerStore.toggle(index)"
-                    :class="['log-item', log.level_class, logViewerStore.isOpen(index) ? 'active' : '', logViewerStore.shouldBeSticky(index) ? 'sticky z-2' : '']"
+                    :class="['log-item group', log.level_class, logViewerStore.isOpen(index) ? 'active' : '', logViewerStore.shouldBeSticky(index) ? 'sticky z-2' : '']"
                     :style="{ top: logViewerStore.stackTops[index] || 0 }"
                 >
                   <td class="log-level truncate">
                     <div class="flex items-center lg:pl-2">
-                      <div class="log-level-icon mr-2 opacity-75 w-5 h-5 hidden lg:block">
-                        <ExclamationCircleIcon v-if="log.level_class === 'danger'" />
-                        <ExclamationTriangleIcon v-else-if="log.level_class === 'warning'" />
-                        <InformationCircleIcon v-else />
-                      </div>
+                      <button :aria-expanded="logViewerStore.isOpen(index)"
+                           class="log-level-icon mr-2 opacity-75 w-5 h-5 hidden lg:block group focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-brand-500 rounded-md"
+                      >
+                        <span class="sr-only">Open log entry</span>
+                        <span class="w-full h-full group-hover:hidden group-focus:hidden">
+                          <ExclamationCircleIcon v-if="log.level_class === 'danger'" />
+                          <ExclamationTriangleIcon v-else-if="log.level_class === 'warning'" />
+                          <InformationCircleIcon v-else />
+                        </span>
+                        <span class="w-full h-full hidden group-hover:inline-block group-focus:inline-block">
+                          <ChevronRightIcon :class="[logViewerStore.isOpen(index) ? 'rotate-90' : '', 'transition duration-100']" />
+                        </span>
+                      </button>
                       <span>{{ log.level_name }}</span>
                     </div>
                   </td>
@@ -166,6 +174,7 @@ import { highlightSearchResult, replaceQuery } from '../helpers.js';
 import {
   ArrowPathIcon,
   Bars3Icon,
+  ChevronRightIcon,
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
   InformationCircleIcon,
