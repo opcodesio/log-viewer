@@ -21,14 +21,10 @@ class Host
 
     public static function fromConfig(string|int $identifier, array $config = []): self
     {
-        if (! is_string($config['host']) || empty($config['host'])) {
-            throw new \InvalidArgumentException('Host configuration must contain a valid host URL in the "host" key.');
-        }
-
         return new static(
             is_string($identifier) ? $identifier : Utils::shortMd5($config['host']),
             $config['name'] ?? (is_string($identifier) ? $identifier : $config['host']),
-            $config['host'],
+            $config['host'] ?? null,
             $config['headers'] ?? [],
             $config['auth'] ?? [],
         );

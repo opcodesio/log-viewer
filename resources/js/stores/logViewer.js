@@ -187,7 +187,7 @@ export const useLogViewerStore = defineStore({
       this.abortController = new AbortController();
 
       const params = {
-        host: hostStore.selectedHostIdentifier,
+        host: hostStore.hostQueryParam,
         file: this.selectedFile?.identifier,
         direction: this.direction,
         query: searchStore.query,

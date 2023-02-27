@@ -139,10 +139,7 @@ class LogViewerService
 
     public function getHosts(): HostCollection
     {
-        $collection = HostCollection::fromConfig(config('log-viewer.hosts', []));
-        $collection->prepend(new Host(null, 'Local', null));
-
-        return $collection;
+        return HostCollection::fromConfig(config('log-viewer.hosts', []));
     }
 
     public function getHost(?string $hostIdentifier): ?Host

@@ -34,7 +34,7 @@
         <host-selector class="mb-8 mt-6" />
       </template>
 
-      <div class="flex justify-between items-baseline mt-6">
+      <div class="flex justify-between items-baseline mt-6" v-if="fileStore.folders?.length > 0">
         <div class="ml-1 block text-sm text-gray-500 dark:text-gray-400 truncate">Log files on {{ fileStore.selectedHost?.name }}</div>
         <div class="text-sm text-gray-500 dark:text-gray-400">
           <label for="file-sort-direction" class="sr-only">Sort direction</label>

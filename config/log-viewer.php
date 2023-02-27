@@ -88,6 +88,15 @@ return [
     */
 
     'hosts' => [
+        'local' => [
+            'name' => 'Local',
+            'host' => null,
+            'auth' => [
+                'bearer' => env('LOG_VIEWER_AUTH_TOKEN', null)
+            ],
+            'headers' => [],
+        ],
+
         // 'staging' => [
         //     'name' => 'Staging',
         //     'host' => 'http://staging.example.com/log-viewer',

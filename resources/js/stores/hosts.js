@@ -19,7 +19,13 @@ export const useHostStore = defineStore({
     },
     selectedHost() {
       return this.hosts.find(host => host.identifier === this.selectedHostIdentifier);
-    }
+    },
+    localHost() {
+      return this.hosts.find(host => !host.is_remote);
+    },
+    hostQueryParam() {
+      return this.selectedHost && this.selectedHost.is_remote ? this.selectedHost.identifier : undefined;
+    },
   },
 
   actions: {
@@ -30,6 +36,10 @@ export const useHostStore = defineStore({
 
       if (typeof host === 'string') {
         host = this.hosts.find(h => h.identifier === host);
+      }
+
+      if (!host) {
+        host = this.hosts.find(h => !h.is_remote);
       }
 
       this.selectedHostIdentifier = host?.identifier || null;
