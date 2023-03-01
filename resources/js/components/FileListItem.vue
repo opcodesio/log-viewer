@@ -1,20 +1,25 @@
 <template>
-  <div class="file-item-container flex" :class="[isSelected ? 'active' : '']">
+  <div class="file-item-container" :class="[isSelected ? 'active' : '']">
     <Menu>
-      <div class="file-item grow">
-        <div v-if="logFile.can_delete" class="my-auto mr-2" v-show="fileStore.checkBoxesVisibility">
-          <input type="checkbox"
-                 @click.stop="toggleCheckbox"
-                 :checked="fileStore.isChecked(logFile)"
-                 :value="fileStore.isChecked(logFile)"
-          />
-        </div>
-        <p class="file-name">{{ logFile.name }}</p>
-        <span class="file-size">{{ logFile.size_formatted }}</span>
+      <div class="file-item group">
+        <button class="file-item-info">
+          <span class="sr-only" v-if="!isSelected">Select log file</span>
+          <span class="sr-only" v-if="isSelected">Deselect log file</span>
+          <span v-if="logFile.can_delete" class="my-auto mr-2" v-show="fileStore.checkBoxesVisibility">
+            <input type="checkbox"
+                   @click.stop="toggleCheckbox"
+                   :checked="fileStore.isChecked(logFile)"
+                   :value="fileStore.isChecked(logFile)"
+            />
+          </span>
+          <span class="file-name"><span class="sr-only">Name:</span>{{ logFile.name }}</span>
+          <span class="file-size"><span class="sr-only">Size:</span>{{ logFile.size_formatted }}</span>
+        </button>
 
-        <MenuButton as="button" class="file-dropdown-toggle" :data-toggle-id="logFile.identifier"
+        <MenuButton as="button" class="file-dropdown-toggle group-hover:border-brand-600 group-hover:dark:border-brand-800"
+                    :data-toggle-id="logFile.identifier"
                     @click.stop="calculateDropdownDirection($event.target)">
-          <EllipsisVerticalIcon class="w-5 h-5 pointer-events-none" />
+          <EllipsisVerticalIcon class="w-4 h-4 pointer-events-none" />
         </MenuButton>
       </div>
 

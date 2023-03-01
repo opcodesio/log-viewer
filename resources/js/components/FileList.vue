@@ -6,7 +6,7 @@
           Log Viewer
           <a href="https://www.github.com/opcodesio/log-viewer" target="_blank"
              class="rounded ml-3 text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700 p-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" title="">
               <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path>
             </svg>
           </a>
@@ -80,22 +80,27 @@
                  @click="fileStore.toggle(folder)"
                  :class="[fileStore.isOpen(folder) ? 'active-folder' : '', fileStore.shouldBeSticky(folder) ? 'sticky ' + (open ? 'z-20' : 'z-10') : '' ]"
             >
-              <div class="file-item">
-                <div class="file-icon">
-                  <FolderIcon v-show="!fileStore.isOpen(folder)" class="w-5 h-5" />
-                  <FolderOpenIcon v-show="fileStore.isOpen(folder)" class="w-5 h-5" />
-                </div>
-                <div class="file-name">
-                  <span v-if="String(folder.clean_path || '').startsWith('root')">
-                    <span class="text-gray-500 dark:text-gray-400">root</span>{{ String(folder.clean_path).substring(4) }}
+              <div class="file-item group">
+                <button class="file-item-info">
+                  <span class="sr-only" v-if="!fileStore.isOpen(folder)">Open folder</span>
+                  <span class="sr-only" v-if="fileStore.isOpen(folder)">Close folder</span>
+                  <span class="file-icon">
+                    <FolderIcon v-show="!fileStore.isOpen(folder)" class="w-5 h-5" />
+                    <FolderOpenIcon v-show="fileStore.isOpen(folder)" class="w-5 h-5" />
                   </span>
-                  <span v-else>{{ folder.clean_path }}</span>
-                </div>
+                  <span class="file-name">
+                    <span v-if="String(folder.clean_path || '').startsWith('root')">
+                      <span class="text-gray-500 dark:text-gray-400">root</span>{{ String(folder.clean_path).substring(4) }}
+                    </span>
+                    <span v-else>{{ folder.clean_path }}</span>
+                  </span>
+                </button>
 
-                <MenuButton as="button" class="file-dropdown-toggle" :data-toggle-id="folder.identifier"
+                <MenuButton as="button" class="file-dropdown-toggle group-hover:border-brand-600 group-hover:dark:border-brand-800"
+                            :data-toggle-id="folder.identifier"
                             @click.stop="calculateDropdownDirection($event.target)">
                   <span class="sr-only">Open folder options</span>
-                  <EllipsisVerticalIcon class="w-5 h-5 pointer-events-none" />
+                  <EllipsisVerticalIcon class="w-4 h-4 pointer-events-none" />
                 </MenuButton>
               </div>
 

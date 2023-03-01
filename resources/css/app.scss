@@ -347,7 +347,7 @@ html.dark {
             @apply flex items-center justify-end w-full -my-0.5 py-0.5 pl-1 rounded;
 
             @screen sm {
-                min-width: 50px;
+                min-width: 64px;
             }
 
             & > svg {
@@ -530,7 +530,14 @@ html.dark {
         @apply relative mt-2 text-gray-800 dark:text-gray-200 rounded-md bg-white dark:bg-gray-800 top-0;
 
         .file-item {
-            @apply relative flex justify-between items-center pl-4 pr-10 py-2 rounded-md border cursor-pointer border-transparent transition duration-100;
+            @apply relative flex justify-between items-center rounded-md border cursor-pointer border-transparent transition duration-100;
+
+            .file-item-info {
+                @apply flex-1 text-left flex items-center justify-between pl-4 pr-3 py-2 rounded-l-md outline-brand-500 dark:outline-brand-700 transition duration-200;
+                &:hover {
+                    @apply bg-brand-50 dark:bg-brand-900;
+                }
+            }
 
             .file-icon {
                 @apply mr-2 text-gray-400 dark:text-gray-500;
@@ -562,12 +569,9 @@ html.dark {
         }
 
         .file-dropdown-toggle {
-            @apply absolute top-0 right-0 bottom-0 w-8 flex rounded-r-md items-center justify-center border-l border-transparent text-gray-500 dark:text-gray-400 outline-brand-500 dark:outline-brand-700 transition duration-200;
+            @apply self-stretch w-8 flex rounded-r-md items-center justify-center border-l border-transparent text-gray-500 dark:text-gray-400 outline-brand-500 dark:outline-brand-700 transition duration-200;
             &:hover {
                 @apply border-brand-600 bg-brand-50 dark:border-brand-800 dark:bg-brand-900;
-            }
-            & > svg {
-                @apply h-4 w-4;
             }
         }
     }
@@ -577,10 +581,6 @@ html.dark {
             &.sticky {
                 position: -webkit-sticky;
                 position: sticky;
-            }
-
-            & > .file-item {
-                @apply pr-4;
             }
         }
     }
