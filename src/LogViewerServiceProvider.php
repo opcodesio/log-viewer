@@ -43,7 +43,7 @@ class LogViewerServiceProvider extends ServiceProvider
             ], "{$this->name}-config");
 
             $this->publishes([
-                self::basePath("/resources/views") => resource_path("views/vendor/{$this->name}"),
+                self::basePath('/resources/views') => resource_path("views/vendor/{$this->name}"),
             ], "{$this->name}-views");
 
             // registering the command
