@@ -11,6 +11,7 @@ class IndexController
     {
         return view('log-viewer::index', [
             'logViewerScriptVariables' => [
+                'headers' => (object) [],
                 'assets_outdated' => ! LogViewer::assetsAreCurrent(),
                 'version' => LogViewer::version(),
                 'app_name' => config('app.name'),

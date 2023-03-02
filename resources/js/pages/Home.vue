@@ -85,7 +85,6 @@ watch(
 
 onMounted(() => {
   window.onresize = function () {
-    console.log('dimensions changed', window.innerWidth, window.innerHeight);
     logViewerStore.setViewportDimensions(window.innerWidth, window.innerHeight);
   };
 })

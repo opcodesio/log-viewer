@@ -11,6 +11,10 @@ if (token) {
   axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 }
 
+for (const [key, value] of Object.entries(window.LogViewer.headers || {})) {
+  axios.defaults.headers.common[key] = value;
+}
+
 window.LogViewer.basePath = '/' + window.LogViewer.path;
 
 let routerBasePath = window.LogViewer.basePath + '/';
