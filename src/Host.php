@@ -34,12 +34,4 @@ class Host
     {
         return ! is_null($this->host);
     }
-
-    public function healthCheck(): bool
-    {
-        return Http::withHeaders($this->headers)
-            ->get($this->host.'/health-check')
-            ->throw()
-            ->ok();
-    }
 }

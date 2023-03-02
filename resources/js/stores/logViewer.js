@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { useFileStore } from './files.js';
 import axios from 'axios';
 import { useSearchStore } from './search.js';
-import { nextTick } from 'vue';
+import { nextTick, toRaw } from 'vue';
 import { usePaginationStore } from './pagination.js';
 import { useSeverityStore } from './severity.js';
 import { useLocalStorage } from '@vueuse/core';
@@ -193,7 +193,7 @@ export const useLogViewerStore = defineStore({
         query: searchStore.query,
         page: paginationStore.currentPage,
         per_page: this.resultsPerPage,
-        levels: severityStore.selectedLevels,
+        levels: toRaw(severityStore.selectedLevels.length > 0 ? severityStore.selectedLevels : 'none'),
         shorter_stack_traces: this.shorterStackTraces,
       };
 

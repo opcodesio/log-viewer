@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use Opcodes\LogViewer\Http\Middleware\ForwardRequestToHostMiddleware;
 
 Route::get('hosts', 'HostsController@index')->name('log-viewer.hosts');
-Route::get('hosts/{hostIdentifier}/health-check', 'HostsController@healthCheck')->name('log-viewer.hosts.health-check');
 
 Route::middleware(ForwardRequestToHostMiddleware::class)->group(function () {
     Route::get('folders', 'FoldersController@index')->name('log-viewer.folders');
