@@ -81,12 +81,15 @@
                  :class="[fileStore.isOpen(folder) ? 'active-folder' : '', fileStore.shouldBeSticky(folder) ? 'sticky ' + (open ? 'z-20' : 'z-10') : '' ]"
             >
               <div class="file-item group">
-                <button class="file-item-info">
+                <button class="file-item-info group">
                   <span class="sr-only" v-if="!fileStore.isOpen(folder)">Open folder</span>
                   <span class="sr-only" v-if="fileStore.isOpen(folder)">Close folder</span>
-                  <span class="file-icon">
+                  <span class="file-icon group-hover:hidden group-focus:hidden">
                     <FolderIcon v-show="!fileStore.isOpen(folder)" class="w-5 h-5" />
                     <FolderOpenIcon v-show="fileStore.isOpen(folder)" class="w-5 h-5" />
+                  </span>
+                  <span class="file-icon hidden group-hover:inline-block group-focus:inline-block">
+                    <ChevronRightIcon :class="[fileStore.isOpen(folder) ? 'rotate-90' : '', 'transition duration-100']" />
                   </span>
                   <span class="file-name">
                     <span v-if="String(folder.clean_path || '').startsWith('root')">
@@ -185,6 +188,7 @@ import {
   FolderOpenIcon,
   TrashIcon,
   XMarkIcon,
+  ChevronRightIcon,
 } from '@heroicons/vue/24/outline';
 import { useHostStore } from '../stores/hosts.js';
 import { useFileStore } from '../stores/files.js';

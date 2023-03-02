@@ -69,7 +69,8 @@
                       <button :aria-expanded="logViewerStore.isOpen(index)"
                            class="log-level-icon mr-2 opacity-75 w-5 h-5 hidden lg:block group focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-brand-500 rounded-md"
                       >
-                        <span class="sr-only">Open log entry</span>
+                        <span class="sr-only" v-if="!logViewerStore.isOpen(index)">Expand log entry</span>
+                        <span class="sr-only" v-if="logViewerStore.isOpen(index)">Collapse log entry</span>
                         <span class="w-full h-full group-hover:hidden group-focus:hidden">
                           <ExclamationCircleIcon v-if="log.level_class === 'danger'" />
                           <ExclamationTriangleIcon v-else-if="log.level_class === 'warning'" />
