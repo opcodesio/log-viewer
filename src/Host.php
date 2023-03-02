@@ -2,7 +2,6 @@
 
 namespace Opcodes\LogViewer;
 
-use Illuminate\Support\Facades\Http;
 use Opcodes\LogViewer\Utils\Utils;
 
 class Host
