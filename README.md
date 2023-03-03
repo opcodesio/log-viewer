@@ -36,8 +36,10 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 - 🔍 **Search** the logs,
 - 🎚 **Filter** by log level (error, info, debug, etc.),
 - 🔗 **Sharable links** to individual log entries,
-- 🌑 **Dark mode**
+- 🌑 **Dark mode**,
 - 📱 **Mobile-friendly** UI,
+- 🖥️ **Multiple host support**,
+- ⌨️ **Keyboard accessible**,
 - 💾 **Download & delete** log files from the UI,
 - ☑️ **Horizon** log support (up to Horizon v9.20),
 - ☎️ **API access** for folders, files & log entries,

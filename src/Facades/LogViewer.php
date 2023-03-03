@@ -16,6 +16,7 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @method static string version()
  * @method static bool assetsAreCurrent()
  * @method static bool supportsHostsFeature()
+ * @method static void resolveHostsUsing(callable $callback)
  * @method static Host[]|HostCollection getHosts()
  * @method static Host|null getHost(?string $hostIdentifier)
  * @method static LogFolder[]|LogFolderCollection getFilesGroupedByFolder()

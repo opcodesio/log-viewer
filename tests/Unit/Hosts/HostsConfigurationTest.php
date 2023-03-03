@@ -80,3 +80,96 @@ it('can get an individual host by its identifier', function () {
         ->and($host->host)->toBe($hostConfigs['first']['host'])
         ->and($host->headers)->toBe($hostConfigs['first']['headers']);
 });
+
+it('hosts list can be empty', function () {
+    config(['log-viewer.hosts' => []]);
+    expect(LogViewer::getHosts())->toBeEmpty();
+});
+
+it('can provide a custom resolver for hosts', function () {
+    $hostConfigs = [
+        'local' => [
+            'name' => 'Local',
+            'host' => null,
+        ],
+        'first' => [
+            'name' => 'First host',
+            'host' => 'https://example.com/log-viewer',
+            'headers' => [
+                'Authorization' => 'Bearer 1234',
+            ],
+        ],
+    ];
+    config(['log-viewer.hosts' => []]);
+    expect(LogViewer::getHosts())->toBeEmpty();
+
+    LogViewer::resolveHostsUsing(function () use ($hostConfigs) {
+        return $hostConfigs;
+    });
+
+    $hosts = LogViewer::getHosts();
+
+    expect($hosts)->toHaveCount(count($hostConfigs))
+        ->and($hosts)->toBeInstanceOf(HostCollection::class);
+
+    $firstHost = $hosts->get(0);
+
+    expect($firstHost)->toBeInstanceOf(Host::class)
+        ->and($firstHost->identifier)->toBe('local')
+        ->and($firstHost->name)->toBe($hostConfigs['local']['name'])
+        ->and($firstHost->host)->toBe($hostConfigs['local']['host']);
+
+    $secondHost = $hosts->get(1);
+
+    expect($secondHost)->toBeInstanceOf(Host::class)
+        ->and($secondHost->identifier)->toBe('first')
+        ->and($secondHost->name)->toBe($hostConfigs['first']['name'])
+        ->and($secondHost->host)->toBe($hostConfigs['first']['host'])
+        ->and($secondHost->headers)->toBe($hostConfigs['first']['headers']);
+});
+
+test('resolver callback is given the current collection of hosts', function () {
+    $hasParam = false;
+    LogViewer::resolveHostsUsing(function ($param) use (&$hasParam) {
+        if (isset($param)) {
+            $hasParam = true;
+        }
+
+        $this->assertInstanceOf(HostCollection::class, $param);
+
+        return $param;
+    });
+
+    LogViewer::getHosts();
+
+    $this->assertTrue($hasParam);
+});
+
+test('resolver can return a mix of Host instances and array configs as well', function () {
+    LogViewer::resolveHostsUsing(function () {
+        return [
+            'local' => [
+                'name' => 'Local',
+                'host' => null,
+            ],
+            new Host('first', 'First host', 'https://example.com/log-viewer'),
+        ];
+    });
+
+    $hosts = LogViewer::getHosts();
+
+    expect($hosts)->toHaveCount(2)
+        ->and($hosts)->toBeInstanceOf(HostCollection::class);
+
+    $firstHost = $hosts->get(0);
+    expect($firstHost)->toBeInstanceOf(Host::class)
+        ->and($firstHost->identifier)->toBe('local')
+        ->and($firstHost->name)->toBe('Local')
+        ->and($firstHost->host)->toBe(null);
+
+    $secondHost = $hosts->get(1);
+    expect($secondHost)->toBeInstanceOf(Host::class)
+        ->and($secondHost->identifier)->toBe('first')
+        ->and($secondHost->name)->toBe('First host')
+        ->and($secondHost->host)->toBe('https://example.com/log-viewer');
+});

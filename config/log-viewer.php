@@ -90,26 +90,25 @@ return [
     'hosts' => [
         'local' => [
             'name' => 'Local',
-            'host' => null,
-            'auth' => [
-                'bearer' => env('LOG_VIEWER_AUTH_TOKEN', null),
-            ],
-            'headers' => [],
         ],
 
         // 'staging' => [
         //     'name' => 'Staging',
-        //     'host' => 'http://staging.example.com/log-viewer',
-        //     'headers' => [
-        //         'Authentication' => 'Bearer 1234567890',
+        //     'host' => 'https://staging.example.com/log-viewer',
+        //     'auth' => [      // Example of HTTP Basic auth
+        //         'username' => 'username',
+        //         'password' => 'password',
         //     ],
         // ],
         //
         // 'production' => [
         //     'name' => 'Production',
-        //     'host' => 'http://example.com/log-viewer',
+        //     'host' => 'https://example.com/log-viewer',
+        //     'auth' => [      // Example of Bearer token auth
+        //         'token' => env('LOG_VIEWER_PRODUCTION_TOKEN'),
+        //     ],
         //     'headers' => [
-        //         'Authentication' => 'Bearer 1234567890',
+        //         'X-Foo' => 'Bar',
         //     ],
         // ],
     ],
