@@ -17,6 +17,10 @@ for (const [key, value] of Object.entries(window.LogViewer.headers || {})) {
 
 window.LogViewer.basePath = '/' + window.LogViewer.path;
 
+if (! window.location.pathname.startsWith(window.LogViewer.basePath)) {
+  window.LogViewer.basePath = window.location.pathname;
+}
+
 let routerBasePath = window.LogViewer.basePath + '/';
 
 if (window.LogViewer.path === '' || window.LogViewer.path === '/') {
@@ -26,7 +30,7 @@ if (window.LogViewer.path === '' || window.LogViewer.path === '/') {
 
 const router = createRouter({
   routes: [{
-    path: `/${LogViewer.path}`,
+    path: LogViewer.basePath,
     name: 'home',
     component: Home,
   }],
