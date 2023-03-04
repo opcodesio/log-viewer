@@ -88,7 +88,7 @@ html.dark {
     @apply bg-white dark:bg-gray-800 transition duration-200 cursor-pointer;
 
     &.success {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-emerald-50 dark:bg-emerald-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
@@ -100,7 +100,7 @@ html.dark {
     }
 
     &.info {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-sky-50 dark:bg-sky-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
@@ -112,7 +112,7 @@ html.dark {
     }
 
     &.warning {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-amber-50 dark:bg-amber-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
@@ -124,7 +124,7 @@ html.dark {
     }
 
     &.danger {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-rose-50 dark:bg-rose-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
@@ -136,7 +136,7 @@ html.dark {
     }
 
     &.none {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-gray-50 dark:bg-gray-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
