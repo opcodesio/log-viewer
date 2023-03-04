@@ -67,7 +67,8 @@
                   <td class="log-level truncate">
                     <div class="flex items-center lg:pl-2">
                       <button :aria-expanded="logViewerStore.isOpen(index)"
-                           class="log-level-icon mr-2 opacity-75 w-5 h-5 hidden lg:block group focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-brand-500 rounded-md"
+                              @keydown="handleLogToggleKeyboardNavigation"
+                              class="log-level-icon mr-2 opacity-75 w-5 h-5 hidden lg:block group focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-brand-500 rounded-md"
                       >
                         <span class="sr-only" v-if="!logViewerStore.isOpen(index)">Expand log entry</span>
                         <span class="sr-only" v-if="logViewerStore.isOpen(index)">Collapse log entry</span>
@@ -92,7 +93,7 @@
                   <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90"
                       v-html="highlightSearchResult(log.text, searchStore.query)"></td>
                   <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs hidden lg:table-cell">
-                    <LogCopyButton :log="log" class="pr-2" />
+                    <LogCopyButton :log="log" class="pr-2 large-screen" />
                   </td>
                 </tr>
                 <tr v-show="logViewerStore.isOpen(index)">
@@ -191,6 +192,7 @@ import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import LogCopyButton from './LogCopyButton.vue';
+import { handleLogToggleKeyboardNavigation } from '../keyboardNavigation.js';
 
 const router = useRouter();
 const fileStore = useFileStore();

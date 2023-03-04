@@ -1,5 +1,9 @@
 <template>
-  <button class="log-link group" @click.stop.prevent="copy" title="Copy link to this log entry">
+  <button class="log-link group"
+          @click.stop="copy"
+          @keydown="handleLogLinkKeyboardNavigation"
+          title="Copy link to this log entry"
+  >
     <span class="sr-only">Log index {{ log.index }}. Click the button to copy link to this log entry.</span>
     <span v-show="!copied" class="hidden md:inline group-hover:underline">{{ Number(log.index).toLocaleString() }}</span>
     <LinkIcon v-show="!copied" class="md:opacity-75 group-hover:opacity-100" />
@@ -13,6 +17,7 @@ import { ref } from 'vue';
 import { copyToClipboard } from '../helpers.js';
 import { LinkIcon } from '@heroicons/vue/24/outline';
 import { HandThumbUpIcon } from '@heroicons/vue/24/solid';
+import { handleLogLinkKeyboardNavigation } from '../keyboardNavigation.js';
 
 const props = defineProps({
   log: {

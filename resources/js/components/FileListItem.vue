@@ -2,7 +2,7 @@
   <div class="file-item-container" :class="[isSelected ? 'active' : '']">
     <Menu>
       <div class="file-item group">
-        <button class="file-item-info">
+        <button class="file-item-info" @keydown="handleKeyboardFileNavigation">
           <span class="sr-only" v-if="!isSelected">Select log file</span>
           <span class="sr-only" v-if="isSelected">Deselect log file</span>
           <span v-if="logFile.can_delete" class="my-auto mr-2" v-show="fileStore.checkBoxesVisibility">
@@ -18,6 +18,7 @@
 
         <MenuButton as="button" class="file-dropdown-toggle group-hover:border-brand-600 group-hover:dark:border-brand-800"
                     :data-toggle-id="logFile.identifier"
+                    @keydown.prevent.stop="handleKeyboardFileSettingsNavigation"
                     @click.stop="calculateDropdownDirection($event.target)">
           <EllipsisVerticalIcon class="w-4 h-4 pointer-events-none" />
         </MenuButton>
@@ -82,6 +83,7 @@ import { useFileStore } from '../stores/files.js';
 import SpinnerIcon from './SpinnerIcon.vue';
 import { replaceQuery, useDropdownDirection } from '../helpers.js';
 import { useRouter } from 'vue-router';
+import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation.js';
 
 const props = defineProps({
   logFile: {

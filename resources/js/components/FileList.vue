@@ -81,7 +81,7 @@
                  :class="[fileStore.isOpen(folder) ? 'active-folder' : '', fileStore.shouldBeSticky(folder) ? 'sticky ' + (open ? 'z-20' : 'z-10') : '' ]"
             >
               <div class="file-item group">
-                <button class="file-item-info group">
+                <button class="file-item-info group" @keydown="handleKeyboardFileNavigation">
                   <span class="sr-only" v-if="!fileStore.isOpen(folder)">Open folder</span>
                   <span class="sr-only" v-if="fileStore.isOpen(folder)">Close folder</span>
                   <span class="file-icon group-hover:hidden group-focus:hidden">
@@ -101,6 +101,7 @@
 
                 <MenuButton as="button" class="file-dropdown-toggle group-hover:border-brand-600 group-hover:dark:border-brand-800"
                             :data-toggle-id="folder.identifier"
+                            @keydown="handleKeyboardFileSettingsNavigation"
                             @click.stop="calculateDropdownDirection($event.target)">
                   <span class="sr-only">Open folder options</span>
                   <EllipsisVerticalIcon class="w-4 h-4 pointer-events-none" />
@@ -211,6 +212,7 @@ import FileListItem from './FileListItem.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import HostSelector from './HostSelector.vue';
+import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation.js';
 
 const router = useRouter();
 const route = useRoute();
