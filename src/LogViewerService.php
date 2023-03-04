@@ -19,6 +19,8 @@ class LogViewerService
 
     protected int $maxLogSizeToDisplay = self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
 
+    protected mixed $hostsResolver;
+
     protected function getFilePaths(): array
     {
         // Because we'll use the base path as a parameter for `glob`, we should escape any
@@ -130,6 +132,41 @@ class LogViewerService
                     || $folder->identifier === $folderIdentifier
                     || $folder->path === $folderIdentifier;
             });
+    }
+
+    public function supportsHostsFeature(): bool
+    {
+        return class_exists(\GuzzleHttp\Client::class);
+    }
+
+    public function resolveHostsUsing(callable $callback): void
+    {
+        $this->hostsResolver = $callback;
+    }
+
+    public function getHosts(): HostCollection
+    {
+        $hosts = HostCollection::fromConfig(config('log-viewer.hosts', []));
+
+        if (isset($this->hostsResolver)) {
+            $hosts = new HostCollection(
+                call_user_func($this->hostsResolver, $hosts) ?? []
+            );
+
+            $hosts->transform(function ($host, $key) {
+                return is_array($host)
+                    ? Host::fromConfig($key, $host)
+                    : $host;
+            });
+        }
+
+        return $hosts->values();
+    }
+
+    public function getHost(?string $hostIdentifier): ?Host
+    {
+        return $this->getHosts()
+            ->first(fn (Host $host) => $host->identifier === $hostIdentifier);
     }
 
     public function clearFileCache(): void

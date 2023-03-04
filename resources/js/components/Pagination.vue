@@ -6,7 +6,7 @@
         <span class="sm:hidden">Previous page</span>
       </button>
     </div>
-    <div class="lg:hidden border-transparent text-gray-500 dark:text-gray-400 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium">
+    <div class="sm:hidden border-transparent text-gray-500 dark:text-gray-400 border-t-2 pt-3 px-4 inline-flex items-center text-sm font-medium">
       <span>{{ paginationStore.page }}</span>
     </div>
     <div class="pages">

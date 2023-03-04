@@ -42,6 +42,10 @@ class LogViewerServiceProvider extends ServiceProvider
                 self::basePath("/config/{$this->name}.php") => config_path("{$this->name}.php"),
             ], "{$this->name}-config");
 
+            $this->publishes([
+                self::basePath('/resources/views') => resource_path("views/vendor/{$this->name}"),
+            ], "{$this->name}-views");
+
             // registering the command
             $this->commands([
                 PublishCommand::class,

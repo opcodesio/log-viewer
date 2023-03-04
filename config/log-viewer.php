@@ -79,6 +79,42 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Log Viewer Remote hosts.
+    |--------------------------------------------------------------------------
+    | Log Viewer supports viewing Laravel logs from remote hosts. They must
+    | be running Log Viewer as well. Below you can define the hosts you
+    | would like to show in this Log Viewer instance.
+    |
+    */
+
+    'hosts' => [
+        'local' => [
+            'name' => 'Local',
+        ],
+
+        // 'staging' => [
+        //     'name' => 'Staging',
+        //     'host' => 'https://staging.example.com/log-viewer',
+        //     'auth' => [      // Example of HTTP Basic auth
+        //         'username' => 'username',
+        //         'password' => 'password',
+        //     ],
+        // ],
+        //
+        // 'production' => [
+        //     'name' => 'Production',
+        //     'host' => 'https://example.com/log-viewer',
+        //     'auth' => [      // Example of Bearer token auth
+        //         'token' => env('LOG_VIEWER_PRODUCTION_TOKEN'),
+        //     ],
+        //     'headers' => [
+        //         'X-Foo' => 'Bar',
+        //     ],
+        // ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Include file patterns
     |--------------------------------------------------------------------------
     |

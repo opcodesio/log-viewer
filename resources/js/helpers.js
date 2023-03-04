@@ -51,6 +51,7 @@ export const copyToClipboard = (str) => {
 export const replaceQuery = (router, key, value) => {
   const route = router.currentRoute.value;
   const query = {
+    host: route.query.host || undefined,
     file: route.query.file || undefined,
     query: route.query.query || undefined,
     page: route.query.page || undefined,
@@ -58,7 +59,10 @@ export const replaceQuery = (router, key, value) => {
 
   // maybe this logic shouldn't be here, but that's what works for now.
   // calling `replaceQuery` twice in a single "tick" can cause previous change to be reverted.
-  if (key === 'file' && query.page !== undefined) {
+  if (key === 'host') {
+    query.file = undefined;
+    query.page = undefined;
+  } else if (key === 'file' && query.page !== undefined) {
     query.page = undefined;
   }
 
@@ -83,4 +87,8 @@ export const useDropdownDirection = () => {
   }
 
   return { dropdownDirections, calculateDropdownDirection };
+}
+
+export const isMobile = () => {
+  return window.matchMedia('(max-width: 768px)').matches;
 }

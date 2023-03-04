@@ -1,6 +1,6 @@
 <template>
   <div class="absolute z-20 top-0 bottom-10 bg-gray-100 dark:bg-gray-900 md:left-0 md:flex md:w-88 md:flex-col md:fixed md:inset-y-0"
-       :class="[fileStore.sidebarOpen ? 'left-0 right-0 md:left-auto md:right-auto' : '-left-[100%] right-[100%] md:left-auto md:right-auto']"
+       :class="[fileStore.sidebarOpen ? 'left-0 right-0 md:left-auto md:right-auto' : '-left-[200%] right-[200%] md:left-auto md:right-auto']"
   >
     <file-list></file-list>
   </div>
@@ -10,14 +10,14 @@
   </div>
 
   <div class="absolute bottom-4 right-4 flex items-center">
-    <p class="text-xs text-gray-400 dark:text-gray-500 @if($showSupportLink) mr-5 -mb-0.5 @endif">
+    <p class="text-xs text-gray-500 dark:text-gray-400 mr-5 -mb-0.5">
       <template v-if="logViewerStore.performance?.requestTime">
-        <span>Memory: <span class="font-semibold">{{ logViewerStore.performance.memoryUsage }}</span></span>
+        <span><span class="hidden md:inline">Memory: </span><span class="font-semibold">{{ logViewerStore.performance.memoryUsage }}</span></span>
         <span class="mx-1.5">&middot;</span>
-        <span>Duration: <span class="font-semibold">{{ logViewerStore.performance.requestTime }}</span></span>
+        <span><span class="hidden md:inline">Duration: </span><span class="font-semibold">{{ logViewerStore.performance.requestTime }}</span></span>
         <span class="mx-1.5">&middot;</span>
       </template>
-      <span>Version: <span class="font-semibold">{{ LogViewer.version }}</span></span>
+      <span><span class="hidden md:inline">Version: </span><span class="font-semibold">{{ LogViewer.version }}</span></span>
     </p>
     <a href="https://www.buymeacoffee.com/arunas" target="_blank" v-if="LogViewer.show_support_link">
       <bmc-logo class="h-6 w-auto" title="Support me by buying me a cup of coffee ❤️" />
@@ -28,19 +28,23 @@
 <script setup>
 import FileList from '../components/FileList.vue';
 import LogList from '../components/LogList.vue';
+import { useHostStore } from '../stores/hosts.js';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { useFileStore } from '../stores/files.js';
 import { useSearchStore } from '../stores/search.js';
 import { usePaginationStore } from '../stores/pagination.js';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { onBeforeMount, onMounted, watch } from 'vue';
 import BmcLogo from '../components/BmcLogo.vue';
+import { replaceQuery } from '../helpers.js';
 
+const hostStore = useHostStore();
 const logViewerStore = useLogViewerStore();
 const fileStore = useFileStore();
 const searchStore = useSearchStore();
 const paginationStore = usePaginationStore();
 const route = useRoute();
+const router = useRouter();
 
 onBeforeMount(() => logViewerStore.syncTheme());
 
@@ -61,4 +65,27 @@ watch(
   },
   { immediate: true },
 )
+
+watch(
+  () => route.query.host,
+  async (newHost) => {
+    hostStore.selectHost(newHost || null);
+
+    if (newHost && !hostStore.selectedHostIdentifier) {
+      // the host no longer exists, remove it from the URL
+      replaceQuery(router, 'host', null);
+    }
+
+    fileStore.reset();
+    await fileStore.loadFolders();
+    logViewerStore.loadLogs();
+  },
+  { immediate: true },
+)
+
+onMounted(() => {
+  window.onresize = function () {
+    logViewerStore.setViewportDimensions(window.innerWidth, window.innerHeight);
+  };
+})
 </script>

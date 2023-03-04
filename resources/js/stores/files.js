@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
 import { useLocalStorage } from '@vueuse/core';
+import { useHostStore } from './hosts.js';
+import { useLogViewerStore } from './logViewer.js';
 
 export const useFileStore = defineStore({
   id: 'files',
@@ -11,18 +13,33 @@ export const useFileStore = defineStore({
     direction: useLocalStorage('fileViewerDirection', 'desc'),
     selectedFileIdentifier: null,
 
+    error: null,
+    clearingCache: {},
+    cacheRecentlyCleared: {},
+    deleting: {},
+    abortController: null,
+
     // control variables
     loading: false,
     checkBoxesVisibility: false,
     filesChecked: [],
     openFolderIdentifiers: [],
     foldersInView: [],
-    folderTops: {},
     containerTop: 0,
     sidebarOpen: false,
   }),
 
   getters: {
+    selectedHost() {
+      const hostStore = useHostStore();
+      return hostStore.selectedHost;
+    },
+
+    hostQueryParam() {
+      const hostStore = useHostStore();
+      return hostStore.hostQueryParam;
+    },
+
     files: (state) => state.folders.flatMap((folder) => folder.files),
 
     selectedFile: (state) => state.files.find((file) => file.identifier === state.selectedFileIdentifier),
@@ -45,18 +62,6 @@ export const useFileStore = defineStore({
 
     isInViewport() {
       return (index) => this.pixelsAboveFold(index) > -36
-    },
-
-    stickTopPosition() {
-      return (folder) => {
-        let aboveFold = this.pixelsAboveFold(folder);
-
-        if (aboveFold < 0) {
-          return Math.max(0, -8 + aboveFold) + 'px';
-        }
-
-        return '-8px';
-      }
     },
 
     pixelsAboveFold: (state) => (folder) => {
@@ -100,12 +105,32 @@ export const useFileStore = defineStore({
     },
 
     loadFolders() {
+      // abort the previous request which might now be outdated
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+
+      if (!this.selectedHost) {
+        this.folders = [];
+        this.error = null;
+        this.loading = false;
+        return;
+      }
+
+      this.abortController = new AbortController();
       this.loading = true;
 
       // load the folders from the server
-      return axios.get(`${LogViewer.basePath}/api/folders`, { params: { direction: this.direction }})
+      return axios.get(`${LogViewer.basePath}/api/folders`, {
+          params: {
+            host: this.hostQueryParam,
+            direction: this.direction,
+          },
+          signal: this.abortController.signal
+        })
         .then(({ data }) => {
           this.folders = data;
+          this.error = data.error || null;
           this.loading = false;
 
           if (this.openFolderIdentifiers.length === 0) {
@@ -116,7 +141,16 @@ export const useFileStore = defineStore({
           this.onScroll();
         })
         .catch((error) => {
+          // aborted, thus we don't need to display that as an error.
+          if (error.code === 'ERR_CANCELED') return;
+
           this.loading = false;
+          this.error = error.message;
+
+          if (error.response?.data?.message) {
+            this.error += ': ' + error.response.data.message;
+          }
+
           console.error(error);
         })
     },
@@ -137,10 +171,8 @@ export const useFileStore = defineStore({
           if (!vm.foldersInView.includes(folder)) {
             vm.foldersInView.push(folder);
           }
-          vm.folderTops[folder] = vm.stickTopPosition(folder);
         } else {
           vm.foldersInView = vm.foldersInView.filter(f => f !== folder);
-          delete vm.folderTops[folder];
         }
       })
     },
@@ -148,10 +180,11 @@ export const useFileStore = defineStore({
     reset() {
       this.openFolderIdentifiers = [];
       this.foldersInView = [];
-      this.folderTops = {};
       const container = document.getElementById('file-list-container');
-      this.containerTop = container.getBoundingClientRect().top;
-      container.scrollTo(0, 0);
+      if (container) {
+        this.containerTop = container.getBoundingClientRect().top;
+        container.scrollTo(0, 0);
+      }
     },
 
     toggleSidebar() {
@@ -173,6 +206,87 @@ export const useFileStore = defineStore({
     resetChecks() {
       this.filesChecked = [];
       this.checkBoxesVisibility = false;
+    },
+
+    clearCacheForFile(file) {
+      this.clearingCache[file.identifier] = true;
+
+      return axios.post(`${LogViewer.basePath}/api/files/${file.identifier}/clear-cache`, {}, {
+          params: { host: this.hostQueryParam }
+        })
+        .then(() => {
+          if (file.identifier === this.selectedFileIdentifier) {
+            useLogViewerStore().loadLogs();
+          }
+
+          this.cacheRecentlyCleared[file.identifier] = true;
+          setTimeout(() => this.cacheRecentlyCleared[file.identifier] = false, 2000);
+        })
+        .catch((error) => console.error(error))
+        .finally(() => this.clearingCache[file.identifier] = false);
+    },
+
+    deleteFile(file) {
+      return axios.delete(`${LogViewer.basePath}/api/files/${file.identifier}`, {
+          params: { host: this.hostQueryParam }
+        })
+        .then(() => this.loadFolders())
+    },
+
+    clearCacheForFolder(folder) {
+      this.clearingCache[folder.identifier] = true;
+
+      return axios.post(`${LogViewer.basePath}/api/folders/${folder.identifier}/clear-cache`, {}, {
+          params: { host: this.hostQueryParam }
+        })
+        .then(() => {
+          if (folder.files.some(file => file.identifier === this.selectedFileIdentifier)) {
+            useLogViewerStore().loadLogs();
+          }
+
+          this.cacheRecentlyCleared[folder.identifier] = true;
+          setTimeout(() => this.cacheRecentlyCleared[folder.identifier] = false, 2000);
+        })
+        .catch((error) => console.error(error))
+        .finally(() => {
+          this.clearingCache[folder.identifier] = false;
+        })
+    },
+
+    deleteFolder(folder) {
+      this.deleting[folder.identifier] = true;
+
+      return axios.delete(`${LogViewer.basePath}/api/folders/${folder.identifier}`, {
+          params: { host: this.hostQueryParam }
+        })
+        .then(() => this.loadFolders())
+        .catch((error) => console.error(error))
+        .finally(() => {
+          this.deleting[folder.identifier] = false;
+        })
+    },
+
+    deleteSelectedFiles() {
+      return axios.post(`${LogViewer.basePath}/api/delete-multiple-files`, {
+        files: this.filesChecked
+      }, {
+        params: { host: this.hostQueryParam }
+      });
+    },
+
+    clearCacheForAllFiles() {
+      this.clearingCache['*'] = true;
+
+      axios.post(`${LogViewer.basePath}/api/clear-cache-all`, {}, {
+          params: { host: this.hostQueryParam }
+        })
+        .then(() => {
+          this.cacheRecentlyCleared['*'] = true;
+          setTimeout(() => this.cacheRecentlyCleared['*'] = false, 2000);
+          useLogViewerStore().loadLogs();
+        })
+        .catch((error) => console.error(error))
+        .finally(() => this.clearingCache['*'] = false);
     },
   },
 })

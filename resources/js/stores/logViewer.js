@@ -2,11 +2,12 @@ import { defineStore } from 'pinia';
 import { useFileStore } from './files.js';
 import axios from 'axios';
 import { useSearchStore } from './search.js';
-import { nextTick } from 'vue';
+import { nextTick, toRaw } from 'vue';
 import { usePaginationStore } from './pagination.js';
 import { useSeverityStore } from './severity.js';
 import { useLocalStorage } from '@vueuse/core';
 import { debounce } from 'lodash';
+import { useHostStore } from './hosts.js';
 
 export const Theme = {
   System: 'System',
@@ -34,6 +35,8 @@ export const useLogViewerStore = defineStore({
     abortController: null,
 
     // Log scrolling behaviour data
+    viewportWidth: window.innerWidth,
+    viewportHeight: window.innerHeight,
     stacksOpen: [],
     stacksInView: [],
     stackTops: {},
@@ -49,6 +52,16 @@ export const useLogViewerStore = defineStore({
 
     isOpen: (state) => (index) => state.stacksOpen.includes(index),
 
+    isMobile: (state) => state.viewportWidth <= 1023,
+
+    tableRowHeight() {
+      return this.isMobile ? 29 : 36;
+    },
+
+    headerHeight() {
+      return this.isMobile ? 0 : 36;
+    },
+
     shouldBeSticky(state) {
       return (index) => this.isOpen(index) && state.stacksInView.includes(index);
     },
@@ -58,10 +71,13 @@ export const useLogViewerStore = defineStore({
         let aboveFold = this.pixelsAboveFold(index);
 
         if (aboveFold < 0) {
-          return Math.max(0, 36 + aboveFold) + 'px';
+          return Math.max(
+            this.headerHeight - this.tableRowHeight,
+            this.headerHeight + aboveFold
+          ) + 'px';
         }
 
-        return '36px';
+        return this.headerHeight + 'px';
       }
     },
 
@@ -70,16 +86,26 @@ export const useLogViewerStore = defineStore({
         let tbody = document.getElementById('tbody-' + index);
         if (!tbody) return false;
         let row = tbody.getClientRects()[0];
-        return (row.top + row.height - 73) - state.containerTop;
+
+        return (row.top + row.height - this.tableRowHeight - this.headerHeight) - state.containerTop;
       }
     },
 
     isInViewport() {
-      return (index) => this.pixelsAboveFold(index) > -36;
+      return (index) => this.pixelsAboveFold(index) > -this.tableRowHeight;
     },
   },
 
   actions: {
+    setViewportDimensions(width, height) {
+      this.viewportWidth = width;
+      this.viewportHeight = height;
+      const container = document.querySelector('.log-item-container');
+      if (container) {
+        this.containerTop = container.getBoundingClientRect().top;
+      }
+    },
+
     toggleTheme() {
       switch (this.theme) {
         case Theme.System:
@@ -141,6 +167,7 @@ export const useLogViewerStore = defineStore({
     },
 
     loadLogs: debounce(function ({ silently = false } = {}) {
+      const hostStore = useHostStore();
       const fileStore = useFileStore();
       const searchStore = useSearchStore();
       const paginationStore = usePaginationStore();
@@ -154,15 +181,19 @@ export const useLogViewerStore = defineStore({
         this.abortController.abort();
       }
 
+      // abort if there's no selected file and no query
+      if (!this.selectedFile && !searchStore.hasQuery) return;
+
       this.abortController = new AbortController();
 
       const params = {
+        host: hostStore.hostQueryParam,
         file: this.selectedFile?.identifier,
         direction: this.direction,
         query: searchStore.query,
         page: paginationStore.currentPage,
         per_page: this.resultsPerPage,
-        levels: severityStore.selectedLevels,
+        levels: toRaw(severityStore.selectedLevels.length > 0 ? severityStore.selectedLevels : 'none'),
         shorter_stack_traces: this.shorterStackTraces,
       };
 
@@ -172,7 +203,16 @@ export const useLogViewerStore = defineStore({
 
       axios.get(`${LogViewer.basePath}/api/logs`, { params, signal: this.abortController.signal })
         .then(({ data }) => {
-          this.logs = data.logs;
+          if (params.host) {
+            // because the host is different, we need to update the log links to be local instead of remote.
+            this.logs = data.logs.map(log => {
+              const queryParams = { host: params.host, file: log.file_identifier, query: `log-index:${log.index}` };
+              log.url = `${window.location.host}${LogViewer.basePath}?${new URLSearchParams(queryParams)}`;
+              return log;
+            })
+          } else {
+            this.logs = data.logs;
+          }
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;
           this.error = data.error || null;
@@ -196,6 +236,13 @@ export const useLogViewerStore = defineStore({
           }
         })
         .catch((error) => {
+          // aborted, thus we don't need to display that as an error.
+          if (error.code === 'ERR_CANCELED') {
+            this.hasMoreResults = false;
+            this.percentScanned = 100;
+            return;
+          }
+
           this.loading = false;
           this.error = error.message;
 

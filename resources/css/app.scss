@@ -50,9 +50,34 @@ html.dark {
                 @apply text-gray-700 dark:text-gray-400;
             }
         }
+
         .log-count {
             @apply text-gray-500 dark:text-gray-400 ml-8 whitespace-nowrap;
         }
+
+        button.active {
+            .log-level {
+                &.success {
+                    @apply text-emerald-100;
+                }
+                &.info {
+                    @apply text-sky-100;
+                }
+                &.warning {
+                    @apply text-amber-100;
+                }
+                &.danger {
+                    @apply text-rose-100;
+                }
+                &.none {
+                    @apply text-gray-100;
+                }
+            }
+            .log-count {
+                @apply text-gray-200 dark:text-gray-300;
+            }
+        }
+
         .no-results {
             @apply text-xs text-gray-500 dark:text-gray-400 text-center px-4 py-1;
         }
@@ -63,7 +88,7 @@ html.dark {
     @apply bg-white dark:bg-gray-800 transition duration-200 cursor-pointer;
 
     &.success {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-emerald-50 dark:bg-emerald-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
@@ -75,7 +100,7 @@ html.dark {
     }
 
     &.info {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-sky-50 dark:bg-sky-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
@@ -87,7 +112,7 @@ html.dark {
     }
 
     &.warning {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-amber-50 dark:bg-amber-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
@@ -99,7 +124,7 @@ html.dark {
     }
 
     &.danger {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-rose-50 dark:bg-rose-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
@@ -111,7 +136,7 @@ html.dark {
     }
 
     &.none {
-        &:hover > td, &.active > td {
+        &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-gray-50 dark:bg-gray-800 dark:bg-opacity-40;
         }
         .log-level-indicator {
@@ -120,6 +145,10 @@ html.dark {
         .log-level {
             @apply text-gray-700 dark:text-gray-400;
         }
+    }
+
+    &:hover .log-level-icon {
+        @apply opacity-100;
     }
 }
 
@@ -301,19 +330,11 @@ html.dark {
         @apply bg-white dark:bg-gray-800 dark:text-gray-200 relative;
 
         .log-item > td {
-            @apply border-t border-gray-200 dark:border-gray-700 px-1 lg:px-2 py-1 lg:py-2 text-xs lg:text-sm;
-        }
-
-        .log-item > td.log-level-icon {
-            @apply whitespace-nowrap border-t border-gray-200 dark:border-gray-700 py-1 lg:py-2 pl-2 lg:pl-4 lg:pr-2 lg:pl-6 lg:pl-8;
-            & > svg {
-                @apply opacity-75 h-5 w-5;
-            }
+            @apply border-t border-gray-200 dark:border-gray-700 px-1 lg:px-2 py-1.5 lg:py-2 text-xs lg:text-sm;
         }
 
         &.first {
-            .log-item > td,
-            .log-item > td.log-level-icon {
+            .log-item > td {
                 @apply border-t-transparent;
             }
         }
@@ -323,14 +344,18 @@ html.dark {
         }
 
         .log-link {
-            @apply flex items-center w-full;
-            margin-right: 0.5rem;
+            @apply flex items-center justify-end w-full -my-0.5 py-0.5 pl-1 rounded;
+
             @screen sm {
-                min-width: 40px;
+                min-width: 64px;
             }
 
             & > svg {
                 @apply h-4 w-4 ml-1 transition duration-200;
+            }
+
+            &:focus {
+                @apply outline-none ring-2 ring-brand-500 dark:ring-brand-400;
             }
         }
 
@@ -342,16 +367,19 @@ html.dark {
 }
 
 .pagination {
-    @apply md:mt-2 px-4 w-full flex items-center justify-center lg:px-0;
+    @apply sm:mt-2 sm:px-4 w-full flex items-center justify-center lg:px-0;
 
     .previous {
         @apply -mt-px w-0 flex-1 flex justify-start md:justify-end;
 
         button {
-            @apply border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;
+            @apply border-t-2 border-transparent pt-3 pr-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;
             &:hover {
                 @apply text-gray-700 border-gray-300
                   dark:text-gray-300 border-gray-400;
+            }
+            &:focus {
+                @apply rounded-md outline-none ring-2 ring-brand-500 dark:ring-brand-400;
             }
             svg {
                 @apply mx-3 h-5 w-5 text-current;
@@ -363,10 +391,13 @@ html.dark {
         @apply -mt-px w-0 flex-1 flex justify-end md:justify-start;
 
         button {
-            @apply border-t-2 border-transparent pt-4 pl-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;
+            @apply border-t-2 border-transparent pt-3 pl-1 inline-flex items-center text-sm font-medium text-gray-500 dark:text-gray-400;
             &:hover {
                 @apply text-gray-700 border-gray-300
                   dark:text-gray-300 border-gray-400;
+            }
+            &:focus {
+                @apply rounded-md outline-none ring-2 ring-brand-500 dark:ring-brand-400;
             }
             svg {
                 @apply mx-3 h-5 w-5 text-current;
@@ -378,11 +409,15 @@ html.dark {
         @apply hidden sm:-mt-px sm:flex;
 
         span {
-            @apply border-transparent text-gray-500 dark:text-gray-400 border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium;
+            @apply border-transparent text-gray-500 dark:text-gray-400 border-t-2 pt-3 px-4 inline-flex items-center text-sm font-medium;
         }
 
         button {
-            @apply border-t-2 pt-4 px-4 inline-flex items-center text-sm font-medium;
+            @apply border-t-2 pt-3 px-4 inline-flex items-center text-sm font-medium;
+
+            &:focus {
+                @apply rounded-md outline-none ring-2 ring-brand-500 dark:ring-brand-400;
+            }
         }
     }
 }
@@ -429,6 +464,10 @@ html.dark {
 .dropdown {
     @apply absolute top-full z-40 right-1 -mt-1 overflow-hidden text-gray-900 dark:text-gray-200 rounded-md bg-white border-gray-200 dark:bg-gray-800 border dark:border-gray-700 shadow-md;
 
+    &:focus {
+        @apply outline-none ring-1 ring-brand-500 ring-opacity-50 dark:ring-brand-700 dark:ring-opacity-50;
+    }
+
     transform-origin: top right !important;
 
     &.up {
@@ -448,7 +487,7 @@ html.dark {
         }
     }
 
-    button, a {
+    button:not(.inline-link), a:not(.inline-link) {
         @apply block flex items-center w-full px-4 py-2 text-left text-sm outline-brand-500 dark:outline-brand-800;
         & > svg {
             @apply w-4 h-4 mr-3 text-gray-400;
@@ -459,8 +498,16 @@ html.dark {
             }
         }
     }
-    button:hover, a:hover {
-        @apply bg-gray-50 dark:bg-gray-700;
+    button:hover, a:hover, button.active, a.active {
+        @apply text-white bg-brand-600;
+
+        & > .checkmark {
+            @apply bg-brand-600 dark:border-gray-300;
+        }
+
+        & > svg {
+            @apply text-white;
+        }
     }
 
     .divider {
@@ -476,14 +523,21 @@ html.dark {
 // Dark border (hover): border-brand-700
 
 .file-list {
-    @apply relative h-full overflow-y-auto pl-3 sm:pl-0 pt-2 pb-4 pr-3 sm:pr-4;
+    @apply relative h-full overflow-y-auto pb-4 px-3 md:pr-0 md:pl-0;
 
     .file-item-container,
     .folder-item-container {
-        @apply relative mt-2 text-gray-800 dark:text-gray-200 rounded-md bg-white dark:bg-gray-800;
+        @apply relative mt-2 text-gray-800 dark:text-gray-200 rounded-md bg-white dark:bg-gray-800 top-0;
 
         .file-item {
-            @apply relative flex justify-between items-center pl-4 pr-10 py-2 rounded-md border cursor-pointer border-transparent transition duration-100;
+            @apply relative flex justify-between items-center rounded-md border cursor-pointer border-transparent transition duration-100;
+
+            .file-item-info {
+                @apply flex-1 text-left flex items-center justify-between pl-4 pr-3 py-2 rounded-l-md outline-brand-500 dark:outline-brand-700 transition duration-200;
+                &:hover {
+                    @apply bg-brand-50 dark:bg-brand-900;
+                }
+            }
 
             .file-icon {
                 @apply mr-2 text-gray-400 dark:text-gray-500;
@@ -515,12 +569,9 @@ html.dark {
         }
 
         .file-dropdown-toggle {
-            @apply absolute top-0 right-0 bottom-0 w-8 flex rounded-r-md items-center justify-center border-l border-transparent text-gray-500 dark:text-gray-400 outline-brand-500 dark:outline-brand-700 transition duration-200;
+            @apply self-stretch w-8 flex rounded-r-md items-center justify-center border-l border-transparent text-gray-500 dark:text-gray-400 outline-brand-500 dark:outline-brand-700 transition duration-200;
             &:hover {
                 @apply border-brand-600 bg-brand-50 dark:border-brand-800 dark:bg-brand-900;
-            }
-            & > svg {
-                @apply h-4 w-4;
             }
         }
     }
@@ -531,11 +582,11 @@ html.dark {
                 position: -webkit-sticky;
                 position: sticky;
             }
-
-            & > .file-item {
-                @apply pr-4;
-            }
         }
+    }
+
+    .folder-container:first-child > .folder-item-container {
+        @apply mt-0;
     }
 }
 
@@ -567,7 +618,11 @@ button.button:hover, a.button:hover {
 }
 
 .select {
-    @apply bg-gray-50 dark:bg-gray-800 dark:bg-opacity-50 px-3 py-0.5 border dark:border-gray-700 rounded-md font-normal outline-none
+    @apply bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded font-normal outline-none px-1 -my-0.5 py-0.5;
+}
+
+.select:hover {
+    @apply bg-gray-200 dark:bg-gray-800;
 }
 
 .select:focus {
