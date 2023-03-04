@@ -150,7 +150,7 @@
           </div>
         </div>
       </div>
-      <div v-else class="flex h-full items-center justify-center text-gray-500 dark:text-gray-400">
+      <div v-else class="flex h-full items-center justify-center text-gray-600 dark:text-gray-400">
         <span v-if="logViewerStore.hasMoreResults">Searching...</span>
         <span v-else>Select a file or start searching...</span>
       </div>

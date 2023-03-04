@@ -160,6 +160,18 @@
             />
           </div>
         </div>
+
+        <div v-if="fileStore.folders.length === 0" class="text-center text-sm text-gray-600 dark:text-gray-400">
+          <p class="mb-5">No log files were found.</p>
+          <div class="flex items-center justify-center px-1">
+            <button @click.prevent="fileStore.loadFolders()"
+                    class="inline-flex items-center px-4 py-2 text-left text-sm bg-white hover:bg-gray-50 outline-brand-500 dark:outline-brand-800 text-gray-900 dark:text-gray-200 rounded-md"
+            >
+              <ArrowPathIcon class="w-4 h-4 mr-1.5" />
+              Refresh file list
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- gradient to hide the bottom of the file list -->
@@ -180,6 +192,7 @@ import { onMounted, watch } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import {
   ArrowLeftIcon,
+  ArrowPathIcon,
   CircleStackIcon,
   CloudArrowDownIcon,
   EllipsisVerticalIcon,
