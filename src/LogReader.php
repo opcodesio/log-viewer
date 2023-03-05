@@ -35,6 +35,8 @@ class LogReader
      */
     protected $fileHandle = null;
 
+    protected int $mtimeBeforeScan;
+
     protected string $direction = Direction::Forward;
 
     public function __construct(LogFile $file)
@@ -291,6 +293,8 @@ class LogReader
             // when forcing, make sure we start from scratch and reset everything.
             $this->index()->clearCache();
         }
+
+        $this->mtimeBeforeScan = $this->file->mtime();
 
         // we don't care about the selected levels here, we should scan everything
         $logIndex = $this->index();
@@ -565,6 +569,14 @@ class LogReader
 
     public function requiresScan(): bool
     {
+        if (isset($this->mtimeBeforeScan) && ($this->file->mtime() > $this->mtimeBeforeScan || $this->file->mtime() === time())) {
+            // The file has been modified since the last scan in this request.
+            // Let's only request another scan if it's not the last chunk (smaller than lazyScanChunkSize).
+            // The last chunk will be scanned until the end before hitting this logic again,
+            // and by then the only appended bytes will be from the current request and thus return false.
+            return $this->numberOfNewBytes() >= LogViewer::lazyScanChunkSize();
+        }
+
         return $this->numberOfNewBytes() !== 0;
     }
 
