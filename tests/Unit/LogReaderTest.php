@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\File;
-use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogReader;
 
 beforeEach(function () {
