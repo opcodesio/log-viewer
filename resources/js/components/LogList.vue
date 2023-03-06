@@ -8,12 +8,12 @@
         <div class="w-full lg:w-auto flex-1 flex justify-end min-h-[38px]">
           <SearchInput />
           <div class="hidden md:block ml-5">
-            <button @click="logViewerStore.loadLogs()" title="Reload current results" class="menu-button">
+            <button @click="logViewerStore.loadLogs()" id="reload-logs-button" title="Reload current results" class="menu-button">
               <ArrowPathIcon class="w-5 h-5" />
             </button>
           </div>
           <div class="hidden md:block">
-            <SiteSettingsDropdown class="ml-2" />
+            <SiteSettingsDropdown class="ml-2" id="desktop-site-settings" />
           </div>
           <div class="md:hidden">
             <button type="button" class="menu-button">
@@ -192,7 +192,7 @@ import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import LogCopyButton from './LogCopyButton.vue';
-import { handleLogToggleKeyboardNavigation } from '../keyboardNavigation.js';
+import { handleLogToggleKeyboardNavigation } from '../keyboardNavigation';
 
 const router = useRouter();
 const fileStore = useFileStore();
