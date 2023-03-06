@@ -628,3 +628,11 @@ button.button:hover, a.button:hover {
 .select:focus {
     @apply ring-2 ring-brand-500 dark:ring-brand-700;
 }
+
+.keyboard-shortcut {
+    @apply text-sm flex items-center justify-start mb-3 w-full text-gray-600 dark:text-gray-400;
+
+    .shortcut {
+        @apply font-mono text-base inline-flex w-6 h-6 mr-2 items-center justify-center rounded border border-gray-400 dark:border-gray-600 ring-1 ring-gray-100 dark:ring-gray-900;
+    }
+}

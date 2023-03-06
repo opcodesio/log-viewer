@@ -9,6 +9,7 @@
       <div class="relative flex-1 m-1">
         <input v-model="tempQuery" name="query" id="query" type="text"
                @keydown.enter="submitQuery"
+               @keydown.esc="(event) => event.target.blur()"
         />
         <div v-show="searchStore.hasQuery" class="clear-search">
           <button @click="clearQuery">
@@ -20,7 +21,7 @@
         <button v-if="logViewerStore.hasMoreResults" disabled="disabled">
           <span>Searching<span class="hidden xl:inline ml-1"> {{ selectedFile ? selectedFile.name : 'all files' }}</span>...</span>
         </button>
-        <button v-else @click="submitQuery">
+        <button v-else @click="submitQuery" id="query-submit">
           <span>Search<span class="hidden xl:inline ml-1"> {{ selectedFile ? 'in "' + selectedFile.name + '"' : 'all files' }}</span></span>
           <ArrowRightIcon class="h-4 w-4" />
         </button>
@@ -51,7 +52,10 @@ const route = useRoute();
 const selectedFile = computed(() => logViewerStore.selectedFile);
 
 const tempQuery = ref(route.query.query || '');
-const submitQuery = () => replaceQuery(router, 'query', tempQuery.value === '' ? null : tempQuery.value);
+const submitQuery = () => {
+  replaceQuery(router, 'query', tempQuery.value === '' ? null : tempQuery.value);
+  document.getElementById('query-submit')?.focus();
+}
 const clearQuery = () => {
   tempQuery.value = '';
   submitQuery();

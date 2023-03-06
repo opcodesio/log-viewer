@@ -83,7 +83,7 @@ import { useFileStore } from '../stores/files.js';
 import SpinnerIcon from './SpinnerIcon.vue';
 import { replaceQuery, useDropdownDirection } from '../helpers.js';
 import { useRouter } from 'vue-router';
-import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation.js';
+import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation';
 
 const props = defineProps({
   logFile: {

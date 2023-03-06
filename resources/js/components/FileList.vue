@@ -18,11 +18,13 @@
           </span>
         </h1>
 
-        <a v-if="LogViewer.back_to_system_url" :href="LogViewer.back_to_system_url"
-           class="rounded inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700 mt-0">
-          <ArrowLeftIcon class="h-3 w-3 mr-1.5" />
-          {{ LogViewer.back_to_system_label || `Back to ${LogViewer.app_name}` }}
-        </a>
+        <div v-if="LogViewer.back_to_system_url">
+          <a :href="LogViewer.back_to_system_url"
+             class="rounded shrink inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700 mt-0">
+            <ArrowLeftIcon class="h-3 w-3 mr-1.5" />
+            {{ LogViewer.back_to_system_label || `Back to ${LogViewer.app_name}` }}
+          </a>
+        </div>
       </div>
 
       <div v-if="LogViewer.assets_outdated" class="bg-yellow-100 dark:bg-yellow-900 bg-opacity-75 dark:bg-opacity-40 border border-yellow-300 dark:border-yellow-800 rounded-md px-2 py-1 mt-2 text-xs leading-5 text-yellow-700 dark:text-yellow-400">
@@ -212,7 +214,7 @@ import FileListItem from './FileListItem.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import HostSelector from './HostSelector.vue';
-import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation.js';
+import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation';
 
 const router = useRouter();
 const route = useRoute();

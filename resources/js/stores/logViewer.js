@@ -23,6 +23,7 @@ export const useLogViewerStore = defineStore({
     shorterStackTraces: useLocalStorage('logViewerShorterStackTraces', false),
     direction: useLocalStorage('logViewerDirection', 'desc'),
     resultsPerPage: useLocalStorage('logViewerResultsPerPage', 25),
+    helpSlideOverOpen: false,
 
     // Log data
     loading: false,

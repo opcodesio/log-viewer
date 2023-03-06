@@ -17,7 +17,7 @@ import { ref } from 'vue';
 import { copyToClipboard } from '../helpers.js';
 import { LinkIcon } from '@heroicons/vue/24/outline';
 import { HandThumbUpIcon } from '@heroicons/vue/24/solid';
-import { handleLogLinkKeyboardNavigation } from '../keyboardNavigation.js';
+import { handleLogLinkKeyboardNavigation } from '../keyboardNavigation';
 
 const props = defineProps({
   log: {

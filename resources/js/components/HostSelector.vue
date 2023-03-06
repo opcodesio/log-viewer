@@ -1,9 +1,9 @@
 <template>
   <Listbox as="div" v-model="hostStore.selectedHostIdentifier">
-    <ListboxLabel class="ml-1 block text-sm text-gray-500 dark:text-gray-400">Select server</ListboxLabel>
+    <ListboxLabel class="ml-1 block text-sm text-gray-500 dark:text-gray-400">Select host</ListboxLabel>
 
     <div class="relative mt-1">
-      <ListboxButton class="cursor-pointer relative text-gray-800 dark:text-gray-200 w-full cursor-default rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2 pl-4 pr-10 text-left hover:border-brand-600 hover:dark:border-brand-800 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 text-sm">
+      <ListboxButton id="hosts-toggle-button" class="cursor-pointer relative text-gray-800 dark:text-gray-200 w-full cursor-default rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 py-2 pl-4 pr-10 text-left hover:border-brand-600 hover:dark:border-brand-800 focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 text-sm">
         <span class="block truncate">{{ hostStore.selectedHost?.name || 'Please select a server' }}</span>
         <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
           <ChevronDownIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />

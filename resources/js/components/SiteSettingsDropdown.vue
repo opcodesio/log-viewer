@@ -57,6 +57,13 @@
           </MenuItem>
 
           <MenuItem v-slot="{ active }">
+            <button @click="logViewerStore.helpSlideOverOpen = true" :class="[active ? 'active' : '']">
+              <QuestionMarkCircleIcon class="w-4 h-4" />
+              Keyboard Shortcuts
+            </button>
+          </MenuItem>
+
+          <MenuItem v-slot="{ active }">
             <a href="https://log-viewer.opcodes.io/docs" target="_blank" :class="[active ? 'active' : '']">
               <QuestionMarkCircleIcon class="w-4 h-4" />
               Documentation

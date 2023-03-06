@@ -23,6 +23,8 @@
       <bmc-logo class="h-6 w-auto" title="Support me by buying me a cup of coffee ❤️" />
     </a>
   </div>
+
+  <keyboard-shortcuts-overlay />
 </template>
 
 <script setup>
@@ -34,9 +36,11 @@ import { useFileStore } from '../stores/files.js';
 import { useSearchStore } from '../stores/search.js';
 import { usePaginationStore } from '../stores/pagination.js';
 import { useRoute, useRouter } from 'vue-router';
-import { onBeforeMount, onMounted, watch } from 'vue';
+import { onBeforeMount, onBeforeUnmount, onMounted, watch } from 'vue';
 import BmcLogo from '../components/BmcLogo.vue';
 import { replaceQuery } from '../helpers.js';
+import { registerGlobalShortcuts, unregisterGlobalShortcuts } from '../keyboardNavigation';
+import KeyboardShortcutsOverlay from '../components/KeyboardShortcutsOverlay.vue';
 
 const hostStore = useHostStore();
 const logViewerStore = useLogViewerStore();
@@ -46,7 +50,14 @@ const paginationStore = usePaginationStore();
 const route = useRoute();
 const router = useRouter();
 
-onBeforeMount(() => logViewerStore.syncTheme());
+onBeforeMount(() => {
+  logViewerStore.syncTheme();
+  registerGlobalShortcuts();
+});
+
+onBeforeUnmount(() => {
+  unregisterGlobalShortcuts();
+})
 
 onMounted(() => {
   // This makes sure we react to device's dark mode changes

@@ -2,7 +2,7 @@
   <div class="flex items-center">
     <Menu as="div" class="mr-5 relative log-levels-selector">
 
-      <MenuButton as="button" class="dropdown-toggle badge none" :class="severityStore.levelsSelected.length > 0 ? 'active' : ''">
+      <MenuButton as="button" id="severity-dropdown-toggle" class="dropdown-toggle badge none" :class="severityStore.levelsSelected.length > 0 ? 'active' : ''">
         <template v-if="severityStore.levelsSelected.length > 2">
           <span class="opacity-90 mr-1">{{ severityStore.totalResultsSelected.toLocaleString() + (logViewerStore.hasMoreResults ? '+' : '') }} entries in</span>
           <strong class="font-semibold">{{ severityStore.levelsSelected[0].level_name }} + {{ severityStore.levelsSelected.length - 1 }} more</strong>
