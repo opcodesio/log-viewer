@@ -18,7 +18,7 @@
 
         <MenuButton as="button" class="file-dropdown-toggle group-hover:border-brand-600 group-hover:dark:border-brand-800"
                     :data-toggle-id="logFile.identifier"
-                    @keydown.prevent.stop="handleKeyboardFileSettingsNavigation"
+                    @keydown="handleKeyboardFileSettingsNavigation"
                     @click.stop="calculateDropdownDirection($event.target)">
           <EllipsisVerticalIcon class="w-4 h-4 pointer-events-none" />
         </MenuButton>

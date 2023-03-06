@@ -89,7 +89,7 @@ return [
 
     'hosts' => [
         'local' => [
-            'name' => 'Local',
+            'name' => ucfirst(env('APP_ENV', 'local')),
         ],
 
         // 'staging' => [
