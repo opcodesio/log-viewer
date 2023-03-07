@@ -168,7 +168,7 @@
           <p class="mb-5">No log files were found.</p>
           <div class="flex items-center justify-center px-1">
             <button @click.prevent="fileStore.loadFolders()"
-                    class="inline-flex items-center px-4 py-2 text-left text-sm bg-white hover:bg-gray-50 outline-brand-500 dark:outline-brand-800 text-gray-900 dark:text-gray-200 rounded-md"
+                    class="inline-flex items-center px-4 py-2 text-left text-sm bg-white hover:bg-gray-50 outline-brand-500 dark:outline-brand-800 text-gray-900 dark:text-gray-200 rounded-md dark:bg-gray-700 dark:hover:bg-gray-600"
             >
               <ArrowPathIcon class="w-4 h-4 mr-1.5" />
               Refresh file list
