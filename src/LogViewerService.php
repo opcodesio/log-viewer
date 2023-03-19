@@ -257,6 +257,14 @@ class LogViewerService
             return 'unit-tests';
         }
 
-        return InstalledVersions::getPrettyVersion('opcodesio/log-viewer') ?? 'dev-main';
+        if (class_exists(InstalledVersions::class)) {
+            return InstalledVersions::getPrettyVersion('opcodesio/log-viewer') ?? 'dev-main';
+        } else {
+            $composerJson = json_decode(file_get_contents(__DIR__.'/../composer.json'), true);
+
+            return is_array($composerJson) && isset($composerJson['version'])
+                ? $composerJson['version']
+                : 'dev-main';
+        }
     }
 }
