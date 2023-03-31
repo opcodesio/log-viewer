@@ -104,3 +104,14 @@ it('handles missing message', function () {
     assertEquals('production', $log->environment);
     assertEquals('', $log->fullText);
 });
+
+it('can set a custom timezone of the log entry', function () {
+    $text = '[2022-11-07 17:51:33] production.ERROR: test message';
+    config(['log-viewer.timezone' => $tz = 'Europe/Vilnius']);
+
+    $log = new Log(0, $text, 'laravel.log', 0);
+
+    assertEquals($tz, $log->time->timezoneName);
+    $expectedTime = \Carbon\Carbon::parse('2022-11-07 17:51:33', 'UTC')->tz($tz)->toDateTimeString();
+    assertEquals($expectedTime, $log->time->toDateTimeString());
+});

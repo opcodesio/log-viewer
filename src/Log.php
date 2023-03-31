@@ -50,7 +50,9 @@ class Log
         $firstLineSplit = str_split($firstLine, 1000);
         preg_match(LogViewer::laravelRegexPattern(), array_shift($firstLineSplit), $matches);
 
-        $this->time = Carbon::parse($matches[1])->tz(config('app.timezone', 'UTC'));
+        $this->time = Carbon::parse($matches[1])->tz(
+            config('log-viewer.timezone', config('app.timezone', 'UTC'))
+        );
 
         // $matches[2] contains microseconds, which is already handled
         // $matches[3] contains timezone offset, which is already handled

@@ -52,6 +52,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Log Viewer time zone.
+    |--------------------------------------------------------------------------
+    | The time zone in which to display the times in the UI. Defaults to
+    | the application's timezone defined in config/app.php.
+    |
+    */
+
+    'timezone' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Log Viewer route middleware.
     |--------------------------------------------------------------------------
     | Optional middleware to use when loading the initial Log Viewer page.
