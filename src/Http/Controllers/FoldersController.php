@@ -23,7 +23,7 @@ class FoldersController
             $folders = $folders->sortByLatestFirstIncludingFiles();
         }
 
-        return LogFolderResource::collection($folders);
+        return LogFolderResource::collection($folders->values());
     }
 
     public function download(string $folderIdentifier)
