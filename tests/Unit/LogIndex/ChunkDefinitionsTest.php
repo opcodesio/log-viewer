@@ -95,7 +95,7 @@ it('saves chunks to cache', function () {
     expect($cachedMetadata)->toHaveKey('chunk_definitions')
         ->and($cachedMetadata['chunk_definitions'])->toBeArray()->toHaveCount(1)
         ->and($cachedMetadata['chunk_definitions'][0])
-            ->toBe($logIndex->getChunkDefinition(0));
+        ->toBe($logIndex->getChunkDefinition(0));
 
     // after adding a new log entry, the cache won't be updated until calling the –>save() method.
     $logIndex->addToIndex(3500, now(), 'info');
@@ -109,7 +109,7 @@ it('saves chunks to cache', function () {
     expect($updatedCachedMetadata)->not->toBe($cachedMetadata)
         ->toHaveKey('current_chunk_definition')
         ->and($updatedCachedMetadata['current_chunk_definition'])
-            ->toBe($logIndex->getChunkDefinition(1));
+        ->toBe($logIndex->getChunkDefinition(1));
 });
 
 it('keeps the chunk definitions after re-instantiating the log index', function () {
