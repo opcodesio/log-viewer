@@ -60,6 +60,11 @@ class LogReader
         }
     }
 
+    public static function clearInstances(): void
+    {
+        self::$_instances = [];
+    }
+
     public function index(): LogIndex
     {
         return $this->file->index($this->query);

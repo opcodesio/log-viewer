@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use Laravel\Octane\Events\RequestTerminated;
 use Opcodes\LogViewer\Console\Commands\GenerateDummyLogsCommand;
 use Opcodes\LogViewer\Console\Commands\PublishCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
@@ -62,6 +63,7 @@ class LogViewerServiceProvider extends ServiceProvider
         $this->defineAssetPublishing();
         $this->defineDefaultGates();
         $this->configureMiddleware();
+        $this->resetStateAfterOctaneRequest();
 
         Event::listen(LogFileDeleted::class, function (LogFileDeleted $event) {
             LogViewer::clearFileCache();
@@ -135,7 +137,14 @@ class LogViewerServiceProvider extends ServiceProvider
         $kernel->prependToMiddlewarePriority(EnsureFrontendRequestsAreStateful::class);
     }
 
-    private function isEnabled(): bool
+    protected function resetStateAfterOctaneRequest()
+    {
+        $this->app['events']->listen(RequestTerminated::class, function ($event) {
+            LogReader::clearInstances();
+        });
+    }
+
+    protected function isEnabled(): bool
     {
         return (bool) $this->app['config']->get("{$this->name}.enabled", true);
     }
