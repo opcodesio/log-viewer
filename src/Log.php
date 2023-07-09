@@ -22,6 +22,8 @@ class Log
 
     public string $fullText;
 
+    public array $contexts = [];
+
     public bool $fullTextIncomplete = false;
 
     public int $fullTextLength;
@@ -103,6 +105,8 @@ class Log
         }
 
         $this->fullText = trim($text);
+
+        $this->extractContextsFromFullText();
     }
 
     public function fullTextMatches(string $query = null): bool
@@ -126,5 +130,27 @@ class Log
     public function url(): string
     {
         return route('log-viewer.index', ['file' => $this->fileIdentifier, 'query' => 'log-index:'.$this->index]);
+    }
+
+    public function extractContextsFromFullText(): void
+    {
+        // The regex pattern to find JSON strings.
+        // $pattern = '~\{(?:[^{}]|(?R))*\}~';
+        $pattern = '/(\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\])/';
+
+        // Find matches.
+        preg_match_all($pattern, $this->fullText, $matches);
+
+        if (! isset($matches[0])) return;
+
+        // Loop through the matches.
+        foreach ($matches[0] as $json_string) {
+            // Try to decode the JSON string. If it fails, json_last_error() will return a non-zero value.
+            $json_data = json_decode($json_string, true);
+            if (json_last_error() == JSON_ERROR_NONE) {
+                $this->contexts[] = $json_data;
+                $this->fullText = str_replace($json_string, '', $this->fullText);
+            }
+        }
     }
 }
