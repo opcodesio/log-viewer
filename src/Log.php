@@ -141,7 +141,9 @@ class Log
         // Find matches.
         preg_match_all($pattern, $this->fullText, $matches);
 
-        if (! isset($matches[0])) return;
+        if (! isset($matches[0])) {
+            return;
+        }
 
         // Loop through the matches.
         foreach ($matches[0] as $json_string) {
