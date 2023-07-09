@@ -23,7 +23,6 @@ it('can understand multi-line logs', function () {
     $logText = <<<'EOF'
 Example log entry for the level debug
 with multiple lines of content.
-{"one":1,"two":"two","three":[1,2,3]}
 can contain dumped objects or JSON as well - it's all part of the contents.
 EOF;
     $text = '[2022-08-25 11:16:17] local.DEBUG: '.$logText;
@@ -32,6 +31,23 @@ EOF;
 
     assertEquals('Example log entry for the level debug', $log->text);
     assertEquals($logText, $log->fullText);
+});
+
+it('extracts JSON from the log text', function () {
+    $logText = <<<'EOF'
+Example log entry for the level debug
+with multiple lines of content.
+{"one":1,"two":"two","three":[1,2,3]}
+can contain dumped objects or JSON as well - it's all part of the contents.
+EOF;
+    $jsonString = '{"one":1,"two":"two","three":[1,2,3]}';
+    $text = '[2022-08-25 11:16:17] local.DEBUG: '.$logText;
+
+    $log = new Log(0, $text, 'laravel.log', 0);
+
+    assertEquals('Example log entry for the level debug', $log->text);
+    assertEquals(str_replace($jsonString, '', $logText), $log->fullText);
+    assertEquals(json_decode($jsonString, true), $log->contexts[0]);
 });
 
 it('can understand the optional microseconds in the timestamp', function () {
@@ -61,8 +77,8 @@ it('can understand the optional time offset in the timestamp', function () {
 });
 
 it('can handle text in-between timestamp and environment/severity', function () {
-    $text = '[2022-08-25 11:16:17] some additional text [] and characters // !@#$ local.DEBUG: Example log entry for the level debug';
-    $expectedAdditionalText = 'some additional text [] and characters // !@#$';
+    $text = '[2022-08-25 11:16:17] some additional text [!@#$%^&] and characters // !@#$ local.DEBUG: Example log entry for the level debug';
+    $expectedAdditionalText = 'some additional text [!@#$%^&] and characters // !@#$';
 
     $log = new Log(0, $text, 'laravel.log', 0);
 

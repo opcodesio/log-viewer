@@ -22,6 +22,7 @@ class LogResource extends JsonResource
             'level_class' => $this->level->getClass(),
             'environment' => $this->environment,
             'text' => $this->text,
+            'contexts' => $this->contexts,
             'full_text' => $this->fullText,
             'full_text_incomplete' => $this->fullTextIncomplete,
             'full_text_length' => $this->fullTextLength,
