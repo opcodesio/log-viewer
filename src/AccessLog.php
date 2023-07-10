@@ -8,25 +8,36 @@ use Illuminate\Support\Carbon;
 class AccessLog
 {
     public string $ip;
+
     public string $identity;
+
     public string $remoteUser;
+
     public CarbonInterface $datetime;
+
     public string $method;
+
     public string $path;
+
     public string $httpVersion;
+
     public int $statusCode;
+
     public int $contentLength;
+
     public string $referrer;
+
     public string $userAgent;
+
     public ?string $fileIdentifier = null;
+
     public ?int $filePosition = null;
 
     public function __construct(
         $ip, $identity, $remoteUser, $datetime, $method, $path, $httpVersion,
         $statusCode, $contentLength, $referrer, $userAgent,
         $fileIdentifier = null, $filePosition = null,
-    )
-    {
+    ) {
         $this->ip = $ip;
         $this->identity = $identity;
         $this->remoteUser = $remoteUser;

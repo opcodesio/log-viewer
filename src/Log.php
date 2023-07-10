@@ -11,15 +11,25 @@ use Opcodes\LogViewer\Utils\Utils;
 class Log
 {
     public int $index;
+
     public CarbonInterface $time;
+
     public Level $level;
+
     public string $environment;
+
     public string $text;
+
     public string $fullText;
+
     public array $contexts = [];
+
     public bool $fullTextIncomplete = false;
+
     public int $fullTextLength;
+
     public string $fileIdentifier;
+
     public int $filePosition;
 
     public function __construct(
@@ -142,7 +152,7 @@ class Log
 
             if (json_last_error() == JSON_ERROR_CTRL_CHAR) {
                 // might need to escape new lines
-                $json_data = json_decode(str_replace("\n", "\\n", $json_string), true);
+                $json_data = json_decode(str_replace("\n", '\\n', $json_string), true);
             }
 
             if (json_last_error() == JSON_ERROR_NONE) {

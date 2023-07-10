@@ -11,16 +11,22 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class LogFile
 {
     const TYPE_LARAVEL = 'laravel';
+
     const TYPE_HTTP_ACCESS = 'http_access';
 
     use Concerns\LogFile\HasMetadata;
     use Concerns\LogFile\CanCacheData;
 
     public string $path;
+
     public string $name;
+
     public string $identifier;
+
     public string $subFolder = '';
+
     public string $type = self::TYPE_LARAVEL;
+
     private array $_logIndexCache;
 
     public function __construct(string $path, string $type = self::TYPE_LARAVEL)
