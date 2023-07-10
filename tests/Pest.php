@@ -20,15 +20,15 @@ uses()->beforeEach(fn () => Artisan::call('log-viewer:publish'))->in('Feature');
 /**
  * Generate log files with random data
  */
-function generateLogFiles(array $files, string $content = null, bool $randomContent = false): array
+function generateLogFiles(array $files, string $content = null, bool $randomContent = false, $type = LogFile::TYPE_LARAVEL): array
 {
     return array_map(
-        fn ($file) => generateLogFile($file, $content, $randomContent),
+        fn ($file) => generateLogFile($file, $content, $randomContent, $type),
         $files
     );
 }
 
-function generateLogFile(string $fileName = null, string $content = null, bool $randomContent = false): LogFile
+function generateLogFile(string $fileName = null, string $content = null, bool $randomContent = false, $type = LogFile::TYPE_LARAVEL): LogFile
 {
     if (is_null($fileName)) {
         $fileName = \Illuminate\Support\Str::random().'.log';
@@ -50,7 +50,7 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
     // we perform a regular PHP assertion, so it doesn't count towards the unit test assertion count.
     assert(file_exists($path));
 
-    return new LogFile($path);
+    return new LogFile($path, $type);
 }
 
 function dummyLogData(int $lines = null): string
