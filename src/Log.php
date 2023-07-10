@@ -152,7 +152,7 @@ class Log
 
             if (json_last_error() == JSON_ERROR_CTRL_CHAR) {
                 // might need to escape new lines
-                $json_data = json_decode(str_replace("\n", "\\n", $json_string), true);
+                $json_data = json_decode(str_replace("\n", '\\n', $json_string), true);
             }
 
             if (json_last_error() == JSON_ERROR_NONE) {
