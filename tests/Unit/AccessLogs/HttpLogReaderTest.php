@@ -47,6 +47,49 @@ it('can read one log at a time', function () {
     }
 });
 
+it('provides the correct file position in the log entry', function () {
+    $lines = [
+        makeHttpAccessLogEntry(),
+        makeHttpAccessLogEntry(),
+        makeHttpAccessLogEntry(),
+    ];
+
+    $file = generateLogFile('http.log', implode("\n", $lines), type: LogFile::TYPE_HTTP_ACCESS);
+
+    $httpLogReader = new HttpLogReader($file);
+
+    $expectedPosition = 0;
+    foreach ($lines as $expectedLine) {
+        $actualLine = $httpLogReader->next();
+        expect($actualLine->filePosition)->toBe($expectedPosition);
+        $expectedPosition += strlen($expectedLine) + strlen("\n");
+    }
+});
+
+it('provides the correct file position when reading backwards', function () {
+    $lines = [
+        makeHttpAccessLogEntry(),
+        makeHttpAccessLogEntry(),
+        makeHttpAccessLogEntry(),
+    ];
+
+    $file = generateLogFile('http.log', implode("\n", $lines), type: LogFile::TYPE_HTTP_ACCESS);
+
+    $httpLogReader = (new HttpLogReader($file))->reverse();
+
+    // expected positions are reversed, because we're reading in reverse
+    $expectedPositions = [
+        strlen($lines[0]) + strlen("\n") + strlen($lines[1]) + strlen("\n"),
+        strlen($lines[0]) + strlen("\n"),
+        0,
+    ];
+
+    foreach ($expectedPositions as $expectedPosition) {
+        $actualLine = $httpLogReader->next();
+        expect($actualLine->filePosition)->toBe($expectedPosition);
+    }
+});
+
 it('can skip a number of logs', function () {
     $lines = [
         makeHttpAccessLogEntry(),
@@ -69,13 +112,12 @@ it('can read in reverse direction', function () {
     ];
     $file = generateLogFile('http.log', implode("\n", $lines), type: LogFile::TYPE_HTTP_ACCESS);
 
-    $httpLogReader = new HttpLogReader($file);
+    $httpLogReader = (new HttpLogReader($file))->reverse();
 
-    $entry = $httpLogReader->reverse()->next();
-    expect($entry->text)->toBe($lines[2]);
-
-    $entry = $httpLogReader->next();
-    expect($entry->text)->toBe($lines[1]);
+    foreach (array_reverse($lines) as $expectedLine) {
+        $actualLine = $httpLogReader->next();
+        expect($actualLine->text)->toBe($expectedLine);
+    }
 });
 
 it('can limit the number of lots to get', function () {

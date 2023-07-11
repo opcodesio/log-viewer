@@ -177,13 +177,13 @@ class HttpLogReader
         }
 
         // get the next log line
-        $line = match ($this->direction) {
+        list($text, $position) = match ($this->direction) {
             Direction::Forward => $this->readLineForward(),
             Direction::Backward => $this->readLineBackward(),
             default => throw new \Exception('Unknown direction: '.$this->direction),
         };
 
-        if ($line === false) {
+        if ($text === false) {
             return null;
         }
 
@@ -193,38 +193,41 @@ class HttpLogReader
             return $this->next();
         }
 
+        return $this->makeLog($text, $position);
+    }
+
+    protected function readLineForward(): array
+    {
         $position = ftell($this->fileHandle);
+        $line = fgets($this->fileHandle);
 
-        return $this->makeLog($line, $position);
+        return [$line, $position];
     }
 
-    protected function readLineForward(): string|bool
+    protected function readLineBackward(): array
     {
-        return fgets($this->fileHandle);
-    }
-
-    protected function readLineBackward(): string|bool
-    {
-        $line = '';
+        $line = false;
+        $position = null;
 
         while (true) {
             if (ftell($this->fileHandle) <= 0) {
-                return false;
+                return [$line, 0];
             }
 
             fseek($this->fileHandle, -1, SEEK_CUR);
             $char = fgetc($this->fileHandle);
 
             if ($char === "\n") {
+                $position = ftell($this->fileHandle);
                 fseek($this->fileHandle, -1, SEEK_CUR);
                 break;
             }
 
-            $line = $char.$line;
+            $line = $char.($line ?: '');
             fseek($this->fileHandle, -1, SEEK_CUR);
         }
 
-        return $line;
+        return [$line, $position];
     }
 
     protected function makeLog(string $text, int $filePosition): HttpLog

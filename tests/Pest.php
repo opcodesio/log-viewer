@@ -90,7 +90,7 @@ function makeHttpAccessLogEntry(CarbonInterface $date = null, string $method = '
     $contentLength ??= rand(1, 9999);
 
     return <<<EOF
-$randomIp - - [$dateFormatted] "$method /$path HTTP/2.0" $statusCode $contentLength "http://www.example.com/post.php" "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko"
+$randomIp - - [$dateFormatted] "$method $path HTTP/2.0" $statusCode $contentLength "http://www.example.com/post.php" "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko"
 EOF;
 }
 
