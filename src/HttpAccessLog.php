@@ -8,23 +8,32 @@ use Illuminate\Support\Carbon;
 class HttpAccessLog extends HttpLog
 {
     public ?string $ip;
+
     public ?string $identity;
+
     public ?string $remoteUser;
+
     public ?CarbonInterface $datetime;
+
     public ?string $method;
+
     public ?string $path;
+
     public ?string $httpVersion;
+
     public ?int $statusCode;
+
     public ?int $contentLength;
+
     public ?string $referrer;
+
     public ?string $userAgent;
 
     public function __construct(
         public string $text,
         public ?string $fileIdentifier = null,
         public ?int $filePosition = null,
-    )
-    {
+    ) {
         parent::__construct($text, $fileIdentifier, $filePosition);
 
         $matches = $this->parseText($this->text);

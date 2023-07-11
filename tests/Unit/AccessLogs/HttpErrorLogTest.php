@@ -42,7 +42,7 @@ it('handles missing details', function () {
 it('strips empty chars at the end', function ($chars) {
     $line = "[Sun Jul 09 09:08:27.901758 2023] [php:error] [pid 116942] [client 20.253.242.138:50173] script '/var/www/cgi-bin/cloud.php' not found or unable to stat";
 
-    $accessLog = new HttpErrorLog($line . $chars);
+    $accessLog = new HttpErrorLog($line.$chars);
 
     expect($accessLog->text)->toBe($line);
 })->with([

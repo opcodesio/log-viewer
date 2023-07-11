@@ -8,18 +8,22 @@ use Illuminate\Support\Carbon;
 class HttpErrorLog extends HttpLog
 {
     public ?CarbonInterface $datetime;
+
     public ?string $module;
+
     public ?string $level;
+
     public ?int $pid;
+
     public ?string $client;
+
     public ?string $message;
 
     public function __construct(
         public string $text,
         public ?string $fileIdentifier = null,
         public ?int $filePosition = null,
-    )
-    {
+    ) {
         parent::__construct($text, $fileIdentifier, $filePosition);
 
         $matches = $this->parseText($text);

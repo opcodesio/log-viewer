@@ -54,7 +54,7 @@ it('can handle missing values', function () {
 it('strips empty chars at the end', function ($chars) {
     $line = '205.123.147.41 - arunas [18/Apr/2023:05:21:57 +0000] "GET /tag HTTP/1.1" 500 2519 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"';
 
-    $accessLog = new HttpAccessLog($line . $chars);
+    $accessLog = new HttpAccessLog($line.$chars);
 
     expect($accessLog->text)->toBe($line);
 })->with([

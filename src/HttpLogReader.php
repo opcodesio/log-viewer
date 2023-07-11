@@ -125,7 +125,9 @@ class HttpLogReader
 
     public function reset(): self
     {
-        if ($this->isClosed()) return $this;
+        if ($this->isClosed()) {
+            return $this;
+        }
 
         $this->resetFilePointer();
 
@@ -187,6 +189,7 @@ class HttpLogReader
 
         if ($this->skip > 0) {
             $this->skip--;
+
             return $this->next();
         }
 

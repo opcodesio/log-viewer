@@ -13,6 +13,7 @@ class LogFile
     const TYPE_LARAVEL = 'laravel';
 
     const TYPE_HTTP_ACCESS = 'http_access';
+
     const TYPE_HTTP_ERROR = 'http_error';
 
     use Concerns\LogFile\HasMetadata;
