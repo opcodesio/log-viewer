@@ -70,6 +70,16 @@ After installing the package, publish the front-end assets by running:
 php artisan log-viewer:publish
 ```
 
+This command should also be appended to the list of post-update commands in your `composer.json`:
+
+```bash
+"post-update-cmd": [
+    "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+    // ...
+    "@php artisan log-viewer:publish"
+],
+```
+
 ### Usage
 
 Once the installation is complete, you will be able to access **Log Viewer** directly in your browser.
