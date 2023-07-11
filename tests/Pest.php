@@ -45,7 +45,7 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
         File::delete($path);
     }
 
-    File::put($path, $content ?? ($randomContent ? dummyLogData() : ''));
+    File::put($path, $content ?? ($randomContent ? dummyLogData(type: $type) : ''));
 
     // we perform a regular PHP assertion, so it doesn't count towards the unit test assertion count.
     assert(file_exists($path));
@@ -53,14 +53,18 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
     return new LogFile($path, $type);
 }
 
-function dummyLogData(int $lines = null): string
+function dummyLogData(int $lines = null, string $type = LogFile::TYPE_LARAVEL): string
 {
     if (is_null($lines)) {
         $lines = rand(1, 10);
     }
 
     return implode("\n", array_map(
-        fn ($_) => makeLogEntry(),
+        fn ($_) => match ($type) {
+            LogFile::TYPE_LARAVEL => makeLaravelLogEntry(),
+            LogFile::TYPE_HTTP_ACCESS => makeHttpAccessLogEntry(),
+            LogFile::TYPE_HTTP_ERROR => makeHttpErrorLogEntry(),
+        },
         range(1, $lines)
     ));
 }
@@ -70,12 +74,38 @@ function clearGeneratedLogFiles(): void
     File::cleanDirectory(storage_path('logs'));
 }
 
-function makeLogEntry(CarbonInterface $date = null, string $level = 'debug', string $message = 'Testing log entry'): string
+function makeLaravelLogEntry(CarbonInterface $date = null, string $level = 'debug', string $message = 'Testing log entry'): string
 {
     $dateFormatted = $date instanceof CarbonInterface ? $date->toDateTimeString() : now()->toDateTimeString();
     $level = strtoupper($level);
 
     return "[$dateFormatted] local.$level: $message";
+}
+
+function makeHttpAccessLogEntry(CarbonInterface $date = null, string $method = 'get', string $path = '/app', int $statusCode = 200, int $contentLength = null): string
+{
+    $randomIp = rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255);
+    $dateFormatted = $date instanceof CarbonInterface ? $date->format('d/M/Y:H:i:s O') : now()->format('d/M/Y:H:i:s O');
+    $method = strtoupper($method);
+    $contentLength ??= rand(1, 9999);
+
+    return <<<EOF
+$randomIp - - [$dateFormatted] "$method /$path HTTP/2.0" $statusCode $contentLength "http://www.example.com/post.php" "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko"
+EOF;
+}
+
+function makeHttpErrorLogEntry(CarbonInterface $date = null, string $module = null, string $level = null, int $pid = null, string $client = null, string $message = null): string
+{
+    $dateFormatted = $date instanceof CarbonInterface ? $date->format('D M d H:i:s.u Y') : now()->format('D M d H:i:s.u Y');
+    $module ??= 'php';
+    $level ??= 'error';
+    $pid ??= rand(1, 9999);
+    $client ??= rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255);
+    $message ??= 'Testing log entry';
+
+    return <<<EOF
+[$dateFormatted] [$module:$level] [pid $pid] [client $client] $message
+EOF;
 }
 
 function createLogIndex($file = null, $query = null, array $predefinedLogs = []): LogIndex

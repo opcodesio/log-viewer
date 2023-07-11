@@ -12,6 +12,7 @@ class LogFile
 {
     const TYPE_LARAVEL = 'laravel';
     const TYPE_HTTP_ACCESS = 'http_access';
+    const TYPE_HTTP_ERROR = 'http_error';
 
     use Concerns\LogFile\HasMetadata;
     use Concerns\LogFile\CanCacheData;
@@ -81,6 +82,11 @@ class LogFile
     public function download(): BinaryFileResponse
     {
         return response()->download($this->path);
+    }
+
+    public function contents(): string
+    {
+        return file_get_contents($this->path);
     }
 
     public function addRelatedIndex(LogIndex $logIndex): void

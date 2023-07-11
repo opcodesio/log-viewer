@@ -205,7 +205,7 @@ it('can check whether the index is incomplete', function () {
     expect($logIndex->incomplete())->toBeFalse();
 
     // if we add some data to the file, the log index should be considered incomplete
-    file_put_contents($logFile->path, makeLogEntry());
+    file_put_contents($logFile->path, makeLaravelLogEntry());
     $logIndex = createLogIndex($logFile);
     expect($logIndex->incomplete())->toBeTrue();
 
