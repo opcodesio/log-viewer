@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 
 class HttpAccessLog extends HttpLog
 {
-    static string $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
+    public static string $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
 
     public ?string $ip;
 

@@ -13,8 +13,11 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class LogFile
 {
     const TYPE_LARAVEL = 'laravel';
+
     const TYPE_HTTP_ACCESS = 'http_access';
+
     const TYPE_HTTP_ERROR_APACHE = 'http_error_apache';
+
     const TYPE_HTTP_ERROR_NGINX = 'http_error_nginx';
 
     use Concerns\LogFile\HasMetadata;
