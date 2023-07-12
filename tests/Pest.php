@@ -63,7 +63,8 @@ function dummyLogData(int $lines = null, string $type = LogFile::TYPE_LARAVEL): 
         fn ($_) => match ($type) {
             LogFile::TYPE_LARAVEL => makeLaravelLogEntry(),
             LogFile::TYPE_HTTP_ACCESS => makeHttpAccessLogEntry(),
-            LogFile::TYPE_HTTP_ERROR => makeHttpErrorLogEntry(),
+            LogFile::TYPE_HTTP_ERROR_APACHE => makeHttpApacheErrorLogEntry(),
+            LogFile::TYPE_HTTP_ERROR_NGINX => makeHttpNginxErrorLogEntry(),
         },
         range(1, $lines)
     ));
@@ -94,7 +95,7 @@ $randomIp - - [$dateFormatted] "$method $path HTTP/2.0" $statusCode $contentLeng
 EOF;
 }
 
-function makeHttpErrorLogEntry(CarbonInterface $date = null, string $module = null, string $level = null, int $pid = null, string $client = null, string $message = null): string
+function makeHttpApacheErrorLogEntry(CarbonInterface $date = null, string $module = null, string $level = null, int $pid = null, string $client = null, string $message = null): string
 {
     $dateFormatted = $date instanceof CarbonInterface ? $date->format('D M d H:i:s.u Y') : now()->format('D M d H:i:s.u Y');
     $module ??= 'php';
@@ -105,6 +106,22 @@ function makeHttpErrorLogEntry(CarbonInterface $date = null, string $module = nu
 
     return <<<EOF
 [$dateFormatted] [$module:$level] [pid $pid] [client $client] $message
+EOF;
+}
+
+function makeHttpNginxErrorLogEntry(CarbonInterface $date = null, string $level = null, string $message = null, string $client = null, string $server = null, string $request = null, string $host = null): string
+{
+    $dateFormatted = $date instanceof CarbonInterface ? $date->format('Y/m/d H:i:s') : now()->format('Y/m/d H:i:s');
+    $level ??= 'error';
+    $pid ??= rand(1, 9999);
+    $client ??= rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255);
+    $message ??= 'Testing log entry';
+    $server ??= '127.0.0.1:80';
+    $request ??= 'GET / HTTP/1.1';
+    $host ??= 'localhost';
+
+    return <<<EOF
+$dateFormatted [$level] 23263#0: $message, client: $client, server: $server, request: "$request", host: "$host"
 EOF;
 }
 

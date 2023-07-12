@@ -149,6 +149,18 @@ return [
         // 'my_secret.log'
     ],
 
+    'http_logs' => [
+        'include_files' => [
+            '/var/log/httpd/*',
+            '/var/log/nginx/*',
+            // '/absolute/paths/supported',
+        ],
+
+        'exclude_files' => [
+            // 'my_secret.log'
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     |  Shorter stack trace filters.

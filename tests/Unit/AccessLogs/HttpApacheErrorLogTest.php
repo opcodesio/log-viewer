@@ -1,11 +1,11 @@
 <?php
 
-use Opcodes\LogViewer\HttpErrorLog;
+use Opcodes\LogViewer\HttpApacheErrorLog;
 
 it('can parse an HTTP error log', function () {
     $line = "[Sun Jul 09 09:08:27.901758 2023] [php:error] [pid 116942] [client 20.253.242.138:50173] script '/var/www/cgi-bin/cloud.php' not found or unable to stat";
 
-    $log = new HttpErrorLog($line);
+    $log = new HttpApacheErrorLog($line);
 
     expect($log->text)->toBe($line)
         ->and($log->datetime->toDateTimeString())->toBe('2023-07-09 09:08:27')
@@ -16,10 +16,24 @@ it('can parse an HTTP error log', function () {
         ->and($log->message)->toBe("script '/var/www/cgi-bin/cloud.php' not found or unable to stat");
 });
 
+it('can parse an HTTP error log with client part missing', function () {
+    $line = "[Sun Jul 09 09:08:27.901758 2023] [php:error] [pid 116942] script '/var/www/cgi-bin/cloud.php' not found or unable to stat";
+
+    $log = new HttpApacheErrorLog($line);
+
+    expect($log->text)->toBe($line)
+        ->and($log->datetime->toDateTimeString())->toBe('2023-07-09 09:08:27')
+        ->and($log->module)->toBe('php')
+        ->and($log->level)->toBe('error')
+        ->and($log->pid)->toBe(116942)
+        ->and($log->client)->toBe(null)
+        ->and($log->message)->toBe("script '/var/www/cgi-bin/cloud.php' not found or unable to stat");
+});
+
 it('can store the related file details', function () {
     $line = "[Sun Jul 09 09:08:27.901758 2023] [php:error] [pid 116942] [client 20.253.242.138:50173] script '/var/www/cgi-bin/cloud.php' not found or unable to stat";
 
-    $log = new HttpErrorLog($line, $fileIdentifier = 'test-xyz.log', $filePosition = 123);
+    $log = new HttpApacheErrorLog($line, $fileIdentifier = 'test-xyz.log', $filePosition = 123);
 
     expect($log->fileIdentifier)->toBe($fileIdentifier)
         ->and($log->filePosition)->toBe($filePosition);
@@ -28,7 +42,7 @@ it('can store the related file details', function () {
 it('handles missing details', function () {
     $line = '';
 
-    $log = new HttpErrorLog($line);
+    $log = new HttpApacheErrorLog($line);
 
     expect($log->text)->toBe($line)
         ->and($log->datetime?->toDateTimeString())->toBe(null)
@@ -42,7 +56,7 @@ it('handles missing details', function () {
 it('strips empty chars at the end', function ($chars) {
     $line = "[Sun Jul 09 09:08:27.901758 2023] [php:error] [pid 116942] [client 20.253.242.138:50173] script '/var/www/cgi-bin/cloud.php' not found or unable to stat";
 
-    $accessLog = new HttpErrorLog($line.$chars);
+    $accessLog = new HttpApacheErrorLog($line.$chars);
 
     expect($accessLog->text)->toBe($line);
 })->with([

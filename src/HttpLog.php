@@ -11,4 +11,9 @@ abstract class HttpLog
     ) {
         $this->text = rtrim($this->text);
     }
+
+    public static function matches(string $text): bool
+    {
+        return preg_match(static::$regex, $text) === 1;
+    }
 }

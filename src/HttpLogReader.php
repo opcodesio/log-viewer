@@ -234,9 +234,27 @@ class HttpLogReader
     {
         return match ($this->file->type) {
             LogFile::TYPE_HTTP_ACCESS => new HttpAccessLog($text, $this->file->identifier, $filePosition),
-            LogFile::TYPE_HTTP_ERROR => new HttpErrorLog($text, $this->file->identifier, $filePosition),
-            default => throw new \Exception('Unknown log file type: '.$this->file->type),
+            LogFile::TYPE_HTTP_ERROR_APACHE => new HttpApacheErrorLog($text, $this->file->identifier, $filePosition),
+            LogFile::TYPE_HTTP_ERROR_NGINX => new HttpNginxErrorLog($text, $this->file->identifier, $filePosition),
+            default => $this->makeLogByGuessingType($text, $filePosition),
         };
+    }
+
+    protected function makeLogByGuessingType(string $text, int $filePosition): HttpLog
+    {
+        if (HttpAccessLog::matches($text)) {
+            return new HttpAccessLog($text, $this->file->identifier, $filePosition);
+        }
+
+        if (HttpApacheErrorLog::matches($text)) {
+            return new HttpApacheErrorLog($text, $this->file->identifier, $filePosition);
+        }
+
+        if (HttpNginxErrorLog::matches($text)) {
+            return new HttpNginxErrorLog($text, $this->file->identifier, $filePosition);
+        }
+
+        throw new \Exception('Could not determine the log type for "'.$text.'".');
     }
 
     public function __destruct()

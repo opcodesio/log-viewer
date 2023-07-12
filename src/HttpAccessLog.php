@@ -7,6 +7,8 @@ use Illuminate\Support\Carbon;
 
 class HttpAccessLog extends HttpLog
 {
+    static string $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
+
     public ?string $ip;
 
     public ?string $identity;
@@ -55,8 +57,7 @@ class HttpAccessLog extends HttpLog
 
     public function parseText(string $text = ''): array
     {
-        $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
-        preg_match($regex, $text, $matches);
+        preg_match(self::$regex, $text, $matches);
 
         return [
             'ip' => $matches[1] ?? null,
@@ -76,5 +77,10 @@ class HttpAccessLog extends HttpLog
     public function parseDateTime(?string $datetime): ?CarbonInterface
     {
         return $datetime ? Carbon::parse($datetime) : null;
+    }
+
+    public static function matches(string $text): bool
+    {
+        return preg_match(self::$regex, $text) === 1;
     }
 }

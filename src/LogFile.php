@@ -3,18 +3,19 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
+use Opcodes\LogViewer\Facades\Cache;
 use Opcodes\LogViewer\Utils\Utils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogFile
 {
     const TYPE_LARAVEL = 'laravel';
-
     const TYPE_HTTP_ACCESS = 'http_access';
-
-    const TYPE_HTTP_ERROR = 'http_error';
+    const TYPE_HTTP_ERROR_APACHE = 'http_error_apache';
+    const TYPE_HTTP_ERROR_NGINX = 'http_error_nginx';
 
     use Concerns\LogFile\HasMetadata;
     use Concerns\LogFile\CanCacheData;
@@ -43,6 +44,32 @@ class LogFile
         $this->subFolder = rtrim($this->subFolder, DIRECTORY_SEPARATOR);
 
         $this->loadMetadata();
+    }
+
+    public static function makeAndGuessType($filePath): self
+    {
+        $typeCacheKey = 'log-viewer::file-type-'.md5($filePath);
+        $type = Cache::get($typeCacheKey);
+
+        if (isset($type)) {
+            return new self($filePath, $type);
+        }
+
+        $reader = new HttpLogReader(new self($filePath));
+        $logEntry = $reader->next();
+
+        $type = match (get_class($logEntry)) {
+            HttpAccessLog::class => LogFile::TYPE_HTTP_ACCESS,
+            HttpApacheErrorLog::class => LogFile::TYPE_HTTP_ERROR_APACHE,
+            HttpNginxErrorLog::class => LogFile::TYPE_HTTP_ERROR_NGINX,
+            default => null,
+        };
+
+        if (isset($type)) {
+            Cache::put($typeCacheKey, $type, Carbon::now()->addMonth());
+        }
+
+        return new self($filePath, $type);
     }
 
     public function index(string $query = null): LogIndex

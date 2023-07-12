@@ -1,7 +1,7 @@
 <?php
 
 use Opcodes\LogViewer\HttpAccessLog;
-use Opcodes\LogViewer\HttpErrorLog;
+use Opcodes\LogViewer\HttpApacheErrorLog;
 use Opcodes\LogViewer\HttpLogReader;
 use Opcodes\LogViewer\LogFile;
 
@@ -28,7 +28,7 @@ it('returns the correct log instance based on file type', function (string $type
     expect($logs[0])->toBeInstanceOf($expectedClass);
 })->with([
     ['type' => LogFile::TYPE_HTTP_ACCESS, 'expectedClass' => HttpAccessLog::class],
-    ['type' => LogFile::TYPE_HTTP_ERROR, 'expectedClass' => HttpErrorLog::class],
+    ['type' => LogFile::TYPE_HTTP_ERROR_APACHE, 'expectedClass' => HttpApacheErrorLog::class],
 ]);
 
 it('can read one log at a time', function () {

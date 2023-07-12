@@ -21,7 +21,7 @@ class LogViewerService
 
     protected mixed $hostsResolver;
 
-    protected function getFilePaths(): array
+    protected function getLaravelLogFilePaths(): array
     {
         // Because we'll use the base path as a parameter for `glob`, we should escape any
         // glob's special characters and treat those as actual characters of the path.
@@ -70,6 +70,25 @@ class LogViewerService
         return array_values(array_reverse($files));
     }
 
+    protected function getHttpLogFilePaths(): array
+    {
+        $files = [];
+
+        foreach (config('log-viewer.http_logs.include_files', []) as $pattern) {
+            $files = array_merge($files, $this->getFilePathsMatchingPattern($pattern));
+        }
+
+        foreach (config('log-viewer.http_logs.exclude_files', []) as $pattern) {
+            $files = array_diff($files, $this->getFilePathsMatchingPattern($pattern));
+        }
+
+        $files = array_map('realpath', $files);
+
+        $files = array_filter($files, 'is_file');
+
+        return array_values(array_reverse($files));
+    }
+
     protected function getFilePathsMatchingPattern($pattern)
     {
         // The GLOB_BRACE flag is not available on some non GNU systems, like Solaris or Alpine Linux.
@@ -88,10 +107,17 @@ class LogViewerService
     public function getFiles(): LogFileCollection
     {
         if (! isset($this->_cachedFiles)) {
-            $this->_cachedFiles = (new LogFileCollection($this->getFilePaths()))
+            $laravelLogFiles = (new LogFileCollection($this->getLaravelLogFilePaths()))
                 ->unique()
                 ->map(fn ($filePath) => new LogFile($filePath))
                 ->values();
+
+            $httpLogFiles = (new LogFileCollection($this->getHttpLogFilePaths()))
+                ->unique()
+                ->map(fn ($filePath) => LogFile::makeAndGuessType($filePath))
+                ->values();
+
+            $this->_cachedFiles = $laravelLogFiles->merge($httpLogFiles);
         }
 
         return $this->_cachedFiles;

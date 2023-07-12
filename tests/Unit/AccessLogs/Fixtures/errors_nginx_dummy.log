@@ -1,0 +1,9 @@
+2023/01/04 11:18:33 [alert] 95160#0: *1473 setsockopt(TCP_NODELAY) failed (22: Invalid argument) while keepalive, client: 127.0.0.1, server: 127.0.0.1:80
+2023/07/01 22:05:03 [warn] 21925#0: the "listen ... http2" directive is deprecated, use the "http2" directive instead in /Users/test/.config/valet/Nginx/blog9.test:9
+2023/07/01 22:05:03 [warn] 21925#0: the "http2_push_preload" directive is obsolete, ignored in /Users/test/.config/valet/Nginx/blog9.test:15
+2023/07/01 22:05:03 [warn] 21925#0: the "listen ... http2" directive is deprecated, use the "http2" directive instead in /Users/test/.config/valet/Nginx/system.test:9
+2023/07/01 22:05:03 [warn] 21925#0: the "http2_push_preload" directive is obsolete, ignored in /Users/test/.config/valet/Nginx/system.test:15
+2023/07/01 22:05:09 [warn] 22583#0: the "listen ... http2" directive is deprecated, use the "http2" directive instead in /Users/test/.config/valet/Nginx/blog9.test:9
+2023/07/01 22:05:09 [warn] 22583#0: the "http2_push_preload" directive is obsolete, ignored in /Users/test/.config/valet/Nginx/blog9.test:15
+2023/07/01 22:05:09 [warn] 22583#0: the "listen ... http2" directive is deprecated, use the "http2" directive instead in /Users/test/.config/valet/Nginx/system.test:9
+2023/07/01 22:05:09 [warn] 22583#0: the "http2_push_preload" directive is obsolete, ignored in /Users/test/.config/valet/Nginx/system.test:15

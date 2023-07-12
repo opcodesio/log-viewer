@@ -5,8 +5,10 @@ namespace Opcodes\LogViewer;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 
-class HttpErrorLog extends HttpLog
+class HttpApacheErrorLog extends HttpLog
 {
+    static string $regex = '/\[(?<dttm>.*?)\]\s\[(?:(?<module>.*?):)?(?<level>.*?)\]\s\[pid\s(?<pid>\d*)\](?:\s\[client\s(?<client>.*?)\])?\s(?<message>.*)/';
+
     public ?CarbonInterface $datetime;
 
     public ?string $module;
@@ -40,15 +42,14 @@ class HttpErrorLog extends HttpLog
 
     public function parseText(string $text): array
     {
-        $regex = '/\[(?<dttm>.*?)\]\s\[(?:(?<module>.*?):)?(?<level>.*?)\]\s\[pid\s(?<pid>\d*)\]\s\[client\s(?<client>.*?)\]\s(?<message>.*)/';
-        preg_match($regex, $this->text, $matches);
+        preg_match(self::$regex, $this->text, $matches);
 
         return [
             'datetime' => $matches['dttm'] ?? null,
             'module' => $matches['module'] ?? null,
             'level' => $matches['level'] ?? null,
             'pid' => $matches['pid'] ?? null,
-            'client' => $matches['client'] ?? null,
+            'client' => isset($matches['client']) ? ($matches['client'] ?: null) : null,
             'message' => $matches['message'] ?? null,
         ];
     }
@@ -56,5 +57,10 @@ class HttpErrorLog extends HttpLog
     public function parseDateTime(?string $datetime): ?CarbonInterface
     {
         return $datetime ? Carbon::createFromFormat('D M d H:i:s.u Y', $datetime) : null;
+    }
+
+    public static function matches(string $text): bool
+    {
+        return preg_match(self::$regex, $text) === 1;
     }
 }
