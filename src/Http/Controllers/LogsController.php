@@ -114,7 +114,7 @@ class LogsController
             return JsonResource::collection([]);
         }
 
-        return match(get_class($logs->items()[0])) {
+        return match (get_class($logs->items()[0])) {
             HttpAccessLog::class => HttpAccessLogResource::collection($logs),
             default => LogResource::collection($logs),
         };

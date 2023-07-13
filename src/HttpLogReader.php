@@ -16,13 +16,20 @@ class HttpLogReader implements LogReaderInterface
     public static array $_instances = [];
 
     protected LogFile $file;
+
     /** @var resource|null */
     protected $fileHandle = null;
+
     protected string $direction = Direction::Forward;
+
     protected ?array $filterLevels = null;
+
     protected ?int $limit = null;
+
     protected int $skip = 0;
+
     protected ?string $query = null;
+
     private ?int $onlyShowPosition = null;
 
     public function __construct(LogFile $file)
@@ -235,6 +242,7 @@ class HttpLogReader implements LogReaderInterface
             if ($char === "\n" && $line === false) {
                 // we have not yet started reading a line, so skip this character
                 fseek($this->fileHandle, -1, SEEK_CUR);
+
                 continue;
             }
 
@@ -259,7 +267,7 @@ class HttpLogReader implements LogReaderInterface
 
         fseek($this->fileHandle, $position);
 
-        list($text, $position) = $this->readLineForward();
+        [$text, $position] = $this->readLineForward();
 
         if ($text === false) {
             return null;
