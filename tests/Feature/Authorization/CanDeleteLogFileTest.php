@@ -18,14 +18,14 @@ test('deleting a file that\'s not found still returns a successful response', fu
 
 test('"deleteLogFile" gate can prevent file deletion', function () {
     generateLogFiles([$fileName = 'laravel.log']);
-    Gate::define('deleteLogFile', fn (mixed $user, ?LogFile $file = null) => false);
+    Gate::define('deleteLogFile', fn (mixed $user, LogFile $file = null) => false);
 
     $this->deleteJson(route('log-viewer.files.delete', $fileName))
         ->assertForbidden();
     test()->assertFileExists(storage_path('logs/'.$fileName));
 
     // now let's allow access again
-    Gate::define('deleteLogFile', fn (mixed $user, ?LogFile $file = null) => true);
+    Gate::define('deleteLogFile', fn (mixed $user, LogFile $file = null) => true);
 
     $this->deleteJson(route('log-viewer.files.delete', $fileName))
         ->assertOk();

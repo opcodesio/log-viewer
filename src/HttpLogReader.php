@@ -192,7 +192,7 @@ class HttpLogReader implements LogReaderInterface
         }
 
         // get the next log line
-        list($text, $position) = match ($this->direction) {
+        [$text, $position] = match ($this->direction) {
             Direction::Forward => $this->readLineForward(),
             Direction::Backward => $this->readLineBackward(),
             default => throw new \Exception('Unknown direction: '.$this->direction),
