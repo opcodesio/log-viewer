@@ -25,8 +25,9 @@ class HttpApacheErrorLog extends HttpLog
         public string $text,
         public ?string $fileIdentifier = null,
         public ?int $filePosition = null,
+        public ?int $index = null,
     ) {
-        parent::__construct($text, $fileIdentifier, $filePosition);
+        parent::__construct($text, $fileIdentifier, $filePosition, $index);
 
         $matches = $this->parseText($text);
 

@@ -8,6 +8,7 @@ abstract class HttpLog
         public string $text,
         public ?string $fileIdentifier = null,
         public ?int $filePosition = null,
+        public ?int $index = null,
     ) {
         $this->text = rtrim($this->text);
     }

@@ -13,7 +13,7 @@ class HttpAccessLogResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'index' => $this->filePosition,
+            'index' => $this->index,
             'file_identifier' => $this->fileIdentifier,
             'file_position' => $this->filePosition,
 
