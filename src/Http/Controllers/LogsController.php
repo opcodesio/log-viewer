@@ -2,13 +2,17 @@
 
 namespace Opcodes\LogViewer\Http\Controllers;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Http\Resources\HttpAccessLogResource;
 use Opcodes\LogViewer\Http\Resources\LevelCountResource;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
 use Opcodes\LogViewer\Http\Resources\LogResource;
+use Opcodes\LogViewer\HttpAccessLog;
 use Opcodes\LogViewer\Level;
 
 class LogsController
@@ -40,6 +44,8 @@ class LogsController
         }
 
         if (isset($logQuery)) {
+            $supportsLevels = $logQuery->supportsLevels();
+
             try {
                 $logQuery->search($query);
 
@@ -73,7 +79,7 @@ class LogsController
         return response()->json([
             'file' => isset($file) ? new LogFileResource($file) : null,
             'levelCounts' => LevelCountResource::collection($levels ?? []),
-            'logs' => LogResource::collection($logs ?? []),
+            'logs' => $this->logsToResources($logs ?? []),
             'pagination' => isset($logs) ? [
                 'current_page' => $logs->currentPage(),
                 'first_page_url' => $logs->url(1),
@@ -93,8 +99,25 @@ class LogsController
             'cacheRecentlyCleared' => $this->cacheRecentlyCleared ?? false,
             'hasMoreResults' => $hasMoreResults,
             'percentScanned' => $percentScanned,
+            'supportsLevels' => $supportsLevels ?? false,
             'performance' => $this->getRequestPerformanceInfo(),
         ]);
+    }
+
+    protected function logsToResources(LengthAwarePaginator|array $logs): JsonResource
+    {
+        if (is_array($logs) && empty($logs)) {
+            return JsonResource::collection([]);
+        }
+
+        if (empty($logs->items())) {
+            return JsonResource::collection([]);
+        }
+
+        return match(get_class($logs->items()[0])) {
+            HttpAccessLog::class => HttpAccessLogResource::collection($logs),
+            default => LogResource::collection($logs),
+        };
     }
 
     protected function getRequestPerformanceInfo(): array

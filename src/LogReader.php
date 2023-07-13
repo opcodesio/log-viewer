@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Utils\Utils;
 
-class LogReader
+class LogReader implements LogReaderInterface
 {
     /**
      * Cached LogReader instances.
@@ -44,7 +44,7 @@ class LogReader
         $this->file = $file;
     }
 
-    public static function instance(LogFile $file): self
+    public static function instance(LogFile $file): static
     {
         if (! isset(self::$_instances[$file->path])) {
             self::$_instances[$file->path] = new self($file);
@@ -65,9 +65,14 @@ class LogReader
         self::$_instances = [];
     }
 
-    public function index(): LogIndex
+    protected function index(): LogIndex
     {
         return $this->file->index($this->query);
+    }
+
+    public function supportsLevels(): bool
+    {
+        return true;
     }
 
     /**
@@ -77,7 +82,7 @@ class LogReader
      *
      * @param  string|array|null  $levels
      */
-    public function only($levels = null): self
+    public function only($levels = null): static
     {
         return $this->setLevels($levels);
     }
@@ -87,14 +92,14 @@ class LogReader
      *
      * @param  string|array|null  $levels
      */
-    public function setLevels($levels = null): self
+    public function setLevels($levels = null): static
     {
         $this->index()->forLevels($levels);
 
         return $this;
     }
 
-    public function allLevels(): self
+    public function allLevels(): static
     {
         $this->index()->forLevels(null);
 
@@ -109,7 +114,7 @@ class LogReader
      * @param  string|array|null  $levels
      * @return $this
      */
-    public function except($levels = null): self
+    public function except($levels = null): static
     {
         return $this->exceptLevels($levels);
     }
@@ -120,10 +125,8 @@ class LogReader
      * @param  string|array|null  $levels
      * @return $this
      */
-    public function exceptLevels($levels = null): self
+    public function exceptLevels($levels = null): static
     {
-        $levels = null;
-
         if (is_array($levels)) {
             $levels = array_map('strtolower', array_filter($levels));
             $levels = array_diff(self::getDefaultLevels(), $levels);
@@ -142,12 +145,12 @@ class LogReader
         return Level::caseValues();
     }
 
-    public function isOpen(): bool
+    protected function isOpen(): bool
     {
         return is_resource($this->fileHandle);
     }
 
-    public function isClosed(): bool
+    protected function isClosed(): bool
     {
         return ! $this->isOpen();
     }
@@ -157,7 +160,7 @@ class LogReader
      *
      * @throws \Exception
      */
-    public function open(): self
+    protected function open(): static
     {
         if ($this->isOpen()) {
             return $this;
@@ -183,7 +186,7 @@ class LogReader
      *
      * @throws \Exception
      */
-    public function close(): self
+    protected function close(): static
     {
         if ($this->isClosed()) {
             return $this;
@@ -198,7 +201,7 @@ class LogReader
         return $this;
     }
 
-    public function reverse(): self
+    public function reverse(): static
     {
         $this->direction = Direction::Backward;
         $this->index()->reverse();
@@ -206,7 +209,15 @@ class LogReader
         return $this->reset();
     }
 
-    public function setDirection(string $direction = null): self
+    public function forward(): static
+    {
+        $this->direction = Direction::Forward;
+        $this->index()->forward();
+
+        return $this->reset();
+    }
+
+    public function setDirection(string $direction = null): static
     {
         $this->direction = $direction === Direction::Backward
             ? Direction::Backward
@@ -216,28 +227,33 @@ class LogReader
         return $this;
     }
 
-    public function skip(int $number): self
+    public function skip(int $number): static
     {
         $this->index()->skip($number);
 
         return $this;
     }
 
-    public function onlyShow(int $targetIndex = 0): self
+    protected function onlyShow(int $targetIndex = 0): static
     {
         $this->onlyShowIndex = $targetIndex;
 
         return $this;
     }
 
-    public function limit(int $number): self
+    public function limit(int $number): static
     {
         $this->index()->limit($number);
 
         return $this;
     }
 
-    public function setQuery(string $query = null): self
+    public function search(string $query = null): static
+    {
+        return $this->setQuery($query);
+    }
+
+    protected function setQuery(string $query = null): static
     {
         $this->close();
 
@@ -260,12 +276,7 @@ class LogReader
         return $this;
     }
 
-    public function search(string $query = null): self
-    {
-        return $this->setQuery($query);
-    }
-
-    public function lazyScanning($lazy = true): self
+    public function lazyScanning($lazy = true): static
     {
         $this->lazyScanning = $lazy;
 
@@ -278,7 +289,7 @@ class LogReader
      *
      * @throws \Exception
      */
-    public function scan(int $maxBytesToScan = null, bool $force = false): self
+    public function scan(int $maxBytesToScan = null, bool $force = false): static
     {
         if ($this->isClosed()) {
             $this->open();
@@ -390,7 +401,7 @@ class LogReader
         return $this->reset();
     }
 
-    public function reset(): self
+    public function reset(): static
     {
         $this->index()->reset();
 
@@ -422,7 +433,7 @@ class LogReader
     /**
      * @return array|Log[]
      */
-    public function get(int $limit = null)
+    public function get(int $limit = null): array
     {
         if (! is_null($limit)) {
             $this->limit($limit);
@@ -437,7 +448,7 @@ class LogReader
         return $logs;
     }
 
-    public function getLogAtIndex(int $index): ?Log
+    protected function getLogAtIndex(int $index): ?Log
     {
         $position = $this->index()->getPositionForIndex($index);
 
@@ -483,14 +494,6 @@ class LogReader
      * Alias for total()
      */
     public function count(): int
-    {
-        return $this->total();
-    }
-
-    /**
-     * @deprecated Will be removed in v2.0.0
-     */
-    public function getTotalItemCount(): int
     {
         return $this->total();
     }

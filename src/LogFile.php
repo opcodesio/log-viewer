@@ -81,9 +81,14 @@ class LogFile
         return $this->_logIndexCache[$query];
     }
 
-    public function logs(): LogReader
+    public function logs(): LogReader|HttpLogReader
     {
-        return LogReader::instance($this);
+        return match ($this->type) {
+            self::TYPE_HTTP_ACCESS,
+            self::TYPE_HTTP_ERROR_NGINX,
+            self::TYPE_HTTP_ERROR_APACHE => HttpLogReader::instance($this),
+            default => LogReader::instance($this),
+        };
     }
 
     public function size(): int

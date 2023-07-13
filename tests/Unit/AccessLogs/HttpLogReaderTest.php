@@ -120,7 +120,7 @@ it('can read in reverse direction', function () {
     }
 });
 
-it('can limit the number of lots to get', function () {
+it('can limit the number of logs to get', function () {
     $lines = [
         makeHttpAccessLogEntry(),
         makeHttpAccessLogEntry(),
@@ -131,6 +131,23 @@ it('can limit the number of lots to get', function () {
     $httpLogReader = new HttpLogReader($file);
 
     $entries = $httpLogReader->limit(2)->get();
+
+    expect($entries)->toHaveCount(2)
+        ->and($entries[0]->text)->toBe($lines[0])
+        ->and($entries[1]->text)->toBe($lines[1]);
+});
+
+it('can limit the number of logs to get (second option)', function () {
+    $lines = [
+        makeHttpAccessLogEntry(),
+        makeHttpAccessLogEntry(),
+        makeHttpAccessLogEntry(),
+    ];
+    $file = generateLogFile('http.log', implode("\n", $lines), type: LogFile::TYPE_HTTP_ACCESS);
+
+    $httpLogReader = new HttpLogReader($file);
+
+    $entries = $httpLogReader->get(2);
 
     expect($entries)->toHaveCount(2)
         ->and($entries[0]->text)->toBe($lines[0])

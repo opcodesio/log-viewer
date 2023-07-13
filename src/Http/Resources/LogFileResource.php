@@ -5,7 +5,11 @@ namespace Opcodes\LogViewer\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
+use Opcodes\LogViewer\LogFile;
 
+/**
+ * @mixin LogFile
+ */
 class LogFileResource extends JsonResource
 {
     /**
@@ -15,6 +19,7 @@ class LogFileResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'type' => $this->type,
             'identifier' => $this->identifier,
             'sub_folder' => $this->subFolder,
             'sub_folder_identifier' => $this->subFolderIdentifier(),

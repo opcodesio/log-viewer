@@ -16,4 +16,9 @@ abstract class HttpLog
     {
         return preg_match(static::$regex, $text) === 1;
     }
+
+    public function url(): string
+    {
+        return route('log-viewer.index', ['file' => $this->fileIdentifier, 'query' => 'file-pos:'.$this->filePosition]);
+    }
 }

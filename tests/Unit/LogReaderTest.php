@@ -14,8 +14,10 @@ it('can scan a log file', function () {
 
     $logReader->scan();
 
+    $index = $this->file->index();
+
     expect($logReader->requiresScan())->toBeFalse()
-        ->and($logReader->index()->count())->toBe(1);
+        ->and($index->count())->toBe(1);
 });
 
 it('can re-scan the file after a new entry has been added', function () {
@@ -32,8 +34,9 @@ it('can re-scan the file after a new entry has been added', function () {
     expect($logReader->requiresScan())->toBeTrue();
 
     $logReader->scan();
+    $index = $this->file->index();
 
     expect($logReader->requiresScan())->toBeFalse()
-        ->and($logReader->index()->count())->toBe(2)
-        ->and($logReader->index()->getFlatIndex())->toHaveCount(2);
+        ->and($index->count())->toBe(2)
+        ->and($index->getFlatIndex())->toHaveCount(2);
 });

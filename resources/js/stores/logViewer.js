@@ -28,6 +28,7 @@ export const useLogViewerStore = defineStore({
     // Log data
     loading: false,
     error: null,
+    type: 'laravel',
     logs: [],
     levelCounts: [],
     performance: {},
@@ -214,6 +215,7 @@ export const useLogViewerStore = defineStore({
           } else {
             this.logs = data.logs;
           }
+          this.type = data.file.type;
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;
           this.error = data.error || null;
