@@ -10,16 +10,27 @@ class HttpAccessLog extends HttpLog
     public static string $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
 
     public ?CarbonInterface $datetime;
+
     public ?string $level;
+
     public ?string $ip;
+
     public ?string $identity;
+
     public ?string $remoteUser;
+
     public ?string $method;
+
     public ?string $path;
+
     public ?string $httpVersion;
+
     public ?int $statusCode;
+
     public ?int $contentLength;
+
     public ?string $referrer;
+
     public ?string $userAgent;
 
     public function __construct(
