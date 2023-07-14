@@ -12,10 +12,16 @@ class HttpAccessLogResource extends JsonResource
 {
     public function toArray($request): array
     {
+        $level = $this->getLevel();
+
         return [
             'index' => $this->index,
             'file_identifier' => $this->fileIdentifier,
             'file_position' => $this->filePosition,
+
+            'level' => $level->value,
+            'level_name' => $level->getName(),
+            'level_class' => $level->getClass(),
 
             'ip' => $this->ip ?? null,
             'identity' => $this->identity ?? null,

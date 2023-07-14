@@ -2,7 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
-class Level
+class Level implements LevelInterface
 {
     const Debug = 'debug';
 

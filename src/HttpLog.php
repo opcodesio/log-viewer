@@ -2,7 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
-abstract class HttpLog
+abstract class HttpLog implements LogInterface
 {
     public function __construct(
         public string $text,
@@ -13,9 +13,27 @@ abstract class HttpLog
         $this->text = rtrim($this->text);
     }
 
+    public function getTimestamp(): int
+    {
+        return $this->datetime?->timestamp ?? 0;
+    }
+
+    public function getLevel(): LevelInterface
+    {
+        $levelClass = static::levelClass();
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        return $levelClass::from($this->level);
+    }
+
     public static function matches(string $text): bool
     {
         return preg_match(static::$regex, $text) === 1;
+    }
+
+    public static function isMultiline(): bool
+    {
+        return false;
     }
 
     public function url(): string

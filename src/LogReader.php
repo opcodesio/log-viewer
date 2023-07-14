@@ -17,6 +17,10 @@ class LogReader implements LogReaderInterface
 
     protected LogFile $file;
 
+    protected string $logClass;
+
+    protected string $levelClass;
+
     /**
      * Contains an index of file positions where each log entry is located in.
      */
@@ -42,6 +46,8 @@ class LogReader implements LogReaderInterface
     public function __construct(LogFile $file)
     {
         $this->file = $file;
+        $this->logClass = LogTypeRegistrar::getClass($this->file->type());
+        $this->levelClass = $this->logClass::levelClass();
     }
 
     public static function instance(LogFile $file): static
@@ -110,7 +116,6 @@ class LogReader implements LogReaderInterface
      * @alias exceptLevels
      *
      * @param  string|array|null  $levels
-     * @return $this
      */
     public function except($levels = null): static
     {
@@ -121,19 +126,12 @@ class LogReader implements LogReaderInterface
      * Load all log levels except the provided ones.
      *
      * @param  string|array|null  $levels
-     * @return $this
      */
     public function exceptLevels($levels = null): static
     {
-        if (is_array($levels)) {
-            $levels = array_map('strtolower', array_filter($levels));
-            $levels = array_diff(self::getDefaultLevels(), $levels);
-        } elseif (is_string($levels)) {
-            $level = strtolower($levels);
-            $levels = array_diff(self::getDefaultLevels(), [$level]);
-        }
+        $this->index()->exceptLevels($levels);
 
-        return $this->setLevels($levels);
+        return $this;
     }
 
     public static function getDefaultLevels(): array
@@ -334,7 +332,7 @@ class LogReader implements LogReaderInterface
              * $matches[3] - the optional timezone offset, like `+02:00` or `-05:30`
              */
             $matches = [];
-            if (preg_match($logMatchPattern, $line, $matches) === 1) {
+            if ($this->logClass::matches(trim($line))) {
                 if ($currentLog !== '') {
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
                         $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel, $currentIndex);
@@ -344,16 +342,23 @@ class LogReader implements LogReaderInterface
                     $currentIndex++;
                 }
 
-                $currentTimestamp = strtotime($matches[1] ?? '');
+                /** @var LogInterface $log */
+                $log = new $this->logClass($line);
+
+                $currentTimestamp = $log->getTimestamp();
                 $earliest_timestamp = min($earliest_timestamp ?? $currentTimestamp, $currentTimestamp);
                 $latest_timestamp = max($latest_timestamp ?? $currentTimestamp, $currentTimestamp);
                 $currentLogPosition = ftell($this->fileHandle) - strlen($line);
-                $lowercaseLine = strtolower($line);
+                $currentLogLevel = $log->level;
 
-                foreach ($levels as $level) {
-                    if (strpos($lowercaseLine, '.'.$level) || strpos($lowercaseLine, $level.':')) {
-                        $currentLogLevel = $level;
-                        break;
+                if ($this->logClass === Log::class) {
+                    $lowercaseLine = strtolower($line);
+
+                    foreach ($levels as $level) {
+                        if (strpos($lowercaseLine, '.'.$level) || strpos($lowercaseLine, $level.':')) {
+                            $currentLogLevel = $level;
+                            break;
+                        }
                     }
                 }
 
@@ -370,7 +375,7 @@ class LogReader implements LogReaderInterface
             }
         }
 
-        if ($currentLog !== '' && preg_match($logMatchPattern, $currentLog) === 1) {
+        if ($currentLog !== '' && $this->logClass::matches($currentLog)) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
                 $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel, $currentIndex);
                 $currentIndex++;
@@ -416,18 +421,21 @@ class LogReader implements LogReaderInterface
         }
 
         $selectedLevels = $this->index()->getSelectedLevels();
+        $exceptedLevels = $this->index()->getExceptedLevels();
+        $levelClass = $this->logClass::levelClass();
 
-        return $this->index()->getLevelCounts()->map(function (int $count, string $level) use ($selectedLevels) {
+        return $this->index()->getLevelCounts()->map(function (int $count, string $level) use ($selectedLevels, $exceptedLevels) {
             return new LevelCount(
-                Level::from($level),
+                $this->levelClass::from($level),
                 $count,
-                in_array($level, $selectedLevels)
+                (is_null($selectedLevels) || in_array($level, $selectedLevels))
+                && (is_null($exceptedLevels) || ! in_array($level, $exceptedLevels))
             );
         })->toArray();
     }
 
     /**
-     * @return array|Log[]
+     * @return array|LogInterface[]
      */
     public function get(int $limit = null): array
     {
@@ -444,11 +452,11 @@ class LogReader implements LogReaderInterface
         return $logs;
     }
 
-    protected function getLogAtIndex(int $index): ?Log
+    protected function getLogAtIndex(int $index): ?LogInterface
     {
         $position = $this->index()->getPositionForIndex($index);
 
-        [$level, $text, $position] = $this->getLogText($index, $position);
+        [$text, $position] = $this->getLogText($index, $position);
 
         // If we did not find any logs, this means either the file is empty, or
         // we have already reached the end of file. So we return early.
@@ -459,7 +467,7 @@ class LogReader implements LogReaderInterface
         return $this->makeLog($text, $position, $index);
     }
 
-    public function next(): ?Log
+    public function next(): ?LogInterface
     {
         // We open it here to make we also check for possible need of index re-building.
         if ($this->isClosed()) {
@@ -472,7 +480,7 @@ class LogReader implements LogReaderInterface
             return null;
         }
 
-        [$level, $text, $position] = $this->getLogText($index, $position);
+        [$text, $position] = $this->getLogText($index, $position);
 
         if (empty($text)) {
             return null;
@@ -517,9 +525,9 @@ class LogReader implements LogReaderInterface
         );
     }
 
-    protected function makeLog(string $text, int $filePosition, int $index)
+    protected function makeLog(string $text, int $filePosition, int $index): LogInterface
     {
-        return new Log($index, $text, $this->file->identifier, $filePosition);
+        return new $this->logClass($text, $this->file->identifier, $filePosition, $index);
     }
 
     /**
@@ -536,28 +544,19 @@ class LogReader implements LogReaderInterface
         fseek($this->fileHandle, $position, SEEK_SET);
 
         $currentLog = '';
-        $currentLogLevel = '';
 
         while (($line = fgets($this->fileHandle)) !== false) {
-            if (preg_match(LogViewer::logMatchPattern(), $line) === 1) {
+            if ($this->logClass::matches($line)) {
                 if ($currentLog !== '') {
                     // found the next log, so let's stop the loop and return the log we found
                     break;
-                }
-
-                $lowercaseLine = strtolower($line);
-                foreach (self::getDefaultLevels() as $level) {
-                    if (strpos($lowercaseLine, '.'.$level) || strpos($lowercaseLine, $level.':')) {
-                        $currentLogLevel = $level;
-                        break;
-                    }
                 }
             }
 
             $currentLog .= $line;
         }
 
-        return [$currentLogLevel, $currentLog, $position];
+        return [$currentLog, $position];
     }
 
     public function numberOfNewBytes(): int

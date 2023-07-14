@@ -7,6 +7,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Utils\Utils;
 
+/** @deprecated */
 class HttpLogReader implements LogReaderInterface
 {
     /**
@@ -332,7 +333,7 @@ class HttpLogReader implements LogReaderInterface
 
     protected function makeLog(string $text, int $filePosition, int $index = null): HttpLog
     {
-        return match ($this->file->type) {
+        return match ($this->file->type()) {
             LogFile::TYPE_HTTP_ACCESS => new HttpAccessLog($text, $this->file->identifier, $filePosition, $index),
             LogFile::TYPE_HTTP_ERROR_APACHE => new HttpApacheErrorLog($text, $this->file->identifier, $filePosition, $index),
             LogFile::TYPE_HTTP_ERROR_NGINX => new HttpNginxErrorLog($text, $this->file->identifier, $filePosition, $index),

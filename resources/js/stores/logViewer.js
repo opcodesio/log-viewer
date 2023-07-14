@@ -195,7 +195,7 @@ export const useLogViewerStore = defineStore({
         query: searchStore.query,
         page: paginationStore.currentPage,
         per_page: this.resultsPerPage,
-        levels: toRaw(severityStore.selectedLevels.length > 0 ? severityStore.selectedLevels : 'none'),
+        exclude_levels: toRaw(severityStore.excludedLevels.length > 0 ? severityStore.excludedLevels : ''),
         shorter_stack_traces: this.shorterStackTraces,
       };
 

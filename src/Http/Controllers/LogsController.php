@@ -13,7 +13,6 @@ use Opcodes\LogViewer\Http\Resources\LevelCountResource;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
 use Opcodes\LogViewer\Http\Resources\LogResource;
 use Opcodes\LogViewer\HttpAccessLog;
-use Opcodes\LogViewer\Level;
 
 class LogsController
 {
@@ -27,7 +26,7 @@ class LogsController
         $query = $request->query('query', '');
         $direction = $request->query('direction', 'desc');
         $log = $request->query('log', null);
-        $selectedLevels = $request->query('levels', Level::caseValues());
+        $excludedLevels = $request->query('exclude_levels', []);
         $perPage = $request->query('per_page', 25);
         session()->put('log-viewer:shorter-stack-traces', $request->boolean('shorter_stack_traces', false));
         $hasMoreResults = false;
@@ -59,7 +58,7 @@ class LogsController
                 }
 
                 $logQuery->scan(LogViewer::lazyScanChunkSize());
-                $logQuery->setLevels($selectedLevels);
+                $logQuery->exceptLevels($excludedLevels);
                 $logs = $logQuery->paginate($perPage);
                 $levels = array_values($logQuery->getLevelCounts());
 

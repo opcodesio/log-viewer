@@ -114,7 +114,7 @@ class LogViewerService
 
             $httpLogFiles = (new LogFileCollection($this->getHttpLogFilePaths()))
                 ->unique()
-                ->map(fn ($filePath) => LogFile::makeAndGuessType($filePath))
+                ->map(fn ($filePath) => new LogFile($filePath))
                 ->values();
 
             $this->_cachedFiles = $laravelLogFiles->merge($httpLogFiles);

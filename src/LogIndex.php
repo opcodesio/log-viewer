@@ -121,7 +121,10 @@ class LogIndex
                 }
 
                 foreach ($tsIndex as $level => $levelIndex) {
-                    if (isset($this->filterLevels) && ! in_array($level, $this->filterLevels)) {
+                    if (
+                        (isset($this->filterLevels) && ! in_array($level, $this->filterLevels))
+                        || (isset($this->exceptLevels) && in_array($level, $this->exceptLevels))
+                    ) {
                         continue;
                     }
 
@@ -200,7 +203,10 @@ class LogIndex
                 $itemsWithinThisTimestamp = [];
 
                 foreach ($tsIndex as $level => $levelIndex) {
-                    if (isset($this->filterLevels) && ! in_array($level, $this->filterLevels)) {
+                    if (
+                        (isset($this->filterLevels) && ! in_array($level, $this->filterLevels))
+                        || (isset($this->exceptLevels) && in_array($level, $this->exceptLevels))
+                    ) {
                         continue;
                     }
 
@@ -241,18 +247,26 @@ class LogIndex
 
     public function getLevelCounts(): Collection
     {
-        $counts = collect(Level::caseValues())->mapWithKeys(fn ($case) => [$case => 0]);
+        $counts = collect([]);
 
         if (! $this->hasDateFilters()) {
             // without date filters, we can use a faster approach
             foreach ($this->getChunkDefinitions() as $chunkDefinition) {
                 foreach ($chunkDefinition['level_counts'] as $severity => $count) {
+                    if (!$counts->has($severity)) {
+                        $counts[$severity] = 0;
+                    }
+
                     $counts[$severity] += $count;
                 }
             }
         } else {
             foreach ($this->get() as $timestamp => $tsIndex) {
                 foreach ($tsIndex as $severity => $logIndex) {
+                    if (!$counts->has($severity)) {
+                        $counts[$severity] = 0;
+                    }
+
                     $counts[$severity] += count($logIndex);
                 }
             }
@@ -273,7 +287,10 @@ class LogIndex
     {
         return array_reduce($this->getChunkDefinitions(), function ($sum, $chunkDefinition) {
             foreach ($chunkDefinition['level_counts'] as $level => $count) {
-                if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
+                if (
+                    (! isset($this->filterLevels) || in_array($level, $this->filterLevels))
+                    && (! isset($this->exceptLevels ) || ! in_array($level, $this->exceptLevels))
+                ) {
                     $sum += $count;
                 }
             }

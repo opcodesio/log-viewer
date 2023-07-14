@@ -12,12 +12,10 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogFile
 {
+    // TODO: remove types, as they're no longer necessary
     const TYPE_LARAVEL = 'laravel';
-
     const TYPE_HTTP_ACCESS = 'http_access';
-
     const TYPE_HTTP_ERROR_APACHE = 'http_error_apache';
-
     const TYPE_HTTP_ERROR_NGINX = 'http_error_nginx';
 
     use Concerns\LogFile\HasMetadata;
@@ -31,11 +29,11 @@ class LogFile
 
     public string $subFolder = '';
 
-    public string $type = self::TYPE_LARAVEL;
+    private ?string $type = self::TYPE_LARAVEL;
 
     private array $_logIndexCache;
 
-    public function __construct(string $path, string $type = self::TYPE_LARAVEL)
+    public function __construct(string $path, string $type = null)
     {
         $this->path = $path;
         $this->name = basename($path);
@@ -49,30 +47,17 @@ class LogFile
         $this->loadMetadata();
     }
 
-    public static function makeAndGuessType($filePath): self
+    public function type(): string
     {
-        $typeCacheKey = 'log-viewer::file-type-'.md5($filePath);
-        $type = Cache::get($typeCacheKey);
-
-        if (isset($type)) {
-            return new self($filePath, $type);
+        if (is_null($this->type)) {
+            $this->type = Cache::remember(
+                'log-viewer::file-type-'.md5($this->path),
+                Carbon::now()->addMonth(),
+                fn() => LogTypeRegistrar::guessTypeFromFirstLine($this)
+            );
         }
 
-        $reader = new HttpLogReader(new self($filePath));
-        $logEntry = $reader->next();
-
-        $type = match (get_class($logEntry)) {
-            HttpAccessLog::class => LogFile::TYPE_HTTP_ACCESS,
-            HttpApacheErrorLog::class => LogFile::TYPE_HTTP_ERROR_APACHE,
-            HttpNginxErrorLog::class => LogFile::TYPE_HTTP_ERROR_NGINX,
-            default => null,
-        };
-
-        if (isset($type)) {
-            Cache::put($typeCacheKey, $type, Carbon::now()->addMonth());
-        }
-
-        return new self($filePath, $type);
+        return $this->type;
     }
 
     public function index(string $query = null): LogIndex
@@ -84,14 +69,9 @@ class LogFile
         return $this->_logIndexCache[$query];
     }
 
-    public function logs(): LogReader|HttpLogReader
+    public function logs(): LogReader
     {
-        return match ($this->type) {
-            self::TYPE_HTTP_ACCESS,
-            self::TYPE_HTTP_ERROR_NGINX,
-            self::TYPE_HTTP_ERROR_APACHE => HttpLogReader::instance($this),
-            default => LogReader::instance($this),
-        };
+        return LogReader::instance($this);
     }
 
     public function size(): int
@@ -129,6 +109,15 @@ class LogFile
     public function contents(): string
     {
         return file_get_contents($this->path);
+    }
+
+    public function getFirstLine(): string
+    {
+        $handle = fopen($this->path, 'r');
+        $line = fgets($handle);
+        fclose($handle);
+
+        return $line;
     }
 
     public function addRelatedIndex(LogIndex $logIndex): void

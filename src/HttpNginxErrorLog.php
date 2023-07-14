@@ -57,4 +57,9 @@ class HttpNginxErrorLog extends HttpLog
     {
         return $datetime ? Carbon::createFromFormat('Y/m/d H:i:s', $datetime) : null;
     }
+
+    public static function levelClass(): string
+    {
+        return Level::class;
+    }
 }

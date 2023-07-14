@@ -46,7 +46,7 @@ interface LogReaderInterface
     // Retrieving actual logs
     public function get(int $limit = null): array;
 
-    public function next(): Log|HttpLog|null;   // TODO: create a base log!!
+    public function next(): ?LogInterface;
 
     /** @return LengthAwarePaginator<Log|HttpLog> */
     public function paginate(int $perPage = 25, int $page = null);

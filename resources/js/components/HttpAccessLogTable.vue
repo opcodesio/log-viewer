@@ -2,8 +2,8 @@
   <table class="table-fixed min-w-full max-w-full border-separate" style="border-spacing: 0">
     <thead class="bg-gray-50">
     <tr>
-      <th scope="col" class="w-[180px] hidden lg:table-cell"><div class="pl-2">Time</div></th>
-      <th scope="col" class="w-[110px] hidden lg:table-cell">Status</th>
+      <th scope="col" class="w-[110px] hidden lg:table-cell"><div class="pl-2">Status</div></th>
+      <th scope="col" class="w-[180px] hidden lg:table-cell">Time</th>
       <th scope="col" class="w-[120px] hidden lg:table-cell">Request</th>
       <th scope="col" class="hidden lg:table-cell"><span class="sr-only">File position</span></th>
     </tr>
@@ -15,7 +15,7 @@
              :id="`tbody-${index}`" :data-index="index"
       >
       <tr @click="logViewerStore.toggle(index)"
-          :class="['log-item group', logViewerStore.isOpen(index) ? 'active' : '', logViewerStore.shouldBeSticky(index) ? 'sticky z-2' : '']"
+          :class="['log-item group', log.level_class, logViewerStore.isOpen(index) ? 'active' : '', logViewerStore.shouldBeSticky(index) ? 'sticky z-2' : '']"
           :style="{ top: logViewerStore.stackTops[index] || 0 }"
       >
         <!-- Datetime -->
@@ -34,17 +34,18 @@
                 <ChevronRightIcon :class="[logViewerStore.isOpen(index) ? 'rotate-90' : '', 'transition duration-100']" />
               </span>
             </button>
-            <span>{{ log.datetime }}</span>
+            <span class="font-semibold">{{ log.level_name }}</span>
           </div>
         </td>
         <!-- /Datetime -->
         <!-- Status -->
-        <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 hidden lg:table-cell">
-          {{ log.status_code }}
+        <td class="whitespace-nowrap text-gray-900 dark:text-gray-200">
+          <span class="hidden lg:inline" v-html="highlightSearchResult(log.datetime, searchStore.query)"></span>
+          <span class="lg:hidden">{{ log.time }}</span>
         </td>
         <!-- /Status -->
         <!-- Request -->
-        <td class="max-w-[1px] w-full truncate text-gray-900 dark:text-gray-200">
+        <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90">
           <span v-html="highlightSearchResult(`${log.method} ${log.path}`, searchStore.query)"></span>
         </td>
         <!-- /Request -->
@@ -74,6 +75,11 @@
               class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-brand-600 dark:hover:border-brand-700 rounded-md"
               @click.prevent="clearSelectedFile">Search all files
             </button>
+            <button
+              v-if="severityStore.levelsFound.length > 0 && severityStore.levelsSelected.length === 0"
+              class="px-3 ml-3 py-2 border dark:border-gray-700 text-gray-800 dark:text-gray-200 hover:border-brand-600 dark:hover:border-brand-700 rounded-md"
+              @click="severityStore.selectAllLevels">Select all severities
+            </button>
           </div>
         </div>
       </td>
@@ -90,10 +96,12 @@ import { useSearchStore } from '../stores/search.js';
 import { useFileStore } from '../stores/files.js';
 import LogCopyButton from './LogCopyButton.vue';
 import { handleLogToggleKeyboardNavigation } from '../keyboardNavigation';
+import { useSeverityStore } from '../stores/severity.js';
 
 const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
 const searchStore = useSearchStore();
+const severityStore = useSeverityStore();
 const emit = defineEmits(['clearSelectedFile', 'clearQuery']);
 
 const clearSelectedFile = () => {

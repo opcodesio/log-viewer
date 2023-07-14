@@ -3,18 +3,14 @@
 namespace Opcodes\LogViewer\Concerns\LogIndex;
 
 use Carbon\CarbonInterface;
-use Opcodes\LogViewer\Level;
 
 trait CanFilterIndex
 {
     protected ?int $filterFrom = null;
-
     protected ?int $filterTo = null;
-
     protected ?array $filterLevels = null;
-
+    protected ?array $exceptLevels = null;
     protected ?int $limit = null;
-
     protected ?int $skip = null;
 
     public function setQuery(string $query = null): self
@@ -64,6 +60,19 @@ trait CanFilterIndex
         return $this;
     }
 
+    public function exceptLevels(string|array $levels = null): self
+    {
+        if (is_null($levels)) {
+            $this->exceptLevels = null;
+        } elseif (is_array($levels)) {
+            $this->exceptLevels = $levels;
+        } else {
+            $this->exceptLevels = [$levels];
+        }
+
+        return $this;
+    }
+
     public function forLevel(string $level = null): self
     {
         return $this->forLevels($level);
@@ -71,7 +80,12 @@ trait CanFilterIndex
 
     public function getSelectedLevels(): ?array
     {
-        return $this->filterLevels ?? Level::caseValues();
+        return $this->filterLevels;
+    }
+
+    public function getExceptedLevels(): ?array
+    {
+        return $this->exceptLevels;
     }
 
     public function skip(int $skip = null): self
@@ -107,6 +121,7 @@ trait CanFilterIndex
     protected function hasFilters(): bool
     {
         return $this->hasDateFilters()
-            || isset($this->filterLevels);
+            || isset($this->filterLevels)
+            || isset($this->exceptLevels);
     }
 }

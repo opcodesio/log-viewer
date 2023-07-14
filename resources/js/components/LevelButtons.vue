@@ -80,7 +80,7 @@ const logViewerStore = useLogViewerStore();
 const severityStore = useSeverityStore();
 
 watch(
-  () => severityStore.selectedLevels,
+  () => severityStore.excludedLevels,
   () => logViewerStore.loadLogs()
 );
 </script>

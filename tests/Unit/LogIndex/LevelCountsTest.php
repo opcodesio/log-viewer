@@ -11,16 +11,9 @@ it('can return the counts for each severity level in the file', function () {
 
     $logCounts = $logIndex->getLevelCounts();
 
-    foreach (Level::caseValues() as $caseValue) {
-        if ($caseValue === Level::Info) {
-            expect($logCounts[Level::Info])->toBe(2);
-        } elseif ($caseValue === Level::Error) {
-            expect($logCounts[Level::Error])->toBe(1);
-        } else {
-            // we still want the rest of the level counts to be set
-            expect($logCounts[$caseValue])->toBe(0);
-        }
-    }
+    expect($logCounts)->toHaveCount(2)
+        ->and($logCounts[Level::Info])->toBe(2)
+        ->and($logCounts[Level::Error])->toBe(1);
 });
 
 it('can return the smaller counts with date filter applied', function () {

@@ -8,9 +8,9 @@ use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Utils\Utils;
 
-class Log
+class Log implements LogInterface
 {
-    public int $index;
+    public ?int $index;
 
     public CarbonInterface $time;
 
@@ -28,15 +28,15 @@ class Log
 
     public int $fullTextLength;
 
-    public string $fileIdentifier;
+    public ?string $fileIdentifier;
 
-    public int $filePosition;
+    public ?int $filePosition;
 
     public function __construct(
-        int $index,
         string $text,
-        string $fileIdentifier,
-        int $filePosition,
+        string $fileIdentifier = null,
+        int $filePosition = null,
+        int $index = null,
     ) {
         $this->index = $index;
         $this->fileIdentifier = $fileIdentifier;
@@ -107,6 +107,31 @@ class Log
         $this->fullText = trim($text);
 
         $this->extractContextsFromFullText();
+    }
+
+    public function getTimestamp(): int
+    {
+        return $this->time?->timestamp ?? 0;
+    }
+
+    public function getLevel(): LevelInterface
+    {
+        return $this->level;
+    }
+
+    public static function matches(string $text): bool
+    {
+        return preg_match(LogViewer::logMatchPattern(), $text) === 1;
+    }
+
+    public static function isMultiline(): bool
+    {
+        return true;
+    }
+
+    public static function levelClass(): string
+    {
+        return Level::class;
     }
 
     public function fullTextMatches(string $query = null): bool

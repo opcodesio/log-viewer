@@ -42,6 +42,7 @@ class HttpAccessLog extends HttpLog
         $this->path = $matches['path'];
         $this->httpVersion = $matches['httpVersion'];
         $this->statusCode = isset($matches['statusCode']) ? intval($matches['statusCode']) : null;
+        $this->level = $this->statusCode;
         $this->contentLength = isset($matches['contentLength']) ? intval($matches['contentLength']) : null;
         $this->referrer = $matches['referrer'];
         $this->userAgent = $matches['userAgent'];
@@ -72,8 +73,8 @@ class HttpAccessLog extends HttpLog
         return $datetime ? Carbon::parse($datetime) : null;
     }
 
-    public static function matches(string $text): bool
+    public static function levelClass(): string
     {
-        return preg_match(self::$regex, $text) === 1;
+        return StatusCodeLevel::class;
     }
 }
