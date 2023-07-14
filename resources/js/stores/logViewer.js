@@ -220,6 +220,7 @@ export const useLogViewerStore = defineStore({
           this.percentScanned = data.percentScanned;
           this.error = data.error || null;
           this.performance = data.performance || {};
+          severityStore.setSupportsLevels(data.supportsLevels);
           severityStore.setLevelCounts(data.levelCounts);
           paginationStore.setPagination(data.pagination);
 

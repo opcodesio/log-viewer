@@ -10,17 +10,11 @@ class HttpNginxErrorLog extends HttpLog
     public static string $regex = '/^(?P<datetime>[\d+\/ :]+) \[(?P<errortype>.+)\] .*?: (?P<errormessage>.+?)(?:, client: (?P<client>.+?))?(?:, server: (?P<server>.+?))?(?:, request: "?(?P<request>.+?)"?)?(?:, host: "?(?P<host>.+?)"?)?$/';
 
     public ?CarbonInterface $datetime;
-
     public ?string $level;
-
     public ?string $message;
-
     public ?string $client;
-
     public ?string $server;
-
     public ?string $request;
-
     public ?string $host;
 
     public function __construct(

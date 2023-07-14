@@ -135,7 +135,6 @@ class Log
     public function extractContextsFromFullText(): void
     {
         // The regex pattern to find JSON strings.
-        // $pattern = '~\{(?:[^{}]|(?R))*\}~';
         $pattern = '/(\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\])/';
 
         // Find matches.

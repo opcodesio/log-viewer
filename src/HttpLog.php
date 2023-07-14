@@ -20,6 +20,6 @@ abstract class HttpLog
 
     public function url(): string
     {
-        return route('log-viewer.index', ['file' => $this->fileIdentifier, 'query' => 'file-pos:'.$this->filePosition]);
+        return route('log-viewer.index', ['file' => $this->fileIdentifier, 'query' => 'log-index:'.$this->index]);
     }
 }

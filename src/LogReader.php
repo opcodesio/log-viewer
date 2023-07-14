@@ -101,9 +101,7 @@ class LogReader implements LogReaderInterface
 
     public function allLevels(): static
     {
-        $this->index()->forLevels(null);
-
-        return $this;
+        return $this->setLevels(null);
     }
 
     /**
@@ -135,9 +133,7 @@ class LogReader implements LogReaderInterface
             $levels = array_diff(self::getDefaultLevels(), [$level]);
         }
 
-        $this->index()->forLevels($levels);
-
-        return $this;
+        return $this->setLevels($levels);
     }
 
     public static function getDefaultLevels(): array

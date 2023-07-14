@@ -54,7 +54,7 @@
       </tr>
       <tr v-show="logViewerStore.isOpen(index)">
         <td colspan="6">
-          <pre class="log-stack" v-html="JSON.stringify(log, null, 2)"></pre>
+          <pre class="log-stack" v-html="JSON.stringify(stripLogViewerProperties(log), null, 2)"></pre>
         </td>
       </tr>
       </tbody>
@@ -102,5 +102,15 @@ const clearSelectedFile = () => {
 
 const clearQuery = () => {
   emit('clearQuery');
+}
+
+const stripLogViewerProperties = (log) => {
+  let copy = { ...log };
+  delete copy.index;
+  delete copy.file_identifier;
+  delete copy.file_position;
+  delete copy.url;
+
+  return copy;
 }
 </script>

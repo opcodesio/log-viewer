@@ -10,15 +10,10 @@ class HttpApacheErrorLog extends HttpLog
     public static string $regex = '/\[(?<dttm>.*?)\]\s\[(?:(?<module>.*?):)?(?<level>.*?)\]\s\[pid\s(?<pid>\d*)\](?:\s\[client\s(?<client>.*?)\])?\s(?<message>.*)/';
 
     public ?CarbonInterface $datetime;
-
-    public ?string $module;
-
     public ?string $level;
-
+    public ?string $module;
     public ?int $pid;
-
     public ?string $client;
-
     public ?string $message;
 
     public function __construct(

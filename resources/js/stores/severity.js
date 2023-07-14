@@ -20,6 +20,7 @@ export const useSeverityStore = defineStore({
   id: 'severity',
 
   state: () => ({
+    supportsLevels: false,
     selectedLevels: useLocalStorage('selectedLevels', DefaultSeverities),
     levelCounts: [],
   }),
@@ -41,6 +42,10 @@ export const useSeverityStore = defineStore({
   },
 
   actions: {
+    setSupportsLevels(supportsLevels) {
+      this.supportsLevels = supportsLevels;
+    },
+
     setLevelCounts(levelCounts) {
       if (levelCounts.hasOwnProperty('length')) {
         this.levelCounts = levelCounts;

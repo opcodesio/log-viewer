@@ -9,26 +9,17 @@ class HttpAccessLog extends HttpLog
 {
     public static string $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
 
-    public ?string $ip;
-
-    public ?string $identity;
-
-    public ?string $remoteUser;
-
     public ?CarbonInterface $datetime;
-
+    public ?string $level;
+    public ?string $ip;
+    public ?string $identity;
+    public ?string $remoteUser;
     public ?string $method;
-
     public ?string $path;
-
     public ?string $httpVersion;
-
     public ?int $statusCode;
-
     public ?int $contentLength;
-
     public ?string $referrer;
-
     public ?string $userAgent;
 
     public function __construct(
@@ -69,6 +60,7 @@ class HttpAccessLog extends HttpLog
             'path' => $matches[6] ?? null,
             'httpVersion' => $matches[7] ?? null,
             'statusCode' => $matches[8] ?? null,
+            'level' => $matches[8] ?? null,
             'contentLength' => $matches[9] ?? null,
             'referrer' => $matches[10] ?? null,
             'userAgent' => $matches[11] ?? null,

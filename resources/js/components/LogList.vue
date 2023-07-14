@@ -93,15 +93,18 @@ import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import LaravelLogTable from './LaravelLogTable.vue';
 import HttpAccessLogTable from './HttpAccessLogTable.vue';
+import { useSeverityStore } from '../stores/severity.js';
 
 const router = useRouter();
 const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
 const searchStore = useSearchStore();
 const paginationStore = usePaginationStore();
+const severityStore = useSeverityStore();
 
 const showLevelsDropdown = computed(() => {
-  return fileStore.selectedFile || String(searchStore.query || '').trim().length > 0;
+  return severityStore.supportsLevels
+    && (fileStore.selectedFile || String(searchStore.query || '').trim().length > 0);
 });
 
 const displayLogs = computed(() => {
