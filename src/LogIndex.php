@@ -253,7 +253,7 @@ class LogIndex
             // without date filters, we can use a faster approach
             foreach ($this->getChunkDefinitions() as $chunkDefinition) {
                 foreach ($chunkDefinition['level_counts'] as $severity => $count) {
-                    if (!$counts->has($severity)) {
+                    if (! $counts->has($severity)) {
                         $counts[$severity] = 0;
                     }
 
@@ -263,7 +263,7 @@ class LogIndex
         } else {
             foreach ($this->get() as $timestamp => $tsIndex) {
                 foreach ($tsIndex as $severity => $logIndex) {
-                    if (!$counts->has($severity)) {
+                    if (! $counts->has($severity)) {
                         $counts[$severity] = 0;
                     }
 
@@ -289,7 +289,7 @@ class LogIndex
             foreach ($chunkDefinition['level_counts'] as $level => $count) {
                 if (
                     (! isset($this->filterLevels) || in_array($level, $this->filterLevels))
-                    && (! isset($this->exceptLevels ) || ! in_array($level, $this->exceptLevels))
+                    && (! isset($this->exceptLevels) || ! in_array($level, $this->exceptLevels))
                 ) {
                     $sum += $count;
                 }

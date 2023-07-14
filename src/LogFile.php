@@ -14,8 +14,11 @@ class LogFile
 {
     // TODO: remove types, as they're no longer necessary
     const TYPE_LARAVEL = 'laravel';
+
     const TYPE_HTTP_ACCESS = 'http_access';
+
     const TYPE_HTTP_ERROR_APACHE = 'http_error_apache';
+
     const TYPE_HTTP_ERROR_NGINX = 'http_error_nginx';
 
     use Concerns\LogFile\HasMetadata;
@@ -53,7 +56,7 @@ class LogFile
             $this->type = Cache::remember(
                 'log-viewer::file-type-'.md5($this->path),
                 Carbon::now()->addMonth(),
-                fn() => LogTypeRegistrar::guessTypeFromFirstLine($this)
+                fn () => LogTypeRegistrar::guessTypeFromFirstLine($this)
             );
         }
 
