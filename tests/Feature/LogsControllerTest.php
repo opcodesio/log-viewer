@@ -1,6 +1,5 @@
 <?php
 
-use Opcodes\LogViewer\Facades\LogViewer;
 use function Pest\Laravel\getJson;
 
 it('can load the logs for a specific file', function () {
