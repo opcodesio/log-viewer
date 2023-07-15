@@ -15,7 +15,13 @@ interface LogInterface
 
     public function getLevel(): LevelInterface;
 
-    public static function matches(string $text): bool;
+    /**
+     * @param string $text The log entry line.
+     * @param int|null $timestamp The timestamp (as integer) extracted from the log entry. Used for indexing.
+     * @param string|null $level The log level (severity) extracted from the log entry. Used for indexing.
+     * @return bool
+     */
+    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool;
 
     public static function isMultiline(): bool;
 

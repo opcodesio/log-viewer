@@ -64,6 +64,19 @@ class HttpNginxErrorLog extends HttpLog
         return $datetime ? Carbon::createFromFormat('Y/m/d H:i:s', $datetime) : null;
     }
 
+    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
+    {
+        $matches = [];
+        $result = preg_match(static::$regex, $text, $matches) === 1;
+
+        if ($result) {
+            $timestamp = Carbon::createFromFormat('Y/m/d H:i:s', $matches['datetime'])->timestamp;
+            $level = $matches['errortype'];
+        }
+
+        return $result;
+    }
+
     public static function levelClass(): string
     {
         return Level::class;

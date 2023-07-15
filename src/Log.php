@@ -119,9 +119,17 @@ class Log implements LogInterface
         return $this->level;
     }
 
-    public static function matches(string $text): bool
+    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
     {
-        return preg_match(LogViewer::logMatchPattern(), $text) === 1;
+        $matches = [];
+        $result = preg_match(LogViewer::logMatchPattern(), $text, $matches) === 1;
+
+        if ($result) {
+            $timestamp = Carbon::parse($matches[1])?->timestamp;
+            $level = strtolower($matches[6] ?? '');
+        }
+
+        return $result;
     }
 
     public static function isMultiline(): bool

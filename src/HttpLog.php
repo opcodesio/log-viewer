@@ -26,11 +26,6 @@ abstract class HttpLog implements LogInterface
         return $levelClass::from($this->level);
     }
 
-    public static function matches(string $text): bool
-    {
-        return preg_match(static::$regex, $text) === 1;
-    }
-
     public static function isMultiline(): bool
     {
         return false;

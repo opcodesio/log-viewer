@@ -57,7 +57,7 @@ class LogsController
                     $logQuery->reverse();
                 }
 
-                $logQuery->scan(LogViewer::lazyScanChunkSize());
+                $logQuery->scan();
                 $logQuery->exceptLevels($excludedLevels);
                 $logs = $logQuery->paginate($perPage);
                 $levels = array_values($logQuery->getLevelCounts());

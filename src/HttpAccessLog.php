@@ -84,6 +84,19 @@ class HttpAccessLog extends HttpLog
         return $datetime ? Carbon::parse($datetime) : null;
     }
 
+    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
+    {
+        $matches = [];
+        $result = preg_match(static::$regex, $text, $matches) === 1;
+
+        if ($result) {
+            $timestamp = strtotime($matches[4]);
+            $level = $matches[8];
+        }
+
+        return $result;
+    }
+
     public static function levelClass(): string
     {
         return StatusCodeLevel::class;

@@ -134,6 +134,7 @@ class LogReader implements LogReaderInterface
         return $this;
     }
 
+    /** @deprecated not used anymore, will be removed in v3 */
     public static function getDefaultLevels(): array
     {
         return Level::caseValues();
@@ -285,6 +286,10 @@ class LogReader implements LogReaderInterface
      */
     public function scan(int $maxBytesToScan = null, bool $force = false): static
     {
+        if (is_null($maxBytesToScan)) {
+            $maxBytesToScan = LogViewer::lazyScanChunkSize();
+        }
+
         if ($this->isClosed()) {
             $this->open();
         }
@@ -308,7 +313,7 @@ class LogReader implements LogReaderInterface
 
         // we don't care about the selected levels here, we should scan everything
         $logIndex = $this->index();
-        $levels = self::getDefaultLevels();
+        $laravelSeverityLevels = Level::caseValues();
         $logMatchPattern = LogViewer::logMatchPattern();
         $earliest_timestamp = $this->file->getMetadata('earliest_timestamp');
         $latest_timestamp = $this->file->getMetadata('latest_timestamp');
@@ -332,29 +337,28 @@ class LogReader implements LogReaderInterface
              * $matches[3] - the optional timezone offset, like `+02:00` or `-05:30`
              */
             $matches = [];
-            if ($this->logClass::matches(trim($line))) {
+            $ts = null;
+            $lvl = null;
+            if ($this->logClass::matches(trim($line), $ts, $lvl)) {
                 if ($currentLog !== '') {
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
-                        $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel, $currentIndex);
+                        $logIndex->addToIndex($currentLogPosition, $currentTimestamp ?? 0, $currentLogLevel, $currentIndex);
                     }
 
                     $currentLog = '';
                     $currentIndex++;
                 }
 
-                /** @var LogInterface $log */
-                $log = new $this->logClass($line);
-
-                $currentTimestamp = $log->getTimestamp();
+                $currentTimestamp = $ts;
                 $earliest_timestamp = min($earliest_timestamp ?? $currentTimestamp, $currentTimestamp);
                 $latest_timestamp = max($latest_timestamp ?? $currentTimestamp, $currentTimestamp);
                 $currentLogPosition = ftell($this->fileHandle) - strlen($line);
-                $currentLogLevel = $log->level;
+                $currentLogLevel = $lvl;
 
                 if ($this->logClass === Log::class) {
                     $lowercaseLine = strtolower($line);
 
-                    foreach ($levels as $level) {
+                    foreach ($laravelSeverityLevels as $level) {
                         if (strpos($lowercaseLine, '.'.$level) || strpos($lowercaseLine, $level.':')) {
                             $currentLogLevel = $level;
                             break;
@@ -377,7 +381,7 @@ class LogReader implements LogReaderInterface
 
         if ($currentLog !== '' && $this->logClass::matches($currentLog)) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
-                $logIndex->addToIndex($currentLogPosition, $currentTimestamp, $currentLogLevel, $currentIndex);
+                $logIndex->addToIndex($currentLogPosition, $currentTimestamp ?? 0, $currentLogLevel, $currentIndex);
                 $currentIndex++;
             }
         }

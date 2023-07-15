@@ -60,6 +60,19 @@ class HttpApacheErrorLog extends HttpLog
         return $datetime ? Carbon::createFromFormat('D M d H:i:s.u Y', $datetime) : null;
     }
 
+    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
+    {
+        $matches = [];
+        $result = preg_match(static::$regex, $text, $matches) === 1;
+
+        if ($result) {
+            $timestamp = strtotime($matches['dttm']);
+            $level = $matches['level'];
+        }
+
+        return $result;
+    }
+
     public static function levelClass(): string
     {
         return Level::class;
