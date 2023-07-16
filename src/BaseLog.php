@@ -11,6 +11,12 @@ abstract class BaseLog implements LogInterface
 
     public static string $levelClass = Level::class;
 
+    public static array $columns = [
+        ['label' => 'Datetime', 'data_path' => 'datetime'],
+        ['label' => 'Severity', 'data_path' => 'level'],
+        ['label' => 'Message', 'data_path' => 'message'],
+    ];
+
     /** @var string|null The original full text of the log */
     protected ?string $text;
 

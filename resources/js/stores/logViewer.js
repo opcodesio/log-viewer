@@ -15,6 +15,12 @@ export const Theme = {
   Dark: 'Dark',
 }
 
+const defaultColumns = [
+  { label: 'Datetime', data_key: 'datetime' },
+  { label: 'Severity', data_key: 'level' },
+  { label: 'Message', data_key: 'message' },
+]
+
 export const useLogViewerStore = defineStore({
   id: 'logViewer',
 
@@ -30,6 +36,7 @@ export const useLogViewerStore = defineStore({
     error: null,
     type: 'laravel',
     logs: [],
+    columns: defaultColumns,
     levelCounts: [],
     performance: {},
     hasMoreResults: false,
@@ -215,6 +222,7 @@ export const useLogViewerStore = defineStore({
           } else {
             this.logs = data.logs;
           }
+          this.columns = data.columns || defaultColumns;
           this.type = data.file.type;
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;

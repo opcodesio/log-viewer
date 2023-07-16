@@ -77,10 +77,14 @@ class LogsController
             }
         }
 
+        $logClass = $this->getLogClass($logs ?? []);
+
+        /** @noinspection PhpUndefinedFieldInspection */
         return response()->json([
             'file' => isset($file) ? new LogFileResource($file) : null,
             'levelCounts' => LevelCountResource::collection($levels ?? []),
             'logs' => $this->logsToResources($logs ?? []),
+            'columns' => isset($logClass) ? $logClass::$columns : null,
             'pagination' => isset($logs) ? [
                 'current_page' => $logs->currentPage(),
                 'first_page_url' => $logs->url(1),
@@ -121,6 +125,19 @@ class LogsController
             HttpApacheErrorLog::class => BaseLogResource::collection($logs),
             default => LogResource::collection($logs),
         };
+    }
+
+    protected function getLogClass(LengthAwarePaginator|array $logs): ?string
+    {
+        if (is_array($logs) && empty($logs)) {
+            return null;
+        }
+
+        if (empty($logs->items())) {
+            return null;
+        }
+
+        return get_class($logs->items()[0]);
     }
 
     protected function getRequestPerformanceInfo(): array

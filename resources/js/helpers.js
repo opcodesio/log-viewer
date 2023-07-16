@@ -1,6 +1,8 @@
 import { ref } from 'vue';
 
 export const highlightSearchResult = (text, query = null) => {
+  text = text || '';
+
   if (query) {
     try {
       text = text.replace(new RegExp(query, 'gi'), '<mark>$&</mark>');

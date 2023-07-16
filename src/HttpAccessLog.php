@@ -11,6 +11,12 @@ class HttpAccessLog extends BaseLog
 
     public static string $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
 
+    public static array $columns = [
+        ['label' => 'Datetime', 'data_path' => 'datetime'],
+        ['label' => 'Status', 'data_path' => 'level'],
+        ['label' => 'Request', 'data_path' => 'message'],
+    ];
+
     protected function parseText(): void
     {
         $matches = [];

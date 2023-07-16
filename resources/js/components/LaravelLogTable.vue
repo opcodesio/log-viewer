@@ -62,7 +62,7 @@
           </div>
           <pre class="log-stack" v-html="highlightSearchResult(log.full_text, searchStore.query)"></pre>
           <template v-if="log.contexts && log.contexts.length > 0">
-            <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400">Context:</p>
+            <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400 text-xs lg:text-sm">Context:</p>
             <template v-for="context in log.contexts">
               <pre class="log-stack" v-html="JSON.stringify(context, null, 2)"></pre>
             </template>
