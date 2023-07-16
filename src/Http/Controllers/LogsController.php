@@ -79,12 +79,11 @@ class LogsController
 
         $logClass = $this->getLogClass($logs ?? []);
 
-        /** @noinspection PhpUndefinedFieldInspection */
         return response()->json([
             'file' => isset($file) ? new LogFileResource($file) : null,
             'levelCounts' => LevelCountResource::collection($levels ?? []),
             'logs' => $this->logsToResources($logs ?? []),
-            'columns' => isset($logClass) ? $logClass::$columns : null,
+            'columns' => isset($logClass) ? ($logClass::$columns ?? null) : null,
             'pagination' => isset($logs) ? [
                 'current_page' => $logs->currentPage(),
                 'first_page_url' => $logs->url(1),

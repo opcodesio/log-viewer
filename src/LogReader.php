@@ -435,7 +435,7 @@ class LogReader implements LogReaderInterface
                 (is_null($selectedLevels) || in_array($level, $selectedLevels))
                 && (is_null($exceptedLevels) || ! in_array($level, $exceptedLevels))
             );
-        })->toArray();
+        })->sortBy(fn (LevelCount $levelCount) => $levelCount->level->getName(), SORT_NATURAL)->toArray();
     }
 
     /**
