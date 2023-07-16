@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 class HttpNginxErrorLog extends BaseLog
 {
     public static string $regex = '/^(?P<datetime>[\d+\/ :]+) \[(?P<errortype>.+)\] .*?: (?P<errormessage>.+?)(?:, client: (?P<client>.+?))?(?:, server: (?P<server>.+?))?(?:, request: "?(?P<request>.+?)"?)?(?:, host: "?(?P<host>.+?)"?)?$/';
+
     public static string $levelClass = Level::class;
 
     public function parseText(): void

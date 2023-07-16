@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 class HttpApacheErrorLog extends BaseLog
 {
     public static string $regex = '/\[(?<dttm>.*?)\]\s\[(?:(?<module>.*?):)?(?<level>.*?)\]\s\[pid\s(?<pid>\d*)\](?:\s\[client\s(?<client>.*?)\])?\s(?<message>.*)/';
+
     public static string $levelClass = Level::class;
 
     public function parseText(): void

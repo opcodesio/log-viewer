@@ -11,15 +11,25 @@ use Opcodes\LogViewer\Utils\Utils;
 class Log implements LogInterface
 {
     public ?int $index;
+
     public CarbonInterface $time;
+
     public Level $level;
+
     public string $environment;
+
     public string $text;
+
     public string $fullText;
+
     public array $contexts = [];
+
     public bool $fullTextIncomplete = false;
+
     public int $fullTextLength;
+
     public ?string $fileIdentifier;
+
     public ?int $filePosition;
 
     public function __construct(

@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 class HttpAccessLog extends BaseLog
 {
     public static string $levelClass = StatusCodeLevel::class;
+
     public static string $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
 
     protected function parseText(): void
