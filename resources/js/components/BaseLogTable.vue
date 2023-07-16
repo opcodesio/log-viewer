@@ -4,8 +4,8 @@
     <tr>
       <th scope="col" class="w-[110px] hidden lg:table-cell"><div class="pl-2">Status</div></th>
       <th scope="col" class="w-[180px] hidden lg:table-cell">Time</th>
-      <th scope="col" class="w-[120px] hidden lg:table-cell">Request</th>
-      <th scope="col" class="hidden lg:table-cell"><span class="sr-only">File position</span></th>
+      <th scope="col" class="w-[120px] hidden lg:table-cell">Message</th>
+      <th scope="col" class="hidden lg:table-cell"><span class="sr-only">Log index</span></th>
     </tr>
     </thead>
 
@@ -44,18 +44,20 @@
           <span class="lg:hidden">{{ log.time }}</span>
         </td>
         <!-- /Status -->
-        <!-- Request -->
+        <!-- Message -->
         <td class="max-w-[1px] w-full truncate text-gray-500 dark:text-gray-300 dark:opacity-90">
-          <span v-html="highlightSearchResult(`${log.method} ${log.path}`, searchStore.query)"></span>
+          <span v-html="highlightSearchResult(`${log.message}`, searchStore.query)"></span>
         </td>
-        <!-- /Request -->
+        <!-- /Message -->
         <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs hidden lg:table-cell">
           <LogCopyButton :log="log" class="pr-2 large-screen" />
         </td>
       </tr>
       <tr v-show="logViewerStore.isOpen(index)">
         <td colspan="6">
-          <pre class="log-stack" v-html="JSON.stringify(stripLogViewerProperties(log), null, 2)"></pre>
+          <pre class="log-stack" v-html="highlightSearchResult(log.full_text, searchStore.query)"></pre>
+          <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400">Context:</p>
+          <pre class="log-stack" v-html="highlightSearchResult(JSON.stringify(log.context, null, 2), searchStore.query)"></pre>
         </td>
       </tr>
       </tbody>

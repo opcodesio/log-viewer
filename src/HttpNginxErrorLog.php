@@ -5,58 +5,29 @@ namespace Opcodes\LogViewer;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 
-class HttpNginxErrorLog extends HttpLog
+class HttpNginxErrorLog extends BaseLog
 {
     public static string $regex = '/^(?P<datetime>[\d+\/ :]+) \[(?P<errortype>.+)\] .*?: (?P<errormessage>.+?)(?:, client: (?P<client>.+?))?(?:, server: (?P<server>.+?))?(?:, request: "?(?P<request>.+?)"?)?(?:, host: "?(?P<host>.+?)"?)?$/';
+    public static string $levelClass = Level::class;
 
-    public ?CarbonInterface $datetime;
+    public function parseText(): void
+    {
+        $matches = [];
+        preg_match(self::$regex, $this->text, $matches);
 
-    public ?string $level;
-
-    public ?string $message;
-
-    public ?string $client;
-
-    public ?string $server;
-
-    public ?string $request;
-
-    public ?string $host;
-
-    public function __construct(
-        public string $text,
-        public ?string $fileIdentifier = null,
-        public ?int $filePosition = null,
-        public ?int $index = null,
-    ) {
-        parent::__construct($text, $fileIdentifier, $filePosition, $index);
-
-        $matches = $this->parseText($text);
-
-        $this->datetime = $this->parseDateTime($matches['datetime'])?->tz(
+        $this->datetime = $this->parseDateTime($matches['datetime'] ?? null)?->tz(
             config('log-viewer.timezone', config('app.timezone', 'UTC'))
         );
-        $this->level = $matches['level'];
-        $this->message = $matches['message'];
-        $this->client = $matches['client'];
-        $this->server = $matches['server'];
-        $this->request = $matches['request'];
-        $this->host = $matches['host'];
-    }
-
-    public function parseText(string $text): array
-    {
-        $result = preg_match(self::$regex, $this->text, $matches);
-
-        return [
-            'datetime' => $matches['datetime'] ?? null,
-            'level' => $matches['errortype'] ?? null,
-            'message' => $matches['errormessage'] ?? null,
-            'client' => isset($matches['client']) ? ($matches['client'] ?: null) : null,
+        $this->level = $matches['errortype'] ?? null;
+        $this->message = $matches['errormessage'] ?? null;
+        $this->context = [
+            'client' => $matches['client'] ?? null,
             'server' => $matches['server'] ?? null,
             'request' => $matches['request'] ?? null,
             'host' => $matches['host'] ?? null,
         ];
+
+        unset($matches);
     }
 
     public function parseDateTime(?string $datetime): ?CarbonInterface
@@ -79,6 +50,6 @@ class HttpNginxErrorLog extends HttpLog
 
     public static function levelClass(): string
     {
-        return Level::class;
+        return static::$levelClass;
     }
 }

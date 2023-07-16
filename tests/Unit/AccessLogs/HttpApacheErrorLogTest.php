@@ -7,13 +7,12 @@ it('can parse an HTTP error log', function () {
 
     $log = new HttpApacheErrorLog($line);
 
-    expect($log->text)->toBe($line)
-        ->and($log->datetime->toDateTimeString())->toBe('2023-07-09 09:08:27')
-        ->and($log->module)->toBe('php')
+    expect($log->datetime->toDateTimeString())->toBe('2023-07-09 09:08:27')
         ->and($log->level)->toBe('error')
-        ->and($log->pid)->toBe(116942)
-        ->and($log->client)->toBe('20.253.242.138:50173')
-        ->and($log->message)->toBe("script '/var/www/cgi-bin/cloud.php' not found or unable to stat");
+        ->and($log->message)->toBe("script '/var/www/cgi-bin/cloud.php' not found or unable to stat")
+        ->and($log->context['module'])->toBe('php')
+        ->and($log->context['pid'])->toBe(116942)
+        ->and($log->context['client'])->toBe('20.253.242.138:50173');
 });
 
 it('can parse an HTTP error log with client part missing', function () {
@@ -21,13 +20,12 @@ it('can parse an HTTP error log with client part missing', function () {
 
     $log = new HttpApacheErrorLog($line);
 
-    expect($log->text)->toBe($line)
-        ->and($log->datetime->toDateTimeString())->toBe('2023-07-09 09:08:27')
-        ->and($log->module)->toBe('php')
+    expect($log->datetime->toDateTimeString())->toBe('2023-07-09 09:08:27')
         ->and($log->level)->toBe('error')
-        ->and($log->pid)->toBe(116942)
-        ->and($log->client)->toBe(null)
-        ->and($log->message)->toBe("script '/var/www/cgi-bin/cloud.php' not found or unable to stat");
+        ->and($log->message)->toBe("script '/var/www/cgi-bin/cloud.php' not found or unable to stat")
+        ->and($log->context['module'])->toBe('php')
+        ->and($log->context['pid'])->toBe(116942)
+        ->and($log->context['client'])->toBe(null);
 });
 
 it('can store the related file details', function () {
@@ -44,13 +42,12 @@ it('handles missing details', function () {
 
     $log = new HttpApacheErrorLog($line);
 
-    expect($log->text)->toBe($line)
-        ->and($log->datetime?->toDateTimeString())->toBe(null)
-        ->and($log->module)->toBe(null)
+    expect($log->datetime)->toBe(null)
         ->and($log->level)->toBe(null)
-        ->and($log->pid)->toBe(null)
-        ->and($log->client)->toBe(null)
-        ->and($log->message)->toBe(null);
+        ->and($log->message)->toBe(null)
+        ->and($log->context['module'])->toBe(null)
+        ->and($log->context['pid'])->toBe(null)
+        ->and($log->context['client'])->toBe(null);
 });
 
 it('strips empty chars at the end', function ($chars) {
@@ -58,7 +55,7 @@ it('strips empty chars at the end', function ($chars) {
 
     $accessLog = new HttpApacheErrorLog($line.$chars);
 
-    expect($accessLog->text)->toBe($line);
+    expect($accessLog->getOriginalText())->toBe($line);
 })->with([
     ['chars' => "\n"],
     ['chars' => "\r\n"],

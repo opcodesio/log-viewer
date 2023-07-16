@@ -8,11 +8,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Http\Resources\HttpAccessLogResource;
+use Opcodes\LogViewer\Http\Resources\BaseLogResource;
 use Opcodes\LogViewer\Http\Resources\LevelCountResource;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
 use Opcodes\LogViewer\Http\Resources\LogResource;
 use Opcodes\LogViewer\HttpAccessLog;
+use Opcodes\LogViewer\HttpApacheErrorLog;
+use Opcodes\LogViewer\HttpNginxErrorLog;
 
 class LogsController
 {
@@ -114,7 +116,9 @@ class LogsController
         }
 
         return match (get_class($logs->items()[0])) {
-            HttpAccessLog::class => HttpAccessLogResource::collection($logs),
+            HttpAccessLog::class,
+            HttpNginxErrorLog::class,
+            HttpApacheErrorLog::class => BaseLogResource::collection($logs),
             default => LogResource::collection($logs),
         };
     }

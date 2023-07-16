@@ -23,7 +23,5 @@ interface LogInterface
      */
     public static function matches(string $text, int &$timestamp = null, string &$level = null): bool;
 
-    public static function isMultiline(): bool;
-
     public static function levelClass(): string;
 }

@@ -257,7 +257,7 @@ class LogReader implements LogReaderInterface
             $this->only(null);
             $this->onlyShow(intval(explode(':', $query)[1]));
         } elseif (! empty($query)) {
-            $query = '/'.$query.'/i';
+            $query = '~'.$query.'~i';
 
             Utils::validateRegex($query);
 

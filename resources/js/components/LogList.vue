@@ -45,8 +45,8 @@
         <div class="log-item-container h-full overflow-y-auto md:px-4" @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
 
-            <http-access-log-table v-if="logViewerStore.type === 'http_access'" />
-            <laravel-log-table v-else />
+            <laravel-log-table v-if="logViewerStore.type === 'laravel'" />
+            <base-log-table v-else />
 
           </div>
         </div>
@@ -92,7 +92,7 @@ import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import LaravelLogTable from './LaravelLogTable.vue';
-import HttpAccessLogTable from './HttpAccessLogTable.vue';
+import BaseLogTable from './BaseLogTable.vue';
 import { useSeverityStore } from '../stores/severity.js';
 
 const router = useRouter();

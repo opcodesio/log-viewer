@@ -48,7 +48,7 @@ interface LogReaderInterface
 
     public function next(): ?LogInterface;
 
-    /** @return LengthAwarePaginator<Log|HttpLog> */
+    /** @return LengthAwarePaginator<Log|BaseLog> */
     public function paginate(int $perPage = 25, int $page = null);
 
     public function total(): int;

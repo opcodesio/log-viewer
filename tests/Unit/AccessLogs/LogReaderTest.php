@@ -14,16 +14,16 @@ it('can read access logs with the default LogReader', function () {
     // 205.123.147.41 - - [18/Jan/2023:05:21:57 +0000] "GET /tag HTTP/1.1" 500 2519 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
     expect($firstLog->index)->toBe(0)
         ->and($firstLog)->toBeInstanceOf(\Opcodes\LogViewer\HttpAccessLog::class)
-        ->and($firstLog->ip)->toBe('205.123.147.41')
+        ->and($firstLog->context['ip'])->toBe('205.123.147.41')
         ->and($firstLog->datetime->toDateTimeString())->toBe('2023-01-18 05:21:57')
-        ->and($firstLog->statusCode)->toBe(500)
+        ->and($firstLog->context['statusCode'])->toBe(500)
         ->and($firstLog->level)->toBe('500')
-        ->and($firstLog->method)->toBe('GET')
-        ->and($firstLog->path)->toBe('/tag')
-        ->and($firstLog->httpVersion)->toBe('HTTP/1.1')
-        ->and($firstLog->contentLength)->toBe(2519)
-        ->and($firstLog->referrer)->toBe('-')
-        ->and($firstLog->userAgent)->toBe('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
+        ->and($firstLog->context['method'])->toBe('GET')
+        ->and($firstLog->context['path'])->toBe('/tag')
+        ->and($firstLog->context['httpVersion'])->toBe('HTTP/1.1')
+        ->and($firstLog->context['contentLength'])->toBe(2519)
+        ->and($firstLog->context['referrer'])->toBe('-')
+        ->and($firstLog->context['userAgent'])->toBe('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
 });
 
 it('can read nginx error logs with the default LogReader', function () {
@@ -43,8 +43,8 @@ it('can read nginx error logs with the default LogReader', function () {
         ->and($firstLog->datetime->toDateTimeString())->toBe('2023-01-04 11:18:33')
         ->and($firstLog->level)->toBe('alert')
         ->and($firstLog->message)->toBe('*1473 setsockopt(TCP_NODELAY) failed (22: Invalid argument) while keepalive')
-        ->and($firstLog->client)->toBe('127.0.0.1')
-        ->and($firstLog->server)->toBe('127.0.0.1:80');
+        ->and($firstLog->context['client'])->toBe('127.0.0.1')
+        ->and($firstLog->context['server'])->toBe('127.0.0.1:80');
 });
 
 it('can read apache error logs with the default LogReader', function () {
@@ -62,8 +62,8 @@ it('can read apache error logs with the default LogReader', function () {
     expect($firstLog->index)->toBe(0)
         ->and($firstLog)->toBeInstanceOf(\Opcodes\LogViewer\HttpApacheErrorLog::class)
         ->and($firstLog->datetime->toDateTimeString())->toBe('2023-07-09 06:10:51')
-        ->and($firstLog->pid)->toBe(44570)
-        ->and($firstLog->module)->toBe('ssl')
+        ->and($firstLog->context['pid'])->toBe(44570)
+        ->and($firstLog->context['module'])->toBe('ssl')
         ->and($firstLog->level)->toBe('error')
         ->and($firstLog->message)->toBe('AH02032: Hostname test.example.com provided via SNI and hostname system.test provided via HTTP are different');
 });
