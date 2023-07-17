@@ -48,9 +48,4 @@ class HttpApacheErrorLog extends BaseLog
 
         return $result;
     }
-
-    public static function levelClass(): string
-    {
-        return static::$levelClass;
-    }
 }

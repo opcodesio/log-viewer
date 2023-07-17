@@ -5,7 +5,6 @@ export const useSeverityStore = defineStore({
   id: 'severity',
 
   state: () => ({
-    supportsLevels: false,
     allLevels: [],  // should be updated by the backend
     excludedLevels: useLocalStorage('excludedLevels', []),
     levelCounts: [],
@@ -28,10 +27,6 @@ export const useSeverityStore = defineStore({
   },
 
   actions: {
-    setSupportsLevels(supportsLevels) {
-      this.supportsLevels = supportsLevels;
-    },
-
     setLevelCounts(levelCounts) {
       if (levelCounts.hasOwnProperty('length')) {
         this.levelCounts = levelCounts;

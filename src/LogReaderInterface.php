@@ -26,9 +26,6 @@ interface LogReaderInterface
 
     public function setDirection(string $direction = null): static;
 
-    // Controlling which severity levels are shown
-    public function supportsLevels(): bool;
-
     public function getLevelCounts(): array;
 
     public function only($levels = null): static;
@@ -48,7 +45,7 @@ interface LogReaderInterface
 
     public function next(): ?LogInterface;
 
-    /** @return LengthAwarePaginator<Log|BaseLog> */
+    /** @return LengthAwarePaginator<BaseLog> */
     public function paginate(int $perPage = 25, int $page = null);
 
     public function total(): int;

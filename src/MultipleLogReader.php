@@ -4,6 +4,7 @@ namespace Opcodes\LogViewer;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Opcodes\LogViewer\Facades\LogViewer;
 
 class MultipleLogReader
 {
@@ -17,7 +18,7 @@ class MultipleLogReader
 
     protected string $direction;
 
-    protected ?array $levels = null;
+    protected ?array $exceptLevels = null;
 
     public function __construct(mixed $files)
     {
@@ -32,16 +33,16 @@ class MultipleLogReader
         $this->setDirection(Direction::Forward);
     }
 
-    public function setLevels($levels = null): self
+    public function exceptLevels($levels = null): self
     {
-        $this->levels = $levels;
+        $this->exceptLevels = $levels;
 
         return $this;
     }
 
     public function allLevels(): self
     {
-        $this->levels = null;
+        $this->exceptLevels = null;
 
         return $this;
     }
@@ -136,7 +137,7 @@ class MultipleLogReader
     /**
      * Get the logs from this file collection.
      *
-     * @return array|Log[]
+     * @return array|BaseLog[]
      */
     public function get(int $limit = null): array
     {
@@ -205,6 +206,7 @@ class MultipleLogReader
     public function scan(int $maxBytesToScan = null, bool $force = false): void
     {
         $fileSizeScanned = 0;
+        $stopScanningAfter = microtime(true) + LogViewer::lazyScanTimeout();
 
         /** @var LogFile $logFile */
         foreach ($this->fileCollection as $logFile) {
@@ -221,6 +223,10 @@ class MultipleLogReader
             if (isset($maxBytesToScan) && $fileSizeScanned >= $maxBytesToScan) {
                 break;
             }
+
+            if ($stopScanningAfter < microtime(true)) {
+                break;
+            }
         }
     }
 
@@ -229,7 +235,7 @@ class MultipleLogReader
         return $file->logs()
             ->search($this->query)
             ->setDirection($this->direction)
-            ->setLevels($this->levels)
+            ->exceptLevels($this->exceptLevels)
             ->lazyScanning();
     }
 }

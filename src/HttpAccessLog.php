@@ -66,9 +66,4 @@ class HttpAccessLog extends BaseLog
 
         return $result;
     }
-
-    public static function levelClass(): string
-    {
-        return static::$levelClass;
-    }
 }

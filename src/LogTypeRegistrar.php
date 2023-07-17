@@ -5,7 +5,7 @@ namespace Opcodes\LogViewer;
 class LogTypeRegistrar
 {
     private static array $logTypes = [
-        'laravel' => Log::class,
+        'laravel' => LaravelLog::class,
         'http_access' => HttpAccessLog::class,
         'http_error_apache' => HttpApacheErrorLog::class,
         'http_error_nginx' => HttpNginxErrorLog::class,

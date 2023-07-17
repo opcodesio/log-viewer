@@ -235,6 +235,11 @@ class LogViewerService
         return intval(config('log-viewer.lazy_scan_chunk_size_in_mb', 100)) * 1024 * 1024;
     }
 
+    public function lazyScanTimeout(): float
+    {
+        return 10.0;    // 10 seconds
+    }
+
     /**
      * Get the maximum number of bytes of the log that we should display.
      */

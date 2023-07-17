@@ -19,7 +19,7 @@
           :class="['log-item group', log.level_class, logViewerStore.isOpen(index) ? 'active' : '', logViewerStore.shouldBeSticky(index) ? 'sticky z-2' : '']"
           :style="{ top: logViewerStore.stackTops[index] || 0 }"
       >
-        <td class="hidden lg:table-cell">
+        <td class="log-level hidden lg:table-cell">
           <div class="flex items-center lg:pl-2">
             <button :aria-expanded="logViewerStore.isOpen(index)"
                     @keydown="handleLogToggleKeyboardNavigation"
@@ -28,9 +28,11 @@
               <span class="sr-only" v-if="!logViewerStore.isOpen(index)">Expand log entry</span>
               <span class="sr-only" v-if="logViewerStore.isOpen(index)">Collapse log entry</span>
               <span class="w-full h-full group-hover:hidden group-focus:hidden">
-
+                <ExclamationCircleIcon v-if="log.level_class === 'danger'" />
+                <ExclamationTriangleIcon v-else-if="log.level_class === 'warning'" />
+                <InformationCircleIcon v-else />
               </span>
-              <span class="w-full h-full inline-block">
+              <span class="w-full h-full hidden group-hover:inline-block group-focus:inline-block">
                 <ChevronRightIcon :class="[logViewerStore.isOpen(index) ? 'rotate-90' : '', 'transition duration-100']" />
               </span>
             </button>
@@ -40,7 +42,7 @@
         <template v-for="(column, colIndex) in logViewerStore.columns">
           <!-- Severity -->
           <td :key="`${log.index}-column-${colIndex}`" v-if="column.data_path === 'level'" class="log-level truncate">
-            <span class="font-semibold">{{ log.level_name }}</span>
+            <span>{{ log.level_name }}</span>
           </td>
           <!-- /Severity -->
 
@@ -57,8 +59,8 @@
           </td>
           <!-- /Message -->
 
-          <td :key="`${log.index}-column-${colIndex}`" v-else class="max-w-[1px] text-gray-500 dark:text-gray-300 dark:opacity-90">
-            <span v-html="highlightSearchResult(log[column.data_path], searchStore.query)"></span>
+          <td :key="`${log.index}-column-${colIndex}`" v-else class="text-gray-500 dark:text-gray-300 dark:opacity-90">
+            <span v-html="highlightSearchResult(getDataAtPath(log, column.data_path), searchStore.query)"></span>
           </td>
         </template>
 
@@ -68,9 +70,20 @@
       </tr>
       <tr v-show="logViewerStore.isOpen(index)">
         <td colspan="6">
+          <div class="lg:hidden flex justify-between px-2 pt-2 pb-1 text-xs">
+            <div class="flex-1"><span class="font-semibold">Datetime:</span> {{ log.datetime }}</div>
+            <div>
+              <LogCopyButton :log="log" />
+            </div>
+          </div>
           <pre class="log-stack" v-html="highlightSearchResult(log.full_text, searchStore.query)"></pre>
           <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400 text-xs lg:text-sm">Context:</p>
           <pre class="log-stack" v-html="highlightSearchResult(JSON.stringify(log.context, null, 2), searchStore.query)"></pre>
+
+          <div v-if="log.context.log_viewer && log.context.log_viewer.log_text_incomplete" class="py-4 px-8 text-gray-500 italic">
+            The contents of this log have been cut short to the first {{ LogViewer.max_log_size_formatted }}.
+            The full size of this log entry is <strong>{{ log.context.log_viewer.log_size_formatted }}</strong>
+          </div>
         </td>
       </tr>
       </tbody>
@@ -104,8 +117,13 @@
 </template>
 
 <script setup>
+import {
+  ChevronRightIcon,
+  ExclamationCircleIcon,
+  ExclamationTriangleIcon,
+  InformationCircleIcon,
+} from '@heroicons/vue/24/solid';
 import { highlightSearchResult } from '../helpers.js';
-import { ChevronRightIcon } from '@heroicons/vue/24/solid';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { useSearchStore } from '../stores/search.js';
 import { useFileStore } from '../stores/files.js';
@@ -125,5 +143,9 @@ const clearSelectedFile = () => {
 
 const clearQuery = () => {
   emit('clearQuery');
+}
+
+const getDataAtPath = (obj, path) => {
+  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
 }
 </script>

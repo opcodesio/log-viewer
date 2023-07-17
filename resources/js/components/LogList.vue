@@ -45,8 +45,7 @@
         <div class="log-item-container h-full overflow-y-auto md:px-4" @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
 
-            <laravel-log-table v-if="logViewerStore.type === 'laravel'" />
-            <base-log-table v-else />
+            <base-log-table />
 
           </div>
         </div>
@@ -91,7 +90,6 @@ import LevelButtons from './LevelButtons.vue';
 import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
-import LaravelLogTable from './LaravelLogTable.vue';
 import BaseLogTable from './BaseLogTable.vue';
 import { useSeverityStore } from '../stores/severity.js';
 
@@ -103,8 +101,7 @@ const paginationStore = usePaginationStore();
 const severityStore = useSeverityStore();
 
 const showLevelsDropdown = computed(() => {
-  return severityStore.supportsLevels
-    && (fileStore.selectedFile || String(searchStore.query || '').trim().length > 0);
+  return fileStore.selectedFile || String(searchStore.query || '').trim().length > 0;
 });
 
 const displayLogs = computed(() => {

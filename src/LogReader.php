@@ -76,11 +76,6 @@ class LogReader implements LogReaderInterface
         return $this->file->index($this->query);
     }
 
-    public function supportsLevels(): bool
-    {
-        return true;
-    }
-
     /**
      * Load only the provided log levels
      *
@@ -309,12 +304,12 @@ class LogReader implements LogReaderInterface
             $this->index()->clearCache();
         }
 
+        $stopScanningAfter = microtime(true) + LogViewer::lazyScanTimeout();
         $this->mtimeBeforeScan = $this->file->mtime();
 
         // we don't care about the selected levels here, we should scan everything
         $logIndex = $this->index();
         $laravelSeverityLevels = Level::caseValues();
-        $logMatchPattern = LogViewer::logMatchPattern();
         $earliest_timestamp = $this->file->getMetadata('earliest_timestamp');
         $latest_timestamp = $this->file->getMetadata('latest_timestamp');
         $currentLog = '';
@@ -327,6 +322,7 @@ class LogReader implements LogReaderInterface
 
         while (
             (! isset($lastPositionToScan) || $currentLogPosition < $lastPositionToScan)
+            && ($stopScanningAfter > microtime(true))
             && ($line = fgets($this->fileHandle, 1024)) !== false
         ) {
             /**
@@ -355,7 +351,7 @@ class LogReader implements LogReaderInterface
                 $currentLogPosition = ftell($this->fileHandle) - strlen($line);
                 $currentLogLevel = $lvl;
 
-                if ($this->logClass === Log::class) {
+                if ($this->logClass === LaravelLog::class) {
                     $lowercaseLine = strtolower($line);
 
                     foreach ($laravelSeverityLevels as $level) {

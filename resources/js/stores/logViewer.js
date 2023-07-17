@@ -34,7 +34,6 @@ export const useLogViewerStore = defineStore({
     // Log data
     loading: false,
     error: null,
-    type: 'laravel',
     logs: [],
     columns: defaultColumns,
     levelCounts: [],
@@ -223,12 +222,10 @@ export const useLogViewerStore = defineStore({
             this.logs = data.logs;
           }
           this.columns = data.columns || defaultColumns;
-          this.type = data.file.type;
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;
           this.error = data.error || null;
           this.performance = data.performance || {};
-          severityStore.setSupportsLevels(data.supportsLevels);
           severityStore.setLevelCounts(data.levelCounts);
           paginationStore.setPagination(data.pagination);
 
