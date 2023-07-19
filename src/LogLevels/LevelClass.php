@@ -5,9 +5,13 @@ namespace Opcodes\LogViewer\LogLevels;
 class LevelClass
 {
     const SUCCESS = 'success';
+
     const INFO = 'info';
+
     const WARNING = 'warning';
+
     const DANGER = 'danger';
+
     const NONE = 'none';
 
     public function __construct(

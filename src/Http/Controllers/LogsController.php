@@ -2,7 +2,6 @@
 
 namespace Opcodes\LogViewer\Http\Controllers;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;

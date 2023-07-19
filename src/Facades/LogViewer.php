@@ -33,7 +33,6 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @method static int lazyScanChunkSize()
  * @method static float lazyScanTimeout()
  * @method static string basePathForLogs()
- *
  * @method static void extend(string $type, string $class)
  * @method static void useLogFileClass(string $class)
  * @method static void useLogReaderClass(string $class)

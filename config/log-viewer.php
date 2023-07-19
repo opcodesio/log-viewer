@@ -1,7 +1,5 @@
 <?php
 
-use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
-
 return [
 
     /*
