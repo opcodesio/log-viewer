@@ -2,6 +2,8 @@
 
 namespace Opcodes\LogViewer;
 
+use Opcodes\LogViewer\LogLevels\LevelInterface;
+
 class LevelCount
 {
     public function __construct(

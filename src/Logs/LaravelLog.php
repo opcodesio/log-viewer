@@ -1,20 +1,23 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Logs;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 use Opcodes\LogViewer\Utils\Utils;
 
 class LaravelLog extends BaseLog
 {
+    public static string $regex = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\].*/';
+
     public int $fullTextLength;
 
     public static array $columns = [
         ['label' => 'Severity', 'data_path' => 'level'],
         ['label' => 'Datetime', 'data_path' => 'datetime'],
-        ['label' => 'Env', 'data_path' => 'context.environment'],
+        ['label' => 'Env', 'data_path' => 'extra.environment'],
         ['label' => 'Message', 'data_path' => 'message'],
     ];
 
@@ -23,10 +26,8 @@ class LaravelLog extends BaseLog
         $this->text = mb_convert_encoding(rtrim($this->text, "\t\n\r"), 'UTF-8', 'UTF-8');
         $length = strlen($this->text);
 
-        if ($length >= LogViewer::maxLogSize()) {
-            $this->context['log_viewer']['log_size'] = $length;
-            $this->context['log_viewer']['log_size_formatted'] = Utils::bytesForHumans($length);
-        }
+        $this->extra['log_size'] = $length;
+        $this->extra['log_size_formatted'] = Utils::bytesForHumans($length);
 
         [$firstLine, $theRestOfIt] = explode("\n", Str::finish($this->text, "\n"), 2);
 
@@ -34,7 +35,7 @@ class LaravelLog extends BaseLog
         // so in order to properly match, we must have a smaller first line...
         $firstLineSplit = str_split($firstLine, 1000);
         $matches = [];
-        preg_match(LogViewer::laravelRegexPattern(), array_shift($firstLineSplit), $matches);
+        preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches);
 
         $this->datetime = Carbon::parse($matches[1])->tz(
             config('log-viewer.timezone', config('app.timezone', 'UTC'))
@@ -43,11 +44,11 @@ class LaravelLog extends BaseLog
         // $matches[2] contains microseconds, which is already handled
         // $matches[3] contains timezone offset, which is already handled
 
-        $this->context['environment'] = $matches[5] ?? null;
+        $this->extra['environment'] = $matches[5] ?? null;
 
         // There might be something in the middle between the timestamp
         // and the environment/level. Let's put that at the beginning of the first line.
-        $middle = trim(rtrim($matches[4] ?? '', $this->context['environment'].'.'));
+        $middle = trim(rtrim($matches[4] ?? '', $this->extra['environment'].'.'));
 
         $this->level = strtolower($matches[6] ?? '');
 
@@ -85,9 +86,7 @@ class LaravelLog extends BaseLog
 
         if (strlen($text) > LogViewer::maxLogSize()) {
             $text = Str::limit($text, LogViewer::maxLogSize());
-            $this->context['log_viewer']['log_text_incomplete'] = true;
-        } else {
-            unset($this->context['log_viewer']);
+            $this->extra['log_text_incomplete'] = true;
         }
 
         $this->text = trim($text);
@@ -97,10 +96,17 @@ class LaravelLog extends BaseLog
         unset($matches);
     }
 
+    protected static function regexPattern(): string
+    {
+        return '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\](.*?(\w+)\.|.*?)('
+            .implode('|', array_filter(LaravelLogLevel::caseValues()))
+            .')?: ?(.*?)( in [\/].*?:[0-9]+)?$/is';
+    }
+
     public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
     {
         $matches = [];
-        $result = preg_match(LogViewer::logMatchPattern(), $text, $matches) === 1;
+        $result = preg_match(static::$regex, $text, $matches) === 1;
 
         if ($result) {
             $timestamp = Carbon::parse($matches[1])?->timestamp;
@@ -145,14 +151,14 @@ class LaravelLog extends BaseLog
 
             if (json_last_error() == JSON_ERROR_NONE) {
                 $contexts[] = $json_data;
-                $this->text = str_replace($json_string, '', $this->text);
+                $this->text = rtrim(str_replace($json_string, '', $this->text));
             }
         }
 
         if (count($contexts) > 1) {
-            $this->context['laravel_context'] = $contexts;
+            $this->context = $contexts;
         } elseif (count($contexts) === 1) {
-            $this->context['laravel_context'] = $contexts[0];
+            $this->context = $contexts[0];
         }
     }
 }

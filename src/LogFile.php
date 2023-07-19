@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\Cache;
+use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Utils\Utils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -32,7 +33,7 @@ class LogFile
 
     public string $subFolder = '';
 
-    private ?string $type = self::TYPE_LARAVEL;
+    private ?string $type = null;
 
     private array $_logIndexCache;
 
@@ -72,9 +73,12 @@ class LogFile
         return $this->_logIndexCache[$query];
     }
 
-    public function logs(): LogReader
+    public function logs(): LogReaderInterface
     {
-        return LogReader::instance($this);
+        $logReaderClass = LogViewer::logReaderClass();
+
+        /** @noinspection PhpUndefinedMethodInspection */
+        return $logReaderClass::instance($this);
     }
 
     public function size(): int
@@ -173,7 +177,7 @@ class LogFile
     /**
      * @throws InvalidRegularExpression
      */
-    public function search(string $query = null): LogReader
+    public function search(string $query = null): LogReaderInterface
     {
         return $this->logs()->search($query);
     }

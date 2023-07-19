@@ -8,7 +8,7 @@ it('can retrieve the http log files', function () {
     $error_dummy_path = __DIR__.'/Fixtures/errors_dummy.log';
     $error_nginx_dummy_path = __DIR__.'/Fixtures/errors_nginx_dummy.log';
 
-    config()->set('log-viewer.http_logs.include_files', [__DIR__.'/Fixtures/*']);
+    config()->set('log-viewer.include_files', [__DIR__.'/Fixtures/*']);
 
     $files = LogViewer::getFiles();
 

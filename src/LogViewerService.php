@@ -13,6 +13,10 @@ class LogViewerService
 {
     const DEFAULT_MAX_LOG_SIZE_TO_DISPLAY = 131_072;    // 128 KB
 
+    public static string $logFileClass = LogFile::class;
+
+    public static string $logReaderClass = LogReader::class;
+
     protected ?Collection $_cachedFiles = null;
 
     protected mixed $authCallback;
@@ -70,25 +74,6 @@ class LogViewerService
         return array_values(array_reverse($files));
     }
 
-    protected function getHttpLogFilePaths(): array
-    {
-        $files = [];
-
-        foreach (config('log-viewer.http_logs.include_files', []) as $pattern) {
-            $files = array_merge($files, $this->getFilePathsMatchingPattern($pattern));
-        }
-
-        foreach (config('log-viewer.http_logs.exclude_files', []) as $pattern) {
-            $files = array_diff($files, $this->getFilePathsMatchingPattern($pattern));
-        }
-
-        $files = array_map('realpath', $files);
-
-        $files = array_filter($files, 'is_file');
-
-        return array_values(array_reverse($files));
-    }
-
     protected function getFilePathsMatchingPattern($pattern)
     {
         // The GLOB_BRACE flag is not available on some non GNU systems, like Solaris or Alpine Linux.
@@ -107,17 +92,12 @@ class LogViewerService
     public function getFiles(): LogFileCollection
     {
         if (! isset($this->_cachedFiles)) {
-            $laravelLogFiles = (new LogFileCollection($this->getLaravelLogFilePaths()))
-                ->unique()
-                ->map(fn ($filePath) => new LogFile($filePath))
-                ->values();
+            $fileClass = static::$logFileClass;
 
-            $httpLogFiles = (new LogFileCollection($this->getHttpLogFilePaths()))
+            $this->_cachedFiles = (new LogFileCollection($this->getLaravelLogFilePaths()))
                 ->unique()
-                ->map(fn ($filePath) => new LogFile($filePath))
+                ->map(fn ($filePath) => new $fileClass($filePath))
                 ->values();
-
-            $this->_cachedFiles = $laravelLogFiles->merge($httpLogFiles);
         }
 
         return $this->_cachedFiles;
@@ -253,14 +233,36 @@ class LogViewerService
         $this->maxLogSizeToDisplay = $bytes > 0 ? $bytes : self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
     }
 
-    public function laravelRegexPattern(): string
+    public function extend(string $type, string $class): void
     {
-        return config('log-viewer.patterns.laravel.log_parsing_regex');
+        LogTypeRegistrar::register($type, $class);
     }
 
-    public function logMatchPattern(): string
+    public function useLogFileClass(string $class): void
     {
-        return config('log-viewer.patterns.laravel.log_matching_regex');
+        // figure out whether the class extends from the LogFile class
+        if (! is_subclass_of($class, LogFile::class)) {
+            throw new \InvalidArgumentException("The class {$class} must extend from the ".LogFile::class.' class.');
+        }
+
+        static::$logFileClass = $class;
+    }
+
+    public function useLogReaderClass(string $class): void
+    {
+        // figure out whether the class implements the LogReaderInterface
+        $reflection = new \ReflectionClass($class);
+
+        if (! $reflection->implementsInterface(LogReaderInterface::class)) {
+            throw new \InvalidArgumentException("The class {$class} must implement the LogReaderInterface.");
+        }
+
+        static::$logReaderClass = $class;
+    }
+
+    public function logReaderClass(): string
+    {
+        return static::$logReaderClass;
     }
 
     /**

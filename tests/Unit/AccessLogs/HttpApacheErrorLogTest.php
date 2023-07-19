@@ -1,6 +1,6 @@
 <?php
 
-use Opcodes\LogViewer\HttpApacheErrorLog;
+use Opcodes\LogViewer\Logs\HttpApacheErrorLog;
 
 it('can parse an HTTP error log', function () {
     $line = "[Sun Jul 09 09:08:27.901758 2023] [php:error] [pid 116942] [client 20.253.242.138:50173] script '/var/www/cgi-bin/cloud.php' not found or unable to stat";

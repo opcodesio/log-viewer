@@ -6,6 +6,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
+use Opcodes\LogViewer\Logs\BaseLog;
+use Opcodes\LogViewer\Logs\LaravelLog;
 use Opcodes\LogViewer\Utils\Utils;
 
 class LogReader implements LogReaderInterface
@@ -127,12 +130,6 @@ class LogReader implements LogReaderInterface
         $this->index()->exceptLevels($levels);
 
         return $this;
-    }
-
-    /** @deprecated not used anymore, will be removed in v3 */
-    public static function getDefaultLevels(): array
-    {
-        return Level::caseValues();
     }
 
     protected function isOpen(): bool
@@ -309,7 +306,7 @@ class LogReader implements LogReaderInterface
 
         // we don't care about the selected levels here, we should scan everything
         $logIndex = $this->index();
-        $laravelSeverityLevels = Level::caseValues();
+        $laravelSeverityLevels = LaravelLogLevel::caseValues();
         $earliest_timestamp = $this->file->getMetadata('earliest_timestamp');
         $latest_timestamp = $this->file->getMetadata('latest_timestamp');
         $currentLog = '';
@@ -435,7 +432,7 @@ class LogReader implements LogReaderInterface
     }
 
     /**
-     * @return array|LogInterface[]
+     * @return array|BaseLog[]
      */
     public function get(int $limit = null): array
     {
@@ -452,7 +449,7 @@ class LogReader implements LogReaderInterface
         return $logs;
     }
 
-    protected function getLogAtIndex(int $index): ?LogInterface
+    protected function getLogAtIndex(int $index): ?BaseLog
     {
         $position = $this->index()->getPositionForIndex($index);
 
@@ -467,7 +464,7 @@ class LogReader implements LogReaderInterface
         return $this->makeLog($text, $position, $index);
     }
 
-    public function next(): ?LogInterface
+    public function next(): ?BaseLog
     {
         // We open it here to make we also check for possible need of index re-building.
         if ($this->isClosed()) {
@@ -525,7 +522,7 @@ class LogReader implements LogReaderInterface
         );
     }
 
-    protected function makeLog(string $text, int $filePosition, int $index): LogInterface
+    protected function makeLog(string $text, int $filePosition, int $index): BaseLog
     {
         return new $this->logClass($text, $this->file->identifier, $filePosition, $index);
     }

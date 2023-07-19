@@ -275,14 +275,6 @@ class LogIndex
         return $counts;
     }
 
-    /**
-     * @deprecated Will be removed in v2.0. Please use LogIndex::count()
-     */
-    public function total(): int
-    {
-        return $this->count();
-    }
-
     public function count(): int
     {
         return array_reduce($this->getChunkDefinitions(), function ($sum, $chunkDefinition) {

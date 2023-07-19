@@ -2,6 +2,11 @@
 
 namespace Opcodes\LogViewer;
 
+use Opcodes\LogViewer\Logs\HttpAccessLog;
+use Opcodes\LogViewer\Logs\HttpApacheErrorLog;
+use Opcodes\LogViewer\Logs\HttpNginxErrorLog;
+use Opcodes\LogViewer\Logs\LaravelLog;
+
 class LogTypeRegistrar
 {
     private static array $logTypes = [

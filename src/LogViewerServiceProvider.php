@@ -140,7 +140,10 @@ class LogViewerServiceProvider extends ServiceProvider
     protected function resetStateAfterOctaneRequest()
     {
         $this->app['events']->listen(RequestTerminated::class, function ($event) {
-            LogReader::clearInstances();
+            $logReaderClass = LogViewer::logReaderClass();
+
+            /** @noinspection PhpUndefinedMethodInspection */
+            $logReaderClass::clearInstances();
         });
     }
 

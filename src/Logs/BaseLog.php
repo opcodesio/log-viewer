@@ -1,15 +1,15 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Logs;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
+use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
+use Opcodes\LogViewer\LogLevels\LevelInterface;
 
-abstract class BaseLog implements LogInterface
+abstract class BaseLog
 {
     public static string $regex = '/^(?P<datetime>[\d+\/ :]+) \[(?P<level>.+)\] (?P<message>.+)$/';
-
-    public static string $levelClass = Level::class;
 
     public static array $columns = [
         ['label' => 'Datetime', 'data_path' => 'datetime'],
@@ -27,6 +27,8 @@ abstract class BaseLog implements LogInterface
     public ?string $message;
 
     public array $context = [];
+
+    public array $extra = [];
 
     public ?string $fileIdentifier;
 
@@ -51,7 +53,7 @@ abstract class BaseLog implements LogInterface
 
     public static function levelClass(): string
     {
-        return static::$levelClass;
+        return static::$levelClass ?? LaravelLogLevel::class;
     }
 
     protected function parseText(): void

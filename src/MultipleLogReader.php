@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Logs\BaseLog;
 
 class MultipleLogReader
 {
@@ -230,7 +231,7 @@ class MultipleLogReader
         }
     }
 
-    protected function getLogQueryForFile(LogFile $file): LogReader
+    protected function getLogQueryForFile(LogFile $file): LogReaderInterface
     {
         return $file->logs()
             ->search($this->query)

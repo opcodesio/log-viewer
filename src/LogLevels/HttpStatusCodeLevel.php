@@ -1,8 +1,8 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\LogLevels;
 
-class StatusCodeLevel implements LevelInterface
+class HttpStatusCodeLevel implements LevelInterface
 {
     public function __construct(
         public string $value,
@@ -24,20 +24,20 @@ class StatusCodeLevel implements LevelInterface
         return $this->value;
     }
 
-    public function getClass(): string
+    public function getClass(): LevelClass
     {
         $value = intval($this->value);
 
         if ($value < 300) {
-            return 'success';
+            return LevelClass::success();
         } elseif ($value < 400) {
-            return 'info';
+            return LevelClass::info();
         } elseif ($value < 500) {
-            return 'warning';
+            return LevelClass::warning();
         } elseif ($value < 600) {
-            return 'danger';
+            return LevelClass::danger();
         } else {
-            return 'none';
+            return LevelClass::none();
         }
     }
 }

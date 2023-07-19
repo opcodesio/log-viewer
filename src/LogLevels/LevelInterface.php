@@ -1,6 +1,6 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\LogLevels;
 
 interface LevelInterface
 {
@@ -12,5 +12,5 @@ interface LevelInterface
 
     public function getName(): string;
 
-    public function getClass(): string;
+    public function getClass(): LevelClass;
 }

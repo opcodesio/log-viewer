@@ -1,7 +1,7 @@
 <?php
 
-use Opcodes\LogViewer\Level;
-use Opcodes\LogViewer\LaravelLog;
+use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
+use Opcodes\LogViewer\Logs\LaravelLog;
 use function PHPUnit\Framework\assertEquals;
 
 it('can understand the default Laravel log format', function () {
@@ -10,8 +10,8 @@ it('can understand the default Laravel log format', function () {
     $log = new LaravelLog($text, $fileIdentifier = 'laravel.log', $filePosition = 5200, $index = 10);
 
     assertEquals($index, $log->index);
-    assertEquals(Level::Debug, $log->level);
-    assertEquals('local', $log->context['environment']);
+    assertEquals(LaravelLogLevel::Debug, $log->level);
+    assertEquals('local', $log->extra['environment']);
     assertEquals('2022-08-25 11:16:17', $log->datetime->toDateTimeString());
     assertEquals('Example log entry for the level debug', $log->message);
     assertEquals('Example log entry for the level debug', $log->getOriginalText());
@@ -46,8 +46,8 @@ EOF;
     $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
     assertEquals('Example log entry for the level debug', $log->message);
-    assertEquals(str_replace($jsonString, '', $logText), $log->getOriginalText());
-    assertEquals(json_decode($jsonString, true), $log->context['laravel_context']);
+    assertEquals(rtrim(str_replace($jsonString, '', $logText)), $log->getOriginalText());
+    assertEquals(json_decode($jsonString, true), $log->context);
 });
 
 it('can understand the optional microseconds in the timestamp', function () {
@@ -85,8 +85,8 @@ it('can handle text in-between timestamp and environment/severity', function () 
     assertEquals($expectedAdditionalText.' Example log entry for the level debug', $log->message);
     assertEquals($expectedAdditionalText.' Example log entry for the level debug', $log->getOriginalText());
     // got to make sure the rest of the data is still processed correctly!
-    assertEquals('local', $log->context['environment']);
-    assertEquals(Level::Debug, $log->level);
+    assertEquals('local', $log->extra['environment']);
+    assertEquals(LaravelLogLevel::Debug, $log->level);
 });
 
 it('finds the correct log level', function ($levelProvided, $levelExpected) {
@@ -96,18 +96,18 @@ it('finds the correct log level', function ($levelProvided, $levelExpected) {
 
     assertEquals($levelExpected, $log->level);
 })->with([
-    ['INFO', Level::Info],
-    ['DEBUG', Level::Debug],
-    ['ERROR', Level::Error],
-    ['WARNING', Level::Warning],
-    ['CRITICAL', Level::Critical],
-    ['ALERT', Level::Alert],
-    ['EMERGENCY', Level::Emergency],
-    ['PROCESSING', Level::Processing],
-    ['PROCESSED', Level::Processed],
-    ['info', Level::Info],
-    ['iNfO', Level::Info],
-    ['', Level::None],
+    ['INFO', LaravelLogLevel::Info],
+    ['DEBUG', LaravelLogLevel::Debug],
+    ['ERROR', LaravelLogLevel::Error],
+    ['WARNING', LaravelLogLevel::Warning],
+    ['CRITICAL', LaravelLogLevel::Critical],
+    ['ALERT', LaravelLogLevel::Alert],
+    ['EMERGENCY', LaravelLogLevel::Emergency],
+    ['PROCESSING', LaravelLogLevel::Processing],
+    ['PROCESSED', LaravelLogLevel::Processed],
+    ['info', LaravelLogLevel::Info],
+    ['iNfO', LaravelLogLevel::Info],
+    ['', LaravelLogLevel::None],
 ]);
 
 it('handles missing message', function () {
@@ -116,8 +116,8 @@ it('handles missing message', function () {
     $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
     assertEquals('2022-11-07 17:51:33', $log->datetime?->toDateTimeString());
-    assertEquals(Level::Error, $log->level);
-    assertEquals('production', $log->context['environment']);
+    assertEquals(LaravelLogLevel::Error, $log->level);
+    assertEquals('production', $log->extra['environment']);
     assertEquals('', $log->getOriginalText());
 });
 

@@ -1,13 +1,14 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Logs;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
+use Opcodes\LogViewer\LogLevels\HttpStatusCodeLevel;
 
 class HttpAccessLog extends BaseLog
 {
-    public static string $levelClass = StatusCodeLevel::class;
+    public static string $levelClass = HttpStatusCodeLevel::class;
 
     public static string $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
 

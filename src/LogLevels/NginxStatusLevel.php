@@ -1,8 +1,8 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\LogLevels;
 
-class Level implements LevelInterface
+class NginxStatusLevel implements LevelInterface
 {
     const Debug = 'debug';
 
@@ -10,29 +10,21 @@ class Level implements LevelInterface
 
     const Notice = 'notice';
 
-    const Warning = 'warning';
+    const Warning = 'warn';
 
     const Error = 'error';
 
-    const Critical = 'critical';
+    const Critical = 'crit';
 
     const Alert = 'alert';
 
-    const Emergency = 'emergency';
-
-    const Processing = 'processing';
-
-    const Processed = 'processed';
-
-    const Failed = 'failed';
-
-    const None = '';
+    const Emergency = 'emerg';
 
     public string $value;
 
     public function __construct(string $value = null)
     {
-        $this->value = $value ?? self::None;
+        $this->value = $value ?? self::Error;
     }
 
     public static function cases(): array
@@ -46,10 +38,6 @@ class Level implements LevelInterface
             self::Critical,
             self::Alert,
             self::Emergency,
-            self::Processing,
-            self::Processed,
-            self::Failed,
-            self::None,
         ];
     }
 
@@ -61,19 +49,20 @@ class Level implements LevelInterface
     public function getName(): string
     {
         return match ($this->value) {
-            self::None => 'None',
+            self::Warning => 'Warning',
+            self::Critical => 'Critical',
+            self::Emergency => 'Emergency',
             default => ucfirst($this->value),
         };
     }
 
-    public function getClass(): string
+    public function getClass(): LevelClass
     {
         return match ($this->value) {
-            self::Processed => 'success',
-            self::Debug, self::Info, self::Notice, self::Processing => 'info',
-            self::Warning, self::Failed => 'warning',
-            self::Error, self::Critical, self::Alert, self::Emergency => 'danger',
-            default => 'none',
+            self::Debug, self::Info, self::Notice => LevelClass::info(),
+            self::Warning => LevelClass::warning(),
+            self::Error, self::Critical, self::Alert, self::Emergency => LevelClass::danger(),
+            default => LevelClass::none(),
         };
     }
 

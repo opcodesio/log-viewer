@@ -77,12 +77,14 @@
             </div>
           </div>
           <pre class="log-stack" v-html="highlightSearchResult(log.full_text, searchStore.query)"></pre>
-          <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400 text-xs lg:text-sm">Context:</p>
-          <pre class="log-stack" v-html="highlightSearchResult(JSON.stringify(log.context, null, 2), searchStore.query)"></pre>
+          <template v-if="hasContext(log)">
+            <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400 text-xs lg:text-sm">Context:</p>
+            <pre class="log-stack" v-html="highlightSearchResult(JSON.stringify(log.context, null, 2), searchStore.query)"></pre>
+          </template>
 
-          <div v-if="log.context.log_viewer && log.context.log_viewer.log_text_incomplete" class="py-4 px-8 text-gray-500 italic">
+          <div v-if="log.extra && log.extra.log_text_incomplete" class="py-4 px-8 text-gray-500 italic">
             The contents of this log have been cut short to the first {{ LogViewer.max_log_size_formatted }}.
-            The full size of this log entry is <strong>{{ log.context.log_viewer.log_size_formatted }}</strong>
+            The full size of this log entry is <strong>{{ log.extra.log_size_formatted }}</strong>
           </div>
         </td>
       </tr>
@@ -147,5 +149,9 @@ const clearQuery = () => {
 
 const getDataAtPath = (obj, path) => {
   return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+}
+
+const hasContext = (log) => {
+  return log.context && Object.keys(log.context).length > 0;
 }
 </script>

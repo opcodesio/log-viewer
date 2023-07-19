@@ -5,12 +5,12 @@ namespace Opcodes\LogViewer\Http\Controllers;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Opcodes\LogViewer\BaseLog;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Http\Resources\BaseLogResource;
 use Opcodes\LogViewer\Http\Resources\LevelCountResource;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
+use Opcodes\LogViewer\Http\Resources\LogResource;
+use Opcodes\LogViewer\Logs\BaseLog;
 use Opcodes\LogViewer\LogTypeRegistrar;
 
 class LogsController
@@ -77,7 +77,7 @@ class LogsController
         return response()->json([
             'file' => isset($file) ? new LogFileResource($file) : null,
             'levelCounts' => LevelCountResource::collection($levels ?? []),
-            'logs' => BaseLogResource::collection($logs ?? []),
+            'logs' => LogResource::collection($logs ?? []),
             'columns' => isset($logClass) ? ($logClass::$columns ?? null) : null,
             'pagination' => isset($logs) ? [
                 'current_page' => $logs->currentPage(),
@@ -100,19 +100,6 @@ class LogsController
             'percentScanned' => $percentScanned,
             'performance' => $this->getRequestPerformanceInfo(),
         ]);
-    }
-
-    protected function getLogClass(LengthAwarePaginator|array $logs): ?string
-    {
-        if (is_array($logs) && empty($logs)) {
-            return null;
-        }
-
-        if (empty($logs->items())) {
-            return null;
-        }
-
-        return get_class($logs->items()[0]);
     }
 
     protected function getRequestPerformanceInfo(): array

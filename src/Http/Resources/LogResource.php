@@ -5,10 +5,9 @@ namespace Opcodes\LogViewer\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \Opcodes\LogViewer\LogInterface
- * @mixin \Opcodes\LogViewer\BaseLog
+ * @mixin \Opcodes\LogViewer\Logs\BaseLog
  */
-class BaseLogResource extends JsonResource
+class LogResource extends JsonResource
 {
     public function toArray($request): array
     {
@@ -21,12 +20,13 @@ class BaseLogResource extends JsonResource
 
             'level' => $level->value,
             'level_name' => $level->getName(),
-            'level_class' => $level->getClass(),
+            'level_class' => $level->getClass()->value,
 
             'datetime' => $this->datetime?->toDateTimeString(),
             'time' => $this->datetime?->format('H:i:s'),
             'message' => $this->message,
             'context' => $this->context,
+            'extra' => $this->extra,
 
             'full_text' => $this->getOriginalText(),
             'url' => $this->url(),

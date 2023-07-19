@@ -8,12 +8,12 @@ it('can read access logs with the default LogReader', function () {
 
     expect($logs)->toHaveCount(10);
 
-    /** @var \Opcodes\LogViewer\HttpAccessLog $firstLog */
+    /** @var \Opcodes\LogViewer\Logs\HttpAccessLog $firstLog */
     $firstLog = $logs[0];
 
     // 205.123.147.41 - - [18/Jan/2023:05:21:57 +0000] "GET /tag HTTP/1.1" 500 2519 "-" "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
     expect($firstLog->index)->toBe(0)
-        ->and($firstLog)->toBeInstanceOf(\Opcodes\LogViewer\HttpAccessLog::class)
+        ->and($firstLog)->toBeInstanceOf(\Opcodes\LogViewer\Logs\HttpAccessLog::class)
         ->and($firstLog->context['ip'])->toBe('205.123.147.41')
         ->and($firstLog->datetime->toDateTimeString())->toBe('2023-01-18 05:21:57')
         ->and($firstLog->context['statusCode'])->toBe(500)
@@ -34,12 +34,12 @@ it('can read nginx error logs with the default LogReader', function () {
 
     expect($logs)->toHaveCount(9);
 
-    /** @var \Opcodes\LogViewer\HttpNginxErrorLog $firstLog */
+    /** @var \Opcodes\LogViewer\Logs\HttpNginxErrorLog $firstLog */
     $firstLog = $logs[0];
 
     // 2023/01/04 11:18:33 [alert] 95160#0: *1473 setsockopt(TCP_NODELAY) failed (22: Invalid argument) while keepalive, client: 127.0.0.1, server: 127.0.0.1:80
     expect($firstLog->index)->toBe(0)
-        ->and($firstLog)->toBeInstanceOf(\Opcodes\LogViewer\HttpNginxErrorLog::class)
+        ->and($firstLog)->toBeInstanceOf(\Opcodes\LogViewer\Logs\HttpNginxErrorLog::class)
         ->and($firstLog->datetime->toDateTimeString())->toBe('2023-01-04 11:18:33')
         ->and($firstLog->level)->toBe('alert')
         ->and($firstLog->message)->toBe('*1473 setsockopt(TCP_NODELAY) failed (22: Invalid argument) while keepalive')
@@ -55,12 +55,12 @@ it('can read apache error logs with the default LogReader', function () {
 
     expect($logs)->toHaveCount(40);
 
-    /** @var \Opcodes\LogViewer\HttpApacheErrorLog $firstLog */
+    /** @var \Opcodes\LogViewer\Logs\HttpApacheErrorLog $firstLog */
     $firstLog = $logs[0];
 
     // [Sun Jul 09 06:10:51.190799 2023] [ssl:error] [pid 44570] AH02032: Hostname test.example.com provided via SNI and hostname system.test provided via HTTP are different
     expect($firstLog->index)->toBe(0)
-        ->and($firstLog)->toBeInstanceOf(\Opcodes\LogViewer\HttpApacheErrorLog::class)
+        ->and($firstLog)->toBeInstanceOf(\Opcodes\LogViewer\Logs\HttpApacheErrorLog::class)
         ->and($firstLog->datetime->toDateTimeString())->toBe('2023-07-09 06:10:51')
         ->and($firstLog->context['pid'])->toBe(44570)
         ->and($firstLog->context['module'])->toBe('ssl')
@@ -75,7 +75,7 @@ it('can get access log level counts', function () {
     $levels = $file->logs()->getLevelCounts();
 
     expect($levels['500']->count)->toBe(3)
-        ->and($levels['500']->level)->toBeInstanceOf(\Opcodes\LogViewer\StatusCodeLevel::class)
+        ->and($levels['500']->level)->toBeInstanceOf(\Opcodes\LogViewer\LogLevels\HttpStatusCodeLevel::class)
         ->and($levels['200']->count)->toBe(4)
         ->and($levels['404']->count)->toBe(3);
 });

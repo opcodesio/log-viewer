@@ -32,9 +32,12 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @method static int maxLogSize()
  * @method static int lazyScanChunkSize()
  * @method static float lazyScanTimeout()
- * @method static string laravelRegexPattern()
- * @method static string logMatchPattern()
  * @method static string basePathForLogs()
+ *
+ * @method static void extend(string $type, string $class)
+ * @method static void useLogFileClass(string $class)
+ * @method static void useLogReaderClass(string $class)
+ * @method static string logReaderClass()
  */
 class LogViewer extends Facade
 {

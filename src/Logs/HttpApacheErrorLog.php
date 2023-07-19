@@ -1,15 +1,16 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Logs;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
+use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 
 class HttpApacheErrorLog extends BaseLog
 {
     public static string $regex = '/\[(?<dttm>.*?)\]\s\[(?:(?<module>.*?):)?(?<level>.*?)\]\s\[pid\s(?<pid>\d*)\](?:\s\[client\s(?<client>.*?)\])?\s(?<message>.*)/';
 
-    public static string $levelClass = Level::class;
+    public static string $levelClass = LaravelLogLevel::class;
 
     public function parseText(): void
     {

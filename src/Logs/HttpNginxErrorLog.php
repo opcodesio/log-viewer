@@ -1,15 +1,16 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Logs;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
+use Opcodes\LogViewer\LogLevels\NginxStatusLevel;
 
 class HttpNginxErrorLog extends BaseLog
 {
     public static string $regex = '/^(?P<datetime>[\d+\/ :]+) \[(?P<errortype>.+)\] .*?: (?P<errormessage>.+?)(?:, client: (?P<client>.+?))?(?:, server: (?P<server>.+?))?(?:, request: "?(?P<request>.+?)"?)?(?:, host: "?(?P<host>.+?)"?)?$/';
 
-    public static string $levelClass = Level::class;
+    public static string $levelClass = NginxStatusLevel::class;
 
     public function parseText(): void
     {

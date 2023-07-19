@@ -1,6 +1,6 @@
 <?php
 
-use Opcodes\LogViewer\Level;
+use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 
 return [
 
@@ -134,6 +134,10 @@ return [
     'include_files' => [
         '*.log',
         '**/*.log',
+
+        // You can include paths to other log types as well, such as apache, nginx, and more.
+        '/var/log/httpd/*',
+        '/var/log/nginx/*',
         // '/absolute/paths/supported',
     ],
 
@@ -149,18 +153,6 @@ return [
         // 'my_secret.log'
     ],
 
-    'http_logs' => [
-        'include_files' => [
-            '/var/log/httpd/*',
-            '/var/log/nginx/*',
-            // '/absolute/paths/supported',
-        ],
-
-        'exclude_files' => [
-            // 'my_secret.log'
-        ],
-    ],
-
     /*
     |--------------------------------------------------------------------------
     |  Shorter stack trace filters.
@@ -174,35 +166,6 @@ return [
         '/vendor/symfony/',
         '/vendor/laravel/framework/',
         '/vendor/barryvdh/laravel-debugbar/',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Log matching patterns
-    |--------------------------------------------------------------------------
-    | Regexes for matching log files
-    |
-    */
-
-    'patterns' => [
-        'laravel' => [
-            'log_matching_regex' => '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\].*/',
-
-            /**
-             * This pattern, used for processing Laravel logs, returns these results:
-             * $matches[0] - the full log line being tested.
-             * $matches[1] - full timestamp between the square brackets (includes microseconds and timezone offset)
-             * $matches[2] - timestamp microseconds, if available
-             * $matches[3] - timestamp timezone offset, if available
-             * $matches[4] - contents between timestamp and the severity level
-             * $matches[5] - environment (local, production, etc)
-             * $matches[6] - log severity (info, debug, error, etc)
-             * $matches[7] - the log text, the rest of the text.
-             */
-            'log_parsing_regex' => '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\](.*?(\w+)\.|.*?)('
-                .implode('|', array_filter(Level::caseValues()))
-                .')?: ?(.*?)( in [\/].*?:[0-9]+)?$/is',
-        ],
     ],
 
     /*
