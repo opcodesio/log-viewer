@@ -19,8 +19,8 @@ class LogTypeRegistrar
 
     public function register(string $type, string $class): void
     {
-        if (!is_subclass_of($class, BaseLog::class)) {
-            throw new \InvalidArgumentException("{$class} must extend " . BaseLog::class);
+        if (! is_subclass_of($class, BaseLog::class)) {
+            throw new \InvalidArgumentException("{$class} must extend ".BaseLog::class);
         }
 
         array_unshift($this->logTypes, [$type, $class]);

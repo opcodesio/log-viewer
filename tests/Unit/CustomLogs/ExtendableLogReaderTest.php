@@ -1,7 +1,6 @@
 <?php
 
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Logs\BaseLog;
 use Opcodes\LogViewer\Logs\HttpAccessLog;
 use Opcodes\LogViewer\LogTypeRegistrar;
 use Opcodes\LogViewer\Tests\Unit\CustomLogs\CustomAccessLog;

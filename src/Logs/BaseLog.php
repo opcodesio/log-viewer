@@ -86,7 +86,7 @@ abstract class BaseLog
     {
         $class = static::$levelClass ?? LaravelLogLevel::class;
 
-        if (!is_subclass_of($class, LevelInterface::class)) {
+        if (! is_subclass_of($class, LevelInterface::class)) {
             throw new \Exception(sprintf('The class %s must implement the %s interface', $class, LevelInterface::class));
         }
 
