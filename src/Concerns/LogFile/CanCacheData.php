@@ -26,6 +26,7 @@ trait CanCacheData
 
         Cache::forget($this->metadataCacheKey());
         Cache::forget($this->relatedCacheKeysKey());
+        Cache::forget('log-viewer::file-type-'.md5($this->path));
 
         $this->index()->clearCache();
     }

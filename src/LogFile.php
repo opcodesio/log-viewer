@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogFile
 {
+    use Concerns\LogFile\HasMetadata;
+    use Concerns\LogFile\CanCacheData;
+
     // TODO: remove types, as they're no longer necessary
     const TYPE_LARAVEL = 'laravel';
 
@@ -21,9 +24,6 @@ class LogFile
     const TYPE_HTTP_ERROR_APACHE = 'http_error_apache';
 
     const TYPE_HTTP_ERROR_NGINX = 'http_error_nginx';
-
-    use Concerns\LogFile\HasMetadata;
-    use Concerns\LogFile\CanCacheData;
 
     public string $path;
 
@@ -57,7 +57,7 @@ class LogFile
             $this->type = Cache::remember(
                 'log-viewer::file-type-'.md5($this->path),
                 Carbon::now()->addMonth(),
-                fn () => LogTypeRegistrar::guessTypeFromFirstLine($this)
+                fn () => app(LogTypeRegistrar::class)->guessTypeFromFirstLine($this)
             );
         }
 

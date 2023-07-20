@@ -10,7 +10,9 @@ class HttpAccessLog extends BaseLog
 {
     public static string $levelClass = HttpStatusCodeLevel::class;
 
-    public static string $regex = '/(\S+) (\S+) (\S+) \[(.+)\] "(\S+) (\S+) (\S+)" (\S+) (\S+) "([^"]*)" "([^"]*)"/';
+    public static string $regex = '/(?P<ip>\S+) (?P<identity>\S+) (?P<remote_user>\S+) \[(?P<datetime>.+)\] "(?P<method>\S+) (?P<path>\S+) (?P<http_version>\S+)" (?P<status_code>\S+) (?P<content_length>\S+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"/';
+
+    public static string $regexLevelKey = 'status_code';
 
     public static array $columns = [
         ['label' => 'Datetime', 'data_path' => 'datetime'],
@@ -18,53 +20,35 @@ class HttpAccessLog extends BaseLog
         ['label' => 'Request', 'data_path' => 'message'],
     ];
 
-    protected function parseText(): void
+    protected function fillMatches(array $matches = []): void
     {
-        $matches = [];
-        preg_match(self::$regex, $this->text, $matches);
-
         $this->context = [
-            'ip' => $matches[1] ?? null,
-            'identity' => $matches[2] ?? null,
-            'remoteUser' => $matches[3] ?? null,
-            'datetime' => $matches[4] ?? null,
-            'method' => $matches[5] ?? null,
-            'path' => $matches[6] ?? null,
-            'httpVersion' => $matches[7] ?? null,
-            'statusCode' => isset($matches[8]) ? intval($matches[8]) : null,
-            'contentLength' => isset($matches[9]) ? intval($matches[9]) : null,
-            'referrer' => $matches[10] ?? null,
-            'userAgent' => $matches[11] ?? null,
+            'ip' => $matches['ip'] ?? null,
+            'identity' => $matches['identity'] ?? null,
+            'remote_user' => $matches['remote_user'] ?? null,
+            'datetime' => $matches['datetime'] ?? null,
+            'method' => $matches['method'] ?? null,
+            'path' => $matches['path'] ?? null,
+            'http_version' => $matches['http_version'] ?? null,
+            'status_code' => isset($matches['status_code']) ? intval($matches['status_code']) : null,
+            'content_length' => isset($matches['content_length']) ? intval($matches['content_length']) : null,
+            'referrer' => $matches['referrer'] ?? null,
+            'user_agent' => $matches['user_agent'] ?? null,
         ];
 
-        $this->datetime = $this->parseDateTime($matches[4] ?? null)?->tz(
+        $this->datetime = static::parseDateTime($matches['datetime'] ?? null)?->tz(
             config('log-viewer.timezone', config('app.timezone', 'UTC'))
         );
-        $this->level = $matches[8] ?? null;
+        $this->level = $matches['status_code'] ?? null;
         $this->message = sprintf(
             '%s %s',
             $this->context['method'],
             $this->context['path'],
         );
-
-        unset($matches);
     }
 
-    protected function parseDateTime(?string $datetime): ?CarbonInterface
+    public static function parseDatetime(?string $datetime): ?CarbonInterface
     {
-        return $datetime ? Carbon::parse($datetime) : null;
-    }
-
-    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
-    {
-        $matches = [];
-        $result = preg_match(static::$regex, $text, $matches) === 1;
-
-        if ($result) {
-            $timestamp = strtotime($matches[4]);
-            $level = $matches[8];
-        }
-
-        return $result;
+        return $datetime ? Carbon::createFromFormat('d/M/Y:H:i:s O', $datetime) : null;
     }
 }

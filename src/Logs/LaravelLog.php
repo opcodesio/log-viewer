@@ -10,7 +10,7 @@ use Opcodes\LogViewer\Utils\Utils;
 
 class LaravelLog extends BaseLog
 {
-    public static string $regex = '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\].*/';
+    public static string $regex = '/\[(?P<datetime>[^\]]+)\] (?P<environment>\S+)\.(?P<level>\S+): (?P<message>.*)/';
 
     public int $fullTextLength;
 
@@ -21,7 +21,7 @@ class LaravelLog extends BaseLog
         ['label' => 'Message', 'data_path' => 'message'],
     ];
 
-    protected function parseText(): void
+    protected function parseText(array &$matches = []): void
     {
         $this->text = mb_convert_encoding(rtrim($this->text, "\t\n\r"), 'UTF-8', 'UTF-8');
         $length = strlen($this->text);
@@ -34,7 +34,7 @@ class LaravelLog extends BaseLog
         // sometimes, even the first line will have a HUGE exception with tons of debug data all in one line,
         // so in order to properly match, we must have a smaller first line...
         $firstLineSplit = str_split($firstLine, 1000);
-        $matches = [];
+
         preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches);
 
         $this->datetime = Carbon::parse($matches[1])->tz(
@@ -92,8 +92,11 @@ class LaravelLog extends BaseLog
         $this->text = trim($text);
 
         $this->extractContextsFromFullText();
+    }
 
-        unset($matches);
+    protected function fillMatches(array $matches = []): void
+    {
+        //
     }
 
     protected static function regexPattern(): string
@@ -101,29 +104,6 @@ class LaravelLog extends BaseLog
         return '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\](.*?(\w+)\.|.*?)('
             .implode('|', array_filter(LaravelLogLevel::caseValues()))
             .')?: ?(.*?)( in [\/].*?:[0-9]+)?$/is';
-    }
-
-    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
-    {
-        $matches = [];
-        $result = preg_match(static::$regex, $text, $matches) === 1;
-
-        if ($result) {
-            $timestamp = Carbon::parse($matches[1])?->timestamp;
-            $level = strtolower($matches[6] ?? '');
-        }
-
-        return $result;
-    }
-
-    public function fullTextLengthFormatted(): string
-    {
-        return Utils::bytesForHumans($this->context['log_text_length']);
-    }
-
-    public function url(): string
-    {
-        return route('log-viewer.index', ['file' => $this->fileIdentifier, 'query' => 'log-index:'.$this->index]);
     }
 
     public function extractContextsFromFullText(): void

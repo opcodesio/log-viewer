@@ -9,8 +9,22 @@ use Opcodes\LogViewer\LogLevels\LevelInterface;
 
 abstract class BaseLog
 {
+    /** @var string The class which defines the severities found on these logs. Should implement the \Opcodes\LogViewer\LogLevels\LevelInterface interface */
+    public static string $levelClass = LaravelLogLevel::class;
+
+    /** @var string The regular expression used to extract various data points of the log */
     public static string $regex = '/^(?P<datetime>[\d+\/ :]+) \[(?P<level>.+)\] (?P<message>.+)$/';
 
+    /** @var string The regular expression group key, which contains the datetime */
+    public static string $regexDatetimeKey = 'datetime';
+
+    /** @var string The regular expression group key, which contains the level/severity of the log */
+    public static string $regexLevelKey = 'level';
+
+    /** @var string The regular expression group key, which contains the message */
+    public static string $regexMessageKey = 'message';
+
+    /** @var array|\string[][] The columns displayed on the frontend, and which data they should display */
     public static array $columns = [
         ['label' => 'Datetime', 'data_path' => 'datetime'],
         ['label' => 'Severity', 'data_path' => 'level'],
@@ -43,30 +57,53 @@ abstract class BaseLog
         $this->filePosition = $filePosition;
         $this->index = $index;
 
-        $this->parseText();
+        $matches = [];
+        $this->parseText($matches);
+        $this->fillMatches($matches);
+
+        unset($matches);
     }
 
     public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
     {
-        return preg_match(static::$regex, $text) === 1;
+        $matches = [];
+        $result = preg_match(static::$regex, $text, $matches) === 1;
+
+        if ($result) {
+            $timestamp = static::parseDateTime($matches[static::$regexDatetimeKey] ?? null)?->timestamp;
+            $level = $matches[static::$regexLevelKey] ?? '';
+        }
+
+        return $result;
+    }
+
+    public static function parseDatetime(?string $datetime): ?CarbonInterface
+    {
+        return $datetime ? Carbon::parse($datetime) : null;
     }
 
     public static function levelClass(): string
     {
-        return static::$levelClass ?? LaravelLogLevel::class;
+        $class = static::$levelClass ?? LaravelLogLevel::class;
+
+        if (!is_subclass_of($class, LevelInterface::class)) {
+            throw new \Exception(sprintf('The class %s must implement the %s interface', $class, LevelInterface::class));
+        }
+
+        return $class;
     }
 
-    protected function parseText(): void
+    protected function parseText(array &$matches = []): void
     {
-        $matches = [];
         preg_match(static::$regex, $this->text, $matches);
+    }
 
-        $this->datetime = Carbon::parse($matches['datetime'] ?? null);
-        $this->level = $matches['level'] ?? null;
-        $this->message = $matches['message'] ?? null;
+    protected function fillMatches(array $matches = []): void
+    {
+        $this->datetime = Carbon::parse($matches[static::$regexDatetimeKey] ?? null);
+        $this->level = $matches[static::$regexLevelKey] ?? null;
+        $this->message = $matches[static::$regexMessageKey] ?? null;
         $this->context = [];
-
-        unset($matches);
     }
 
     public function getTimestamp(): int

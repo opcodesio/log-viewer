@@ -10,15 +10,15 @@ it('can read an access log line', function () {
 
     expect($accessLog->context['ip'])->toBe('205.123.147.41')
         ->and($accessLog->context['identity'])->toBe('-')
-        ->and($accessLog->context['remoteUser'])->toBe('arunas')
+        ->and($accessLog->context['remote_user'])->toBe('arunas')
         ->and($accessLog->datetime->toDateTimeString())->toBe('2023-04-18 05:21:57')
         ->and($accessLog->context['method'])->toBe('GET')
         ->and($accessLog->context['path'])->toBe('/tag')
-        ->and($accessLog->context['httpVersion'])->toBe('HTTP/1.1')
-        ->and($accessLog->context['statusCode'])->toBe(500)
-        ->and($accessLog->context['contentLength'])->toBe(2519)
+        ->and($accessLog->context['http_version'])->toBe('HTTP/1.1')
+        ->and($accessLog->context['status_code'])->toBe(500)
+        ->and($accessLog->context['content_length'])->toBe(2519)
         ->and($accessLog->context['referrer'])->toBe('-')
-        ->and($accessLog->context['userAgent'])->toBe('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
+        ->and($accessLog->context['user_agent'])->toBe('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
 });
 
 it('can pass file info when making the access log', function () {
@@ -38,15 +38,15 @@ it('can handle missing values', function () {
 
     expect($accessLog->context['ip'])->toBe(null)
         ->and($accessLog->context['identity'])->toBe(null)
-        ->and($accessLog->context['remoteUser'])->toBe(null)
+        ->and($accessLog->context['remote_user'])->toBe(null)
         ->and($accessLog->datetime)->toBe(null)
         ->and($accessLog->context['method'])->toBe(null)
         ->and($accessLog->context['path'])->toBe(null)
-        ->and($accessLog->context['httpVersion'])->toBe(null)
-        ->and($accessLog->context['statusCode'])->toBe(null)
-        ->and($accessLog->context['contentLength'])->toBe(null)
+        ->and($accessLog->context['http_version'])->toBe(null)
+        ->and($accessLog->context['status_code'])->toBe(null)
+        ->and($accessLog->context['content_length'])->toBe(null)
         ->and($accessLog->context['referrer'])->toBe(null)
-        ->and($accessLog->context['userAgent'])->toBe(null);
+        ->and($accessLog->context['user_agent'])->toBe(null);
 });
 
 it('strips empty chars at the end', function ($chars) {

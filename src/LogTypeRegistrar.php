@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Opcodes\LogViewer\Logs\BaseLog;
 use Opcodes\LogViewer\Logs\HttpAccessLog;
 use Opcodes\LogViewer\Logs\HttpApacheErrorLog;
 use Opcodes\LogViewer\Logs\HttpNginxErrorLog;
@@ -9,30 +10,40 @@ use Opcodes\LogViewer\Logs\LaravelLog;
 
 class LogTypeRegistrar
 {
-    private static array $logTypes = [
-        'laravel' => LaravelLog::class,
-        'http_access' => HttpAccessLog::class,
-        'http_error_apache' => HttpApacheErrorLog::class,
-        'http_error_nginx' => HttpNginxErrorLog::class,
+    private array $logTypes = [
+        ['laravel', LaravelLog::class],
+        ['http_access', HttpAccessLog::class],
+        ['http_error_apache', HttpApacheErrorLog::class],
+        ['http_error_nginx', HttpNginxErrorLog::class],
     ];
 
-    public static function register(string $type, string $class): void
+    public function register(string $type, string $class): void
     {
-        static::$logTypes[$type] = $class;
+        if (!is_subclass_of($class, BaseLog::class)) {
+            throw new \InvalidArgumentException("{$class} must extend " . BaseLog::class);
+        }
+
+        array_unshift($this->logTypes, [$type, $class]);
     }
 
-    public static function getClass(string $type): string
+    public function getClass(string $type): ?string
     {
-        return static::$logTypes[$type];
+        foreach ($this->logTypes as $logType) {
+            if ($logType[0] === $type) {
+                return $logType[1];
+            }
+        }
+
+        return null;
     }
 
-    public static function guessTypeFromFirstLine(LogFile|string $textOrFile): ?string
+    public function guessTypeFromFirstLine(LogFile|string $textOrFile): ?string
     {
         if ($textOrFile instanceof LogFile) {
             $textOrFile = $textOrFile->getFirstLine();
         }
 
-        foreach (static::$logTypes as $type => $class) {
+        foreach ($this->logTypes as [$type, $class]) {
             if ($class::matches($textOrFile)) {
                 return $type;
             }

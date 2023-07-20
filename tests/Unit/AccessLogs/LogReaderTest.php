@@ -16,14 +16,14 @@ it('can read access logs with the default LogReader', function () {
         ->and($firstLog)->toBeInstanceOf(\Opcodes\LogViewer\Logs\HttpAccessLog::class)
         ->and($firstLog->context['ip'])->toBe('205.123.147.41')
         ->and($firstLog->datetime->toDateTimeString())->toBe('2023-01-18 05:21:57')
-        ->and($firstLog->context['statusCode'])->toBe(500)
+        ->and($firstLog->context['status_code'])->toBe(500)
         ->and($firstLog->level)->toBe('500')
         ->and($firstLog->context['method'])->toBe('GET')
         ->and($firstLog->context['path'])->toBe('/tag')
-        ->and($firstLog->context['httpVersion'])->toBe('HTTP/1.1')
-        ->and($firstLog->context['contentLength'])->toBe(2519)
+        ->and($firstLog->context['http_version'])->toBe('HTTP/1.1')
+        ->and($firstLog->context['content_length'])->toBe(2519)
         ->and($firstLog->context['referrer'])->toBe('-')
-        ->and($firstLog->context['userAgent'])->toBe('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
+        ->and($firstLog->context['user_agent'])->toBe('Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
 });
 
 it('can read nginx error logs with the default LogReader', function () {

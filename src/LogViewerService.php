@@ -235,7 +235,7 @@ class LogViewerService
 
     public function extend(string $type, string $class): void
     {
-        LogTypeRegistrar::register($type, $class);
+        app(LogTypeRegistrar::class)->register($type, $class);
     }
 
     public function useLogFileClass(string $class): void

@@ -18,7 +18,7 @@ class LogsController
 
     const NEWEST_FIRST = 'desc';
 
-    public function index(Request $request)
+    public function index(Request $request, LogTypeRegistrar $logTypeRegistrar)
     {
         $fileIdentifier = $request->query('file', '');
         $query = $request->query('query', '');
@@ -36,7 +36,7 @@ class LogsController
 
         if ($file = LogViewer::getFile($fileIdentifier)) {
             $logQuery = $file->logs();
-            $logClass = LogTypeRegistrar::getClass($file->type());
+            $logClass = $logTypeRegistrar->getClass($file->type());
         } elseif (! empty($query)) {
             $logQuery = LogViewer::getFiles()->logs();
             $logClass = BaseLog::class;
