@@ -27,7 +27,7 @@ it('can index a log entry', function () {
                 'info' => 1,
             ],
             'count' => 1,
-        ]
+        ],
     ]);
 
     $logIndex->addToIndex(
@@ -126,7 +126,7 @@ it('can save the results to cache', function () {
                 'info' => 1,
             ],
             'count' => 1,
-        ]
+        ],
     ]);
 });
 

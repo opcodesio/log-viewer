@@ -38,19 +38,19 @@ it('can guess the type from the provided first line', function ($expectedType, $
 })->with([
     [
         'expectedType' => LogType::LARAVEL,
-        'line' => '[2021-01-01 00:00:00] laravel.INFO: Test log message'
+        'line' => '[2021-01-01 00:00:00] laravel.INFO: Test log message',
     ],
     [
         'expectedType' => LogType::HTTP_ACCESS,
-        'line' => '8.68.121.11 - - [01/Feb/2023:01:53:51 +0000] "POST /main/tag/category HTTP/2.0" 404 4819 "-" "-"'
+        'line' => '8.68.121.11 - - [01/Feb/2023:01:53:51 +0000] "POST /main/tag/category HTTP/2.0" 404 4819 "-" "-"',
     ],
     [
         'expectedType' => LogType::HTTP_ERROR_APACHE,
-        'line' => '[Sun Jul 09 06:21:31.657578 2023] [ssl:error] [pid 44651] AH02032: Hostname test.example.com provided via SNI and hostname system.test provided via HTTP are different'
+        'line' => '[Sun Jul 09 06:21:31.657578 2023] [ssl:error] [pid 44651] AH02032: Hostname test.example.com provided via SNI and hostname system.test provided via HTTP are different',
     ],
     [
         'expectedType' => LogType::HTTP_ERROR_NGINX,
-        'line' => '2023/01/04 11:18:33 [alert] 95160#0: *1473 setsockopt(TCP_NODELAY) failed (22: Invalid argument) while keepalive, client: 127.0.0.1, server: 127.0.0.1:80'
+        'line' => '2023/01/04 11:18:33 [alert] 95160#0: *1473 setsockopt(TCP_NODELAY) failed (22: Invalid argument) while keepalive, client: 127.0.0.1, server: 127.0.0.1:80',
     ],
 ]);
 

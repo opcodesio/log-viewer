@@ -6,7 +6,6 @@ use Carbon\CarbonInterface;
 use Opcodes\LogViewer\Facades\Cache;
 use Opcodes\LogViewer\LogIndexChunk;
 use Opcodes\LogViewer\Utils\GenerateCacheKey;
-use Opcodes\LogViewer\Utils\Utils;
 
 trait CanCacheIndex
 {

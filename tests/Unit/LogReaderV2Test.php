@@ -3,7 +3,6 @@
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogReaderV2;
 use Opcodes\LogViewer\Logs\HttpAccessLog;
-use Opcodes\LogViewer\Logs\LaravelLog;
 use Opcodes\LogViewer\Logs\LogType;
 
 beforeEach(function () {

@@ -2,7 +2,6 @@
 
 namespace Opcodes\LogViewer;
 
-use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Logs\BaseLog;
 
 class LogReaderV2 extends LogReader
@@ -53,7 +52,7 @@ class LogReaderV2 extends LogReader
         return $this->reset()->forward()->skip($index)->next();
     }
 
-        /**
+    /**
      * @return array|BaseLog[]
      */
     public function get(int $limit = null): array
@@ -105,7 +104,7 @@ class LogReaderV2 extends LogReader
 
         $index = $this->currentLogIndex;
 
-        list($currentLog, $filePosition, $currentLogLevel, $currentLogTimestamp) = match ($this->direction) {
+        [$currentLog, $filePosition, $currentLogLevel, $currentLogTimestamp] = match ($this->direction) {
             Direction::Forward => $this->readNextLineForward(),
             Direction::Backward => $this->readNextLogBackward(),
         };
@@ -120,6 +119,7 @@ class LogReaderV2 extends LogReader
 
         if ($this->skip > 0) {
             $this->skip--;
+
             return $this->next();
         }
 

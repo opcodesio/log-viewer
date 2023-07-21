@@ -11,6 +11,7 @@ class LogIndexV2
     use Concerns\LogIndex\CanCacheIndex;
     use Concerns\LogIndex\CanFilterIndex;
     use Concerns\LogIndex\CanIterateIndex;
+
     // use Concerns\LogIndex\CanSplitIndexIntoChunks;
     use Concerns\LogIndex\PreservesIndexingProgress;
 
@@ -163,7 +164,7 @@ class LogIndexV2
         $count = 0;
 
         foreach (($group['levels'] ?? []) as $level => $levelCount) {
-            if (empty($this->exceptLevels) || !in_array($level, $this->exceptLevels)) {
+            if (empty($this->exceptLevels) || ! in_array($level, $this->exceptLevels)) {
                 $count += $levelCount;
             }
         }
