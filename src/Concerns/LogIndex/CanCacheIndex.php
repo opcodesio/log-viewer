@@ -6,18 +6,38 @@ use Carbon\CarbonInterface;
 use Opcodes\LogViewer\Facades\Cache;
 use Opcodes\LogViewer\LogIndexChunk;
 use Opcodes\LogViewer\Utils\GenerateCacheKey;
+use Opcodes\LogViewer\Utils\Utils;
 
 trait CanCacheIndex
 {
     public function clearCache(): void
     {
-        $this->clearChunksFromCache();
-
-        Cache::forget($this->metaCacheKey());
-        Cache::forget($this->cacheKey());
+        foreach ($this->getAllCacheKeys() as $cacheKey) {
+            Cache::forget($cacheKey);
+        }
 
         // this will reset all properties to default, because it won't find any cached settings for this index
         $this->loadMetadata();
+    }
+
+    public function cacheSize(): int
+    {
+        return collect($this->getAllCacheKeys())
+            ->sum(fn ($cacheKey) => strlen(serialize(Cache::get($cacheKey))));
+    }
+
+    protected function getAllCacheKeys(): array
+    {
+        $keys = [];
+
+        foreach ($this->getChunkDefinitions() as $chunkDefinition) {
+            $keys[] = $this->chunkCacheKey($chunkDefinition['index']);
+        }
+
+        $keys[] = $this->metaCacheKey();
+        $keys[] = $this->cacheKey();
+
+        return $keys;
     }
 
     protected function saveMetadataToCache(): void

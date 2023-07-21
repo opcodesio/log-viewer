@@ -3,11 +3,10 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
-use Opcodes\LogViewer\Facades\Cache;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Logs\LogType;
 use Opcodes\LogViewer\Utils\Utils;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -15,15 +14,6 @@ class LogFile
 {
     use Concerns\LogFile\HasMetadata;
     use Concerns\LogFile\CanCacheData;
-
-    // TODO: remove types, as they're no longer necessary
-    const TYPE_LARAVEL = 'laravel';
-
-    const TYPE_HTTP_ACCESS = 'http_access';
-
-    const TYPE_HTTP_ERROR_APACHE = 'http_error_apache';
-
-    const TYPE_HTTP_ERROR_NGINX = 'http_error_nginx';
 
     public string $path;
 
@@ -54,14 +44,16 @@ class LogFile
     public function type(): string
     {
         if (is_null($this->type)) {
-            $this->type = Cache::remember(
-                'log-viewer::file-type-'.md5($this->path),
-                Carbon::now()->addMonth(),
-                fn () => app(LogTypeRegistrar::class)->guessTypeFromFirstLine($this)
-            );
+            $this->type = $this->getMetadata('type');
         }
 
-        return $this->type;
+        if (is_null($this->type)) {
+            $this->type = app(LogTypeRegistrar::class)->guessTypeFromFirstLine($this);
+            $this->setMetadata('type', $this->type);
+            $this->saveMetadata();
+        }
+
+        return $this->type ?? LogType::DEFAULT;
     }
 
     public function index(string $query = null): LogIndex

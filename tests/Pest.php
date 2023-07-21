@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogIndex;
+use Opcodes\LogViewer\Logs\LogType;
 use Opcodes\LogViewer\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);
@@ -20,7 +21,7 @@ uses()->beforeEach(fn () => Artisan::call('log-viewer:publish'))->in('Feature');
 /**
  * Generate log files with random data
  */
-function generateLogFiles(array $files, string $content = null, bool $randomContent = false, $type = LogFile::TYPE_LARAVEL): array
+function generateLogFiles(array $files, string $content = null, bool $randomContent = false, $type = LogType::DEFAULT): array
 {
     return array_map(
         fn ($file) => generateLogFile($file, $content, $randomContent, $type),
@@ -28,7 +29,7 @@ function generateLogFiles(array $files, string $content = null, bool $randomCont
     );
 }
 
-function generateLogFile(string $fileName = null, string $content = null, bool $randomContent = false, $type = LogFile::TYPE_LARAVEL): LogFile
+function generateLogFile(string $fileName = null, string $content = null, bool $randomContent = false, $type = LogType::DEFAULT): LogFile
 {
     if (is_null($fileName)) {
         $fileName = \Illuminate\Support\Str::random().'.log';
@@ -53,7 +54,7 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
     return new LogFile($path, $type);
 }
 
-function dummyLogData(int $lines = null, string $type = LogFile::TYPE_LARAVEL): string
+function dummyLogData(int $lines = null, string $type = LogType::DEFAULT): string
 {
     if (is_null($lines)) {
         $lines = rand(1, 10);
@@ -61,10 +62,10 @@ function dummyLogData(int $lines = null, string $type = LogFile::TYPE_LARAVEL): 
 
     return implode("\n", array_map(
         fn ($_) => match ($type) {
-            LogFile::TYPE_LARAVEL => makeLaravelLogEntry(),
-            LogFile::TYPE_HTTP_ACCESS => makeHttpAccessLogEntry(),
-            LogFile::TYPE_HTTP_ERROR_APACHE => makeHttpApacheErrorLogEntry(),
-            LogFile::TYPE_HTTP_ERROR_NGINX => makeHttpNginxErrorLogEntry(),
+            LogType::LARAVEL, LogType::DEFAULT => makeLaravelLogEntry(),
+            LogType::HTTP_ACCESS => makeHttpAccessLogEntry(),
+            LogType::HTTP_ERROR_APACHE => makeHttpApacheErrorLogEntry(),
+            LogType::HTTP_ERROR_NGINX => makeHttpNginxErrorLogEntry(),
         },
         range(1, $lines)
     ));

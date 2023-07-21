@@ -12,14 +12,14 @@ class Utils
     public static function bytesForHumans(int $bytes): string
     {
         if ($bytes > ($gb = 1024 * 1024 * 1024)) {
-            return number_format($bytes / $gb, 2).' GB';
+            return number_format($bytes / $gb, 2) . ' GB';
         } elseif ($bytes > ($mb = 1024 * 1024)) {
-            return number_format($bytes / $mb, 2).' MB';
+            return number_format($bytes / $mb, 2) . ' MB';
         } elseif ($bytes > ($kb = 1024)) {
-            return number_format($bytes / $kb, 2).' KB';
+            return number_format($bytes / $kb, 2) . ' KB';
         }
 
-        return $bytes.' bytes';
+        return $bytes . ' bytes';
     }
 
     /**
@@ -52,7 +52,7 @@ class Utils
         preg_match($regexString, '');
         restore_error_handler();
 
-        if (! empty($error)) {
+        if (!empty($error)) {
             $error = str_replace('preg_match(): ', '', $error);
 
             if ($throw) {

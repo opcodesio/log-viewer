@@ -26,9 +26,28 @@ trait CanCacheData
 
         Cache::forget($this->metadataCacheKey());
         Cache::forget($this->relatedCacheKeysKey());
-        Cache::forget('log-viewer::file-type-'.md5($this->path));
 
         $this->index()->clearCache();
+    }
+
+    public function cacheSize(): int
+    {
+        $size = 0;
+
+        foreach ($this->getMetadata('related_indices', []) as $indexIdentifier => $indexMetadata) {
+            $size += $this->index($indexMetadata['query'])->cacheSize();
+        }
+
+        foreach ($this->getRelatedCacheKeys() as $relatedCacheKey) {
+            $size += strlen(serialize(Cache::get($relatedCacheKey)));
+        }
+
+        $size += strlen(serialize(Cache::get($this->metadataCacheKey())));
+        $size += strlen(serialize(Cache::get($this->relatedCacheKeysKey())));
+
+        $size += $this->index()->cacheSize();
+
+        return $size;
     }
 
     protected function cacheTtl(): CarbonInterface

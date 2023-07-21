@@ -2,6 +2,7 @@
 
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Logs\HttpAccessLog;
+use Opcodes\LogViewer\Logs\LogType;
 use Opcodes\LogViewer\LogTypeRegistrar;
 use Opcodes\LogViewer\Tests\Unit\CustomLogs\CustomAccessLog;
 
@@ -24,21 +25,33 @@ it('cannot extend with a non-existent class', function () {
 })->throws(InvalidArgumentException::class);
 
 it('overrides an existing class with the same type', function () {
-    expect($this->logRegistrar->getClass('laravel'))->toBe(\Opcodes\LogViewer\Logs\LaravelLog::class);
+    expect($this->logRegistrar->getClass(LogType::LARAVEL))->toBe(\Opcodes\LogViewer\Logs\LaravelLog::class);
 
     LogViewer::extend('laravel', CustomAccessLog::class);
 
-    expect($this->logRegistrar->getClass('laravel'))->toBe(CustomAccessLog::class);
+    expect($this->logRegistrar->getClass(LogType::LARAVEL))->toBe(CustomAccessLog::class);
 });
 
-it('can guess the type from the provided first line', function ($line, $actualType) {
+it('can guess the type from the provided first line', function ($expectedType, $line) {
     expect($this->logRegistrar->guessTypeFromFirstLine($line))
-        ->toBe($actualType);
+        ->toBe($expectedType);
 })->with([
-    ['line' => '[2021-01-01 00:00:00] laravel.INFO: Test log message', 'type' => 'laravel'],
-    ['line' => '8.68.121.11 - - [01/Feb/2023:01:53:51 +0000] "POST /main/tag/category HTTP/2.0" 404 4819 "-" "-"', 'type' => 'http_access'],
-    ['line' => '[Sun Jul 09 06:21:31.657578 2023] [ssl:error] [pid 44651] AH02032: Hostname test.example.com provided via SNI and hostname system.test provided via HTTP are different', 'type' => 'http_error_apache'],
-    ['line' => '2023/01/04 11:18:33 [alert] 95160#0: *1473 setsockopt(TCP_NODELAY) failed (22: Invalid argument) while keepalive, client: 127.0.0.1, server: 127.0.0.1:80', 'type' => 'http_error_nginx'],
+    [
+        'expectedType' => LogType::LARAVEL,
+        'line' => '[2021-01-01 00:00:00] laravel.INFO: Test log message'
+    ],
+    [
+        'expectedType' => LogType::HTTP_ACCESS,
+        'line' => '8.68.121.11 - - [01/Feb/2023:01:53:51 +0000] "POST /main/tag/category HTTP/2.0" 404 4819 "-" "-"'
+    ],
+    [
+        'expectedType' => LogType::HTTP_ERROR_APACHE,
+        'line' => '[Sun Jul 09 06:21:31.657578 2023] [ssl:error] [pid 44651] AH02032: Hostname test.example.com provided via SNI and hostname system.test provided via HTTP are different'
+    ],
+    [
+        'expectedType' => LogType::HTTP_ERROR_NGINX,
+        'line' => '2023/01/04 11:18:33 [alert] 95160#0: *1473 setsockopt(TCP_NODELAY) failed (22: Invalid argument) while keepalive, client: 127.0.0.1, server: 127.0.0.1:80'
+    ],
 ]);
 
 it('prefers user-defined log types over default ones', function () {
@@ -46,7 +59,7 @@ it('prefers user-defined log types over default ones', function () {
     $defaultAccessLogLine = '8.68.121.11 - UID 123 - [01/Feb/2023:01:53:51 +0000] "POST /main/tag/category HTTP/2.0" 404 4819 "-" "-"';
 
     expect($this->logRegistrar->guessTypeFromFirstLine($defaultAccessLogLine))
-        ->toBe('http_access');
+        ->toBe(LogType::HTTP_ACCESS);
 
     // now, let's extend with a custom user-defined log type that can also process this same line
     CustomAccessLog::setRegex(HttpAccessLog::$regex);
