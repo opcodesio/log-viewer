@@ -56,10 +56,10 @@ class LogFile
         return $this->type ?? LogType::DEFAULT;
     }
 
-    public function index(string $query = null): LogIndex
+    public function index(string $query = null, string $indexClass = LogIndex::class): LogIndex|LogIndexV2
     {
-        if (! isset($this->_logIndexCache[$query])) {
-            $this->_logIndexCache[$query] = new LogIndex($this, $query);
+        if (! isset($this->_logIndexCache[$query]) || get_class($this->_logIndexCache[$query]) !== $indexClass) {
+            $this->_logIndexCache[$query] = new $indexClass($this, $query);
         }
 
         return $this->_logIndexCache[$query];
@@ -119,7 +119,7 @@ class LogFile
         return $line;
     }
 
-    public function addRelatedIndex(LogIndex $logIndex): void
+    public function addRelatedIndex(LogIndex|LogIndexV2 $logIndex): void
     {
         $relatedIndices = collect($this->getMetadata('related_indices', []));
         $relatedIndices[$logIndex->identifier] = Arr::only(

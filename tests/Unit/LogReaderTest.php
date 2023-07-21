@@ -1,11 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\File;
+use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogReader;
 
 beforeEach(function () {
     $this->file = generateLogFile();
     File::append($this->file->path, makeLaravelLogEntry());
+
+    LogViewer::useLogReaderClass(LogReader::class);
 });
 
 it('can scan a log file', function () {

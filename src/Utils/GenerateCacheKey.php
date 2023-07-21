@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer\Utils;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogIndex;
+use Opcodes\LogViewer\LogIndexV2;
 
 class GenerateCacheKey
 {
@@ -16,7 +17,7 @@ class GenerateCacheKey
             $key = self::baseKey().':file:'.$object->identifier;
         }
 
-        if ($object instanceof LogIndex) {
+        if ($object instanceof LogIndex || $object instanceof LogIndexV2) {
             $key = self::for($object->file).':'.$object->identifier;
         }
 

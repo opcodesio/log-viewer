@@ -15,7 +15,7 @@ class LogViewerService
 
     public static string $logFileClass = LogFile::class;
 
-    public static string $logReaderClass = LogReader::class;
+    public static string $logReaderClass = LogReaderV2::class;
 
     protected ?Collection $_cachedFiles = null;
 

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogIndex;
+use Opcodes\LogViewer\LogIndexV2;
 use Opcodes\LogViewer\Logs\LogType;
 use Opcodes\LogViewer\Tests\TestCase;
 
@@ -133,6 +134,23 @@ function createLogIndex($file = null, $query = null, array $predefinedLogs = [])
     }
 
     $logIndex = new LogIndex($file, $query);
+
+    foreach ($predefinedLogs as $predefinedLog) {
+        $logIndex->addToIndex(...$predefinedLog);
+    }
+
+    $logIndex->save();
+
+    return $logIndex;
+}
+
+function createLogIndexV2($file = null, $query = null, array $predefinedLogs = []): LogIndexV2
+{
+    if (is_null($file)) {
+        $file = new LogFile('test.log');
+    }
+
+    $logIndex = new LogIndexV2($file, $query);
 
     foreach ($predefinedLogs as $predefinedLog) {
         $logIndex->addToIndex(...$predefinedLog);

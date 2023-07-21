@@ -56,7 +56,7 @@ class LogReader implements LogReaderInterface
     public static function instance(LogFile $file): static
     {
         if (! isset(self::$_instances[$file->path])) {
-            self::$_instances[$file->path] = new self($file);
+            self::$_instances[$file->path] = new static($file);
         }
 
         return self::$_instances[$file->path];
@@ -74,7 +74,7 @@ class LogReader implements LogReaderInterface
         self::$_instances = [];
     }
 
-    protected function index(): LogIndex
+    protected function index(): LogIndex|LogIndexV2
     {
         return $this->file->index($this->query);
     }
@@ -306,7 +306,6 @@ class LogReader implements LogReaderInterface
 
         // we don't care about the selected levels here, we should scan everything
         $logIndex = $this->index();
-        $laravelSeverityLevels = LaravelLogLevel::caseValues();
         $earliest_timestamp = $this->file->getMetadata('earliest_timestamp');
         $latest_timestamp = $this->file->getMetadata('latest_timestamp');
         $currentLog = '';
@@ -347,17 +346,6 @@ class LogReader implements LogReaderInterface
                 $latest_timestamp = max($latest_timestamp ?? $currentTimestamp, $currentTimestamp);
                 $currentLogPosition = ftell($this->fileHandle) - strlen($line);
                 $currentLogLevel = $lvl;
-
-                if ($this->logClass === LaravelLog::class) {
-                    $lowercaseLine = strtolower($line);
-
-                    foreach ($laravelSeverityLevels as $level) {
-                        if (strpos($lowercaseLine, '.'.$level) || strpos($lowercaseLine, $level.':')) {
-                            $currentLogLevel = $level;
-                            break;
-                        }
-                    }
-                }
 
                 // Because we matched this line as the beginning of a new log,
                 // and we have already processed the previously set $currentLog variable,
