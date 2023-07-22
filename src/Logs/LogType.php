@@ -13,4 +13,8 @@ class LogType
     const HTTP_ERROR_APACHE = 'http_error_apache';
 
     const HTTP_ERROR_NGINX = 'http_error_nginx';
+
+    const HORIZON_OLD = 'horizon_old';
+
+    const HORIZON = 'horizon';
 }

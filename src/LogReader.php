@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
+use Opcodes\LogViewer\Exceptions\SkipLineException;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 use Opcodes\LogViewer\Logs\BaseLog;
@@ -332,7 +333,14 @@ class LogReader implements LogReaderInterface
             $matches = [];
             $ts = null;
             $lvl = null;
-            if ($this->logClass::matches(trim($line), $ts, $lvl)) {
+
+            try {
+                $lineMatches = $this->logClass::matches(trim($line), $ts, $lvl);
+            } catch (SkipLineException $exception) {
+                continue;
+            }
+
+            if ($lineMatches) {
                 if ($currentLog !== '') {
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
                         $logIndex->addToIndex($currentLogPosition, $currentTimestamp ?? 0, $currentLogLevel, $currentIndex);

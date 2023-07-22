@@ -59,7 +59,7 @@
           </td>
           <!-- /Message -->
 
-          <td :key="`${log.index}-column-${colIndex}`" v-else class="text-gray-500 dark:text-gray-300 dark:opacity-90">
+          <td :key="`${log.index}-column-${colIndex}`" v-else class="text-gray-500 dark:text-gray-300 dark:opacity-90" :class="column.class || ''">
             <span v-html="highlightSearchResult(getDataAtPath(log, column.data_path), searchStore.query)"></span>
           </td>
         </template>

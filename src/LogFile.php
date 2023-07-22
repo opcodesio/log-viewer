@@ -112,8 +112,16 @@ class LogFile
 
     public function getFirstLine(): string
     {
+        return $this->getNthLine(1);
+    }
+
+    public function getNthLine(int $lineNumber): string
+    {
         $handle = fopen($this->path, 'r');
-        $line = fgets($handle);
+        $line = '';
+        for ($i = 0; $i < $lineNumber; $i++) {
+            $line = fgets($handle);
+        }
         fclose($handle);
 
         return $line;

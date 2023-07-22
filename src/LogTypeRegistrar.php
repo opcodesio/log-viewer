@@ -2,7 +2,10 @@
 
 namespace Opcodes\LogViewer;
 
+use Opcodes\LogViewer\Exceptions\SkipLineException;
 use Opcodes\LogViewer\Logs\BaseLog;
+use Opcodes\LogViewer\Logs\HorizonLog;
+use Opcodes\LogViewer\Logs\HorizonOldLog;
 use Opcodes\LogViewer\Logs\HttpAccessLog;
 use Opcodes\LogViewer\Logs\HttpApacheErrorLog;
 use Opcodes\LogViewer\Logs\HttpNginxErrorLog;
@@ -16,6 +19,8 @@ class LogTypeRegistrar
         [LogType::HTTP_ACCESS, HttpAccessLog::class],
         [LogType::HTTP_ERROR_APACHE, HttpApacheErrorLog::class],
         [LogType::HTTP_ERROR_NGINX, HttpNginxErrorLog::class],
+        [LogType::HORIZON, HorizonLog::class],
+        [LogType::HORIZON_OLD, HorizonOldLog::class],
     ];
 
     public function register(string $type, string $class): void
@@ -41,12 +46,28 @@ class LogTypeRegistrar
     public function guessTypeFromFirstLine(LogFile|string $textOrFile): ?string
     {
         if ($textOrFile instanceof LogFile) {
+            $file = $textOrFile;
             $textOrFile = $textOrFile->getFirstLine();
         }
 
         foreach ($this->logTypes as [$type, $class]) {
-            if ($class::matches($textOrFile)) {
-                return $type;
+            try {
+                if ($class::matches($textOrFile)) {
+                    return $type;
+                }
+            } catch (SkipLineException $exception) {
+                // let's try the next 10 lines
+                if (isset($file)) {
+                    foreach (range(1, 5) as $lineNumber) {
+                        try {
+                            if ($class::matches($file->getNthLine($lineNumber))) {
+                                return $type;
+                            }
+                        } catch (SkipLineException $exception) {
+                            continue;
+                        }
+                    }
+                }
             }
         }
 
