@@ -64,3 +64,19 @@ test('can set an absolute path', function () {
         ->and($files->contains('path', $first->path))->toBeTrue()
         ->and($files->contains('path', $second->path))->toBeTrue();
 });
+
+test('can get deep nested logs', function () {
+    $first = generateLogFile('first.log');
+    $second = generateLogFile('subfolder/within/folder/second.log');
+
+    config(['log-viewer.include_files' => [
+        '*.log',    // equals to "storage/logs/*.log"
+        '**/*.log',
+    ]]);
+
+    $files = LogViewer::getFiles();
+
+    expect($files)->toHaveCount(2)
+        ->and($files->contains('path', $first->path))->toBeTrue()
+        ->and($files->contains('path', $second->path))->toBeTrue();
+});
