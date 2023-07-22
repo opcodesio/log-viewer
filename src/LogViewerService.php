@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use Opcodes\LogViewer\Utils\Utils;
 
 class LogViewerService
 {
@@ -78,7 +79,7 @@ class LogViewerService
     {
         // The GLOB_BRACE flag is not available on some non GNU systems, like Solaris or Alpine Linux.
 
-        return glob($pattern);
+        return Utils::glob_recursive($pattern);
     }
 
     public function basePathForLogs(): string
