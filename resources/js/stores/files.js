@@ -84,6 +84,7 @@ export const useFileStore = defineStore({
 
       this.selectedFileIdentifier = logFileIdentifier;
       this.openFolderForActiveFile();
+      this.sidebarOpen = false;
     },
 
     openFolderForActiveFile() {
