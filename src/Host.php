@@ -9,11 +9,11 @@ class Host
     public bool $is_remote;
 
     public function __construct(
-        public string|null $identifier,
+        public ?string $identifier,
         public string $name,
-        public string|null $host = null,
-        public array|null $headers = null,
-        public array|null $auth = null,
+        public ?string $host = null,
+        public ?array $headers = null,
+        public ?array $auth = null,
     ) {
         $this->is_remote = $this->isRemote();
     }
