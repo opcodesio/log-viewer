@@ -23,14 +23,14 @@ test('deleting a folder that\'s not found still returns a successful response', 
 test('"deleteLogFolder" gate can prevent folder deletion', function () {
     generateLogFiles([$fileName = 'laravel.log']);
     $folder = LogViewer::getFolder('');
-    Gate::define('deleteLogFolder', fn (mixed $user, ?LogFolder $folder = null) => false);
+    Gate::define('deleteLogFolder', fn (mixed $user, LogFolder $folder = null) => false);
 
     $this->deleteJson(route('log-viewer.folders.delete', $folder->identifier))
         ->assertForbidden();
     test()->assertFileExists(storage_path('logs/'.$fileName));
 
     // now let's allow access again
-    Gate::define('deleteLogFolder', fn (mixed $user, ?LogFolder $folder = null) => true);
+    Gate::define('deleteLogFolder', fn (mixed $user, LogFolder $folder = null) => true);
 
     $this->deleteJson(route('log-viewer.folders.delete', $folder->identifier))
         ->assertOk();
