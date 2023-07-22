@@ -77,6 +77,8 @@ test('can get deep nested logs', function () {
     $files = LogViewer::getFiles();
 
     expect($files)->toHaveCount(2)
-        ->and($files->contains('path', $first->path))->toBeTrue()
-        ->and($files->contains('path', $second->path))->toBeTrue();
+        ->and($files->contains('name', $first->name))->toBeTrue()
+        ->and($files->contains('name', $second->name))->toBeTrue()
+        ->and(file_exists($files[0]->path))->toBeTrue()
+        ->and(file_exists($files[1]->path))->toBeTrue();
 });
