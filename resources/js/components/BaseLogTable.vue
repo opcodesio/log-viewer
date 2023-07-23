@@ -30,6 +30,7 @@
               <span class="w-full h-full group-hover:hidden group-focus:hidden">
                 <ExclamationCircleIcon v-if="log.level_class === 'danger'" />
                 <ExclamationTriangleIcon v-else-if="log.level_class === 'warning'" />
+                <CheckCircleIcon v-else-if="log.level_class === 'success'" />
                 <InformationCircleIcon v-else />
               </span>
               <span class="w-full h-full hidden group-hover:inline-block group-focus:inline-block">
@@ -123,6 +124,7 @@ import {
   ChevronRightIcon,
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
+  CheckCircleIcon,
   InformationCircleIcon,
 } from '@heroicons/vue/24/solid';
 import { highlightSearchResult } from '../helpers.js';
