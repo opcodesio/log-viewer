@@ -14,7 +14,7 @@ LOG);
     /** LEVELS:
         . debug
         - verbose
-        * notice
+     * notice
         # warning
      */
 
@@ -24,7 +24,6 @@ LOG);
         M master
         C RDB/AOF writing child
      */
-
     $file = new LogFile($file->path);
 
     expect($file->type()->value)->toBe(LogType::REDIS);
