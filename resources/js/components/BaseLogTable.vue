@@ -150,7 +150,7 @@ const clearQuery = () => {
 }
 
 const getDataAtPath = (obj, path) => {
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  return String(path.split('.').reduce((acc, part) => acc && acc[part], obj));
 }
 
 const hasContext = (log) => {

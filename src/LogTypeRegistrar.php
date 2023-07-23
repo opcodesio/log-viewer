@@ -13,6 +13,8 @@ use Opcodes\LogViewer\Logs\LaravelLog;
 use Opcodes\LogViewer\Logs\LogType;
 use Opcodes\LogViewer\Logs\PhpFpmLog;
 use Opcodes\LogViewer\Logs\PostgresLog;
+use Opcodes\LogViewer\Logs\RedisLog;
+use Opcodes\LogViewer\Logs\SupervisorLog;
 
 class LogTypeRegistrar
 {
@@ -25,6 +27,8 @@ class LogTypeRegistrar
         [LogType::HORIZON_OLD, HorizonOldLog::class],
         [LogType::PHP_FPM, PhpFpmLog::class],
         [LogType::POSTGRES, PostgresLog::class],
+        [LogType::REDIS, RedisLog::class],
+        [LogType::SUPERVISOR, SupervisorLog::class],
     ];
 
     public function register(string $type, string $class): void
@@ -88,6 +92,10 @@ class LogTypeRegistrar
             return LogType::HTTP_ACCESS;
         } elseif (str_contains($file->name, 'postgres')) {
             return LogType::POSTGRES;
+        } elseif (str_contains($file->name, 'redis')) {
+            return LogType::REDIS;
+        } elseif (str_contains($file->name, 'supervisor')) {
+            return LogType::SUPERVISOR;
         }
 
         return null;

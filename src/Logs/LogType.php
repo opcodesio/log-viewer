@@ -21,4 +21,8 @@ class LogType
     const PHP_FPM = 'php_fpm';
 
     const POSTGRES = 'postgres';
+
+    const REDIS = 'redis';
+
+    const SUPERVISOR = 'supervisor';
 }

@@ -142,6 +142,8 @@ return [
         '/opt/homebrew/var/log/httpd/*',
         '/opt/homebrew/var/log/php-fpm.log',
         '/opt/homebrew/var/log/postgres*log',
+        '/opt/homebrew/var/log/redis*log',
+        '/opt/homebrew/var/log/supervisor*log',
 
         // '/absolute/paths/supported',
     ],
