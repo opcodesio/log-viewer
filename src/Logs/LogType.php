@@ -17,4 +17,8 @@ class LogType
     const HORIZON_OLD = 'horizon_old';
 
     const HORIZON = 'horizon';
+
+    const PHP_FPM = 'php_fpm';
+
+    const POSTGRES = 'postgres';
 }

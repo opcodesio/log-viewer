@@ -11,6 +11,11 @@ test('handles square brackets in the logs path', function ($folderPath) {
         mkdir($pathWithSquareBrackets, recursive: true);
     }
 
+    config(['log-viewer.include_files' => [
+        '*.log',    // equals to "storage/logs/*.log"
+        '**/*.log',
+    ]]);
+
     // Let's mock LogViewer to return the new path as the base path for logs
     app()->instance(
         LogViewerService::class,

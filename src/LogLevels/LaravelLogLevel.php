@@ -20,20 +20,13 @@ class LaravelLogLevel implements LevelInterface
 
     const Emergency = 'emergency';
 
-    // TODO: split Horizon logs into separate files
-    const Processing = 'processing';
-
-    const Processed = 'processed';
-
-    const Failed = 'failed';
-
     const None = '';
 
     public string $value;
 
     public function __construct(string $value = null)
     {
-        $this->value = $value ?? self::None;
+        $this->value = strtolower($value ?? self::None);
     }
 
     public static function cases(): array
@@ -47,9 +40,6 @@ class LaravelLogLevel implements LevelInterface
             self::Critical,
             self::Alert,
             self::Emergency,
-            self::Processing,
-            self::Processed,
-            self::Failed,
             self::None,
         ];
     }
@@ -70,9 +60,8 @@ class LaravelLogLevel implements LevelInterface
     public function getClass(): LevelClass
     {
         return match ($this->value) {
-            self::Processed => LevelClass::success(),
-            self::Debug, self::Info, self::Notice, self::Processing => LevelClass::info(),
-            self::Warning, self::Failed => LevelClass::warning(),
+            self::Debug, self::Info, self::Notice => LevelClass::info(),
+            self::Warning => LevelClass::warning(),
             self::Error, self::Critical, self::Alert, self::Emergency => LevelClass::danger(),
             default => LevelClass::none(),
         };

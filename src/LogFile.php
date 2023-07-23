@@ -48,7 +48,13 @@ class LogFile
         }
 
         if (is_null($this->type)) {
-            $this->type = app(LogTypeRegistrar::class)->guessTypeFromFirstLine($this);
+            // can we first guess it by the file name?
+            $this->type = app(LogTypeRegistrar::class)->guessTypeFromFileName($this);
+
+            if (is_null($this->type)) {
+                $this->type = app(LogTypeRegistrar::class)->guessTypeFromFirstLine($this);
+            }
+
             $this->setMetadata('type', $this->type);
             $this->saveMetadata();
         }

@@ -11,6 +11,8 @@ use Opcodes\LogViewer\Logs\HttpApacheErrorLog;
 use Opcodes\LogViewer\Logs\HttpNginxErrorLog;
 use Opcodes\LogViewer\Logs\LaravelLog;
 use Opcodes\LogViewer\Logs\LogType;
+use Opcodes\LogViewer\Logs\PhpFpmLog;
+use Opcodes\LogViewer\Logs\PostgresLog;
 
 class LogTypeRegistrar
 {
@@ -21,6 +23,8 @@ class LogTypeRegistrar
         [LogType::HTTP_ERROR_NGINX, HttpNginxErrorLog::class],
         [LogType::HORIZON, HorizonLog::class],
         [LogType::HORIZON_OLD, HorizonOldLog::class],
+        [LogType::PHP_FPM, PhpFpmLog::class],
+        [LogType::POSTGRES, PostgresLog::class],
     ];
 
     public function register(string $type, string $class): void
@@ -69,6 +73,21 @@ class LogTypeRegistrar
                     }
                 }
             }
+        }
+
+        return null;
+    }
+
+    public function guessTypeFromFileName(LogFile $file): ?string
+    {
+        if (str_contains($file->name, 'laravel')) {
+            return LogType::LARAVEL;
+        } elseif (str_contains($file->name, 'php-fpm')) {
+            return LogType::PHP_FPM;
+        } elseif (str_contains($file->name, 'access')) {
+            return LogType::HTTP_ACCESS;
+        } elseif (str_contains($file->name, 'postgres')) {
+            return LogType::POSTGRES;
         }
 
         return null;

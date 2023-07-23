@@ -70,8 +70,13 @@ abstract class BaseLog
         $result = preg_match(static::$regex, $text, $matches) === 1;
 
         if ($result) {
-            $timestamp = static::parseDateTime($matches[static::$regexDatetimeKey] ?? null)?->timestamp;
-            $level = $matches[static::$regexLevelKey] ?? '';
+            try {
+                $timestamp = static::parseDateTime($matches[static::$regexDatetimeKey] ?? null)?->timestamp;
+                $level = $matches[static::$regexLevelKey] ?? '';
+            } catch (\Exception $exception) {
+                // not a valid datetime, so we can't match this log. Perhaps it's a different but similar log type.
+                return false;
+            }
         }
 
         return $result;
@@ -100,7 +105,9 @@ abstract class BaseLog
 
     protected function fillMatches(array $matches = []): void
     {
-        $this->datetime = Carbon::parse($matches[static::$regexDatetimeKey] ?? null);
+        $this->datetime = static::parseDatetime($matches[static::$regexDatetimeKey] ?? null)?->tz(
+            config('log-viewer.timezone', config('app.timezone'))
+        );
         $this->level = $matches[static::$regexLevelKey] ?? null;
         $this->message = $matches[static::$regexMessageKey] ?? null;
         $this->context = [];

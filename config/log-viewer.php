@@ -136,6 +136,13 @@ return [
         // You can include paths to other log types as well, such as apache, nginx, and more.
         '/var/log/httpd/*',
         '/var/log/nginx/*',
+
+        // MacOS Apple Silicon logs
+        '/opt/homebrew/var/log/nginx/*',
+        '/opt/homebrew/var/log/httpd/*',
+        '/opt/homebrew/var/log/php-fpm.log',
+        '/opt/homebrew/var/log/postgres*log',
+
         // '/absolute/paths/supported',
     ],
 

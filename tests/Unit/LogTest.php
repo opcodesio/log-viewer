@@ -103,8 +103,6 @@ it('finds the correct log level', function ($levelProvided, $levelExpected) {
     ['CRITICAL', LaravelLogLevel::Critical],
     ['ALERT', LaravelLogLevel::Alert],
     ['EMERGENCY', LaravelLogLevel::Emergency],
-    ['PROCESSING', LaravelLogLevel::Processing],
-    ['PROCESSED', LaravelLogLevel::Processed],
     ['info', LaravelLogLevel::Info],
     ['iNfO', LaravelLogLevel::Info],
     ['', LaravelLogLevel::None],
