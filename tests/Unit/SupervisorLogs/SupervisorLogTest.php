@@ -13,7 +13,7 @@ LOG);
 
     $file = new LogFile($file->path);
 
-    expect($file->type())->toBe(LogType::SUPERVISOR);
+    expect($file->type()->value)->toBe(LogType::SUPERVISOR);
 
     $logReader = $file->logs()->scan();
 

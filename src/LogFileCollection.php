@@ -4,6 +4,9 @@ namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Collection;
 
+/**
+ * @var LogFile[] $items
+ */
 class LogFileCollection extends Collection
 {
     public function sortByEarliestFirst(): self

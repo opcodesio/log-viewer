@@ -41,7 +41,7 @@ class LogFile
         $this->loadMetadata();
     }
 
-    public function type(): string
+    public function type(): LogType
     {
         if (is_null($this->type)) {
             $this->type = $this->getMetadata('type');
@@ -59,7 +59,7 @@ class LogFile
             $this->saveMetadata();
         }
 
-        return $this->type ?? LogType::DEFAULT;
+        return new LogType($this->type ?? LogType::DEFAULT);
     }
 
     public function index(string $query = null): LogIndex

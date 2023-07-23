@@ -10,6 +10,8 @@ use Opcodes\LogViewer\Utils\Utils;
 
 class LaravelLog extends BaseLog
 {
+    public static string $name = 'Laravel';
+
     public static string $regex = '/\[(?P<datetime>[^\]]+)\] (?P<environment>\S+)\.(?P<level>\S+): (?P<message>.*)/';
 
     public int $fullTextLength;

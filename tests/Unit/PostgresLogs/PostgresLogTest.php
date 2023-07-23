@@ -26,7 +26,7 @@ LOG);
 
     $file = new LogFile($file->path);
 
-    expect($file->type())->toBe(LogType::POSTGRES);
+    expect($file->type()->value)->toBe(LogType::POSTGRES);
 
     $logReader = $file->logs()->scan();
 

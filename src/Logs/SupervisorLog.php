@@ -8,6 +8,8 @@ use Opcodes\LogViewer\LogLevels\SupervisorLogLevel;
 
 class SupervisorLog extends BaseLog
 {
+    public static string $name = 'Supervisor';
+
     public static string $regex = '/^(?<datetime>[0-9\-\s:,]+) (?<level>\w+) (?<message>.*)/';
 
     public static string $levelClass = SupervisorLogLevel::class;

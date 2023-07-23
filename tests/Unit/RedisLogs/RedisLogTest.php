@@ -27,7 +27,7 @@ LOG);
 
     $file = new LogFile($file->path);
 
-    expect($file->type())->toBe(LogType::REDIS);
+    expect($file->type()->value)->toBe(LogType::REDIS);
 
     $logReader = $file->logs()->scan();
 

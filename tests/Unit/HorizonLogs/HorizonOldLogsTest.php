@@ -1,6 +1,7 @@
 <?php
 
 use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\Logs\LogType;
 
 it('can process old Horizon logs', function () {
     $file = generateLogFile('horizon_old_dummy.log', content: <<<EOF
@@ -9,7 +10,7 @@ it('can process old Horizon logs', function () {
 EOF);
     $file = new LogFile($file->path);
 
-    expect($file->type())->toBe('horizon_old'); // HorizonOldLog
+    expect($file->type()->value)->toBe(LogType::HORIZON_OLD); // HorizonOldLog
 
     $logReader = $file->logs()->scan();
 

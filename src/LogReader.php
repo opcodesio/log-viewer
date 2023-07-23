@@ -50,7 +50,7 @@ class LogReader implements LogReaderInterface
     public function __construct(LogFile $file)
     {
         $this->file = $file;
-        $this->logClass = app(LogTypeRegistrar::class)->getClass($this->file->type()) ?? BaseLog::class;
+        $this->logClass = $this->file->type()->logClass() ?? BaseLog::class;
         $this->levelClass = $this->logClass::levelClass();
     }
 

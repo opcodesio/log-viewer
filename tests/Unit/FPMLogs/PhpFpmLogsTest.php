@@ -13,7 +13,7 @@ LOG);
 
     $file = new LogFile($file->path);
 
-    expect($file->type())->toBe(LogType::PHP_FPM);
+    expect($file->type()->value)->toBe(LogType::PHP_FPM);
 
     $logReader = $file->logs()->scan();
 

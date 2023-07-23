@@ -1,6 +1,7 @@
 <?php
 
 use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\Logs\LogType;
 
 it('can process new Horizon logs', function () {
     $file = generateLogFile('horizon_new_dummy.log', content: <<<EOF
@@ -12,7 +13,7 @@ Horizon started successfully.
 EOF);
     $file = new LogFile($file->path);
 
-    expect($file->type())->toBe('horizon'); // HorizonLog
+    expect($file->type()->value)->toBe(LogType::HORIZON); // HorizonLog
 
     $logReader = $file->logs()->scan();
 

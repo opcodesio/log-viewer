@@ -4,6 +4,8 @@ namespace Opcodes\LogViewer\Logs;
 
 class RedisLog extends BaseLog
 {
+    public static string $name = 'Redis';
+
     public static string $regex = '/^(?<pid>\d+):(?<role_letter>\w) (?<datetime>.*) (?<level>[.\-*#]) (?<message>.*)/';
 
     public static array $columns = [

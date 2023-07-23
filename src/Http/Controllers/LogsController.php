@@ -9,8 +9,8 @@ use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LevelCountResource;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
 use Opcodes\LogViewer\Http\Resources\LogResource;
+use Opcodes\LogViewer\LogFileCollection;
 use Opcodes\LogViewer\Logs\BaseLog;
-use Opcodes\LogViewer\LogTypeRegistrar;
 
 class LogsController
 {
@@ -18,13 +18,14 @@ class LogsController
 
     const NEWEST_FIRST = 'desc';
 
-    public function index(Request $request, LogTypeRegistrar $logTypeRegistrar)
+    public function index(Request $request)
     {
         $fileIdentifier = $request->query('file', '');
         $query = $request->query('query', '');
         $direction = $request->query('direction', 'desc');
         $log = $request->query('log', null);
         $excludedLevels = $request->query('exclude_levels', []);
+        $excludedFileTypes = $request->query('exclude_file_types', []);
         $perPage = $request->query('per_page', 25);
         session()->put('log-viewer:shorter-stack-traces', $request->boolean('shorter_stack_traces', false));
         $hasMoreResults = false;
@@ -36,9 +37,17 @@ class LogsController
 
         if ($file = LogViewer::getFile($fileIdentifier)) {
             $logQuery = $file->logs();
-            $logClass = $logTypeRegistrar->getClass($file->type());
+            $logClass = $file->type()->logClass();
         } elseif (! empty($query)) {
-            $logQuery = LogViewer::getFiles()->logs();
+            $fileCollection = LogViewer::getFiles();
+
+            if (! empty($excludedFileTypes)) {
+                $fileCollection = $fileCollection->filter(function ($file) use ($excludedFileTypes) {
+                    return ! in_array($file->type()->value, $excludedFileTypes);
+                })->values();
+            }
+
+            $logQuery = $fileCollection->logs();
             $logClass = BaseLog::class;
         }
 
