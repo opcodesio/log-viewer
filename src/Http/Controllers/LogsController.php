@@ -9,7 +9,6 @@ use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LevelCountResource;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
 use Opcodes\LogViewer\Http\Resources\LogResource;
-use Opcodes\LogViewer\LogFileCollection;
 use Opcodes\LogViewer\Logs\BaseLog;
 
 class LogsController
