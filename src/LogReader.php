@@ -7,9 +7,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Exceptions\SkipLineException;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 use Opcodes\LogViewer\Logs\BaseLog;
-use Opcodes\LogViewer\Logs\LaravelLog;
 use Opcodes\LogViewer\Utils\Utils;
 
 class LogReader implements LogReaderInterface

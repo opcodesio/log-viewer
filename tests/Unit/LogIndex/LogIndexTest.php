@@ -205,7 +205,7 @@ it('can save to the cache after building up the index', function () {
 });
 
 it('compresses chunk if gzip is available', function () {
-    if (!extension_loaded('zlib')) {
+    if (! extension_loaded('zlib')) {
         $this->markTestSkipped('zlib extension is not available');
     }
 
