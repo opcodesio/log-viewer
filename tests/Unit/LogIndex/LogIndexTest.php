@@ -231,7 +231,7 @@ it('compresses chunk if gzip is available', function () {
 });
 
 it('can check whether the index is incomplete', function () {
-    $logFile = generateLogFile('test.log');
+    $logFile = generateLogFile('indextest.log');
     $logIndex = createLogIndex($logFile);
     expect($logIndex->incomplete())->toBeFalse();
 
