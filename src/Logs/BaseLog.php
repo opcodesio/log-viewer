@@ -112,7 +112,7 @@ abstract class BaseLog
             config('log-viewer.timezone', config('app.timezone'))
         );
         $this->level = $matches[static::$regexLevelKey] ?? null;
-        $this->message = $matches[static::$regexMessageKey] ?? null;
+        $this->message = trim($matches[static::$regexMessageKey] ?? null);
         $this->context = [];
     }
 

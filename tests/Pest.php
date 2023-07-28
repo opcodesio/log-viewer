@@ -60,7 +60,7 @@ function dummyLogData(int $lines = null, string $type = LogType::DEFAULT): strin
         $lines = rand(1, 10);
     }
 
-    return implode("\n", array_map(
+    return implode(PHP_EOL, array_map(
         fn ($_) => match ($type) {
             LogType::LARAVEL, LogType::DEFAULT => makeLaravelLogEntry(),
             LogType::HTTP_ACCESS => makeHttpAccessLogEntry(),
