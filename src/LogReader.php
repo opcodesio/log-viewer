@@ -307,7 +307,6 @@ class LogReader implements LogReaderInterface
 
         // we don't care about the selected levels here, we should scan everything
         $logIndex = $this->index();
-        $laravelSeverityLevels = LaravelLogLevel::caseValues();
         $earliest_timestamp = $this->file->getMetadata('earliest_timestamp');
         $latest_timestamp = $this->file->getMetadata('latest_timestamp');
         $currentLog = '';
@@ -355,17 +354,6 @@ class LogReader implements LogReaderInterface
                 $latest_timestamp = max($latest_timestamp ?? $currentTimestamp, $currentTimestamp);
                 $currentLogPosition = ftell($this->fileHandle) - strlen($line);
                 $currentLogLevel = $lvl;
-
-                if ($this->logClass === LaravelLog::class) {
-                    $lowercaseLine = strtolower($line);
-
-                    foreach ($laravelSeverityLevels as $level) {
-                        if (strpos($lowercaseLine, '.'.$level) || strpos($lowercaseLine, $level.':')) {
-                            $currentLogLevel = $level;
-                            break;
-                        }
-                    }
-                }
 
                 // Because we matched this line as the beginning of a new log,
                 // and we have already processed the previously set $currentLog variable,

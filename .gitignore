@@ -10,3 +10,4 @@ phpstan.neon
 testbench.yaml
 vendor
 node_modules
+tests/Feature/performance_test.log

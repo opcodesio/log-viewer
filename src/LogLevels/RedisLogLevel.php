@@ -2,7 +2,7 @@
 
 namespace Opcodes\LogViewer\LogLevels;
 
-class HorizonStatusLevel implements LevelInterface
+class RedisLogLevel implements LevelInterface
 {
     public string $value;
 
@@ -19,26 +19,29 @@ class HorizonStatusLevel implements LevelInterface
     public static function caseValues(): array
     {
         return [
-            'Processing',
-            'Running',
-            'Processed',
-            'Done',
-            'Failed',
-            'Fail',
+            '.' => 'debug',
+            '-' => 'verbose',
+            '*' => 'notice',
+            '#' => 'warning',
         ];
     }
 
     public function getName(): string
     {
-        return ucfirst(strtolower($this->value));
+        return match ($this->value) {
+            '.' => 'Debug',
+            '-' => 'Verbose',
+            '*' => 'Notice',
+            '#' => 'Warning',
+            default => $this->value,
+        };
     }
 
     public function getClass(): LevelClass
     {
-        return match (strtolower($this->value)) {
-            'processing', 'running' => LevelClass::info(),
-            'processed', 'done' => LevelClass::success(),
-            'failed', 'fail' => LevelClass::danger(),
+        return match ($this->value) {
+            '.', '-', '*' => LevelClass::info(),
+            '#' => LevelClass::warning(),
             default => LevelClass::none(),
         };
     }

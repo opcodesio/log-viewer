@@ -15,7 +15,7 @@ class LogIndex
     use Concerns\LogIndex\CanSplitIndexIntoChunks;
     use Concerns\LogIndex\PreservesIndexingProgress;
 
-    const DEFAULT_CHUNK_SIZE = 20_000;
+    const DEFAULT_CHUNK_SIZE = 50_000;
 
     public string $identifier;
 

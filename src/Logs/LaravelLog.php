@@ -52,7 +52,7 @@ class LaravelLog extends BaseLog
         // and the environment/level. Let's put that at the beginning of the first line.
         $middle = trim(rtrim($matches[4] ?? '', $this->extra['environment'].'.'));
 
-        $this->level = strtolower($matches[6] ?? '');
+        $this->level = strtoupper($matches[6] ?? '');
 
         $firstLineText = $matches[7];
 

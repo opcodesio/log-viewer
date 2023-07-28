@@ -4,21 +4,21 @@ namespace Opcodes\LogViewer\LogLevels;
 
 class LaravelLogLevel implements LevelInterface
 {
-    const Debug = 'debug';
+    const Debug = 'DEBUG';
 
-    const Info = 'info';
+    const Info = 'INFO';
 
-    const Notice = 'notice';
+    const Notice = 'NOTICE';
 
-    const Warning = 'warning';
+    const Warning = 'WARNING';
 
-    const Error = 'error';
+    const Error = 'ERROR';
 
-    const Critical = 'critical';
+    const Critical = 'CRITICAL';
 
-    const Alert = 'alert';
+    const Alert = 'ALERT';
 
-    const Emergency = 'emergency';
+    const Emergency = 'EMERGENCY';
 
     const None = '';
 
@@ -26,7 +26,7 @@ class LaravelLogLevel implements LevelInterface
 
     public function __construct(string $value = null)
     {
-        $this->value = strtolower($value ?? self::None);
+        $this->value = $value ?? self::None;
     }
 
     public static function cases(): array
@@ -53,7 +53,7 @@ class LaravelLogLevel implements LevelInterface
     {
         return match ($this->value) {
             self::None => 'None',
-            default => ucfirst($this->value),
+            default => ucfirst(strtolower($this->value)),
         };
     }
 

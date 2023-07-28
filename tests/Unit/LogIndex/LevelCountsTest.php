@@ -4,9 +4,9 @@ use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 
 it('can return the counts for each severity level in the file', function () {
     $logIndex = createLogIndex(predefinedLogs: [
-        [0, now()->subDays(3), 'info'],
-        [1500, now()->subDays(2), 'info'],
-        $latestLog = [3000, now()->subDay(), 'error'],
+        [0, now()->subDays(3), 'INFO'],
+        [1500, now()->subDays(2), 'INFO'],
+        $latestLog = [3000, now()->subDay(), 'ERROR'],
     ]);
 
     $logCounts = $logIndex->getLevelCounts();
@@ -18,9 +18,9 @@ it('can return the counts for each severity level in the file', function () {
 
 it('can return the smaller counts with date filter applied', function () {
     $logIndex = createLogIndex(predefinedLogs: [
-        [0, now()->subDays(3), 'info'],
-        [1500, now()->subDays(2), 'info'],
-        $latestLog = [3000, now()->subDay(), 'error'],
+        [0, now()->subDays(3), 'INFO'],
+        [1500, now()->subDays(2), 'INFO'],
+        $latestLog = [3000, now()->subDay(), 'ERROR'],
     ]);
 
     // the first info log will be skipped from the counts

@@ -196,6 +196,37 @@ it('can save to the cache after building up the index', function () {
 
     $logIndex->save();
 
+    if (extension_loaded('zlib')) {
+        $cachedData = unserialize(gzuncompress(Cache::get($cacheKey)));
+        expect($cachedData)->toBe($expectedLogIndexData);
+    } else {
+        expect(Cache::get($cacheKey))->toBe($expectedLogIndexData);
+    }
+});
+
+it('compresses chunk if gzip is available', function () {
+    if (!extension_loaded('zlib')) {
+        $this->markTestSkipped('zlib extension is not available');
+    }
+
+    $logIndex = createLogIndex();
+    $cacheKey = GenerateCacheKey::for($logIndex, 'chunk:0');    // by default, it will save to the first chunk
+    $firstIndexGenerated = $logIndex->addToIndex(
+        $firstFilePosition = 1000,
+        $firstDate = now()->subMinute(),
+        $level = 'info'
+    );
+    $logIndex->save();
+
+    /** @noinspection PhpComposerExtensionStubsInspection */
+    $expectedLogIndexData = gzcompress(serialize([
+        $firstDate->timestamp => [
+            'info' => [
+                $firstIndexGenerated => $firstFilePosition,
+            ],
+        ],
+    ]), 1);
+
     expect(Cache::get($cacheKey))->toBe($expectedLogIndexData);
 });
 

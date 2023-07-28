@@ -25,7 +25,7 @@ class HorizonLog extends BaseLog
         $this->datetime = $this->parseDatetime($matches['datetime'])?->tz(
             config('log-viewer.timezone', config('app.timezone', 'UTC'))
         );
-        $this->level = strtolower($matches['level']);
+        $this->level = $matches['level'];
         $this->message = $matches['message'];
         $this->context = array_filter([
             'duration' => $matches['duration'] ?: null,

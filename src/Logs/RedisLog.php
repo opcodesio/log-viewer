@@ -2,11 +2,15 @@
 
 namespace Opcodes\LogViewer\Logs;
 
+use Opcodes\LogViewer\LogLevels\RedisLogLevel;
+
 class RedisLog extends BaseLog
 {
     public static string $name = 'Redis';
 
     public static string $regex = '/^(?<pid>\d+):(?<role_letter>\w) (?<datetime>.*) (?<level>[.\-*#]) (?<message>.*)/';
+
+    public static string $levelClass = RedisLogLevel::class;
 
     public static array $columns = [
         ['label' => 'Datetime', 'data_path' => 'datetime'],
@@ -15,19 +19,6 @@ class RedisLog extends BaseLog
         ['label' => 'Severity', 'data_path' => 'level'],
         ['label' => 'Message', 'data_path' => 'message'],
     ];
-
-    protected function parseText(array &$matches = []): void
-    {
-        parent::parseText($matches);
-
-        $matches['level'] = match ($matches['level']) {
-            '.' => 'debug',
-            '-' => 'verbose',
-            '*' => 'notice',
-            '#' => 'warning',
-            default => $matches['level'],
-        };
-    }
 
     protected function fillMatches(array $matches = []): void
     {
@@ -44,22 +35,5 @@ class RedisLog extends BaseLog
                 default => null,
             },
         ];
-    }
-
-    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
-    {
-        $result = parent::matches($text, $timestamp, $level);
-
-        if ($result) {
-            $level = match ($level) {
-                '.' => 'debug',
-                '-' => 'verbose',
-                '*' => 'notice',
-                '#' => 'warning',
-                default => $level,
-            };
-        }
-
-        return $result;
     }
 }
