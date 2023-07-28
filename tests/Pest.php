@@ -35,7 +35,7 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
         $fileName = \Illuminate\Support\Str::random().'.log';
     }
 
-    $path = storage_path('logs/'.$fileName);
+    $path = storage_path('logs'.DIRECTORY_SEPARATOR.$fileName);
     $folder = dirname($path);
 
     if (! File::isDirectory($folder)) {
