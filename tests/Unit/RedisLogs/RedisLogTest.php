@@ -1,6 +1,7 @@
 <?php
 
 use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\LogLevels\RedisLogLevel;
 use Opcodes\LogViewer\Logs\LogType;
 
 it('can process Redis logs', function () {
@@ -14,7 +15,7 @@ LOG);
     /** LEVELS:
         . debug
         - verbose
-     * notice
+        * notice
         # warning
      */
 
@@ -32,28 +33,36 @@ LOG);
 
     expect($logs = $logReader->get())->toHaveCount(4)
         ->and($logs[0]->datetime->toDateTimeString())->toBe('2021-07-17 17:34:22')
-        ->and($logs[0]->level)->toBe('warning')
+        ->and($logs[0]->level)->toBe('#')
+        ->and($logs[0]->getLevel())->toBeInstanceOf(RedisLogLevel::class)
+        ->and($logs[0]->getLevel()->getName())->toBe('Warning')
         ->and($logs[0]->message)->toBe('Configuration loaded')
         ->and($logs[0]->context['role'])->toBe('C')
         ->and($logs[0]->context['role_description'])->toBe('RDB/AOF writing child')
         ->and($logs[0]->context['pid'])->toBe(18696)
 
         ->and($logs[1]->datetime->toDateTimeString())->toBe('2021-07-17 17:34:22')
-        ->and($logs[1]->level)->toBe('notice')
+        ->and($logs[1]->level)->toBe('*')
+        ->and($logs[1]->getLevel())->toBeInstanceOf(RedisLogLevel::class)
+        ->and($logs[1]->getLevel()->getName())->toBe('Notice')
         ->and($logs[1]->message)->toBe('Increased maximum number of open files to 10032 (it was originally set to 256).')
         ->and($logs[1]->context['role'])->toBe('M')
         ->and($logs[1]->context['role_description'])->toBe('master')
         ->and($logs[1]->context['pid'])->toBe(18696)
 
         ->and($logs[2]->datetime->toDateTimeString())->toBe('2021-07-17 17:34:22')
-        ->and($logs[2]->level)->toBe('verbose')
+        ->and($logs[2]->level)->toBe('-')
+        ->and($logs[2]->getLevel())->toBeInstanceOf(RedisLogLevel::class)
+        ->and($logs[2]->getLevel()->getName())->toBe('Verbose')
         ->and($logs[2]->message)->toBe('monotonic clock: POSIX clock_gettime')
         ->and($logs[2]->context['role'])->toBe('X')
         ->and($logs[2]->context['role_description'])->toBe('sentinel')
         ->and($logs[2]->context['pid'])->toBe(18696)
 
         ->and($logs[3]->datetime->toDateTimeString())->toBe('2021-07-17 17:34:22')
-        ->and($logs[3]->level)->toBe('debug')
+        ->and($logs[3]->level)->toBe('.')
+        ->and($logs[3]->getLevel())->toBeInstanceOf(RedisLogLevel::class)
+        ->and($logs[3]->getLevel()->getName())->toBe('Debug')
         ->and($logs[3]->message)->toBe('ticks per second: 100')
         ->and($logs[3]->context['pid'])->toBe(18696)
         ->and($logs[3]->context['role'])->toBe('S')
