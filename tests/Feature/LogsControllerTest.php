@@ -12,5 +12,8 @@ it('can load the logs for a specific file', function () {
 
     $response = getJson(route('log-viewer.logs', ['file' => $file->identifier]));
 
+    dump($file->contents());
+    dump($response->json());
+
     expect($response->json('logs'))->toHaveCount(count($logEntries));
 });
