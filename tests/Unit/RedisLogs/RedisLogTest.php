@@ -15,7 +15,7 @@ LOG);
     /** LEVELS:
         . debug
         - verbose
-        * notice
+     * notice
         # warning
      */
 
