@@ -6,7 +6,7 @@ use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\Logs\LogType;
 
 beforeEach(function () {
-    File::makeDirectory(storage_path('logs/http'), 0755, true, true);
+    File::makeDirectory(storage_path('logs/http'), 0755, true);
     $slash = DIRECTORY_SEPARATOR;
     File::put(
         $this->access_dummy_log_path = storage_path("logs${slash}http${slash}access_dummy.log"),
@@ -47,11 +47,4 @@ it('can retrieve the http log files', function () {
         ->and($files[2]->type()->value)->toBe(LogType::HTTP_ACCESS)
         ->and($files[2]->path)->toBe($this->access_dummy_log_path)
         ->and($files[2]->size())->toBe(filesize($this->access_dummy_log_path));
-});
-
-afterEach(function () {
-    File::delete($this->access_dummy_log_path);
-    File::delete($this->error_dummy_log_path);
-    File::delete($this->error_nginx_dummy_log_path);
-    File::deleteDirectory(storage_path('logs/http'));
 });
