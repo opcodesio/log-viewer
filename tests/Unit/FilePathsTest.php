@@ -82,3 +82,19 @@ test('can get deep nested logs', function () {
         ->and(file_exists($files[0]->path))->toBeTrue()
         ->and(file_exists($files[1]->path))->toBeTrue();
 });
+
+test('does not get nested logs with a single-asterisk wildcard', function () {
+    $first = generateLogFile('first.log');
+    $second = generateLogFile('subfolder/within/folder/second.log');
+
+    config(['log-viewer.include_files' => [
+        '*.log',    // equals to "storage/logs/*.log"
+    ]]);
+
+    $files = LogViewer::getFiles();
+
+    expect($files)->toHaveCount(1)
+        ->and($files->contains('name', $first->name))->toBeTrue()
+        ->and($files->contains('name', $second->name))->toBeFalse()
+        ->and(file_exists($files[0]->path))->toBeTrue();
+});
