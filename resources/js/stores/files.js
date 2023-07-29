@@ -194,12 +194,6 @@ export const useFileStore = defineStore({
     },
 
     setAvailableFileTypes(folders) {
-      // folders is a collection of folders, each containing a collection of files.
-      // each file has a "type" property, which we want to collect into a new array
-      // and only keep the unique values. The "type" property is an object, containing
-      // a "value" (string) property and "name" (string) property.
-      // The unique types should also keep a count of the files found of that type.
-
       const fileTypes = folders.flatMap(folder => folder.files.map(file => file.type));
       const uniqueFileTypes = [...new Set(fileTypes.map(fileType => fileType.value))];
 
