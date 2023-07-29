@@ -75,7 +75,11 @@ class LogViewerService
     {
         // The GLOB_BRACE flag is not available on some non GNU systems, like Solaris or Alpine Linux.
 
-        return Utils::glob_recursive($pattern);
+        if (str_contains($pattern, '**')) {
+            return Utils::glob_recursive($pattern);
+        }
+
+        return glob($pattern);
     }
 
     public function basePathForLogs(): string
