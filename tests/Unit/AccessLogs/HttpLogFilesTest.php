@@ -20,7 +20,6 @@ beforeEach(function () {
         $this->error_nginx_dummy_log_path = storage_path("logs${slash}http${slash}errors_nginx_dummy.log"),
         file_get_contents(__DIR__.'/Fixtures/errors_nginx_dummy.log')
     );
-
 });
 
 it('can retrieve the http log files', function () {

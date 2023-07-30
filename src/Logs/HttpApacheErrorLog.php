@@ -9,9 +9,7 @@ use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 class HttpApacheErrorLog extends BaseLog
 {
     public static string $name = 'HTTP Errors (Apache)';
-
     public static string $regex = '/\[(?<datetime>.*?)\]\s\[(?:(?<module>.*?):)?(?<level>.*?)\]\s\[pid\s(?<pid>\d*)\](?:\s\[client\s(?<client>.*?)\])?\s(?<message>.*)/';
-
     public static string $levelClass = LaravelLogLevel::class;
 
     protected function fillMatches(array $matches = []): void

@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
+use Opcodes\LogViewer\Exceptions\CannotOpenFileException;
 use Opcodes\LogViewer\Exceptions\SkipLineException;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Logs\BaseLog;
@@ -12,37 +13,18 @@ use Opcodes\LogViewer\Utils\Utils;
 
 class LogReader implements LogReaderInterface
 {
-    /**
-     * Cached LogReader instances.
-     */
-    public static array $_instances = [];
+    use Concerns\LogReader\KeepsInstances;
+    use Concerns\LogReader\KeepsFileHandle;
 
     protected LogFile $file;
-
-    protected string $logClass;
-
-    protected string $levelClass;
-
-    /**
-     * Contains an index of file positions where each log entry is located in.
-     */
     protected LogIndex $logIndex;
-
+    protected string $logClass;
+    protected string $levelClass;
     protected ?int $limit = null;
-
     protected ?string $query = null;
-
     protected ?int $onlyShowIndex = null;
-
     protected bool $lazyScanning = false;
-
-    /**
-     * @var resource|null
-     */
-    protected $fileHandle = null;
-
     protected int $mtimeBeforeScan;
-
     protected string $direction = Direction::Forward;
 
     public function __construct(LogFile $file)
@@ -52,25 +34,13 @@ class LogReader implements LogReaderInterface
         $this->levelClass = $this->logClass::levelClass();
     }
 
-    public static function instance(LogFile $file): static
+    protected function onFileOpened(): void
     {
-        if (! isset(self::$_instances[$file->path])) {
-            self::$_instances[$file->path] = new self($file);
+        if ($this->requiresScan() && ! $this->lazyScanning) {
+            $this->scan();
+        } else {
+            $this->reset();
         }
-
-        return self::$_instances[$file->path];
-    }
-
-    public static function clearInstance(LogFile $file): void
-    {
-        if (isset(self::$_instances[$file->path])) {
-            unset(self::$_instances[$file->path]);
-        }
-    }
-
-    public static function clearInstances(): void
-    {
-        self::$_instances = [];
     }
 
     protected function index(): LogIndex
@@ -131,76 +101,14 @@ class LogReader implements LogReaderInterface
         return $this;
     }
 
-    protected function isOpen(): bool
-    {
-        return is_resource($this->fileHandle);
-    }
-
-    protected function isClosed(): bool
-    {
-        return ! $this->isOpen();
-    }
-
-    /**
-     * Open the log file for reading. Most other methods will open the file automatically if needed.
-     *
-     * @throws \Exception
-     */
-    protected function open(): static
-    {
-        if ($this->isOpen()) {
-            return $this;
-        }
-
-        $this->fileHandle = fopen($this->file->path, 'r');
-
-        if ($this->fileHandle === false) {
-            throw new \Exception('Could not open "'.$this->file->path.'" for reading.');
-        }
-
-        if ($this->requiresScan() && ! $this->lazyScanning) {
-            $this->scan();
-        } else {
-            $this->reset();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Close the file handle.
-     *
-     * @throws \Exception
-     */
-    protected function close(): static
-    {
-        if ($this->isClosed()) {
-            return $this;
-        }
-
-        if (fclose($this->fileHandle)) {
-            $this->fileHandle = null;
-        } else {
-            throw new \Exception('Could not close the file "'.$this->file->path.'".');
-        }
-
-        return $this;
-    }
-
     public function reverse(): static
     {
-        $this->direction = Direction::Backward;
-        $this->index()->reverse();
-
-        return $this->reset();
+        return $this->setDirection(Direction::Backward);
     }
 
     public function forward(): static
     {
-        $this->direction = Direction::Forward;
-        $this->index()->forward();
-
-        return $this->reset();
+        return $this->setDirection(Direction::Forward);
     }
 
     public function setDirection(string $direction = null): static
@@ -210,19 +118,12 @@ class LogReader implements LogReaderInterface
             : Direction::Forward;
         $this->index()->setDirection($this->direction);
 
-        return $this;
+        return $this->reset();
     }
 
     public function skip(int $number): static
     {
         $this->index()->skip($number);
-
-        return $this;
-    }
-
-    protected function onlyShow(int $targetIndex = 0): static
-    {
-        $this->onlyShowIndex = $targetIndex;
 
         return $this;
     }
@@ -241,12 +142,12 @@ class LogReader implements LogReaderInterface
 
     protected function setQuery(string $query = null): static
     {
-        $this->close();
+        $this->closeFile();
 
         if (! empty($query) && Str::startsWith($query, 'log-index:')) {
             $this->query = null;
             $this->only(null);
-            $this->onlyShow(intval(explode(':', $query)[1]));
+            $this->onlyShowIndex = intval(explode(':', $query)[1]);
         } elseif (! empty($query)) {
             $query = '~'.$query.'~i';
 
@@ -273,7 +174,7 @@ class LogReader implements LogReaderInterface
      * This method scans the whole file quickly to index the logs in order to speed up
      * the retrieval of individual logs
      *
-     * @throws \Exception
+     * @throws CannotOpenFileException
      */
     public function scan(int $maxBytesToScan = null, bool $force = false): static
     {
@@ -281,9 +182,7 @@ class LogReader implements LogReaderInterface
             $maxBytesToScan = LogViewer::lazyScanChunkSize();
         }
 
-        if ($this->isClosed()) {
-            $this->open();
-        }
+        $this->prepareFileForReading();
 
         if (! $this->requiresScan() && ! $force) {
             return $this;
@@ -320,13 +219,6 @@ class LogReader implements LogReaderInterface
             && ($stopScanningAfter > microtime(true))
             && ($line = fgets($this->fileHandle, 1024)) !== false
         ) {
-            /**
-             * $matches[0] - the full line being checked
-             * $matches[1] - the full timestamp in-between the square brackets, including the optional microseconds
-             *               and the optional timezone offset
-             * $matches[2] - the optional microseconds
-             * $matches[3] - the optional timezone offset, like `+02:00` or `-05:30`
-             */
             $matches = [];
             $ts = null;
             $lvl = null;
@@ -407,9 +299,7 @@ class LogReader implements LogReaderInterface
      */
     public function getLevelCounts(): array
     {
-        if ($this->isClosed()) {
-            $this->open();
-        }
+        $this->prepareFileForReading();
 
         $selectedLevels = $this->index()->getSelectedLevels();
         $exceptedLevels = $this->index()->getExceptedLevels();
@@ -427,6 +317,8 @@ class LogReader implements LogReaderInterface
 
     /**
      * @return array|BaseLog[]
+     *
+     * @throws CannotOpenFileException
      */
     public function get(int $limit = null): array
     {
@@ -443,27 +335,12 @@ class LogReader implements LogReaderInterface
         return $logs;
     }
 
-    protected function getLogAtIndex(int $index): ?BaseLog
-    {
-        $position = $this->index()->getPositionForIndex($index);
-
-        [$text, $position] = $this->getLogText($index, $position);
-
-        // If we did not find any logs, this means either the file is empty, or
-        // we have already reached the end of file. So we return early.
-        if ($text === '') {
-            return null;
-        }
-
-        return $this->makeLog($text, $position, $index);
-    }
-
+    /**
+     * @throws CannotOpenFileException
+     */
     public function next(): ?BaseLog
     {
-        // We open it here to make we also check for possible need of index re-building.
-        if ($this->isClosed()) {
-            $this->open();
-        }
+        $this->prepareFileForReading();
 
         [$index, $position] = $this->index()->next();
 
@@ -471,7 +348,7 @@ class LogReader implements LogReaderInterface
             return null;
         }
 
-        [$text, $position] = $this->getLogText($index, $position);
+        $text = $this->getLogText($position);
 
         if (empty($text)) {
             return null;
@@ -483,14 +360,6 @@ class LogReader implements LogReaderInterface
     public function total(): int
     {
         return $this->index()->count();
-    }
-
-    /**
-     * Alias for total()
-     */
-    public function count(): int
-    {
-        return $this->total();
     }
 
     public function paginate(int $perPage = 25, int $page = null)
@@ -514,40 +383,6 @@ class LogReader implements LogReaderInterface
             $perPage,
             $page
         );
-    }
-
-    protected function makeLog(string $text, int $filePosition, int $index): BaseLog
-    {
-        return new $this->logClass($text, $this->file->identifier, $filePosition, $index);
-    }
-
-    /**
-     * @return array|null Returns an array, [$level, $text, $position]
-     *
-     * @throws \Exception
-     */
-    protected function getLogText(int $index, int $position, bool $fullText = false): ?array
-    {
-        if ($this->isClosed()) {
-            $this->open();
-        }
-
-        fseek($this->fileHandle, $position, SEEK_SET);
-
-        $currentLog = '';
-
-        while (($line = fgets($this->fileHandle)) !== false) {
-            if ($this->logClass::matches($line)) {
-                if ($currentLog !== '') {
-                    // found the next log, so let's stop the loop and return the log we found
-                    break;
-                }
-            }
-
-            $currentLog .= $line;
-        }
-
-        return [$currentLog, $position];
     }
 
     public function numberOfNewBytes(): int
@@ -584,8 +419,57 @@ class LogReader implements LogReaderInterface
         return 100 - intval(($this->numberOfNewBytes() / $this->file->size() * 100));
     }
 
+    protected function getLogAtIndex(int $index): ?BaseLog
+    {
+        $position = $this->index()->getPositionForIndex($index);
+
+        $text = $this->getLogText($position);
+
+        // If we did not find any logs, this means either the file is empty, or
+        // we have already reached the end of file. So we return early.
+        if ($text === '') {
+            return null;
+        }
+
+        return $this->makeLog($text, $position, $index);
+    }
+
+    protected function makeLog(string $text, int $filePosition, int $index): BaseLog
+    {
+        return new $this->logClass($text, $this->file->identifier, $filePosition, $index);
+    }
+
+    /**
+     * Returns the full log text found start at the given position.
+     *
+     * @throws CannotOpenFileException
+     */
+    protected function getLogText(int $position): ?string
+    {
+        $this->prepareFileForReading();
+
+        fseek($this->fileHandle, $position, SEEK_SET);
+
+        $currentLog = '';
+
+        while (($line = fgets($this->fileHandle)) !== false) {
+            if ($this->logClass::matches($line)) {
+                if ($currentLog !== '') {
+                    // found the next log, so let's stop the loop and return the log we found
+                    break;
+                }
+            } elseif ($currentLog === '') {
+                continue;
+            }
+
+            $currentLog .= $line;
+        }
+
+        return $currentLog;
+    }
+
     public function __destruct()
     {
-        $this->close();
+        $this->closeFile();
     }
 }

@@ -8,9 +8,7 @@ use Opcodes\LogViewer\Direction;
 trait CanIterateIndex
 {
     protected array $_cachedFlatIndex;
-
     protected ArrayIterator $_cachedFlatIndexIterator;
-
     protected string $direction = Direction::Forward;
 
     public function setDirection(string $direction): self

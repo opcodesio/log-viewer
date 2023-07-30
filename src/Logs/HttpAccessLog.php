@@ -9,13 +9,9 @@ use Opcodes\LogViewer\LogLevels\HttpStatusCodeLevel;
 class HttpAccessLog extends BaseLog
 {
     public static string $name = 'HTTP Access';
-
     public static string $levelClass = HttpStatusCodeLevel::class;
-
     public static string $regex = '/(?P<ip>\S+) (?P<identity>\S+) (?P<remote_user>\S+) \[(?P<datetime>.+)\] "(?P<method>\S+) (?P<path>\S+) (?P<http_version>\S+)" (?P<status_code>\S+) (?P<content_length>\S+) "(?P<referrer>[^"]*)" "(?P<user_agent>[^"]*)"/';
-
     public static string $regexLevelKey = 'status_code';
-
     public static array $columns = [
         ['label' => 'Datetime', 'data_path' => 'datetime'],
         ['label' => 'Status', 'data_path' => 'level'],

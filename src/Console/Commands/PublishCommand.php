@@ -10,7 +10,6 @@ use Spatie\Watcher\Watch;
 class PublishCommand extends Command
 {
     protected $signature = 'log-viewer:publish  {--watch}';
-
     protected $description = 'Publish Log Viewer assets';
 
     public function handle()

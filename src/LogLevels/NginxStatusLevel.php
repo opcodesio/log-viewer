@@ -5,19 +5,12 @@ namespace Opcodes\LogViewer\LogLevels;
 class NginxStatusLevel implements LevelInterface
 {
     const Debug = 'debug';
-
     const Info = 'info';
-
     const Notice = 'notice';
-
     const Warning = 'warn';
-
     const Error = 'error';
-
     const Critical = 'crit';
-
     const Alert = 'alert';
-
     const Emergency = 'emerg';
 
     public string $value;

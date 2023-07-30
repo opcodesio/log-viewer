@@ -9,9 +9,7 @@ use Opcodes\LogViewer\LogLevels\PostgresLevel;
 class PostgresLog extends BaseLog
 {
     public static string $name = 'Postgres';
-
     public static string $regex = '/^(?<datetime>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \w+) \[(?<pid>\d+)\] (?<level>\w+):\s*(?<message>.*)?$/m';
-
     public static string $levelClass = PostgresLevel::class;
 
     protected function fillMatches(array $matches = []): void

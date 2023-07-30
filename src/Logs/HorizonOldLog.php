@@ -7,11 +7,8 @@ use Opcodes\LogViewer\LogLevels\HorizonStatusLevel;
 class HorizonOldLog extends BaseLog
 {
     public static string $name = 'Laravel Horizon (Old)';
-
     public static string $regex = '/\[(?P<datetime>[^\]]+)\]\[(?P<uuid>\S+)\] (?P<level>\S+): +(?P<message>.*)/';
-
     public static string $levelClass = HorizonStatusLevel::class;
-
     public static array $columns = [
         ['label' => 'Datetime', 'data_path' => 'datetime'],
         ['label' => 'Status', 'data_path' => 'level'],

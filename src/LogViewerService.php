@@ -15,15 +15,10 @@ class LogViewerService
     const DEFAULT_MAX_LOG_SIZE_TO_DISPLAY = 131_072;    // 128 KB
 
     public static string $logFileClass = LogFile::class;
-
     public static string $logReaderClass = LogReader::class;
-
     protected ?Collection $_cachedFiles = null;
-
     protected mixed $authCallback;
-
     protected int $maxLogSizeToDisplay = self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
-
     protected mixed $hostsResolver;
 
     protected function getLaravelLogFilePaths(): array
@@ -222,7 +217,7 @@ class LogViewerService
 
     public function lazyScanTimeout(): float
     {
-        return 10.0;    // 10 seconds
+        return 5.0;    // 5 seconds
     }
 
     /**

@@ -7,11 +7,8 @@ use Opcodes\LogViewer\LogLevels\RedisLogLevel;
 class RedisLog extends BaseLog
 {
     public static string $name = 'Redis';
-
     public static string $regex = '/^(?<pid>\d+):(?<role_letter>\w) (?<datetime>.*) (?<level>[.\-*#]) (?<message>.*)/';
-
     public static string $levelClass = RedisLogLevel::class;
-
     public static array $columns = [
         ['label' => 'Datetime', 'data_path' => 'datetime'],
         ['label' => 'PID', 'data_path' => 'context.pid'],

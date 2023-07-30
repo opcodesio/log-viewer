@@ -11,11 +11,8 @@ use Opcodes\LogViewer\Utils\Utils;
 class LaravelLog extends BaseLog
 {
     public static string $name = 'Laravel';
-
     public static string $regex = '/\[(?P<datetime>[^\]]+)\] (?P<environment>\S+)\.(?P<level>\S+): (?P<message>.*)/';
-
     public int $fullTextLength;
-
     public static array $columns = [
         ['label' => 'Severity', 'data_path' => 'level'],
         ['label' => 'Datetime', 'data_path' => 'datetime'],

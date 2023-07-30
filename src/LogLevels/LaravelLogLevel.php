@@ -5,21 +5,13 @@ namespace Opcodes\LogViewer\LogLevels;
 class LaravelLogLevel implements LevelInterface
 {
     const Debug = 'DEBUG';
-
     const Info = 'INFO';
-
     const Notice = 'NOTICE';
-
     const Warning = 'WARNING';
-
     const Error = 'ERROR';
-
     const Critical = 'CRITICAL';
-
     const Alert = 'ALERT';
-
     const Emergency = 'EMERGENCY';
-
     const None = '';
 
     public string $value;

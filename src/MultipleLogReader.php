@@ -10,15 +10,10 @@ use Opcodes\LogViewer\Logs\BaseLog;
 class MultipleLogReader
 {
     protected LogFileCollection $fileCollection;
-
     protected ?int $limit = null;
-
     protected ?int $skip = null;
-
     protected ?string $query = null;
-
     protected string $direction;
-
     protected ?array $exceptLevels = null;
 
     public function __construct(mixed $files)

@@ -38,19 +38,12 @@ abstract class BaseLog
     protected ?string $text;
 
     public ?CarbonInterface $datetime;
-
     public ?string $level;
-
     public ?string $message;
-
     public array $context = [];
-
     public array $extra = [];
-
     public ?string $fileIdentifier;
-
     public ?int $filePosition;
-
     public ?int $index;
 
     public function __construct(string $text, string $fileIdentifier = null, int $filePosition = null, int $index = null)

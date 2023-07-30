@@ -7,15 +7,10 @@ use Carbon\CarbonInterface;
 trait CanFilterIndex
 {
     protected ?int $filterFrom = null;
-
     protected ?int $filterTo = null;
-
     protected ?array $filterLevels = null;
-
     protected ?array $exceptLevels = null;
-
     protected ?int $limit = null;
-
     protected ?int $skip = null;
 
     public function setQuery(string $query = null): self

@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Log;
 class GenerateDummyLogsCommand extends Command
 {
     protected $signature = 'log-viewer:generate-dummy-logs {amount} {--channel=single}';
-
     protected $description = 'Generate dummy log entries to preview in the Log Viewer';
-
     protected array $severities = [
         // 'notice',
         'info',

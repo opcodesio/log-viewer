@@ -8,11 +8,8 @@ use Opcodes\LogViewer\LogIndexChunk;
 trait CanSplitIndexIntoChunks
 {
     protected int $maxChunkSize;
-
     protected array $currentChunkDefinition;
-
     protected LogIndexChunk $currentChunk;
-
     protected array $chunkDefinitions = [];
 
     /**

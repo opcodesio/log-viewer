@@ -49,8 +49,6 @@ interface LogReaderInterface
 
     public function total(): int;
 
-    public function count(): int;
-
     // Functional
     public function reset(): static;
 
