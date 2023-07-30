@@ -28,9 +28,9 @@
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^6.0",
         "orchestra/testbench": "^7.6|^8.0",
-        "pestphp/pest": "^1.21",
+        "pestphp/pest": "^1.23",
         "pestphp/pest-plugin-laravel": "^1.1",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.6.7",
         "spatie/test-time": "^1.3"
     },
     "suggest": {

@@ -5,6 +5,7 @@ use Opcodes\LogViewer\Logs\HttpAccessLog;
 use Opcodes\LogViewer\Logs\LogType;
 use Opcodes\LogViewer\LogTypeRegistrar;
 use Opcodes\LogViewer\Tests\Unit\CustomLogs\CustomAccessLog;
+use Opcodes\LogViewer\Tests\Unit\CustomLogs\CustomHttpAccessLog;
 
 beforeEach(function () {
     $this->logRegistrar = app(LogTypeRegistrar::class);
@@ -62,8 +63,7 @@ it('prefers user-defined log types over default ones', function () {
         ->toBe(LogType::HTTP_ACCESS);
 
     // now, let's extend with a custom user-defined log type that can also process this same line
-    CustomAccessLog::setRegex(HttpAccessLog::$regex);
-    LogViewer::extend('http_access_custom', CustomAccessLog::class);
+    LogViewer::extend('http_access_custom', CustomHttpAccessLog::class);
 
     expect($this->logRegistrar->guessTypeFromFirstLine($defaultAccessLogLine))
         ->toBe('http_access_custom');

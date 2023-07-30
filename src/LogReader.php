@@ -51,8 +51,6 @@ class LogReader extends BaseLogReader implements LogReaderInterface
             $maxBytesToScan = LogViewer::lazyScanChunkSize();
         }
 
-        $this->prepareFileForReading();
-
         if (! $this->requiresScan() && ! $force) {
             return $this;
         }
@@ -67,6 +65,8 @@ class LogReader extends BaseLogReader implements LogReaderInterface
             // when forcing, make sure we start from scratch and reset everything.
             $this->index()->clearCache();
         }
+
+        $this->prepareFileForReading();
 
         $stopScanningAfter = microtime(true) + LogViewer::lazyScanTimeout();
         $this->mtimeBeforeScan = $this->file->mtime();

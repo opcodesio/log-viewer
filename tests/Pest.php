@@ -51,7 +51,7 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
     // we perform a regular PHP assertion, so it doesn't count towards the unit test assertion count.
     assert(file_exists($path));
 
-    return new LogFile($path, $type);
+    return new LogFile($path);
 }
 
 function dummyLogData(int $lines = null, string $type = LogType::LARAVEL): string
@@ -74,6 +74,7 @@ function dummyLogData(int $lines = null, string $type = LogType::LARAVEL): strin
 function clearGeneratedLogFiles(): void
 {
     File::cleanDirectory(storage_path('logs'));
+    clearstatcache();
 }
 
 function makeLaravelLogEntry(CarbonInterface $date = null, string $level = 'debug', string $message = 'Testing log entry'): string

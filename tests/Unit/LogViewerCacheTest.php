@@ -3,6 +3,10 @@
 use Illuminate\Cache\FileStore;
 use Illuminate\Cache\RedisStore;
 
+beforeEach(function () {
+    config(['log-viewer.cache_driver' => null]);
+});
+
 it('it defaults to the app\'s default cache driver', function ($cacheType, $cacheStoreClass) {
     config(['cache.default' => $cacheType]);
 
