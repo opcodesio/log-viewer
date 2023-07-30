@@ -6,7 +6,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Opcodes\LogViewer\LogLevels\HttpStatusCodeLevel;
 
-class HttpAccessLog extends BaseLog
+class HttpAccessLog extends Log
 {
     public static string $name = 'HTTP Access';
     public static string $levelClass = HttpStatusCodeLevel::class;

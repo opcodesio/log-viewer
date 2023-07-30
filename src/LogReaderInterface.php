@@ -3,7 +3,7 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Opcodes\LogViewer\Logs\BaseLog;
+use Opcodes\LogViewer\Logs\Log;
 
 interface LogReaderInterface
 {
@@ -42,9 +42,9 @@ interface LogReaderInterface
     // Retrieving actual logs
     public function get(int $limit = null): array;
 
-    public function next(): ?BaseLog;
+    public function next(): ?Log;
 
-    /** @return LengthAwarePaginator<BaseLog> */
+    /** @return LengthAwarePaginator<Log> */
     public function paginate(int $perPage = 25, int $page = null);
 
     public function total(): int;

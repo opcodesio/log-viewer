@@ -13,22 +13,22 @@ trait KeepsInstances
 
     public static function instance(LogFile $file): static
     {
-        if (! isset(self::$_instances[$file->path])) {
-            self::$_instances[$file->path] = new self($file);
+        if (! isset(static::$_instances[$file->path])) {
+            static::$_instances[$file->path] = new static($file);
         }
 
-        return self::$_instances[$file->path];
+        return static::$_instances[$file->path];
     }
 
     public static function clearInstance(LogFile $file): void
     {
-        if (isset(self::$_instances[$file->path])) {
-            unset(self::$_instances[$file->path]);
+        if (isset(static::$_instances[$file->path])) {
+            unset(static::$_instances[$file->path]);
         }
     }
 
     public static function clearInstances(): void
     {
-        self::$_instances = [];
+        static::$_instances = [];
     }
 }

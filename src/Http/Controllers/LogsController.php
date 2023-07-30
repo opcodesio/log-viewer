@@ -9,7 +9,7 @@ use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LevelCountResource;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
 use Opcodes\LogViewer\Http\Resources\LogResource;
-use Opcodes\LogViewer\Logs\BaseLog;
+use Opcodes\LogViewer\Logs\Log;
 
 class LogsController
 {
@@ -46,7 +46,7 @@ class LogsController
             }
 
             $logQuery = $fileCollection->logs();
-            $logClass = BaseLog::class;
+            $logClass = Log::class;
         }
 
         if (isset($logQuery)) {

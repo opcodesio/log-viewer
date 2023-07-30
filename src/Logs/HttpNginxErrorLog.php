@@ -6,7 +6,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Opcodes\LogViewer\LogLevels\NginxStatusLevel;
 
-class HttpNginxErrorLog extends BaseLog
+class HttpNginxErrorLog extends Log
 {
     public static string $name = 'HTTP Errors (Nginx)';
     public static string $regex = '/^(?P<datetime>[\d+\/ :]+) \[(?P<level>.+)\] .*?: (?P<errormessage>.+?)(?:, client: (?P<client>.+?))?(?:, server: (?P<server>.+?))?(?:, request: "?(?P<request>.+?)"?)?(?:, host: "?(?P<host>.+?)"?)?$/';

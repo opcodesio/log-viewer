@@ -6,7 +6,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 
-class HttpApacheErrorLog extends BaseLog
+class HttpApacheErrorLog extends Log
 {
     public static string $name = 'HTTP Errors (Apache)';
     public static string $regex = '/\[(?<datetime>.*?)\]\s\[(?:(?<module>.*?):)?(?<level>.*?)\]\s\[pid\s(?<pid>\d*)\](?:\s\[client\s(?<client>.*?)\])?\s(?<message>.*)/';

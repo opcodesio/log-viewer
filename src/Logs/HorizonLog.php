@@ -5,7 +5,7 @@ namespace Opcodes\LogViewer\Logs;
 use Opcodes\LogViewer\Exceptions\SkipLineException;
 use Opcodes\LogViewer\LogLevels\HorizonStatusLevel;
 
-class HorizonLog extends BaseLog
+class HorizonLog extends Log
 {
     public static string $name = 'Laravel Horizon';
     public static string $regex = '/\s*(?P<datetime>\d{4}-\d\d-\d\d \d\d:\d\d:\d\d) (?<message>\S+) \.* ?(?<duration>\d+\.?\d*\S+)? (?P<level>\S+)/';

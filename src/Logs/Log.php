@@ -7,16 +7,16 @@ use Illuminate\Support\Carbon;
 use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 use Opcodes\LogViewer\LogLevels\LevelInterface;
 
-abstract class BaseLog
+class Log
 {
     /** @var string The name of the log type, visible to humans in the UI. */
-    public static string $name = 'Base log';
+    public static string $name = 'Log';
 
     /** @var string The class which defines the severities found on these logs. Should implement the \Opcodes\LogViewer\LogLevels\LevelInterface interface */
     public static string $levelClass = LaravelLogLevel::class;
 
     /** @var string The regular expression used to extract various data points of the log */
-    public static string $regex = '/^(?P<datetime>[\d+\/ :]+) \[(?P<level>.+)\] (?P<message>.+)$/';
+    public static string $regex = '/^(?P<datetime>[\d\-+ :]+) \[(?P<level>.+)\] (?P<message>.+)$/';
 
     /** @var string The regular expression group key, which contains the datetime */
     public static string $regexDatetimeKey = 'datetime';
@@ -88,7 +88,7 @@ abstract class BaseLog
         $class = static::$levelClass ?? LaravelLogLevel::class;
 
         if (! is_subclass_of($class, LevelInterface::class)) {
-            throw new \Exception(sprintf('The class %s must implement the %s interface', $class, LevelInterface::class));
+            throw new \LogicException(sprintf('The class %s must implement the %s interface', $class, LevelInterface::class));
         }
 
         return $class;

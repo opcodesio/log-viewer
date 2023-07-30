@@ -8,7 +8,7 @@ use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 use Opcodes\LogViewer\Utils\Utils;
 
-class LaravelLog extends BaseLog
+class LaravelLog extends Log
 {
     public static string $name = 'Laravel';
     public static string $regex = '/\[(?P<datetime>[^\]]+)\] (?P<environment>\S+)\.(?P<level>\S+): (?P<message>.*)/';

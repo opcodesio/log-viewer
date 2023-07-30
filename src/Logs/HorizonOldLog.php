@@ -4,7 +4,7 @@ namespace Opcodes\LogViewer\Logs;
 
 use Opcodes\LogViewer\LogLevels\HorizonStatusLevel;
 
-class HorizonOldLog extends BaseLog
+class HorizonOldLog extends Log
 {
     public static string $name = 'Laravel Horizon (Old)';
     public static string $regex = '/\[(?P<datetime>[^\]]+)\]\[(?P<uuid>\S+)\] (?P<level>\S+): +(?P<message>.*)/';

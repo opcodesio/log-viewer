@@ -5,7 +5,7 @@ namespace Opcodes\LogViewer\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @mixin \Opcodes\LogViewer\Logs\BaseLog
+ * @mixin \Opcodes\LogViewer\Logs\Log
  */
 class LogResource extends JsonResource
 {

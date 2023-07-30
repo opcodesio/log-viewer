@@ -21,7 +21,7 @@ uses()->beforeEach(fn () => Artisan::call('log-viewer:publish'))->in('Feature');
 /**
  * Generate log files with random data
  */
-function generateLogFiles(array $files, string $content = null, bool $randomContent = false, $type = LogType::DEFAULT): array
+function generateLogFiles(array $files, string $content = null, bool $randomContent = false, $type = LogType::LARAVEL): array
 {
     return array_map(
         fn ($file) => generateLogFile($file, $content, $randomContent, $type),
@@ -29,7 +29,7 @@ function generateLogFiles(array $files, string $content = null, bool $randomCont
     );
 }
 
-function generateLogFile(string $fileName = null, string $content = null, bool $randomContent = false, $type = LogType::DEFAULT): LogFile
+function generateLogFile(string $fileName = null, string $content = null, bool $randomContent = false, $type = LogType::LARAVEL): LogFile
 {
     if (is_null($fileName)) {
         $fileName = \Illuminate\Support\Str::random().'.log';
@@ -54,7 +54,7 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
     return new LogFile($path, $type);
 }
 
-function dummyLogData(int $lines = null, string $type = LogType::DEFAULT): string
+function dummyLogData(int $lines = null, string $type = LogType::LARAVEL): string
 {
     if (is_null($lines)) {
         $lines = rand(1, 10);
@@ -62,7 +62,7 @@ function dummyLogData(int $lines = null, string $type = LogType::DEFAULT): strin
 
     return implode(PHP_EOL, array_map(
         fn ($_) => match ($type) {
-            LogType::LARAVEL, LogType::DEFAULT => makeLaravelLogEntry(),
+            LogType::LARAVEL => makeLaravelLogEntry(),
             LogType::HTTP_ACCESS => makeHttpAccessLogEntry(),
             LogType::HTTP_ERROR_APACHE => makeHttpApacheErrorLogEntry(),
             LogType::HTTP_ERROR_NGINX => makeHttpNginxErrorLogEntry(),

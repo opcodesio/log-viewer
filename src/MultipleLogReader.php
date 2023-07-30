@@ -5,7 +5,7 @@ namespace Opcodes\LogViewer;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Logs\BaseLog;
+use Opcodes\LogViewer\Logs\Log;
 
 class MultipleLogReader
 {
@@ -133,7 +133,7 @@ class MultipleLogReader
     /**
      * Get the logs from this file collection.
      *
-     * @return array|BaseLog[]
+     * @return array|Log[]
      */
     public function get(int $limit = null): array
     {

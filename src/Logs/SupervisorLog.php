@@ -6,7 +6,7 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Opcodes\LogViewer\LogLevels\SupervisorLogLevel;
 
-class SupervisorLog extends BaseLog
+class SupervisorLog extends Log
 {
     public static string $name = 'Supervisor';
     public static string $regex = '/^(?<datetime>[0-9\-\s:,]+) (?<level>\w+) (?<message>.*)/';

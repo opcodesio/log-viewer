@@ -118,10 +118,7 @@ class LogIndex
                 }
 
                 foreach ($tsIndex as $level => $levelIndex) {
-                    if (
-                        (isset($this->filterLevels) && ! in_array($level, $this->filterLevels))
-                        || (isset($this->exceptLevels) && in_array($level, $this->exceptLevels))
-                    ) {
+                    if (! $this->isLevelSelected($level)) {
                         continue;
                     }
 
@@ -200,10 +197,7 @@ class LogIndex
                 $itemsWithinThisTimestamp = [];
 
                 foreach ($tsIndex as $level => $levelIndex) {
-                    if (
-                        (isset($this->filterLevels) && ! in_array($level, $this->filterLevels))
-                        || (isset($this->exceptLevels) && in_array($level, $this->exceptLevels))
-                    ) {
+                    if (! $this->isLevelSelected($level)) {
                         continue;
                     }
 
@@ -276,10 +270,7 @@ class LogIndex
     {
         return array_reduce($this->getChunkDefinitions(), function ($sum, $chunkDefinition) {
             foreach ($chunkDefinition['level_counts'] as $level => $count) {
-                if (
-                    (! isset($this->filterLevels) || in_array($level, $this->filterLevels))
-                    && (! isset($this->exceptLevels) || ! in_array($level, $this->exceptLevels))
-                ) {
+                if ($this->isLevelSelected($level)) {
                     $sum += $count;
                 }
             }

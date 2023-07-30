@@ -3,13 +3,13 @@
 namespace Opcodes\LogViewer;
 
 use Opcodes\LogViewer\Exceptions\SkipLineException;
-use Opcodes\LogViewer\Logs\BaseLog;
 use Opcodes\LogViewer\Logs\HorizonLog;
 use Opcodes\LogViewer\Logs\HorizonOldLog;
 use Opcodes\LogViewer\Logs\HttpAccessLog;
 use Opcodes\LogViewer\Logs\HttpApacheErrorLog;
 use Opcodes\LogViewer\Logs\HttpNginxErrorLog;
 use Opcodes\LogViewer\Logs\LaravelLog;
+use Opcodes\LogViewer\Logs\Log;
 use Opcodes\LogViewer\Logs\LogType;
 use Opcodes\LogViewer\Logs\PhpFpmLog;
 use Opcodes\LogViewer\Logs\PostgresLog;
@@ -33,8 +33,8 @@ class LogTypeRegistrar
 
     public function register(string $type, string $class): void
     {
-        if (! is_subclass_of($class, BaseLog::class)) {
-            throw new \InvalidArgumentException("{$class} must extend ".BaseLog::class);
+        if (! is_subclass_of($class, Log::class)) {
+            throw new \InvalidArgumentException("{$class} must extend ".Log::class);
         }
 
         array_unshift($this->logTypes, [$type, $class]);

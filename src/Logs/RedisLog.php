@@ -4,7 +4,7 @@ namespace Opcodes\LogViewer\Logs;
 
 use Opcodes\LogViewer\LogLevels\RedisLogLevel;
 
-class RedisLog extends BaseLog
+class RedisLog extends Log
 {
     public static string $name = 'Redis';
     public static string $regex = '/^(?<pid>\d+):(?<role_letter>\w) (?<datetime>.*) (?<level>[.\-*#]) (?<message>.*)/';

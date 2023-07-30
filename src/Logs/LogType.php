@@ -6,7 +6,7 @@ use Opcodes\LogViewer\LogTypeRegistrar;
 
 class LogType
 {
-    const DEFAULT = 'laravel';
+    const DEFAULT = 'log';
     const LARAVEL = 'laravel';
     const HTTP_ACCESS = 'http_access';
     const HTTP_ERROR_APACHE = 'http_error_apache';

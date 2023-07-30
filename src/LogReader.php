@@ -4,35 +4,19 @@ namespace Opcodes\LogViewer;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Str;
 use Opcodes\LogViewer\Exceptions\CannotOpenFileException;
 use Opcodes\LogViewer\Exceptions\SkipLineException;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Logs\BaseLog;
-use Opcodes\LogViewer\Utils\Utils;
+use Opcodes\LogViewer\Logs\Log;
 
-class LogReader implements LogReaderInterface
+class LogReader extends BaseLogReader implements LogReaderInterface
 {
-    use Concerns\LogReader\KeepsInstances;
-    use Concerns\LogReader\KeepsFileHandle;
+    use Concerns\LogReader\CanFilterUsingIndex;
+    use Concerns\LogReader\CanSetDirectionUsingIndex;
 
-    protected LogFile $file;
     protected LogIndex $logIndex;
-    protected string $logClass;
-    protected string $levelClass;
-    protected ?int $limit = null;
-    protected ?string $query = null;
-    protected ?int $onlyShowIndex = null;
     protected bool $lazyScanning = false;
     protected int $mtimeBeforeScan;
-    protected string $direction = Direction::Forward;
-
-    public function __construct(LogFile $file)
-    {
-        $this->file = $file;
-        $this->logClass = $this->file->type()->logClass() ?? BaseLog::class;
-        $this->levelClass = $this->logClass::levelClass();
-    }
 
     protected function onFileOpened(): void
     {
@@ -46,121 +30,6 @@ class LogReader implements LogReaderInterface
     protected function index(): LogIndex
     {
         return $this->file->index($this->query);
-    }
-
-    /**
-     * Load only the provided log levels
-     *
-     * @alias setLevels
-     *
-     * @param  string|array|null  $levels
-     */
-    public function only($levels = null): static
-    {
-        return $this->setLevels($levels);
-    }
-
-    /**
-     * Load only the provided log levels
-     *
-     * @param  string|array|null  $levels
-     */
-    public function setLevels($levels = null): static
-    {
-        $this->index()->forLevels($levels);
-
-        return $this;
-    }
-
-    public function allLevels(): static
-    {
-        return $this->setLevels(null);
-    }
-
-    /**
-     * Load all log levels except the provided ones.
-     *
-     * @alias exceptLevels
-     *
-     * @param  string|array|null  $levels
-     */
-    public function except($levels = null): static
-    {
-        return $this->exceptLevels($levels);
-    }
-
-    /**
-     * Load all log levels except the provided ones.
-     *
-     * @param  string|array|null  $levels
-     */
-    public function exceptLevels($levels = null): static
-    {
-        $this->index()->exceptLevels($levels);
-
-        return $this;
-    }
-
-    public function reverse(): static
-    {
-        return $this->setDirection(Direction::Backward);
-    }
-
-    public function forward(): static
-    {
-        return $this->setDirection(Direction::Forward);
-    }
-
-    public function setDirection(string $direction = null): static
-    {
-        $this->direction = $direction === Direction::Backward
-            ? Direction::Backward
-            : Direction::Forward;
-        $this->index()->setDirection($this->direction);
-
-        return $this->reset();
-    }
-
-    public function skip(int $number): static
-    {
-        $this->index()->skip($number);
-
-        return $this;
-    }
-
-    public function limit(int $number): static
-    {
-        $this->index()->limit($number);
-
-        return $this;
-    }
-
-    public function search(string $query = null): static
-    {
-        return $this->setQuery($query);
-    }
-
-    protected function setQuery(string $query = null): static
-    {
-        $this->closeFile();
-
-        if (! empty($query) && Str::startsWith($query, 'log-index:')) {
-            $this->query = null;
-            $this->only(null);
-            $this->onlyShowIndex = intval(explode(':', $query)[1]);
-        } elseif (! empty($query)) {
-            $query = '~'.$query.'~i';
-
-            Utils::validateRegex($query);
-
-            $this->query = $query;
-        } else {
-            $this->query = null;
-        }
-
-        $this->index()->setQuery($this->query);
-
-        return $this;
     }
 
     public function lazyScanning($lazy = true): static
@@ -300,29 +169,25 @@ class LogReader implements LogReaderInterface
     public function getLevelCounts(): array
     {
         $this->prepareFileForReading();
-
-        $selectedLevels = $this->index()->getSelectedLevels();
-        $exceptedLevels = $this->index()->getExceptedLevels();
         $levelClass = $this->logClass::levelClass();
 
-        return $this->index()->getLevelCounts()->map(function (int $count, string $level) use ($selectedLevels, $exceptedLevels) {
+        return $this->index()->getLevelCounts()->map(function (int $count, string $level) {
             return new LevelCount(
                 $this->levelClass::from($level),
                 $count,
-                (is_null($selectedLevels) || in_array($level, $selectedLevels))
-                && (is_null($exceptedLevels) || ! in_array($level, $exceptedLevels))
+                $this->index()->isLevelSelected($level),
             );
         })->sortBy(fn (LevelCount $levelCount) => $levelCount->level->getName(), SORT_NATURAL)->toArray();
     }
 
     /**
-     * @return array|BaseLog[]
+     * @return array|Log[]
      *
      * @throws CannotOpenFileException
      */
     public function get(int $limit = null): array
     {
-        if (! is_null($limit)) {
+        if (! is_null($limit) && method_exists($this, 'limit')) {
             $this->limit($limit);
         }
 
@@ -338,7 +203,7 @@ class LogReader implements LogReaderInterface
     /**
      * @throws CannotOpenFileException
      */
-    public function next(): ?BaseLog
+    public function next(): ?Log
     {
         $this->prepareFileForReading();
 
@@ -419,7 +284,7 @@ class LogReader implements LogReaderInterface
         return 100 - intval(($this->numberOfNewBytes() / $this->file->size() * 100));
     }
 
-    protected function getLogAtIndex(int $index): ?BaseLog
+    protected function getLogAtIndex(int $index): ?Log
     {
         $position = $this->index()->getPositionForIndex($index);
 
@@ -432,11 +297,6 @@ class LogReader implements LogReaderInterface
         }
 
         return $this->makeLog($text, $position, $index);
-    }
-
-    protected function makeLog(string $text, int $filePosition, int $index): BaseLog
-    {
-        return new $this->logClass($text, $this->file->identifier, $filePosition, $index);
     }
 
     /**
@@ -466,10 +326,5 @@ class LogReader implements LogReaderInterface
         }
 
         return $currentLog;
-    }
-
-    public function __destruct()
-    {
-        $this->closeFile();
     }
 }
