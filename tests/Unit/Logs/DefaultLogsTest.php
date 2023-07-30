@@ -1,6 +1,5 @@
 <?php
 
-use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\Logs\LogType;
 
 it('can process unknown logs', function () {
