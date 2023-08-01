@@ -5,6 +5,6 @@ test('dumps', function () {
         $this->markTestSkipped('This test is only for Pest 2.0.0+');
     }
 
-    expect(['dump', 'dd'])
-        ->toOnlyBeUsedIn('Opcodes\LogViewer\Utils\Benchmark');
+    expect('dd')->not->toBeUsed()
+        ->and('dump')->toOnlyBeUsedIn('Opcodes\LogViewer\Utils\Benchmark');
 });
