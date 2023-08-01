@@ -1,15 +1,18 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Readers;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Opcodes\LogViewer\Concerns;
 use Opcodes\LogViewer\Exceptions\CannotOpenFileException;
 use Opcodes\LogViewer\Exceptions\SkipLineException;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LevelCount;
+use Opcodes\LogViewer\LogIndex;
 use Opcodes\LogViewer\Logs\Log;
 
-class LogReader extends BaseLogReader implements LogReaderInterface
+class IndexedLogReader extends BaseLogReader implements LogReaderInterface
 {
     use Concerns\LogReader\CanFilterUsingIndex;
     use Concerns\LogReader\CanSetDirectionUsingIndex;
@@ -213,7 +216,7 @@ class LogReader extends BaseLogReader implements LogReaderInterface
             return null;
         }
 
-        $text = $this->getLogText($position);
+        $text = $this->getLogTextAtPosition($position);
 
         if (empty($text)) {
             return null;
@@ -288,7 +291,7 @@ class LogReader extends BaseLogReader implements LogReaderInterface
     {
         $position = $this->index()->getPositionForIndex($index);
 
-        $text = $this->getLogText($position);
+        $text = $this->getLogTextAtPosition($position);
 
         // If we did not find any logs, this means either the file is empty, or
         // we have already reached the end of file. So we return early.
@@ -304,7 +307,7 @@ class LogReader extends BaseLogReader implements LogReaderInterface
      *
      * @throws CannotOpenFileException
      */
-    protected function getLogText(int $position): ?string
+    protected function getLogTextAtPosition(int $position): ?string
     {
         $this->prepareFileForReading();
 

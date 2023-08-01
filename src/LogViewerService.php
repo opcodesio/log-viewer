@@ -8,6 +8,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use Opcodes\LogViewer\Readers\IndexedLogReader;
+use Opcodes\LogViewer\Readers\LogReaderInterface;
 use Opcodes\LogViewer\Utils\Utils;
 
 class LogViewerService
@@ -15,11 +17,12 @@ class LogViewerService
     const DEFAULT_MAX_LOG_SIZE_TO_DISPLAY = 131_072;    // 128 KB
 
     public static string $logFileClass = LogFile::class;
-    public static string $logReaderClass = LogReader::class;
+    public static string $logReaderClass = IndexedLogReader::class;
     protected ?Collection $_cachedFiles = null;
     protected mixed $authCallback;
     protected int $maxLogSizeToDisplay = self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
     protected mixed $hostsResolver;
+    protected string $layout = 'log-viewer::index';
 
     protected function getLaravelLogFilePaths(): array
     {
@@ -263,6 +266,16 @@ class LogViewerService
     public function logReaderClass(): string
     {
         return static::$logReaderClass;
+    }
+
+    public function setViewLayout(string $layout): void
+    {
+        $this->layout = $layout;
+    }
+
+    public function getViewLayout(): string
+    {
+        return $this->layout;
     }
 
     /**

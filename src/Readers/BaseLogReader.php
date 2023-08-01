@@ -1,7 +1,9 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Readers;
 
+use Opcodes\LogViewer\Concerns;
+use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogLevels\LevelInterface;
 use Opcodes\LogViewer\Logs\Log;
 

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\File;
-use Opcodes\LogViewer\LogReader;
+use Opcodes\LogViewer\Readers\IndexedLogReader;
 
 beforeEach(function () {
     $this->file = generateLogFile();
@@ -29,7 +29,7 @@ it('can re-scan the file after a new entry has been added', function () {
     File::append($this->file->path, PHP_EOL.makeLaravelLogEntry());
 
     // re-instantiate the log reader to make sure we don't have anything cached
-    LogReader::clearInstance($this->file);
+    IndexedLogReader::clearInstance($this->file);
     $logReader = $this->file->logs();
     expect($logReader->requiresScan())->toBeTrue();
 

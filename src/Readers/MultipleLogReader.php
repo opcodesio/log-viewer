@@ -1,10 +1,14 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Readers;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Opcodes\LogViewer\Direction;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LevelCount;
+use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\LogFileCollection;
 use Opcodes\LogViewer\Logs\Log;
 
 class MultipleLogReader

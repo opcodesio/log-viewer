@@ -3,6 +3,7 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Collection;
+use Opcodes\LogViewer\Readers\MultipleLogReader;
 
 /**
  * @var LogFile[] $items

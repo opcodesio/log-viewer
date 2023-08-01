@@ -1,8 +1,9 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Readers;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\Logs\Log;
 
 interface LogReaderInterface
