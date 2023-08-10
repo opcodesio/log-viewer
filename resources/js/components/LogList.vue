@@ -109,7 +109,7 @@
                     <template v-if="log.contexts && log.contexts.length > 0">
                       <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400">Context:</p>
                       <template v-for="context in log.contexts">
-                        <pre class="log-stack" v-html="JSON.stringify(context, null, 2)"></pre>
+                        <pre class="log-stack" v-html="prepareContextForOutput(context)"></pre>
                       </template>
                     </template>
                     <div v-if="log.full_text_incomplete" class="py-4 px-8 text-gray-500 italic">
@@ -214,6 +214,16 @@ const showLevelsDropdown = computed(() => {
 const displayLogs = computed(() => {
   return logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery);
 });
+
+const prepareContextForOutput = (context) => {
+  return JSON.stringify(context, function (key, value) {
+    if (typeof value === 'string') {
+      return value.replaceAll('\n', '<br/>');
+    }
+
+    return value;
+  }, 2);
+}
 
 const clearSelectedFile = () => {
   replaceQuery(router, 'file', null);
