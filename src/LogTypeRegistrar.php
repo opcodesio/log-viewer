@@ -64,7 +64,7 @@ class LogTypeRegistrar
                     return $type;
                 }
             } catch (SkipLineException $exception) {
-                // let's try the next 10 lines
+                // let's try the next 5 lines
                 if (isset($file)) {
                     foreach (range(1, 5) as $lineNumber) {
                         try {
