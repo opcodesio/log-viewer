@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 class LogFolder
 {
     public string $identifier;
-
     protected mixed $files;
 
     public function __construct(

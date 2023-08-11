@@ -1,71 +1,55 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Logs;
 
-use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 use Opcodes\LogViewer\Utils\Utils;
 
-class Log
+class LaravelLog extends Log
 {
-    public int $index;
-
-    public CarbonInterface $time;
-
-    public Level $level;
-
-    public string $environment;
-
-    public string $text;
-
-    public string $fullText;
-
-    public array $contexts = [];
-
-    public bool $fullTextIncomplete = false;
-
+    public static string $name = 'Laravel';
+    public static string $regex = '/\[(?P<datetime>[^\]]+)\] (?P<environment>\S+)\.(?P<level>\S+): (?P<message>.*)/';
     public int $fullTextLength;
+    public static array $columns = [
+        ['label' => 'Severity', 'data_path' => 'level'],
+        ['label' => 'Datetime', 'data_path' => 'datetime'],
+        ['label' => 'Env', 'data_path' => 'extra.environment'],
+        ['label' => 'Message', 'data_path' => 'message'],
+    ];
 
-    public string $fileIdentifier;
+    protected function parseText(array &$matches = []): void
+    {
+        $this->text = mb_convert_encoding(rtrim($this->text, "\t\n\r"), 'UTF-8', 'UTF-8');
+        $length = strlen($this->text);
 
-    public int $filePosition;
+        $this->extra['log_size'] = $length;
+        $this->extra['log_size_formatted'] = Utils::bytesForHumans($length);
 
-    public function __construct(
-        int $index,
-        string $text,
-        string $fileIdentifier,
-        int $filePosition,
-    ) {
-        $this->index = $index;
-        $this->fileIdentifier = $fileIdentifier;
-        $this->filePosition = $filePosition;
-        $text = mb_convert_encoding(rtrim($text, "\t\n\r"), 'UTF-8', 'UTF-8');
-        $this->fullTextLength = strlen($text);
-
-        $matches = [];
-        [$firstLine, $theRestOfIt] = explode("\n", Str::finish($text, "\n"), 2);
+        [$firstLine, $theRestOfIt] = explode("\n", Str::finish($this->text, "\n"), 2);
 
         // sometimes, even the first line will have a HUGE exception with tons of debug data all in one line,
         // so in order to properly match, we must have a smaller first line...
         $firstLineSplit = str_split($firstLine, 1000);
-        preg_match(LogViewer::laravelRegexPattern(), array_shift($firstLineSplit), $matches);
 
-        $this->time = Carbon::parse($matches[1])->tz(
+        preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches);
+
+        $this->datetime = Carbon::parse($matches[1])->tz(
             config('log-viewer.timezone', config('app.timezone', 'UTC'))
         );
 
         // $matches[2] contains microseconds, which is already handled
         // $matches[3] contains timezone offset, which is already handled
 
-        $this->environment = $matches[5] ?? '';
+        $this->extra['environment'] = $matches[5] ?? null;
 
         // There might be something in the middle between the timestamp
         // and the environment/level. Let's put that at the beginning of the first line.
-        $middle = trim(rtrim($matches[4] ?? '', $this->environment.'.'));
+        $middle = trim(rtrim($matches[4] ?? '', $this->extra['environment'].'.'));
 
-        $this->level = Level::from(strtolower($matches[6] ?? ''));
+        $this->level = strtoupper($matches[6] ?? '');
 
         $firstLineText = $matches[7];
 
@@ -73,7 +57,7 @@ class Log
             $firstLineText = $middle.' '.$firstLineText;
         }
 
-        $this->text = trim($firstLineText);
+        $this->message = trim($firstLineText);
         $text = $firstLineText.($matches[8] ?? '').implode('', $firstLineSplit)."\n".$theRestOfIt;
 
         if (session()->get('log-viewer:shorter-stack-traces', false)) {
@@ -101,45 +85,34 @@ class Log
 
         if (strlen($text) > LogViewer::maxLogSize()) {
             $text = Str::limit($text, LogViewer::maxLogSize());
-            $this->fullTextIncomplete = true;
+            $this->extra['log_text_incomplete'] = true;
         }
 
-        $this->fullText = trim($text);
+        $this->text = trim($text);
 
         $this->extractContextsFromFullText();
     }
 
-    public function fullTextMatches(string $query = null): bool
+    protected function fillMatches(array $matches = []): void
     {
-        if (empty($query)) {
-            return true;
-        }
-
-        if (! Str::endsWith($query, '/i')) {
-            $query = '/'.$query.'/i';
-        }
-
-        return (bool) preg_match($query, $this->fullText);
+        //
     }
 
-    public function fullTextLengthFormatted(): string
+    protected static function regexPattern(): string
     {
-        return Utils::bytesForHumans($this->fullTextLength);
-    }
-
-    public function url(): string
-    {
-        return route('log-viewer.index', ['file' => $this->fileIdentifier, 'query' => 'log-index:'.$this->index]);
+        return '/^\[(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}\.?(\d{6}([\+-]\d\d:\d\d)?)?)\](.*?(\w+)\.|.*?)('
+            .implode('|', array_filter(LaravelLogLevel::caseValues()))
+            .')?: ?(.*?)( in [\/].*?:[0-9]+)?$/is';
     }
 
     public function extractContextsFromFullText(): void
     {
         // The regex pattern to find JSON strings.
-        // $pattern = '~\{(?:[^{}]|(?R))*\}~';
         $pattern = '/(\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\])/';
+        $contexts = [];
 
         // Find matches.
-        preg_match_all($pattern, $this->fullText, $matches);
+        preg_match_all($pattern, $this->text, $matches);
 
         if (! isset($matches[0])) {
             return;
@@ -156,12 +129,18 @@ class Log
             }
 
             if (json_last_error() == JSON_ERROR_NONE) {
-                $this->contexts[] = $json_data;
+                $contexts[] = $json_data;
 
                 if (config('log-viewer.strip_extracted_context', false)) {
-                    $this->fullText = str_replace($json_string, '', $this->fullText);
+                    $this->text = rtrim(str_replace($json_string, '', $this->text));
                 }
             }
+        }
+
+        if (count($contexts) > 1) {
+            $this->context = $contexts;
+        } elseif (count($contexts) === 1) {
+            $this->context = $contexts[0];
         }
     }
 }

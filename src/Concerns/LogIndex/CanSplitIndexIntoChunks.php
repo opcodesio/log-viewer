@@ -8,11 +8,8 @@ use Opcodes\LogViewer\LogIndexChunk;
 trait CanSplitIndexIntoChunks
 {
     protected int $maxChunkSize;
-
     protected array $currentChunkDefinition;
-
     protected LogIndexChunk $currentChunk;
-
     protected array $chunkDefinitions = [];
 
     /**
@@ -92,7 +89,7 @@ trait CanSplitIndexIntoChunks
         $relevantItemsInChunk = 0;
 
         foreach ($chunkDefinition['level_counts'] as $level => $count) {
-            if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
+            if ($this->isLevelSelected($level)) {
                 $relevantItemsInChunk += $count;
             }
         }

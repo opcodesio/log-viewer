@@ -9,7 +9,7 @@ class IndexController
 {
     public function __invoke()
     {
-        return view('log-viewer::index', [
+        return view(LogViewer::getViewLayout(), [
             'logViewerScriptVariables' => [
                 'headers' => (object) [],
                 'assets_outdated' => ! LogViewer::assetsAreCurrent(),

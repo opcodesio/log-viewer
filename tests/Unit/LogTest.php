@@ -1,20 +1,20 @@
 <?php
 
-use Opcodes\LogViewer\Level;
-use Opcodes\LogViewer\Log;
+use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
+use Opcodes\LogViewer\Logs\LaravelLog;
 use function PHPUnit\Framework\assertEquals;
 
 it('can understand the default Laravel log format', function () {
     $text = '[2022-08-25 11:16:17] local.DEBUG: Example log entry for the level debug';
 
-    $log = new Log($index = 10, $text, $fileIdentifier = 'laravel.log', $filePosition = 5200);
+    $log = new LaravelLog($text, $fileIdentifier = 'laravel.log', $filePosition = 5200, $index = 10);
 
     assertEquals($index, $log->index);
-    assertEquals(Level::Debug, $log->level->value);
-    assertEquals('local', $log->environment);
-    assertEquals('2022-08-25 11:16:17', $log->time->toDateTimeString());
-    assertEquals('Example log entry for the level debug', $log->text);
-    assertEquals('Example log entry for the level debug', $log->fullText);
+    assertEquals(LaravelLogLevel::Debug, $log->level);
+    assertEquals('local', $log->extra['environment']);
+    assertEquals('2022-08-25 11:16:17', $log->datetime->toDateTimeString());
+    assertEquals('Example log entry for the level debug', $log->message);
+    assertEquals('Example log entry for the level debug', $log->getOriginalText());
     assertEquals($fileIdentifier, $log->fileIdentifier);
     assertEquals($filePosition, $log->filePosition);
 });
@@ -27,10 +27,10 @@ can contain dumped objects or JSON as well - it's all part of the contents.
 EOF;
     $text = '[2022-08-25 11:16:17] local.DEBUG: '.$logText;
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
-    assertEquals('Example log entry for the level debug', $log->text);
-    assertEquals($logText, $log->fullText);
+    assertEquals('Example log entry for the level debug', $log->message);
+    assertEquals($logText, $log->getOriginalText());
 });
 
 it('extracts JSON from the log text', function () {
@@ -44,11 +44,11 @@ EOF;
     $jsonString = '{"one":1,"two":"two","three":[1,2,3]}';
     $text = '[2022-08-25 11:16:17] local.DEBUG: '.$logText;
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
-    assertEquals('Example log entry for the level debug', $log->text);
-    assertEquals(str_replace($jsonString, '', $logText), $log->fullText);
-    assertEquals(json_decode($jsonString, true), $log->contexts[0]);
+    assertEquals('Example log entry for the level debug', $log->message);
+    assertEquals(rtrim(str_replace($jsonString, '', $logText)), $log->getOriginalText());
+    assertEquals(json_decode($jsonString, true), $log->context);
 });
 
 it('extracts JSON, but does not remove from the log text if the config is set to false', function () {
@@ -61,11 +61,11 @@ can contain dumped objects or JSON as well - it's all part of the contents.
 EOF;
     $text = '[2022-08-25 11:16:17] local.DEBUG: '.$logText;
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log');
 
-    assertEquals('Example log entry for the level debug', $log->text);
-    assertEquals($logText, $log->fullText);
-    assertEquals(json_decode('{"one":1,"two":"two","three":[1,2,3]}', true), $log->contexts[0]);
+    assertEquals('Example log entry for the level debug', $log->message);
+    assertEquals($logText, $log->getOriginalText());
+    assertEquals(json_decode('{"one":1,"two":"two","three":[1,2,3]}', true), $log->context);
 });
 
 it('extracts JSON from a complex log', function () {
@@ -82,92 +82,90 @@ EOF;
     $jsonString = '{"permalink":"arunas","session":{"_token":"BpqyiNyinnLamzer4jqzrh9NTyC6emFR41FitMpv","_previous":{"url":"https://system.test/book/arunas/center"},"_flash":{"old":[],"new":[]},"latest_permalink":"arunas"},"ip":"127.0.0.1","user_agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/19G82 [FBAN/FBIOS;FBDV/iPhone9,3;FBMD/iPhone;FBSN/iOS;FBSV/15.6.1;FBSS/2;FBID/phone;FBLC/da_DK;FBOP/5]"}';
     $text = '[2022-08-25 11:16:17] local.DEBUG: '.$logText;
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log');
 
-    assertEquals('arunas', $log->contexts[0]['permalink'] ?? null);
-    assertEquals('Initiating facebook login.', $log->text);
-    assertEquals(str_replace($jsonString, '', $logText), $log->fullText);
-    assertEquals(json_decode($jsonString, true), $log->contexts[0]);
+    assertEquals('arunas', $log->context['permalink'] ?? null);
+    assertEquals('Initiating facebook login.', $log->message);
+    assertEquals(rtrim(str_replace($jsonString, '', $logText)), $log->getOriginalText());
+    assertEquals(json_decode($jsonString, true), $log->context);
 });
 
 it('can understand the optional microseconds in the timestamp', function () {
     $text = '[2022-08-25 11:16:17.125000] local.DEBUG: Example log entry for the level debug';
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
-    assertEquals(125000, $log->time->micro);
+    assertEquals(125000, $log->datetime->micro);
 });
 
 it('can understand the optional time offset in the timestamp', function () {
     $text = '[2022-08-25 11:16:17.125000+02:00] local.DEBUG: Example log entry for the level debug';
     $expectedTimestamp = 1661418977;
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
-    assertEquals($expectedTimestamp, $log->time->timestamp);
+    assertEquals($expectedTimestamp, $log->datetime->timestamp);
 
     // Meanwhile, if we switch the time offset an hour forward,
     // we can expect the timestamp to be reduced by 3600 seconds.
     $text = '[2022-08-25 11:16:17.125000+03:00] local.DEBUG: Example log entry for the level debug';
     $newExpectedTimestamp = $expectedTimestamp - 3600;
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
-    assertEquals($newExpectedTimestamp, $log->time->timestamp);
+    assertEquals($newExpectedTimestamp, $log->datetime->timestamp);
 });
 
 it('can handle text in-between timestamp and environment/severity', function () {
     $text = '[2022-08-25 11:16:17] some additional text [!@#$%^&] and characters // !@#$ local.DEBUG: Example log entry for the level debug';
     $expectedAdditionalText = 'some additional text [!@#$%^&] and characters // !@#$';
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
-    assertEquals($expectedAdditionalText.' Example log entry for the level debug', $log->text);
-    assertEquals($expectedAdditionalText.' Example log entry for the level debug', $log->fullText);
+    assertEquals($expectedAdditionalText.' Example log entry for the level debug', $log->message);
+    assertEquals($expectedAdditionalText.' Example log entry for the level debug', $log->getOriginalText());
     // got to make sure the rest of the data is still processed correctly!
-    assertEquals('local', $log->environment);
-    assertEquals(Level::Debug, $log->level->value);
+    assertEquals('local', $log->extra['environment']);
+    assertEquals(LaravelLogLevel::Debug, $log->level);
 });
 
 it('finds the correct log level', function ($levelProvided, $levelExpected) {
     $text = "[2022-08-25 11:16:17] local.$levelProvided: Example log entry for the level debug";
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
-    assertEquals($levelExpected, $log->level->value);
+    assertEquals($levelExpected, $log->level);
 })->with([
-    ['INFO', Level::Info],
-    ['DEBUG', Level::Debug],
-    ['ERROR', Level::Error],
-    ['WARNING', Level::Warning],
-    ['CRITICAL', Level::Critical],
-    ['ALERT', Level::Alert],
-    ['EMERGENCY', Level::Emergency],
-    ['PROCESSING', Level::Processing],
-    ['PROCESSED', Level::Processed],
-    ['info', Level::Info],
-    ['iNfO', Level::Info],
-    ['', Level::None],
+    ['INFO', LaravelLogLevel::Info],
+    ['DEBUG', LaravelLogLevel::Debug],
+    ['ERROR', LaravelLogLevel::Error],
+    ['WARNING', LaravelLogLevel::Warning],
+    ['CRITICAL', LaravelLogLevel::Critical],
+    ['ALERT', LaravelLogLevel::Alert],
+    ['EMERGENCY', LaravelLogLevel::Emergency],
+    ['info', LaravelLogLevel::Info],
+    ['iNfO', LaravelLogLevel::Info],
+    ['', LaravelLogLevel::None],
 ]);
 
 it('handles missing message', function () {
     $text = '[2022-11-07 17:51:33] production.ERROR: ';
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
-    assertEquals('2022-11-07 17:51:33', $log->time?->toDateTimeString());
-    assertEquals(Level::Error, $log->level->value);
-    assertEquals('production', $log->environment);
-    assertEquals('', $log->fullText);
+    assertEquals('2022-11-07 17:51:33', $log->datetime?->toDateTimeString());
+    assertEquals(LaravelLogLevel::Error, $log->level);
+    assertEquals('production', $log->extra['environment']);
+    assertEquals('', $log->getOriginalText());
 });
 
 it('can set a custom timezone of the log entry', function () {
     $text = '[2022-11-07 17:51:33] production.ERROR: test message';
     config(['log-viewer.timezone' => $tz = 'Europe/Vilnius']);
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
 
-    assertEquals($tz, $log->time->timezoneName);
+    assertEquals($tz, $log->datetime->timezoneName);
     $expectedTime = \Carbon\Carbon::parse('2022-11-07 17:51:33', 'UTC')->tz($tz)->toDateTimeString();
-    assertEquals($expectedTime, $log->time->toDateTimeString());
+    assertEquals($expectedTime, $log->datetime->toDateTimeString());
 });

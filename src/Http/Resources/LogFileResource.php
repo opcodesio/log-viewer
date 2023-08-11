@@ -19,6 +19,10 @@ class LogFileResource extends JsonResource
     public function toArray($request)
     {
         return [
+            'type' => [
+                'value' => $this->type()->value,
+                'name' => $this->type()->name(),
+            ],
             'identifier' => $this->identifier,
             'sub_folder' => $this->subFolder,
             'sub_folder_identifier' => $this->subFolderIdentifier(),

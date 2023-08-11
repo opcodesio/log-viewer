@@ -1,5 +1,8 @@
 <?php
 
+/** @noinspection PhpUndefinedNamespaceInspection */
+/** @noinspection PhpUndefinedClassInspection */
+
 namespace Opcodes\LogViewer;
 
 use Illuminate\Contracts\Http\Kernel;
@@ -33,6 +36,12 @@ class LogViewerServiceProvider extends ServiceProvider
         $this->app->bind('log-viewer-cache', function () {
             return Cache::driver(config('log-viewer.cache_driver'));
         });
+
+        if (! $this->app->bound(LogTypeRegistrar::class)) {
+            $this->app->singleton(LogTypeRegistrar::class, function () {
+                return new LogTypeRegistrar();
+            });
+        }
     }
 
     public function boot()
@@ -140,7 +149,8 @@ class LogViewerServiceProvider extends ServiceProvider
     protected function resetStateAfterOctaneRequest()
     {
         $this->app['events']->listen(RequestTerminated::class, function ($event) {
-            LogReader::clearInstances();
+            $logReaderClass = LogViewer::logReaderClass();
+            $logReaderClass::clearInstances();
         });
     }
 

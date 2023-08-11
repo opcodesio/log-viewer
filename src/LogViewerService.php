@@ -8,21 +8,23 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
+use Opcodes\LogViewer\Readers\IndexedLogReader;
+use Opcodes\LogViewer\Readers\LogReaderInterface;
 use Opcodes\LogViewer\Utils\Utils;
 
 class LogViewerService
 {
     const DEFAULT_MAX_LOG_SIZE_TO_DISPLAY = 131_072;    // 128 KB
 
+    public static string $logFileClass = LogFile::class;
+    public static string $logReaderClass = IndexedLogReader::class;
     protected ?Collection $_cachedFiles = null;
-
     protected mixed $authCallback;
-
     protected int $maxLogSizeToDisplay = self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
-
     protected mixed $hostsResolver;
+    protected string $layout = 'log-viewer::index';
 
-    protected function getFilePaths(): array
+    protected function getLaravelLogFilePaths(): array
     {
         // Because we'll use the base path as a parameter for `glob`, we should escape any
         // glob's special characters and treat those as actual characters of the path.
@@ -93,9 +95,11 @@ class LogViewerService
     public function getFiles(): LogFileCollection
     {
         if (! isset($this->_cachedFiles)) {
-            $this->_cachedFiles = (new LogFileCollection($this->getFilePaths()))
+            $fileClass = static::$logFileClass;
+
+            $this->_cachedFiles = (new LogFileCollection($this->getLaravelLogFilePaths()))
                 ->unique()
-                ->map(fn ($filePath) => new LogFile($filePath))
+                ->map(fn ($filePath) => new $fileClass($filePath))
                 ->values();
         }
 
@@ -214,6 +218,11 @@ class LogViewerService
         return intval(config('log-viewer.lazy_scan_chunk_size_in_mb', 100)) * 1024 * 1024;
     }
 
+    public function lazyScanTimeout(): float
+    {
+        return 5.0;    // 5 seconds
+    }
+
     /**
      * Get the maximum number of bytes of the log that we should display.
      */
@@ -227,14 +236,46 @@ class LogViewerService
         $this->maxLogSizeToDisplay = $bytes > 0 ? $bytes : self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
     }
 
-    public function laravelRegexPattern(): string
+    public function extend(string $type, string $class): void
     {
-        return config('log-viewer.patterns.laravel.log_parsing_regex');
+        app(LogTypeRegistrar::class)->register($type, $class);
     }
 
-    public function logMatchPattern(): string
+    public function useLogFileClass(string $class): void
     {
-        return config('log-viewer.patterns.laravel.log_matching_regex');
+        // figure out whether the class extends from the LogFile class
+        if (! is_subclass_of($class, LogFile::class)) {
+            throw new \InvalidArgumentException("The class {$class} must extend from the ".LogFile::class.' class.');
+        }
+
+        static::$logFileClass = $class;
+    }
+
+    public function useLogReaderClass(string $class): void
+    {
+        // figure out whether the class implements the LogReaderInterface
+        $reflection = new \ReflectionClass($class);
+
+        if (! $reflection->implementsInterface(LogReaderInterface::class)) {
+            throw new \InvalidArgumentException("The class {$class} must implement the LogReaderInterface.");
+        }
+
+        static::$logReaderClass = $class;
+    }
+
+    public function logReaderClass(): string
+    {
+        return static::$logReaderClass;
+    }
+
+    public function setViewLayout(string $layout): void
+    {
+        $this->layout = $layout;
+    }
+
+    public function getViewLayout(): string
+    {
+        return $this->layout;
     }
 
     /**

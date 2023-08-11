@@ -37,3 +37,15 @@ it('takes into account severity filters', function () {
     expect($logIndex->next())->toBe([$idx2, $pos2])
         ->and($logIndex->next())->toBeNull();
 });
+
+it('takes into account excepted severity levels', function () {
+    $logIndex = createLogIndex(null, null, [
+        $idx1 = 0 => [$pos1 = 0, now(), 'debug'],
+        $idx2 = 1 => [$pos2 = 500, now(), 'info'],
+        $idx3 = 2 => [$pos3 = 1000, now(), 'debug'],
+    ]);
+    $logIndex->exceptLevels('debug');
+
+    expect($logIndex->next())->toBe([$idx2, $pos2])
+        ->and($logIndex->next())->toBeNull();
+});

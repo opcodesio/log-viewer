@@ -15,6 +15,12 @@ export const Theme = {
   Dark: 'Dark',
 }
 
+const defaultColumns = [
+  { label: 'Datetime', data_key: 'datetime' },
+  { label: 'Severity', data_key: 'level' },
+  { label: 'Message', data_key: 'message' },
+]
+
 export const useLogViewerStore = defineStore({
   id: 'logViewer',
 
@@ -29,6 +35,7 @@ export const useLogViewerStore = defineStore({
     loading: false,
     error: null,
     logs: [],
+    columns: defaultColumns,
     levelCounts: [],
     performance: {},
     hasMoreResults: false,
@@ -194,7 +201,8 @@ export const useLogViewerStore = defineStore({
         query: searchStore.query,
         page: paginationStore.currentPage,
         per_page: this.resultsPerPage,
-        levels: toRaw(severityStore.selectedLevels.length > 0 ? severityStore.selectedLevels : 'none'),
+        exclude_levels: toRaw(severityStore.excludedLevels.length > 0 ? severityStore.excludedLevels : ''),
+        exclude_file_types: toRaw(fileStore.fileTypesExcluded.length > 0 ? fileStore.fileTypesExcluded : ''),
         shorter_stack_traces: this.shorterStackTraces,
       };
 
@@ -214,6 +222,7 @@ export const useLogViewerStore = defineStore({
           } else {
             this.logs = data.logs;
           }
+          this.columns = data.columns || defaultColumns;
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;
           this.error = data.error || null;

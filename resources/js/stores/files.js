@@ -12,6 +12,8 @@ export const useFileStore = defineStore({
     folders: [],
     direction: useLocalStorage('fileViewerDirection', 'desc'),
     selectedFileIdentifier: null,
+    fileTypesAvailable: [],
+    selectedFileTypes: useLocalStorage('selectedFileTypes', []),
 
     error: null,
     clearingCache: {},
@@ -40,6 +42,16 @@ export const useFileStore = defineStore({
       return hostStore.hostQueryParam;
     },
 
+    filteredFolders: (state) => {
+      // filter the folders based on the selected file types.
+      // If a particular folder is now empty, filter it out.
+
+      return state.folders.map(folder => ({
+        ...folder,
+        files: folder.files.filter(file => state.selectedFileTypes.includes(file.type.value)),
+      })).filter(folder => folder.files.length > 0);
+    },
+
     files: (state) => state.folders.flatMap((folder) => folder.files),
 
     selectedFile: (state) => state.files.find((file) => file.identifier === state.selectedFileIdentifier),
@@ -49,7 +61,7 @@ export const useFileStore = defineStore({
     },
 
     isOpen() {
-      return (folder) => this.foldersOpen.includes(folder);
+      return (folder) => this.foldersOpen.map(f => f.identifier).includes(folder.identifier);
     },
 
     isChecked: (state) => (file) => state.filesChecked.includes(
@@ -57,7 +69,7 @@ export const useFileStore = defineStore({
     ),
 
     shouldBeSticky(state) {
-      return (folder) => this.isOpen(folder) && state.foldersInView.includes(folder);
+      return (folder) => this.isOpen(folder) && state.foldersInView.map(f => f.identifier).includes(folder.identifier);
     },
 
     isInViewport() {
@@ -72,6 +84,29 @@ export const useFileStore = defineStore({
     },
 
     hasFilesChecked: (state) => state.filesChecked.length > 0,
+
+    fileTypesSelected: (state) => state.fileTypesAvailable.filter((fileType) => state.selectedFileTypes.includes(fileType.identifier)),
+
+    /** @returns {string[]} */
+    fileTypesExcluded: (state) => state.fileTypesAvailable
+      .filter((fileType) => !state.selectedFileTypes.includes(fileType.identifier))
+      .map((fileType) => fileType.identifier),
+
+    selectedFileTypesString() {
+      const fileTypesSelected = this.fileTypesSelected.map(fileType => fileType.name);
+
+      if (fileTypesSelected.length === 0) {
+        return 'Please select at least one file type';
+      } else if (fileTypesSelected.length === 1) {
+        return fileTypesSelected[0];
+      } else if (fileTypesSelected.length === 2) {
+        return fileTypesSelected.join(' and ');
+      } else if (fileTypesSelected.length === 3) {
+        return fileTypesSelected.slice(0, -1).join(', ') + ' and ' + fileTypesSelected.slice(-1);
+      } else {
+        return fileTypesSelected.slice(0, 3).join(', ') + ' and ' + (fileTypesSelected.length - 3) + ' more';
+      }
+    },
   },
 
   actions: {
@@ -139,6 +174,8 @@ export const useFileStore = defineStore({
             this.openRootFolderIfNoneOpen();
           }
 
+          this.setAvailableFileTypes(data);
+
           this.onScroll();
         })
         .catch((error) => {
@@ -154,6 +191,23 @@ export const useFileStore = defineStore({
 
           console.error(error);
         })
+    },
+
+    setAvailableFileTypes(folders) {
+      const fileTypes = folders.flatMap(folder => folder.files.map(file => file.type));
+      const uniqueFileTypes = [...new Set(fileTypes.map(fileType => fileType.value))];
+
+      this.fileTypesAvailable = uniqueFileTypes.map(fileType => {
+        return {
+          identifier: fileType,
+          name: fileTypes.find(ft => ft.value === fileType).name,
+          count: fileTypes.filter(ft => ft.value === fileType).length,
+        }
+      });
+
+      if (!this.selectedFileTypes || this.selectedFileTypes.length === 0) {
+        this.selectedFileTypes = uniqueFileTypes;
+      }
     },
 
     toggle(folder) {

@@ -1,23 +1,24 @@
 <?php
 
-namespace Opcodes\LogViewer;
+namespace Opcodes\LogViewer\Readers;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use Opcodes\LogViewer\Direction;
+use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LevelCount;
+use Opcodes\LogViewer\LogFile;
+use Opcodes\LogViewer\LogFileCollection;
+use Opcodes\LogViewer\Logs\Log;
 
 class MultipleLogReader
 {
     protected LogFileCollection $fileCollection;
-
     protected ?int $limit = null;
-
     protected ?int $skip = null;
-
     protected ?string $query = null;
-
     protected string $direction;
-
-    protected ?array $levels = null;
+    protected ?array $exceptLevels = null;
 
     public function __construct(mixed $files)
     {
@@ -32,16 +33,16 @@ class MultipleLogReader
         $this->setDirection(Direction::Forward);
     }
 
-    public function setLevels($levels = null): self
+    public function exceptLevels($levels = null): self
     {
-        $this->levels = $levels;
+        $this->exceptLevels = $levels;
 
         return $this;
     }
 
     public function allLevels(): self
     {
-        $this->levels = null;
+        $this->exceptLevels = null;
 
         return $this;
     }
@@ -205,6 +206,7 @@ class MultipleLogReader
     public function scan(int $maxBytesToScan = null, bool $force = false): void
     {
         $fileSizeScanned = 0;
+        $stopScanningAfter = microtime(true) + LogViewer::lazyScanTimeout();
 
         /** @var LogFile $logFile */
         foreach ($this->fileCollection as $logFile) {
@@ -221,15 +223,19 @@ class MultipleLogReader
             if (isset($maxBytesToScan) && $fileSizeScanned >= $maxBytesToScan) {
                 break;
             }
+
+            if ($stopScanningAfter < microtime(true)) {
+                break;
+            }
         }
     }
 
-    protected function getLogQueryForFile(LogFile $file): LogReader
+    protected function getLogQueryForFile(LogFile $file): LogReaderInterface
     {
         return $file->logs()
-            ->setQuery($this->query)
+            ->search($this->query)
             ->setDirection($this->direction)
-            ->setLevels($this->levels)
+            ->exceptLevels($this->exceptLevels)
             ->lazyScanning();
     }
 }

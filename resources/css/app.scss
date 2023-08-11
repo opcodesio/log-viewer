@@ -323,7 +323,7 @@ html.dark {
 
 .log-list {
     table > thead th {
-        @apply sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 py-2 px-2 text-left text-sm font-semibold text-gray-500 dark:text-gray-400;
+        @apply sticky top-0 z-10 bg-gray-100 dark:bg-gray-900 py-2 px-1 lg:px-2 text-left text-xs lg:text-sm font-semibold text-gray-500 dark:text-gray-400;
     }
 
     .log-group {

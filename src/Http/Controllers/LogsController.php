@@ -9,12 +9,11 @@ use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LevelCountResource;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
 use Opcodes\LogViewer\Http\Resources\LogResource;
-use Opcodes\LogViewer\Level;
+use Opcodes\LogViewer\Logs\Log;
 
 class LogsController
 {
     const OLDEST_FIRST = 'asc';
-
     const NEWEST_FIRST = 'desc';
 
     public function index(Request $request)
@@ -23,7 +22,8 @@ class LogsController
         $query = $request->query('query', '');
         $direction = $request->query('direction', 'desc');
         $log = $request->query('log', null);
-        $selectedLevels = $request->query('levels', Level::caseValues());
+        $excludedLevels = $request->query('exclude_levels', []);
+        $excludedFileTypes = $request->query('exclude_file_types', []);
         $perPage = $request->query('per_page', 25);
         session()->put('log-viewer:shorter-stack-traces', $request->boolean('shorter_stack_traces', false));
         $hasMoreResults = false;
@@ -35,8 +35,18 @@ class LogsController
 
         if ($file = LogViewer::getFile($fileIdentifier)) {
             $logQuery = $file->logs();
+            $logClass = $file->type()->logClass();
         } elseif (! empty($query)) {
-            $logQuery = LogViewer::getFiles()->logs();
+            $fileCollection = LogViewer::getFiles();
+
+            if (! empty($excludedFileTypes)) {
+                $fileCollection = $fileCollection->filter(function ($file) use ($excludedFileTypes) {
+                    return ! in_array($file->type()->value, $excludedFileTypes);
+                })->values();
+            }
+
+            $logQuery = $fileCollection->logs();
+            $logClass = Log::class;
         }
 
         if (isset($logQuery)) {
@@ -52,8 +62,8 @@ class LogsController
                     $logQuery->reverse();
                 }
 
-                $logQuery->scan(LogViewer::lazyScanChunkSize());
-                $logQuery->setLevels($selectedLevels);
+                $logQuery->scan();
+                $logQuery->exceptLevels($excludedLevels);
                 $logs = $logQuery->paginate($perPage);
                 $levels = array_values($logQuery->getLevelCounts());
 
@@ -74,6 +84,7 @@ class LogsController
             'file' => isset($file) ? new LogFileResource($file) : null,
             'levelCounts' => LevelCountResource::collection($levels ?? []),
             'logs' => LogResource::collection($logs ?? []),
+            'columns' => isset($logClass) ? ($logClass::$columns ?? null) : null,
             'pagination' => isset($logs) ? [
                 'current_page' => $logs->currentPage(),
                 'first_page_url' => $logs->url(1),
