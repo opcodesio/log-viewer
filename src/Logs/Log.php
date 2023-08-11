@@ -12,7 +12,7 @@ class Log
     /** @var string The name of the log type, visible to humans in the UI. */
     public static string $name = 'Log';
 
-    /** @var string The class which defines the severities found on these logs. Should implement the \Opcodes\LogViewer\LogLevels\LevelInterface interface */
+    /** @var string|LevelInterface The class which defines the severities found on these logs. Should implement the \Opcodes\LogViewer\LogLevels\LevelInterface interface */
     public static string $levelClass = LaravelLogLevel::class;
 
     /** @var string The regular expression used to extract various data points of the log */
@@ -83,6 +83,9 @@ class Log
         return $datetime ? Carbon::parse($datetime) : null;
     }
 
+    /**
+     * @return string|LevelInterface
+     */
     public static function levelClass(): string
     {
         $class = static::$levelClass ?? LaravelLogLevel::class;
@@ -118,7 +121,6 @@ class Log
     {
         $levelClass = static::levelClass();
 
-        /** @noinspection PhpUndefinedMethodInspection */
         return $levelClass::from($this->level);
     }
 

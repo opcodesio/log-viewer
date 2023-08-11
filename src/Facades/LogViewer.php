@@ -9,6 +9,7 @@ use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFileCollection;
 use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\LogFolderCollection;
+use Opcodes\LogViewer\Readers\LogReaderInterface;
 
 /**
  * @see \Opcodes\LogViewer\LogViewerService
@@ -36,7 +37,7 @@ use Opcodes\LogViewer\LogFolderCollection;
  * @method static void extend(string $type, string $class)
  * @method static void useLogFileClass(string $class)
  * @method static void useLogReaderClass(string $class)
- * @method static string logReaderClass()
+ * @method static string|LogReaderInterface logReaderClass()
  */
 class LogViewer extends Facade
 {

@@ -1,5 +1,8 @@
 <?php
 
+/** @noinspection PhpUndefinedNamespaceInspection */
+/** @noinspection PhpUndefinedClassInspection */
+
 namespace Opcodes\LogViewer;
 
 use Illuminate\Contracts\Http\Kernel;
@@ -147,8 +150,6 @@ class LogViewerServiceProvider extends ServiceProvider
     {
         $this->app['events']->listen(RequestTerminated::class, function ($event) {
             $logReaderClass = LogViewer::logReaderClass();
-
-            /** @noinspection PhpUndefinedMethodInspection */
             $logReaderClass::clearInstances();
         });
     }

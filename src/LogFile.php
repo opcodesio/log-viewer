@@ -71,7 +71,6 @@ class LogFile
     {
         $logReaderClass = LogViewer::logReaderClass();
 
-        /** @noinspection PhpUndefinedMethodInspection */
         return $logReaderClass::instance($this);
     }
 
