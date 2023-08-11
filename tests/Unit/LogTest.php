@@ -61,11 +61,11 @@ can contain dumped objects or JSON as well - it's all part of the contents.
 EOF;
     $text = '[2022-08-25 11:16:17] local.DEBUG: '.$logText;
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log');
 
-    assertEquals('Example log entry for the level debug', $log->text);
-    assertEquals($logText, $log->fullText);
-    assertEquals(json_decode('{"one":1,"two":"two","three":[1,2,3]}', true), $log->contexts[0]);
+    assertEquals('Example log entry for the level debug', $log->message);
+    assertEquals($logText, $log->getOriginalText());
+    assertEquals(json_decode('{"one":1,"two":"two","three":[1,2,3]}', true), $log->context);
 });
 
 it('extracts JSON from a complex log', function () {
@@ -82,12 +82,12 @@ EOF;
     $jsonString = '{"permalink":"arunas","session":{"_token":"BpqyiNyinnLamzer4jqzrh9NTyC6emFR41FitMpv","_previous":{"url":"https://system.test/book/arunas/center"},"_flash":{"old":[],"new":[]},"latest_permalink":"arunas"},"ip":"127.0.0.1","user_agent":"Mozilla/5.0 (iPhone; CPU iPhone OS 15_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/19G82 [FBAN/FBIOS;FBDV/iPhone9,3;FBMD/iPhone;FBSN/iOS;FBSV/15.6.1;FBSS/2;FBID/phone;FBLC/da_DK;FBOP/5]"}';
     $text = '[2022-08-25 11:16:17] local.DEBUG: '.$logText;
 
-    $log = new Log(0, $text, 'laravel.log', 0);
+    $log = new LaravelLog($text, 'laravel.log');
 
-    assertEquals('arunas', $log->contexts[0]['permalink'] ?? null);
-    assertEquals('Initiating facebook login.', $log->text);
-    assertEquals(str_replace($jsonString, '', $logText), $log->fullText);
-    assertEquals(json_decode($jsonString, true), $log->contexts[0]);
+    assertEquals('arunas', $log->context['permalink'] ?? null);
+    assertEquals('Initiating facebook login.', $log->message);
+    assertEquals(rtrim(str_replace($jsonString, '', $logText)), $log->getOriginalText());
+    assertEquals(json_decode($jsonString, true), $log->context);
 });
 
 it('can understand the optional microseconds in the timestamp', function () {

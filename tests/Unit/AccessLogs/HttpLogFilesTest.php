@@ -9,15 +9,15 @@ beforeEach(function () {
     File::makeDirectory(storage_path('logs/http'), 0755, true);
     $slash = DIRECTORY_SEPARATOR;
     File::put(
-        $this->access_dummy_log_path = storage_path("logs${slash}http${slash}access_dummy.log"),
+        $this->access_dummy_log_path = storage_path("logs{$slash}http{$slash}access_dummy.log"),
         file_get_contents(__DIR__.'/Fixtures/access_dummy.log')
     );
     File::put(
-        $this->error_dummy_log_path = storage_path("logs${slash}http${slash}errors_dummy.log"),
+        $this->error_dummy_log_path = storage_path("logs{$slash}http{$slash}errors_dummy.log"),
         file_get_contents(__DIR__.'/Fixtures/errors_dummy.log')
     );
     File::put(
-        $this->error_nginx_dummy_log_path = storage_path("logs${slash}http${slash}errors_nginx_dummy.log"),
+        $this->error_nginx_dummy_log_path = storage_path("logs{$slash}http{$slash}errors_nginx_dummy.log"),
         file_get_contents(__DIR__.'/Fixtures/errors_nginx_dummy.log')
     );
 });
