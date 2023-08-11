@@ -121,7 +121,7 @@ class LaravelLog extends Log
         // Loop through the matches.
         foreach ($matches[0] as $json_string) {
             // Try to decode the JSON string. If it fails, json_last_error() will return a non-zero value.
-            $json_data = json_decode($json_string, true);
+            $json_data = json_decode(trim($json_string), true);
 
             if (json_last_error() == JSON_ERROR_CTRL_CHAR) {
                 // might need to escape new lines
@@ -130,7 +130,10 @@ class LaravelLog extends Log
 
             if (json_last_error() == JSON_ERROR_NONE) {
                 $contexts[] = $json_data;
-                $this->text = rtrim(str_replace($json_string, '', $this->text));
+
+                if (config('log-viewer.strip_extracted_context', false)) {
+                    $this->text = rtrim(str_replace($json_string, '', $this->text));
+                }
             }
         }
 

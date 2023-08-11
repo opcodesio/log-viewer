@@ -195,4 +195,6 @@ return [
     */
 
     'lazy_scan_chunk_size_in_mb' => 50,
+
+    'strip_extracted_context' => true,
 ];

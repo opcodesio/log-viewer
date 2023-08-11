@@ -80,7 +80,7 @@
           <pre class="log-stack" v-html="highlightSearchResult(log.full_text, searchStore.query)"></pre>
           <template v-if="hasContext(log)">
             <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400 text-xs lg:text-sm">Context:</p>
-            <pre class="log-stack" v-html="highlightSearchResult(JSON.stringify(log.context, null, 2), searchStore.query)"></pre>
+            <pre class="log-stack" v-html="highlightSearchResult(prepareContextForOutput(log.context), searchStore.query)"></pre>
           </template>
 
           <div v-if="log.extra && log.extra.log_text_incomplete" class="py-4 px-8 text-gray-500 italic">
@@ -155,5 +155,15 @@ const getDataAtPath = (obj, path) => {
 
 const hasContext = (log) => {
   return log.context && Object.keys(log.context).length > 0;
+}
+
+const prepareContextForOutput = (context) => {
+  return JSON.stringify(context, function (key, value) {
+    if (typeof value === 'string') {
+      return value.replaceAll('\n', '<br/>');
+    }
+
+    return value;
+  }, 2);
 }
 </script>
