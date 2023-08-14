@@ -3,6 +3,11 @@
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogViewerService;
 
+beforeEach(function () {
+    // irrelevant option for these tests, so let's show all files.
+    config(['log-viewer.hide_unknown_files' => false]);
+});
+
 test('handles square brackets in the logs path', function ($folderPath) {
     // Get the original path inside which we'll create a dummy folder with square brackets
     $originalBasePath = LogViewer::basePathForLogs();

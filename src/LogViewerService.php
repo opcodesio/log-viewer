@@ -101,6 +101,12 @@ class LogViewerService
                 ->unique()
                 ->map(fn ($filePath) => new $fileClass($filePath))
                 ->values();
+
+            if (config('log-viewer.hide_unknown_files', true)) {
+                $this->_cachedFiles = $this->_cachedFiles->filter(function (LogFile $file) {
+                    return ! $file->type()->isUnknown();
+                });
+            }
         }
 
         return $this->_cachedFiles;

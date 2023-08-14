@@ -7,6 +7,7 @@ use Opcodes\LogViewer\Utils\GenerateCacheKey;
 use function PHPUnit\Framework\assertNotSame;
 
 beforeEach(function () {
+    config(['log-viewer.hide_unknown_files' => false]);
     generateLogFiles(['laravel.log', 'other.log']);
     $this->file = LogViewer::getFile('laravel.log');
     $this->otherFile = LogViewer::getFile('other.log');
