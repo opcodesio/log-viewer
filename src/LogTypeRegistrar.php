@@ -41,7 +41,6 @@ class LogTypeRegistrar
     }
 
     /**
-     * @param string $type
      * @return string|Log|null
      */
     public function getClass(string $type): ?string
