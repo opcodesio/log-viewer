@@ -56,4 +56,9 @@ class LogType
     {
         return app(LogTypeRegistrar::class)->getClass($this->value);
     }
+
+    public function isUnknown(): bool
+    {
+        return $this->value === static::DEFAULT;
+    }
 }

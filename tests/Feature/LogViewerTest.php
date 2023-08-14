@@ -5,7 +5,7 @@ use function PHPUnit\Framework\assertContains;
 use function PHPUnit\Framework\assertNotContains;
 
 beforeEach(function () {
-    generateLogFiles(['laravel.log', 'other.log']);
+    generateLogFiles(['laravel.log', 'other.log'], randomContent: true, type: 'laravel');
 });
 
 it('properly includes log files', function () {
@@ -22,4 +22,15 @@ it('properly excludes log files', function () {
 
     assertContains('laravel.log', $fileNames);
     assertNotContains('other.log', $fileNames);
+});
+
+it('hides unknown log files', function () {
+    config()->set('log-viewer.hide_unknown_files', true);
+    $unknownFile = generateLogFile('unknown.log', content: 'unknown log content');
+
+    $fileNames = LogViewer::getFiles()->map->name;
+
+    assertNotContains($unknownFile->name, $fileNames);
+    assertContains('laravel.log', $fileNames);
+    assertContains('other.log', $fileNames);
 });

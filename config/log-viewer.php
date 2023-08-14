@@ -162,6 +162,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Hide unknown files.
+    |--------------------------------------------------------------------------
+    | The include/exclude options above might catch files which are not
+    | logs supported by Log Viewer. In that case, you can hide them
+    | from the UI and API calls by setting this to true.
+    |
+    */
+
+    'hide_unknown_files' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     |  Shorter stack trace filters.
     |--------------------------------------------------------------------------
     | Lines containing any of these strings will be excluded from the full log.
