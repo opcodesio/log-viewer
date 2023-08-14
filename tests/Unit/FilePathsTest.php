@@ -1,7 +1,6 @@
 <?php
 
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Logs\LogType;
 use Opcodes\LogViewer\LogViewerService;
 
 beforeEach(function () {
