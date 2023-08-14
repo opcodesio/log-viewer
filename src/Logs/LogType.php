@@ -45,10 +45,13 @@ class LogType
             self::POSTGRES => 'Postgres',
             self::REDIS => 'Redis',
             self::SUPERVISOR => 'Supervisor',
-            default => $class::$name ?? 'Unknown',
+            default => isset($class) ? ($class::$name ?? 'Unknown') : 'Unknown',
         };
     }
 
+    /**
+     * @return string|Log|null
+     */
     public function logClass(): ?string
     {
         return app(LogTypeRegistrar::class)->getClass($this->value);

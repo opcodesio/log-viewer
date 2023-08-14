@@ -40,6 +40,10 @@ class LogTypeRegistrar
         array_unshift($this->logTypes, [$type, $class]);
     }
 
+    /**
+     * @param string $type
+     * @return string|Log|null
+     */
     public function getClass(string $type): ?string
     {
         foreach ($this->logTypes as $logType) {
