@@ -19,7 +19,6 @@ EOF);
     $logReader = $file->logs()->scan();
 
     expect($logs = $logReader->get())->toHaveCount(4)
-        ->and(dump($logs))
         ->and($logs[0]->datetime->toDateTimeString())->toBe('2023-07-22 16:13:33')
         ->and($logs[0]->level)->toBe('RUNNING')
         ->and($logs[0]->getLevel())->toBeInstanceOf(HorizonStatusLevel::class)
@@ -46,7 +45,6 @@ EOF);
     $logReader = $file->logs()->scan();
 
     expect($logs = $logReader->get())->toHaveCount(4)
-        ->and(dump($logs))
         ->and($logs[0]->datetime->toDateTimeString())->toBe('2023-08-17 07:22:32')
         ->and($logs[0]->level)->toBe('DONE')
         ->and($logs[0]->getLevel())->toBeInstanceOf(HorizonStatusLevel::class)
