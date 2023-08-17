@@ -74,11 +74,12 @@ class Utils
         return substr(md5($content), -$length, $length);
     }
 
-    public static function glob_recursive($pattern, $flags = 0): bool|array
+    public static function glob_recursive($pattern, $flags = 0): array
     {
-        $files = glob($pattern, $flags);
+        $files = glob($pattern, $flags) ?: [];
+        $folders = glob(dirname($pattern).'/*', GLOB_ONLYDIR | GLOB_NOSORT) ?: [];
 
-        foreach (glob(dirname($pattern).'/*', GLOB_ONLYDIR | GLOB_NOSORT) as $dir) {
+        foreach ($folders as $dir) {
             $files = array_merge($files, static::glob_recursive($dir.'/'.basename($pattern), $flags));
         }
 

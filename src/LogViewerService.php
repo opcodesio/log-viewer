@@ -73,7 +73,7 @@ class LogViewerService
         return array_values(array_reverse($files));
     }
 
-    protected function getFilePathsMatchingPattern($pattern)
+    protected function getFilePathsMatchingPattern($pattern): array
     {
         // The GLOB_BRACE flag is not available on some non GNU systems, like Solaris or Alpine Linux.
 
@@ -81,7 +81,7 @@ class LogViewerService
             return Utils::glob_recursive($pattern);
         }
 
-        return glob($pattern);
+        return glob($pattern) ?: [];
     }
 
     public function basePathForLogs(): string

@@ -2,6 +2,7 @@
 
 use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 use Opcodes\LogViewer\Logs\LaravelLog;
+
 use function PHPUnit\Framework\assertEquals;
 
 it('can understand the default Laravel log format', function () {
