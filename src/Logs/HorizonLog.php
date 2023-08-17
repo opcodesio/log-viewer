@@ -8,7 +8,7 @@ use Opcodes\LogViewer\LogLevels\HorizonStatusLevel;
 class HorizonLog extends Log
 {
     public static string $name = 'Laravel Horizon';
-    public static string $regex = '/\s*(?P<datetime>\d{4}-\d\d-\d\d \d\d:\d\d:\d\d) (?<message>\S+) \.* ?(?<duration>\d+\.?\d*\S+)? (?P<level>\S+)/';
+    public static string $regex = '/^.*(?P<datetime>\d{4}-\d\d-\d\d \d\d:\d\d:\d\d) (?<message>\S+) \.* ?(?<duration>\d[\d\s\.\w]+)? (?P<level>\S+)$/';
     public static string $levelClass = HorizonStatusLevel::class;
     public static array $columns = [
         ['label' => 'Datetime', 'data_path' => 'datetime'],
