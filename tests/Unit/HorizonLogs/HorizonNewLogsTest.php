@@ -5,7 +5,7 @@ use Opcodes\LogViewer\LogLevels\HorizonStatusLevel;
 use Opcodes\LogViewer\Logs\LogType;
 
 it('can process new Horizon logs', function () {
-    $file = generateLogFile(content: <<<EOF
+    $file = generateLogFile('horizon_new.log', content: <<<EOF
 Horizon started successfully.
   2023-07-22 16:13:33 App\Jobs\TestJob ............................... RUNNING
   2023-07-22 16:13:34 App\Jobs\TestJob ............................... 1s DONE
@@ -31,7 +31,7 @@ EOF);
 });
 
 it('processes weird cases', function () {
-    $file = generateLogFile(content: <<<EOF
+    $file = generateLogFile('horizon_new_weird.log', content: <<<EOF
 Horizon started successfully.
   2023-08-17 07:22:32 App\Jobs\TestJob  1 s DONE
   2023-08-18 06:05:03 App\Jobs\TestJob  32 s. DONE
