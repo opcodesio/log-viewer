@@ -54,6 +54,14 @@ it('can guess the type from the provided first line', function ($expectedType, $
     ],
 ]);
 
+it('handles unaccessible files', function () {
+    $file = generateLogFile(randomContent: true);
+    chmod($file->path, 0333); // prevent reading
+
+    expect($this->logRegistrar->guessTypeFromFirstLine($file))
+        ->toBeNull();
+});
+
 it('prefers user-defined log types over default ones', function () {
     // first, the default http access log
     $defaultAccessLogLine = '8.68.121.11 - UID 123 - [01/Feb/2023:01:53:51 +0000] "POST /main/tag/category HTTP/2.0" 404 4819 "-" "-"';

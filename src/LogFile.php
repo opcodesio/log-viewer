@@ -4,6 +4,7 @@ namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Arr;
 use Opcodes\LogViewer\Events\LogFileDeleted;
+use Opcodes\LogViewer\Exceptions\CannotOpenFileException;
 use Opcodes\LogViewer\Exceptions\InvalidRegularExpression;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Logs\LogType;
@@ -118,7 +119,12 @@ class LogFile
 
     public function getNthLine(int $lineNumber): string
     {
-        $handle = fopen($this->path, 'r');
+        try {
+            $handle = fopen($this->path, 'r');
+        } catch (\ErrorException $e) {
+            throw new CannotOpenFileException('Could not open "'.$this->path.'" for reading.', 0, $e);
+        }
+
         $line = '';
         for ($i = 0; $i < $lineNumber; $i++) {
             $line = fgets($handle);
