@@ -2,6 +2,7 @@
 
 namespace Opcodes\LogViewer;
 
+use Opcodes\LogViewer\Exceptions\CannotOpenFileException;
 use Opcodes\LogViewer\Exceptions\SkipLineException;
 use Opcodes\LogViewer\Logs\HorizonLog;
 use Opcodes\LogViewer\Logs\HorizonOldLog;
@@ -58,7 +59,11 @@ class LogTypeRegistrar
     {
         if ($textOrFile instanceof LogFile) {
             $file = $textOrFile;
-            $textOrFile = $textOrFile->getFirstLine();
+            try {
+                $textOrFile = $textOrFile->getFirstLine();
+            } catch (CannotOpenFileException $exception) {
+                return null;
+            }
         }
 
         foreach ($this->logTypes as [$type, $class]) {
@@ -74,6 +79,8 @@ class LogTypeRegistrar
                             if ($class::matches($file->getNthLine($lineNumber))) {
                                 return $type;
                             }
+                        } catch (CannotOpenFileException $exception) {
+                            return null;
                         } catch (SkipLineException $exception) {
                             continue;
                         }

@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer\Readers;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Opcodes\LogViewer\Direction;
+use Opcodes\LogViewer\Exceptions\CannotOpenFileException;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LevelCount;
 use Opcodes\LogViewer\LogFile;
@@ -218,7 +219,11 @@ class MultipleLogReader
 
             $fileSizeScanned += $logQuery->numberOfNewBytes();
 
-            $logQuery->scan($maxBytesToScan, $force);
+            try {
+                $logQuery->scan($maxBytesToScan, $force);
+            } catch (CannotOpenFileException $exception) {
+                continue;
+            }
 
             if (isset($maxBytesToScan) && $fileSizeScanned >= $maxBytesToScan) {
                 break;

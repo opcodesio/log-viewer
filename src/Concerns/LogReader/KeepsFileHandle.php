@@ -41,7 +41,11 @@ trait KeepsFileHandle
             return $this;
         }
 
-        $this->fileHandle = fopen($this->file->path, 'r');
+        try {
+            $this->fileHandle = fopen($this->file->path, 'r');
+        } catch (\ErrorException $exception) {
+            throw new CannotOpenFileException('Could not open "'.$this->file->path.'" for reading.', 0, $exception);
+        }
 
         if ($this->fileHandle === false) {
             throw new CannotOpenFileException('Could not open "'.$this->file->path.'" for reading.');
