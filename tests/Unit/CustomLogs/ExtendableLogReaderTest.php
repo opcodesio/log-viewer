@@ -55,12 +55,16 @@ it('can guess the type from the provided first line', function ($expectedType, $
 ]);
 
 it('handles unaccessible files', function () {
+    if (PHP_OS_FAMILY === 'Windows') {
+        $this->markTestSkipped('File permissions work differently on Windows. The feature tested might still work.');
+    }
+
     $file = generateLogFile(randomContent: true);
     chmod($file->path, 0333); // prevent reading
 
     expect($this->logRegistrar->guessTypeFromFirstLine($file))
         ->toBeNull();
-})->skipOnWindows();
+});
 
 it('prefers user-defined log types over default ones', function () {
     // first, the default http access log
