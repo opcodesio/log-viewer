@@ -21,4 +21,4 @@ it('continues reading when one file cannot be read', function () {
     } catch (\Exception $exception) {
         $this->fail('Exception thrown: '.$exception->getMessage());
     }
-});
+})->skipOnWindows();

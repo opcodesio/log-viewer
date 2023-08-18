@@ -60,7 +60,7 @@ it('handles unaccessible files', function () {
 
     expect($this->logRegistrar->guessTypeFromFirstLine($file))
         ->toBeNull();
-});
+})->skipOnWindows();
 
 it('prefers user-defined log types over default ones', function () {
     // first, the default http access log

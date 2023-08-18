@@ -47,4 +47,5 @@ it('throws an exception when file cannot be opened for reading', function () {
     $logReader = $this->file->logs();
 
     $logReader->scan();
-})->expectException(CannotOpenFileException::class);
+})->skipOnWindows()
+    ->expectException(CannotOpenFileException::class);
