@@ -41,11 +41,13 @@ class Log
         $this->index = $index;
         $this->fileIdentifier = $fileIdentifier;
         $this->filePosition = $filePosition;
-        $text = mb_convert_encoding(rtrim($text, "\t\n\r"), 'UTF-8', 'UTF-8');
+        $this->fullText = mb_convert_encoding(rtrim($text, "\t\n\r"), 'UTF-8', 'UTF-8');
         $this->fullTextLength = strlen($text);
 
+        $this->extractContextsFromFullText();
+
         $matches = [];
-        [$firstLine, $theRestOfIt] = explode("\n", Str::finish($text, "\n"), 2);
+        [$firstLine, $theRestOfIt] = explode("\n", Str::finish($this->fullText, "\n"), 2);
 
         // sometimes, even the first line will have a HUGE exception with tons of debug data all in one line,
         // so in order to properly match, we must have a smaller first line...
@@ -74,12 +76,12 @@ class Log
         }
 
         $this->text = trim($firstLineText);
-        $text = $firstLineText.($matches[8] ?? '').implode('', $firstLineSplit)."\n".$theRestOfIt;
+        $this->fullText = $firstLineText.($matches[8] ?? '').implode('', $firstLineSplit)."\n".$theRestOfIt;
 
         if (session()->get('log-viewer:shorter-stack-traces', false)) {
             $excludes = config('log-viewer.shorter_stack_trace_excludes', []);
             $emptyLineCharacter = '    ...';
-            $lines = explode("\n", $text);
+            $lines = explode("\n", $this->fullText);
             $filteredLines = [];
             foreach ($lines as $line) {
                 $shouldExclude = false;
@@ -96,17 +98,15 @@ class Log
                     $filteredLines[] = $line;
                 }
             }
-            $text = implode("\n", $filteredLines);
+            $this->fullText = implode("\n", $filteredLines);
         }
 
-        if (strlen($text) > LogViewer::maxLogSize()) {
-            $text = Str::limit($text, LogViewer::maxLogSize());
+        if (strlen($this->fullText) > LogViewer::maxLogSize()) {
+            $this->fullText = Str::limit($this->fullText, LogViewer::maxLogSize());
             $this->fullTextIncomplete = true;
         }
 
-        $this->fullText = trim($text);
-
-        $this->extractContextsFromFullText();
+        $this->fullText = trim($this->fullText);
     }
 
     public function fullTextMatches(string $query = null): bool

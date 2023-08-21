@@ -2,6 +2,7 @@
 
 use Opcodes\LogViewer\Level;
 use Opcodes\LogViewer\Log;
+
 use function PHPUnit\Framework\assertEquals;
 
 it('can understand the default Laravel log format', function () {
@@ -86,7 +87,7 @@ EOF;
 
     assertEquals('arunas', $log->contexts[0]['permalink'] ?? null);
     assertEquals('Initiating facebook login.', $log->text);
-    assertEquals(str_replace($jsonString, '', $logText), $log->fullText);
+    assertEquals(trim(str_replace($jsonString, '', $logText)), $log->fullText);
     assertEquals(json_decode($jsonString, true), $log->contexts[0]);
 });
 
@@ -170,4 +171,18 @@ it('can set a custom timezone of the log entry', function () {
     assertEquals($tz, $log->time->timezoneName);
     $expectedTime = \Carbon\Carbon::parse('2022-11-07 17:51:33', 'UTC')->tz($tz)->toDateTimeString();
     assertEquals($expectedTime, $log->time->toDateTimeString());
+});
+
+it('strips extracted context when there\'s multiple contexts available', function () {
+    config(['log-viewer.strip_extracted_context' => true]);
+    $logText = <<<'EOF'
+[2023-08-16 14:00:25] testing.INFO: Test message. ["one","two"] {"memory_usage":"78 MB","process_id":1234}
+EOF;
+
+    $log = new Log(0, $logText, 'laravel.log', 0);
+
+    assertEquals('Test message.', $log->text);
+    assertEquals(2, count($log->contexts));
+    assertEquals(['one', 'two'], $log->contexts[0]);
+    assertEquals(['memory_usage' => '78 MB', 'process_id' => 1234], $log->contexts[1]);
 });

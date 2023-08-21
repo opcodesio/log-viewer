@@ -1,6 +1,6 @@
 {
     "name": "opcodesio/log-viewer",
-    "version": "v2.5.4",
+    "version": "v2.5.5",
     "description": "Fast and easy-to-use log viewer for your Laravel application",
     "keywords": [
         "arukompas",
