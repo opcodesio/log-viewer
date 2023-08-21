@@ -170,3 +170,17 @@ it('can set a custom timezone of the log entry', function () {
     $expectedTime = \Carbon\Carbon::parse('2022-11-07 17:51:33', 'UTC')->tz($tz)->toDateTimeString();
     assertEquals($expectedTime, $log->datetime->toDateTimeString());
 });
+
+it('strips extracted context when there\'s multiple contexts available', function () {
+    config(['log-viewer.strip_extracted_context' => true]);
+    $logText = <<<'EOF'
+[2023-08-16 14:00:25] testing.INFO: Test message. ["one","two"] {"memory_usage":"78 MB","process_id":1234}
+EOF;
+
+    $log = new LaravelLog($logText);
+
+    assertEquals('Test message.', $log->message);
+    assertEquals(2, count($log->context));
+    assertEquals(['one', 'two'], $log->context[0]);
+    assertEquals(['memory_usage' => '78 MB', 'process_id' => 1234], $log->context[1]);
+});

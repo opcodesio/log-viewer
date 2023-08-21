@@ -25,6 +25,8 @@ class LaravelLog extends Log
         $this->text = mb_convert_encoding(rtrim($this->text, "\t\n\r"), 'UTF-8', 'UTF-8');
         $length = strlen($this->text);
 
+        $this->extractContextsFromFullText();
+
         $this->extra['log_size'] = $length;
         $this->extra['log_size_formatted'] = Utils::bytesForHumans($length);
 
@@ -89,8 +91,6 @@ class LaravelLog extends Log
         }
 
         $this->text = trim($text);
-
-        $this->extractContextsFromFullText();
     }
 
     protected function fillMatches(array $matches = []): void
