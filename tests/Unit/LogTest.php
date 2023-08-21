@@ -173,7 +173,7 @@ it('can set a custom timezone of the log entry', function () {
 
 it('strips extracted context when there\'s multiple contexts available', function () {
     config(['log-viewer.strip_extracted_context' => true]);
-    $logText = <<<EOF
+    $logText = <<<'EOF'
 [2023-08-16 14:00:25] testing.INFO: Test message. ["one","two"] {"memory_usage":"78 MB","process_id":1234}
 EOF;
 
