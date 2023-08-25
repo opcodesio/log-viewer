@@ -39,6 +39,8 @@ Example attachment content
 
 ------=_Part_1_1234567890--
 EOF;
+    // The email string (as per RFC 5322) actually needs to use \r\n sequence instead of \n
+    $messageString = str_replace("\n", "\r\n", $messageString);
 
     $log = new LaravelLog($messageString);
 

@@ -148,15 +148,25 @@ class LaravelLog extends Log
 
     protected function extractMailPreview(): void
     {
-        $isMail = Str::contains($this->text, 'To:')
-            && Str::contains($this->text, 'From:')
-            && Str::contains($this->text, 'MIME-Version: 1.0');
+        $possibleParts = preg_split('/[^\r]\n/', $this->text);
+        $part = null;
 
-        if (! $isMail) {
+        foreach ($possibleParts as $possiblePart) {
+            if (
+                Str::contains($this->text, 'To:')
+                && Str::contains($this->text, 'From:')
+                && Str::contains($this->text, 'MIME-Version: 1.0')
+            ) {
+                $part = $possiblePart;
+                break;
+            }
+        }
+
+        if (! $part) {
             return;
         }
 
-        $message = Message::fromString($this->text);
+        $message = Message::fromString($part);
 
         $this->extra['mail_preview'] = [
             'id' => $message->getId() ?: null,
