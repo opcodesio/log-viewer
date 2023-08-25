@@ -4,7 +4,7 @@ use Opcodes\LogViewer\Logs\LaravelLog;
 use Opcodes\LogViewer\Utils\Utils;
 
 it('can extract mail preview from a log', function () {
-    $messageString = <<<EOF
+    $messageString = <<<'EOF'
 [2023-08-24 15:51:14] local.DEBUG: From: sender@example.com
 To: recipient@example.com
 Cc: cc@example.com
@@ -56,7 +56,7 @@ EOF;
                     'size_formatted' => Utils::bytesForHumans(strlen('Example attachment content')),
                 ],
             ],
-            'html' => <<<EOF
+            'html' => <<<'EOF'
 <html>
 <head>
 <title>This is an HTML email</title>

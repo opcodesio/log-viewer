@@ -152,7 +152,9 @@ class LaravelLog extends Log
             && Str::contains($this->text, 'From:')
             && Str::contains($this->text, 'MIME-Version: 1.0');
 
-        if (! $isMail) return;
+        if (! $isMail) {
+            return;
+        }
 
         $message = Message::fromString($this->text);
 
@@ -161,7 +163,7 @@ class LaravelLog extends Log
             'subject' => $message->getSubject(),
             'from' => $message->getFrom(),
             'to' => $message->getTo(),
-            'attachments' => array_map(fn($attachment) => [
+            'attachments' => array_map(fn ($attachment) => [
                 'content' => $attachment->getContent(),
                 'content_type' => $attachment->getContentType(),
                 'filename' => $attachment->getFilename(),
