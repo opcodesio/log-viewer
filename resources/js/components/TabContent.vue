@@ -1,6 +1,6 @@
 <template>
   <div v-if="isSelected">
-    <slot>c</slot>
+    <slot></slot>
   </div>
 </template>
 
