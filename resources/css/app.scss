@@ -339,8 +339,58 @@ html.dark {
             }
         }
 
+        .mail-preview-attributes {
+            @apply text-xs lg:text-sm w-full border border-brand-100 dark:border-brand-800 rounded bg-brand-50/30 dark:bg-brand-900/20 overflow-x-auto lg:overflow-hidden mb-4 lg:mb-6;
+
+            table {
+                @apply w-full;
+            }
+            td {
+                @apply px-2 py-1 lg:px-6 lg:py-2;
+            }
+            td:not(:first-child) {
+                overflow-wrap: anywhere;
+            }
+            tr:first-child td {
+                @apply pt-1.5 lg:pt-3;
+            }
+            tr:last-child td {
+                @apply pb-1.5 lg:pb-3;
+            }
+            tr:not(:last-child) td {
+                @apply border-b border-brand-100 dark:border-brand-900;
+            }
+        }
+
+        .mail-preview-html {
+            @apply w-full border border-gray-200 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-900 overflow-auto mb-4 lg:mb-6;
+        }
+
+        .mail-attachment-button {
+            @apply flex items-center justify-between px-2 py-1 lg:px-4 lg:py-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded;
+            max-width: 460px;
+
+            &:not(:last-child) {
+                @apply mb-2;
+            }
+
+            a {
+                @apply focus:outline-brand-500;
+            }
+        }
+
+        .tabs-container {
+            @apply text-xs lg:text-sm;
+        }
+
+        .tabs-container,
+        .mail-preview,
         .log-stack {
-            @apply px-2 lg:px-4 py-1 lg:py-2 lg:px-6 lg:px-8 border-gray-200 dark:border-gray-700 text-[10px] leading-3 lg:text-xs lg:leading-4 whitespace-pre-wrap break-all;
+            @apply px-2 py-1 lg:py-2 lg:px-8;
+        }
+
+        .log-stack {
+            @apply border-gray-200 dark:border-gray-700 text-[10px] leading-3 lg:text-xs lg:leading-4 whitespace-pre-wrap break-all;
         }
 
         .log-link {
