@@ -77,16 +77,25 @@
               <LogCopyButton :log="log" />
             </div>
           </div>
-          <pre class="log-stack" v-html="highlightSearchResult(log.full_text, searchStore.query)"></pre>
-          <template v-if="hasContext(log)">
-            <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400 text-xs lg:text-sm">Context:</p>
-            <pre class="log-stack" v-html="highlightSearchResult(prepareContextForOutput(log.context), searchStore.query)"></pre>
-          </template>
 
-          <div v-if="log.extra && log.extra.log_text_incomplete" class="py-4 px-8 text-gray-500 italic">
-            The contents of this log have been cut short to the first {{ LogViewer.max_log_size_formatted }}.
-            The full size of this log entry is <strong>{{ log.extra.log_size_formatted }}</strong>
-          </div>
+          <tab-container v-if="logViewerStore.isOpen(index)" :tabs="getTabsForLog(log)">
+            <tab-content v-if="log.extra && log.extra.mail_preview" tab-value="mail_preview">
+              <mail-preview :mail="log.extra.mail_preview" />
+            </tab-content>
+
+            <tab-content tab-value="raw">
+              <pre class="log-stack" v-html="highlightSearchResult(log.full_text, searchStore.query)"></pre>
+              <template v-if="hasContext(log)">
+                <p class="mx-2 lg:mx-8 pt-2 border-t font-semibold text-gray-700 dark:text-gray-400 text-xs lg:text-sm">Context:</p>
+                <pre class="log-stack" v-html="highlightSearchResult(prepareContextForOutput(log.context), searchStore.query)"></pre>
+              </template>
+
+              <div v-if="log.extra && log.extra.log_text_incomplete" class="py-4 px-8 text-gray-500 italic">
+                The contents of this log have been cut short to the first {{ LogViewer.max_log_size_formatted }}.
+                The full size of this log entry is <strong>{{ log.extra.log_size_formatted }}</strong>
+              </div>
+            </tab-content>
+          </tab-container>
         </td>
       </tr>
       </tbody>
@@ -134,6 +143,9 @@ import { useFileStore } from '../stores/files.js';
 import LogCopyButton from './LogCopyButton.vue';
 import { handleLogToggleKeyboardNavigation } from '../keyboardNavigation';
 import { useSeverityStore } from '../stores/severity.js';
+import TabContainer from "./TabContainer.vue";
+import TabContent from "./TabContent.vue";
+import MailPreview from "./MailPreview.vue";
 
 const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
@@ -156,6 +168,23 @@ const getDataAtPath = (obj, path) => {
 
 const hasContext = (log) => {
   return log.context && Object.keys(log.context).length > 0;
+}
+
+const hasPreviews = (log) => {
+  return getExtraTabsForLog(log).length > 0;
+}
+
+const getExtraTabsForLog = (log) => {
+  return [
+    log.extra && log.extra.mail_preview ? { name: 'Mail preview', value: 'mail_preview' } : null,
+  ].filter(Boolean);
+}
+
+const getTabsForLog = (log) => {
+  return [
+    ...getExtraTabsForLog(log),
+    { name: 'Raw', value: 'raw' },
+  ].filter(Boolean);
 }
 
 const prepareContextForOutput = (context) => {

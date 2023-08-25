@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogLevels\LaravelLogLevel;
 use Opcodes\LogViewer\Utils\Utils;
+use Opcodes\MailParser\Message;
 
 class LaravelLog extends Log
 {
@@ -91,6 +92,7 @@ class LaravelLog extends Log
         }
 
         $this->text = trim($text);
+        $this->extractMailPreview();
     }
 
     protected function fillMatches(array $matches = []): void
@@ -105,7 +107,7 @@ class LaravelLog extends Log
             .')?: ?(.*?)( in [\/].*?:[0-9]+)?$/is';
     }
 
-    public function extractContextsFromFullText(): void
+    protected function extractContextsFromFullText(): void
     {
         // The regex pattern to find JSON strings.
         $pattern = '/(\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\])/';
@@ -142,5 +144,32 @@ class LaravelLog extends Log
         } elseif (count($contexts) === 1) {
             $this->context = $contexts[0];
         }
+    }
+
+    protected function extractMailPreview(): void
+    {
+        $isMail = Str::contains($this->text, 'To:')
+            && Str::contains($this->text, 'From:')
+            && Str::contains($this->text, 'MIME-Version: 1.0');
+
+        if (! $isMail) return;
+
+        $message = Message::fromString($this->text);
+
+        $this->extra['mail_preview'] = [
+            'id' => $message->getId() ?: null,
+            'subject' => $message->getSubject(),
+            'from' => $message->getFrom(),
+            'to' => $message->getTo(),
+            'attachments' => array_map(fn($attachment) => [
+                'content' => $attachment->getContent(),
+                'content_type' => $attachment->getContentType(),
+                'filename' => $attachment->getFilename(),
+                'size_formatted' => Utils::bytesForHumans($attachment->getSize()),
+            ], $message->getAttachments()),
+            'html' => $message->getHtmlPart()?->getContent(),
+            'text' => $message->getTextPart()?->getContent(),
+            'size_formatted' => Utils::bytesForHumans($message->getSize()),
+        ];
     }
 }
