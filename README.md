@@ -24,7 +24,7 @@
 
 [OPcodes's](https://www.opcodes.io/) **Log Viewer** is a perfect companion for your [Laravel](https://laravel.com/) app.
 
-You will no longer need to read the raw Laravel log files trying to find what you're looking for.
+You will no longer need to read the raw Laravel log files (and other types of logs) trying to find what you're looking for.
 
 Log Viewer helps you quickly and clearly see individual log entries, to **search**, **filter**, and make sense of your Laravel logs **fast**. It is free and easy to install.
 
@@ -33,6 +33,7 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 ### Features
 
 - 📂 **View all the Laravel logs** in your `storage/logs` directory,
+- 📂 **View other types of logs** - Horizon, Apache, Nginx, Redis, Supervisor, Postgres, and more,
 - 🔍 **Search** the logs,
 - 🎚 **Filter** by log level (error, info, debug, etc.),
 - 🔗 **Sharable links** to individual log entries,
@@ -43,6 +44,7 @@ Log Viewer helps you quickly and clearly see individual log entries, to **search
 - 💾 **Download & delete** log files from the UI,
 - ☑️ **Horizon** log support (up to Horizon v9.20),
 - ☎️ **API access** for folders, files & log entries,
+- 💌 **Mail previews** for e-mails sent to the logs,
 - and more...
 
 ### Documentation
@@ -88,21 +90,19 @@ Here are some common problems and solutions.
 
 ### Problem: Logs not loading
 
-At the moment, Log Viewer is only able to process [Laravel logs](https://laravel.com/docs/9.x/logging) that look something like this:
+Please see [this page](https://log-viewer.opcodes.io/docs/3.x/log-types/default) for support log formats. If your log has a custom format, or is not supported by Log Viewer out of the box, you will need to [define your own custom log parser](https://log-viewer.opcodes.io/docs/3.x/log-types/custom).
 
-```
-[2022-08-25 11:16:17] local.DEBUG: Example log entry for the level debug {"one":1,"two":"two","three":[1,2,3]}
-Multiple lines are allowed
-and will be picked up as contents
-of the same log entry.
-```
+If your logs are still not showing up, make sure the web process, which Log Viewer runs on, has permission to read these logs.
 
-If your logs are structured differently, then you'll have to wait until we ship support for custom log formats. Otherwise, please adjust your log format to Laravel's default.
+For example, if you want to read the Apache HTTP access logs in `/var/log/httpd`, you will need to make sure that your web process (apache/httpd) has permission to read these files. On unix systems, you can do this with [file ACLs](https://www.thegeekdiary.com/unix-linux-access-control-lists-acls-basics/#:~:text=Every%20file%20on%20any%20UNIX,their%20permission%20to%20the%20file).
 
 ## Screenshots
 
 Read the **[release blog post](https://arunas.dev/log-viewer-for-laravel/)** for screenshots and more information about Log Viewer's features.
-The **[release of v2](https://arunas.dev/log-viewer-v2/)** also includes a few new features.
+
+The **[release of v2](https://arunas.dev/log-viewer-v2/)** includes a few new features in v2.
+
+The **[release of v3](https://arunas.dev/log-viewer-v3/)** includes a few new features in v3.
 
 ## Changelog
 
