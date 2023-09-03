@@ -9,8 +9,8 @@ use Opcodes\LogViewer\Logs\Log;
 
 abstract class BaseLogReader
 {
-    use Concerns\LogReader\KeepsInstances;
     use Concerns\LogReader\KeepsFileHandle;
+    use Concerns\LogReader\KeepsInstances;
 
     protected LogFile $file;
 
