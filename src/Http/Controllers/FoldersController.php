@@ -3,7 +3,6 @@
 namespace Opcodes\LogViewer\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LogFolderResource;
@@ -13,8 +12,6 @@ class FoldersController
 {
     public function index(Request $request)
     {
-        JsonResource::withoutWrapping();
-
         $folders = LogViewer::getFilesGroupedByFolder();
 
         if ($request->query('direction', 'desc') === 'asc') {
