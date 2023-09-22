@@ -17,6 +17,6 @@ it('can get the log files', function () {
 
     expect($response->json())->not->toHaveKey('data');
     $response->assertJsonCount(2)
-        ->assertJsonFragment(['clean_path' => 'root/one'])
-        ->assertJsonFragment(['clean_path' => 'root/two']);
+        ->assertJsonFragment(['clean_path' => 'root'.DIRECTORY_SEPARATOR.'one'])
+        ->assertJsonFragment(['clean_path' => 'root'.DIRECTORY_SEPARATOR.'two']);
 });
