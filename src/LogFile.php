@@ -14,8 +14,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class LogFile
 {
-    use Concerns\LogFile\HasMetadata;
     use Concerns\LogFile\CanCacheData;
+    use Concerns\LogFile\HasMetadata;
 
     public string $path;
     public string $name;

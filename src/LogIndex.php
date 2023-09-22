@@ -8,11 +8,11 @@ use Opcodes\LogViewer\Utils\Utils;
 
 class LogIndex
 {
-    use Concerns\LogIndex\HasMetadata;
     use Concerns\LogIndex\CanCacheIndex;
     use Concerns\LogIndex\CanFilterIndex;
     use Concerns\LogIndex\CanIterateIndex;
     use Concerns\LogIndex\CanSplitIndexIntoChunks;
+    use Concerns\LogIndex\HasMetadata;
     use Concerns\LogIndex\PreservesIndexingProgress;
 
     const DEFAULT_CHUNK_SIZE = 50_000;
