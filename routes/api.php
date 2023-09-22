@@ -8,7 +8,7 @@ Route::get('hosts', 'HostsController@index')->name('log-viewer.hosts');
 
 Route::middleware([
     ForwardRequestToHostMiddleware::class,
-    JsonResourceWithoutWrappingMiddleware::class
+    JsonResourceWithoutWrappingMiddleware::class,
 ])->group(function () {
     Route::get('folders', 'FoldersController@index')->name('log-viewer.folders');
     Route::get('folders/{folderIdentifier}/download', 'FoldersController@download')->name('log-viewer.folders.download');
