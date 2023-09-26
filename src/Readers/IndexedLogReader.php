@@ -89,7 +89,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
         while (
             (! isset($lastPositionToScan) || $currentLogPosition < $lastPositionToScan)
             && ($stopScanningAfter > microtime(true))
-            && ($line = fgets($this->fileHandle, 1024)) !== false
+            && ($line = fgets($this->fileHandle)) !== false
         ) {
             $matches = [];
             $ts = null;
