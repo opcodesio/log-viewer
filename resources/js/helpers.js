@@ -15,7 +15,8 @@ export const highlightSearchResult = (text, query = null) => {
   // while escaping the rest of the HTML entities
   return escapeHtml(text)
     .replace(/&lt;mark&gt;/g, '<mark>')
-    .replace(/&lt;\/mark&gt;/g, '</mark>');
+    .replace(/&lt;\/mark&gt;/g, '</mark>')
+    .replace(/&lt;br\/&gt;/g, '<br/>');
 };
 
 export const escapeHtml = (text) => {
