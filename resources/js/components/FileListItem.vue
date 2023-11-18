@@ -45,10 +45,7 @@
             </MenuItem>
 
             <MenuItem v-if="logFile.can_download" @click.stop v-slot="{ active }">
-              <a :href="logFile.download_url" download :class="[active ? 'active' : '']">
-                <CloudArrowDownIcon class="w-4 h-4 mr-2" />
-                Download
-              </a>
+              <DownloadLink :url="logFile.download_url" :class="[active ? 'active' : '']" />
             </MenuItem>
 
             <template v-if="logFile.can_delete">
@@ -78,12 +75,13 @@
 <script setup>
 import { computed } from 'vue';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
-import { CircleStackIcon, CloudArrowDownIcon, EllipsisVerticalIcon, TrashIcon } from '@heroicons/vue/24/outline';
+import { CircleStackIcon, EllipsisVerticalIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { useFileStore } from '../stores/files.js';
 import SpinnerIcon from './SpinnerIcon.vue';
 import { replaceQuery, useDropdownDirection } from '../helpers.js';
 import { useRouter } from 'vue-router';
 import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation';
+import DownloadLink from "./DownloadLink.vue";
 
 const props = defineProps({
   logFile: {

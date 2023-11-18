@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import axios from 'axios';
 
 export const useSearchStore = defineStore({
   id: 'search',
@@ -40,9 +41,9 @@ export const useSearchStore = defineStore({
       const queryChecked = this.query;
       if (queryChecked === '') return;
       const queryParams = '?' + new URLSearchParams({ query: queryChecked });
-      fetch(this.searchMoreRoute + queryParams)
-        .then((response) => response.json())
-        .then((data) => {
+      axios.get(this.searchMoreRoute + queryParams)
+        .then((response) => {
+          const data = response.data;
           if (this.query !== queryChecked) return;
           const wasPreviouslySearching = this.searching;
           this.searching = data.hasMoreResults;

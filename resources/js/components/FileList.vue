@@ -135,10 +135,7 @@
                     </MenuItem>
 
                     <MenuItem v-if="folder.can_download" v-slot="{ active }">
-                      <a :href="folder.download_url" download @click.stop :class="[active ? 'active' : '']">
-                        <CloudArrowDownIcon class="w-4 h-4 mr-2"/>
-                        Download
-                      </a>
+                      <DownloadLink :url="folder.download_url" @click.stop :class="[active ? 'active' : '']" />
                     </MenuItem>
 
                     <template v-if="folder.can_delete">
@@ -201,7 +198,6 @@ import {
   ArrowLeftIcon,
   ArrowPathIcon,
   CircleStackIcon,
-  CloudArrowDownIcon,
   EllipsisVerticalIcon,
   ExclamationTriangleIcon,
   FolderIcon,
@@ -220,6 +216,7 @@ import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import HostSelector from './HostSelector.vue';
 import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation';
 import FileTypeSelector from './FileTypeSelector.vue';
+import DownloadLink from "./DownloadLink.vue";
 
 const router = useRouter();
 const route = useRoute();
