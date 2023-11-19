@@ -12,7 +12,7 @@ Bcc: bcc@example.com
 Subject: This is an email with common headers
 Date: Thu, 24 Aug 2023 21:15:01 PST
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="----=_Part_1_1234567890"
+Content-Type: multipart/alternative; boundary="----=_Part_1_1234567890"
 
 ------=_Part_1_1234567890
 Content-Type: text/plain; charset="utf-8"
@@ -52,7 +52,7 @@ EOF;
             'to' => 'recipient@example.com',
             'attachments' => [
                 [
-                    'content' => 'Example attachment content',
+                    'content' => base64_encode('Example attachment content'),
                     'content_type' => 'text/plain; charset="utf-8"',
                     'filename' => 'example.txt',
                     'size_formatted' => Utils::bytesForHumans(strlen('Example attachment content')),
