@@ -174,7 +174,7 @@ class LaravelLog extends Log
             'from' => $message->getFrom(),
             'to' => $message->getTo(),
             'attachments' => array_map(fn ($attachment) => [
-                'content' => $attachment->getContent(),
+                'content' => base64_encode($attachment->getContent()),
                 'content_type' => $attachment->getContentType(),
                 'filename' => $attachment->getFilename(),
                 'size_formatted' => Utils::bytesForHumans($attachment->getSize()),

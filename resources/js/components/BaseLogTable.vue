@@ -79,8 +79,12 @@
           </div>
 
           <tab-container v-if="logViewerStore.isOpen(index)" :tabs="getTabsForLog(log)">
-            <tab-content v-if="log.extra && log.extra.mail_preview" tab-value="mail_preview">
-              <mail-preview :mail="log.extra.mail_preview" />
+            <tab-content v-if="log.extra && log.extra.mail_preview && log.extra.mail_preview.html" tab-value="mail_html_preview">
+              <mail-html-preview :mail="log.extra.mail_preview" />
+            </tab-content>
+
+            <tab-content v-if="log.extra && log.extra.mail_preview && log.extra.mail_preview.text" tab-value="mail_text_preview">
+              <mail-text-preview :mail="log.extra.mail_preview" />
             </tab-content>
 
             <tab-content tab-value="raw">
@@ -145,7 +149,8 @@ import { handleLogToggleKeyboardNavigation } from '../keyboardNavigation';
 import { useSeverityStore } from '../stores/severity.js';
 import TabContainer from "./TabContainer.vue";
 import TabContent from "./TabContent.vue";
-import MailPreview from "./MailPreview.vue";
+import MailHtmlPreview from "./MailHtmlPreview.vue";
+import MailTextPreview from "./MailTextPreview.vue";
 
 const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
@@ -170,14 +175,22 @@ const hasContext = (log) => {
   return log.context && Object.keys(log.context).length > 0;
 }
 
-const hasPreviews = (log) => {
-  return getExtraTabsForLog(log).length > 0;
-}
-
 const getExtraTabsForLog = (log) => {
-  return [
-    log.extra && log.extra.mail_preview ? { name: 'Mail preview', value: 'mail_preview' } : null,
-  ].filter(Boolean);
+  let tabs = [];
+
+  if (! log.extra || ! log.extra.mail_preview) {
+    return tabs;
+  }
+
+  if (log.extra.mail_preview.html) {
+    tabs.push({ name: 'HTML preview', value: 'mail_html_preview' });
+  }
+
+  if (log.extra.mail_preview.text) {
+    tabs.push({ name: 'Text preview', value: 'mail_text_preview' });
+  }
+
+  return tabs;
 }
 
 const getTabsForLog = (log) => {
