@@ -49,11 +49,17 @@ trait CanCacheIndex
         return Cache::get($this->metaCacheKey(), []);
     }
 
+    protected function canUseCompression(): bool
+    {
+        return extension_loaded('zlib')
+            && in_array(config('cache.default'), ['file', 'redis', 'array']);
+    }
+
     protected function saveChunkToCache(LogIndexChunk $chunk): void
     {
         $data = $chunk->data;
 
-        if (extension_loaded('zlib')) {
+        if ($this->canUseCompression()) {
             $data = gzcompress(serialize($data), 1);
         }
 
@@ -68,7 +74,7 @@ trait CanCacheIndex
     {
         $data = Cache::get($this->chunkCacheKey($index), $default);
 
-        if (is_string($data) && extension_loaded('zlib')) {
+        if (is_string($data) && $this->canUseCompression()) {
             $data = unserialize(gzuncompress($data));
         }
 
