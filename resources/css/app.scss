@@ -366,6 +366,10 @@ html.dark {
             @apply w-full border border-gray-200 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-900 overflow-auto mb-4 lg:mb-6;
         }
 
+        .mail-preview-text {
+            @apply w-full border border-gray-200 dark:border-gray-700 rounded bg-gray-50 dark:bg-gray-900 text-sm whitespace-pre-wrap mb-4 lg:mb-6 p-4;
+        }
+
         .mail-attachment-button {
             @apply flex items-center justify-between px-2 py-1 lg:px-4 lg:py-2 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded;
             max-width: 460px;
