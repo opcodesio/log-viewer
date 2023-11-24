@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
 
 beforeEach(function () {
@@ -53,12 +54,12 @@ it('can forward request to a different host', function ($method, $routeName, $ro
     });
 })->with([
     'folders index' => ['get', 'log-viewer.folders'],
-    'folder download' => ['get', 'log-viewer.folders.download', ['folderIdentifier' => 'folder']],
+    'folder download' => ['get', 'log-viewer.folders.request-download', ['folderIdentifier' => 'folder']],
     'folder clear cache' => ['post', 'log-viewer.folders.clear-cache', ['folderIdentifier' => 'folder']],
     'folder delete' => ['delete', 'log-viewer.folders.delete', ['folderIdentifier' => 'folder']],
 
     'files index' => ['get', 'log-viewer.files'],
-    'file download' => ['get', 'log-viewer.files.download', ['fileIdentifier' => 'file']],
+    'file download' => ['get', 'log-viewer.files.request-download', ['fileIdentifier' => 'file']],
     'file clear cache' => ['post', 'log-viewer.files.clear-cache', ['fileIdentifier' => 'file']],
     'file delete' => ['delete', 'log-viewer.files.delete', ['fileIdentifier' => 'file']],
 

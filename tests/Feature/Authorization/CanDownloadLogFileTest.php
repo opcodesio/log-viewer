@@ -1,20 +1,37 @@
 <?php
 
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Opcodes\LogViewer\LogFile;
 
 use function Pest\Laravel\get;
 
+function assertCanDownloadFile(string $fileName): void
+{
+    $response = get(route('log-viewer.files.request-download', $fileName));
+
+    $response->assertOk();
+    expect(URL::isValidUrl($response->json('url')))->toBeTrue();
+
+    get($response->json('url'))
+        ->assertOk()
+        ->assertDownload($fileName);
+}
+
+function assertCannotDownloadFile(string $fileName): void
+{
+    get(route('log-viewer.files.request-download', $fileName))
+        ->assertForbidden();
+}
+
 test('can download every file by default', function () {
     generateLogFiles([$fileName = 'laravel.log']);
 
-    get(route('log-viewer.files.download', $fileName))
-        ->assertOk()
-        ->assertDownload($fileName);
+    assertCanDownloadFile($fileName);
 });
 
 test('cannot download a file that\'s not found', function () {
-    get(route('log-viewer.files.download', 'notfound.log'))
+    get(route('log-viewer.files.request-download', 'notfound.log'))
         ->assertNotFound();
 });
 
@@ -22,15 +39,12 @@ test('"downloadLogFile" gate can prevent file download', function () {
     generateLogFiles([$fileName = 'laravel.log']);
     Gate::define('downloadLogFile', fn (mixed $user) => false);
 
-    get(route('log-viewer.files.download', $fileName))
-        ->assertForbidden();
+    assertCannotDownloadFile($fileName);
 
     // now let's allow access again
     Gate::define('downloadLogFile', fn (mixed $user) => true);
 
-    get(route('log-viewer.files.download', $fileName))
-        ->assertOk()
-        ->assertDownload($fileName);
+    assertCanDownloadFile($fileName);
 });
 
 test('"downloadLogFile" gate is supplied with a log file object', function () {
@@ -45,9 +59,7 @@ test('"downloadLogFile" gate is supplied with a log file object', function () {
         return true;
     });
 
-    get(route('log-viewer.files.download', $fileName))
-        ->assertOk()
-        ->assertDownload($fileName);
+    assertCanDownloadFile($fileName);
 
     expect($gateChecked)->toBeTrue();
 });
