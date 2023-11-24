@@ -36,7 +36,7 @@ class FilesController
                 'log-viewer.files.download',
                 now()->addMinute(),
                 ['fileIdentifier' => $fileIdentifier]
-            )
+            ),
         ]);
     }
 

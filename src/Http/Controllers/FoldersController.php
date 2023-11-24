@@ -37,7 +37,7 @@ class FoldersController
                 'log-viewer.folders.download',
                 now()->addMinutes(30),   // longer time to allow for processing of the ZIP file
                 ['folderIdentifier' => $folderIdentifier]
-            )
+            ),
         ]);
     }
 
