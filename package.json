@@ -33,7 +33,6 @@
         "vue": "^3.2.47",
         "vue-loader": "^17.0.1",
         "vue-router": "^4.1.6",
-        "vue-template-compiler": "^2.7.14",
-        "streamsaver": "^2.0.6"
+        "vue-template-compiler": "^2.7.14"
     }
 }
