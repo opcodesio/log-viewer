@@ -30,7 +30,7 @@ class LogIndex
         $this->loadMetadata();
     }
 
-    public function addToIndex(int $filePosition, int|CarbonInterface $timestamp, string $severity, int $index = null): int
+    public function addToIndex(int $filePosition, int|CarbonInterface $timestamp, string $severity, ?int $index = null): int
     {
         $logIndex = $index ?? $this->nextLogIndexToCreate ?? 0;
 
@@ -75,7 +75,7 @@ class LogIndex
         return null;
     }
 
-    public function get(int $limit = null): array
+    public function get(?int $limit = null): array
     {
         $results = [];
         $itemsAdded = 0;
@@ -157,7 +157,7 @@ class LogIndex
         return $results;
     }
 
-    public function getFlatIndex(int $limit = null): array
+    public function getFlatIndex(?int $limit = null): array
     {
         $results = [];
         $itemsAdded = 0;

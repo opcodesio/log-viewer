@@ -15,7 +15,7 @@ interface LogReaderInterface
     public static function clearInstances(): void;
 
     // Search/querying
-    public function search(string $query = null): static;
+    public function search(?string $query = null): static;
 
     public function skip(int $number): static;
 
@@ -26,7 +26,7 @@ interface LogReaderInterface
 
     public function forward(): static;
 
-    public function setDirection(string $direction = null): static;
+    public function setDirection(?string $direction = null): static;
 
     public function getLevelCounts(): array;
 
@@ -41,12 +41,12 @@ interface LogReaderInterface
     public function exceptLevels($levels = null): static;
 
     // Retrieving actual logs
-    public function get(int $limit = null): array;
+    public function get(?int $limit = null): array;
 
     public function next(): ?Log;
 
     /** @return LengthAwarePaginator<Log> */
-    public function paginate(int $perPage = 25, int $page = null);
+    public function paginate(int $perPage = 25, ?int $page = null);
 
     public function total(): int;
 
@@ -54,7 +54,7 @@ interface LogReaderInterface
     public function reset(): static;
 
     // We should decouple scanning from the LogReader
-    public function scan(int $maxBytesToScan = null, bool $force = false): static;
+    public function scan(?int $maxBytesToScan = null, bool $force = false): static;
 
     public function numberOfNewBytes(): int;
 

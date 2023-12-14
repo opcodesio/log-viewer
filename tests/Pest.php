@@ -25,7 +25,7 @@ uses()->beforeEach(function () {
 /**
  * Generate log files with random data
  */
-function generateLogFiles(array $files, string $content = null, bool $randomContent = false, $type = LogType::LARAVEL): array
+function generateLogFiles(array $files, ?string $content = null, bool $randomContent = false, $type = LogType::LARAVEL): array
 {
     return array_map(
         fn ($file) => generateLogFile($file, $content, $randomContent, $type),
@@ -33,7 +33,7 @@ function generateLogFiles(array $files, string $content = null, bool $randomCont
     );
 }
 
-function generateLogFile(string $fileName = null, string $content = null, bool $randomContent = false, $type = LogType::LARAVEL): LogFile
+function generateLogFile(?string $fileName = null, ?string $content = null, bool $randomContent = false, $type = LogType::LARAVEL): LogFile
 {
     if (is_null($fileName)) {
         $fileName = \Illuminate\Support\Str::random().'.log';
@@ -58,7 +58,7 @@ function generateLogFile(string $fileName = null, string $content = null, bool $
     return new LogFile($path);
 }
 
-function dummyLogData(int $lines = null, string $type = LogType::LARAVEL): string
+function dummyLogData(?int $lines = null, string $type = LogType::LARAVEL): string
 {
     if (is_null($lines)) {
         $lines = rand(1, 10);
@@ -81,7 +81,7 @@ function clearGeneratedLogFiles(): void
     clearstatcache();
 }
 
-function makeLaravelLogEntry(CarbonInterface $date = null, string $level = 'debug', string $message = 'Testing log entry'): string
+function makeLaravelLogEntry(?CarbonInterface $date = null, string $level = 'debug', string $message = 'Testing log entry'): string
 {
     $dateFormatted = $date instanceof CarbonInterface ? $date->toDateTimeString() : now()->toDateTimeString();
     $level = strtoupper($level);
@@ -89,7 +89,7 @@ function makeLaravelLogEntry(CarbonInterface $date = null, string $level = 'debu
     return "[$dateFormatted] local.$level: $message";
 }
 
-function makeHttpAccessLogEntry(CarbonInterface $date = null, string $method = 'get', string $path = '/app', int $statusCode = 200, int $contentLength = null): string
+function makeHttpAccessLogEntry(?CarbonInterface $date = null, string $method = 'get', string $path = '/app', int $statusCode = 200, ?int $contentLength = null): string
 {
     $randomIp = rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255).'.'.rand(1, 255);
     $dateFormatted = $date instanceof CarbonInterface ? $date->format('d/M/Y:H:i:s O') : now()->format('d/M/Y:H:i:s O');
@@ -101,7 +101,7 @@ $randomIp - - [$dateFormatted] "$method $path HTTP/2.0" $statusCode $contentLeng
 EOF;
 }
 
-function makeHttpApacheErrorLogEntry(CarbonInterface $date = null, string $module = null, string $level = null, int $pid = null, string $client = null, string $message = null): string
+function makeHttpApacheErrorLogEntry(?CarbonInterface $date = null, ?string $module = null, ?string $level = null, ?int $pid = null, ?string $client = null, ?string $message = null): string
 {
     $dateFormatted = $date instanceof CarbonInterface ? $date->format('D M d H:i:s.u Y') : now()->format('D M d H:i:s.u Y');
     $module ??= 'php';
@@ -115,7 +115,7 @@ function makeHttpApacheErrorLogEntry(CarbonInterface $date = null, string $modul
 EOF;
 }
 
-function makeHttpNginxErrorLogEntry(CarbonInterface $date = null, string $level = null, string $message = null, string $client = null, string $server = null, string $request = null, string $host = null): string
+function makeHttpNginxErrorLogEntry(?CarbonInterface $date = null, ?string $level = null, ?string $message = null, ?string $client = null, ?string $server = null, ?string $request = null, ?string $host = null): string
 {
     $dateFormatted = $date instanceof CarbonInterface ? $date->format('Y/m/d H:i:s') : now()->format('Y/m/d H:i:s');
     $level ??= 'error';

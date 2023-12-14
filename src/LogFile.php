@@ -24,7 +24,7 @@ class LogFile
     private ?string $type = null;
     private array $_logIndexCache;
 
-    public function __construct(string $path, string $type = null)
+    public function __construct(string $path, ?string $type = null)
     {
         $this->path = $path;
         $this->name = basename($path);
@@ -59,7 +59,7 @@ class LogFile
         return new LogType($this->type ?? LogType::DEFAULT);
     }
 
-    public function index(string $query = null): LogIndex
+    public function index(?string $query = null): LogIndex
     {
         if (! isset($this->_logIndexCache[$query])) {
             $this->_logIndexCache[$query] = new LogIndex($this, $query);
@@ -171,7 +171,7 @@ class LogFile
         return $this->getMetadata('latest_timestamp') ?? $this->mtime();
     }
 
-    public function scan(int $maxBytesToScan = null, bool $force = false): void
+    public function scan(?int $maxBytesToScan = null, bool $force = false): void
     {
         $this->logs()->scan($maxBytesToScan, $force);
     }
@@ -184,7 +184,7 @@ class LogFile
     /**
      * @throws InvalidRegularExpression
      */
-    public function search(string $query = null): LogReaderInterface
+    public function search(?string $query = null): LogReaderInterface
     {
         return $this->logs()->search($query);
     }

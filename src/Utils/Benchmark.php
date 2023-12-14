@@ -84,7 +84,7 @@ class Benchmark
     /**
      * Dump the results from the tests and exit immediately. Akin to Laravel's dd() call.
      */
-    public static function dd(string $name = null): void
+    public static function dd(?string $name = null): void
     {
         self::dump($name);
 
@@ -94,7 +94,7 @@ class Benchmark
     /**
      * Dump the results from the tests
      */
-    public static function dump(string $name = null): void
+    public static function dump(?string $name = null): void
     {
         if ($name) {
             dump(self::results($name));
@@ -110,7 +110,7 @@ class Benchmark
     /**
      * Get the results of the benchmark.
      */
-    public static function results(string $name = null): array
+    public static function results(?string $name = null): array
     {
         if ($name) {
             $testData = static::$tests[$name];

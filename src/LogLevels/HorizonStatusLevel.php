@@ -11,7 +11,7 @@ class HorizonStatusLevel implements LevelInterface
         $this->value = $value;
     }
 
-    public static function from(string $value = null): LevelInterface
+    public static function from(?string $value = null): LevelInterface
     {
         return new static($value);
     }

@@ -31,7 +31,7 @@ class HorizonLog extends Log
         ]);
     }
 
-    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
+    public static function matches(string $text, ?int &$timestamp = null, ?string &$level = null): bool
     {
         return parent::matches($text, $timestamp, $level)
             || (str_contains($text, 'Horizon started successfully') && throw new SkipLineException);

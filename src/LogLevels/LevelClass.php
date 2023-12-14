@@ -15,7 +15,7 @@ class LevelClass
     ) {
     }
 
-    public static function from(string $value = null): LevelClass
+    public static function from(?string $value = null): LevelClass
     {
         return new static($value);
     }
