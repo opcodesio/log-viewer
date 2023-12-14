@@ -46,7 +46,7 @@ class Log
     public ?int $filePosition;
     public ?int $index;
 
-    public function __construct(string $text, string $fileIdentifier = null, int $filePosition = null, int $index = null)
+    public function __construct(string $text, ?string $fileIdentifier = null, ?int $filePosition = null, ?int $index = null)
     {
         $this->text = rtrim($text);
         $this->fileIdentifier = $fileIdentifier;
@@ -60,7 +60,7 @@ class Log
         unset($matches);
     }
 
-    public static function matches(string $text, int &$timestamp = null, string &$level = null): bool
+    public static function matches(string $text, ?int &$timestamp = null, ?string &$level = null): bool
     {
         $matches = [];
         $result = preg_match(static::$regex, $text, $matches) === 1;

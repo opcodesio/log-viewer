@@ -15,7 +15,7 @@ class NginxStatusLevel implements LevelInterface
 
     public string $value;
 
-    public function __construct(string $value = null)
+    public function __construct(?string $value = null)
     {
         $this->value = $value ?? self::Error;
     }
@@ -34,7 +34,7 @@ class NginxStatusLevel implements LevelInterface
         ];
     }
 
-    public static function from(string $value = null): self
+    public static function from(?string $value = null): self
     {
         return new self($value);
     }

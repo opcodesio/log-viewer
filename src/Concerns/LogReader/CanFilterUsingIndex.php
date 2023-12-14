@@ -76,12 +76,12 @@ trait CanFilterUsingIndex
         return $this;
     }
 
-    public function search(string $query = null): static
+    public function search(?string $query = null): static
     {
         return $this->setQuery($query);
     }
 
-    protected function setQuery(string $query = null): static
+    protected function setQuery(?string $query = null): static
     {
         $this->closeFile();
 

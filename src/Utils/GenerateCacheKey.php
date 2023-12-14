@@ -8,7 +8,7 @@ use Opcodes\LogViewer\LogIndex;
 
 class GenerateCacheKey
 {
-    public static function for(mixed $object, string $namespace = null): string
+    public static function for(mixed $object, ?string $namespace = null): string
     {
         $key = '';
 

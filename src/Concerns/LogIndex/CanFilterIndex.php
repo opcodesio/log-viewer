@@ -13,7 +13,7 @@ trait CanFilterIndex
     protected ?int $limit = null;
     protected ?int $skip = null;
 
-    public function setQuery(string $query = null): self
+    public function setQuery(?string $query = null): self
     {
         if ($this->query !== $query) {
             $this->query = $query;
@@ -29,7 +29,7 @@ trait CanFilterIndex
         return $this->query;
     }
 
-    public function forDateRange(int|CarbonInterface $from = null, int|CarbonInterface $to = null): self
+    public function forDateRange(int|CarbonInterface|null $from = null, int|CarbonInterface|null $to = null): self
     {
         if ($from instanceof CarbonInterface) {
             $from = $from->timestamp;
@@ -45,7 +45,7 @@ trait CanFilterIndex
         return $this;
     }
 
-    public function forLevels(string|array $levels = null): self
+    public function forLevels(string|array|null $levels = null): self
     {
         if (is_string($levels)) {
             $levels = [$levels];
@@ -60,7 +60,7 @@ trait CanFilterIndex
         return $this;
     }
 
-    public function exceptLevels(string|array $levels = null): self
+    public function exceptLevels(string|array|null $levels = null): self
     {
         if (is_null($levels)) {
             $this->excludeLevels = null;
@@ -73,7 +73,7 @@ trait CanFilterIndex
         return $this;
     }
 
-    public function forLevel(string $level = null): self
+    public function forLevel(?string $level = null): self
     {
         return $this->forLevels($level);
     }
@@ -84,7 +84,7 @@ trait CanFilterIndex
             && (is_null($this->excludeLevels) || ! in_array($level, $this->excludeLevels));
     }
 
-    public function skip(int $skip = null): self
+    public function skip(?int $skip = null): self
     {
         $this->skip = $skip;
 
@@ -96,7 +96,7 @@ trait CanFilterIndex
         return $this->skip;
     }
 
-    public function limit(int $limit = null): self
+    public function limit(?int $limit = null): self
     {
         $this->limit = $limit;
 

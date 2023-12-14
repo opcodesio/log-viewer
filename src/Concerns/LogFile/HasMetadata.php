@@ -11,7 +11,7 @@ trait HasMetadata
         $this->metadata[$attribute] = $value;
     }
 
-    public function getMetadata(string $attribute = null, $default = null): mixed
+    public function getMetadata(?string $attribute = null, $default = null): mixed
     {
         if (! isset($this->metadata)) {
             $this->loadMetadata();

@@ -9,7 +9,7 @@ class HttpStatusCodeLevel implements LevelInterface
     ) {
     }
 
-    public static function from(string $value = null): LevelInterface
+    public static function from(?string $value = null): LevelInterface
     {
         return new static($value);
     }

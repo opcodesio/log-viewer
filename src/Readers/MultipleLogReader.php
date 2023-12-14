@@ -48,7 +48,7 @@ class MultipleLogReader
         return $this;
     }
 
-    public function setDirection(string $direction = null): self
+    public function setDirection(?string $direction = null): self
     {
         $this->direction = $direction === Direction::Backward
             ? Direction::Backward
@@ -87,7 +87,7 @@ class MultipleLogReader
         return $this;
     }
 
-    public function search(string $query = null): self
+    public function search(?string $query = null): self
     {
         $this->query = $query;
 
@@ -121,7 +121,7 @@ class MultipleLogReader
         });
     }
 
-    public function paginate($perPage = 25, int $page = null): LengthAwarePaginator
+    public function paginate($perPage = 25, ?int $page = null): LengthAwarePaginator
     {
         $page = $page ?: Paginator::resolveCurrentPage('page');
 
@@ -140,7 +140,7 @@ class MultipleLogReader
      *
      * @return array|Log[]
      */
-    public function get(int $limit = null): array
+    public function get(?int $limit = null): array
     {
         $skip = $this->skip ?? null;
         $limit = $limit ?? $this->limit ?? null;
@@ -204,7 +204,7 @@ class MultipleLogReader
         return 100 - intval($missingScansBytes / $totalFileBytes * 100);
     }
 
-    public function scan(int $maxBytesToScan = null, bool $force = false): void
+    public function scan(?int $maxBytesToScan = null, bool $force = false): void
     {
         $fileSizeScanned = 0;
         $stopScanningAfter = microtime(true) + LogViewer::lazyScanTimeout();

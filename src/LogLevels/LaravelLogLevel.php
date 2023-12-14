@@ -16,7 +16,7 @@ class LaravelLogLevel implements LevelInterface
 
     public string $value;
 
-    public function __construct(string $value = null)
+    public function __construct(?string $value = null)
     {
         $this->value = $value ?? self::None;
     }
@@ -36,7 +36,7 @@ class LaravelLogLevel implements LevelInterface
         ];
     }
 
-    public static function from(string $value = null): self
+    public static function from(?string $value = null): self
     {
         return new self($value);
     }

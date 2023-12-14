@@ -48,7 +48,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
      *
      * @throws CannotOpenFileException
      */
-    public function scan(int $maxBytesToScan = null, bool $force = false): static
+    public function scan(?int $maxBytesToScan = null, bool $force = false): static
     {
         if (is_null($maxBytesToScan)) {
             $maxBytesToScan = LogViewer::lazyScanChunkSize();
@@ -188,7 +188,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
      *
      * @throws CannotOpenFileException
      */
-    public function get(int $limit = null): array
+    public function get(?int $limit = null): array
     {
         if (! is_null($limit) && method_exists($this, 'limit')) {
             $this->limit($limit);
@@ -230,7 +230,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
         return $this->index()->count();
     }
 
-    public function paginate(int $perPage = 25, int $page = null)
+    public function paginate(int $perPage = 25, ?int $page = null)
     {
         $page = $page ?: Paginator::resolveCurrentPage('page');
 

@@ -16,7 +16,7 @@ trait CanSetDirectionUsingIndex
         return $this->setDirection(Direction::Forward);
     }
 
-    public function setDirection(string $direction = null): static
+    public function setDirection(?string $direction = null): static
     {
         $direction = $direction === Direction::Backward
             ? Direction::Backward
