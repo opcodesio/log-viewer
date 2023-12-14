@@ -70,7 +70,7 @@
         </td>
       </tr>
       <tr v-show="logViewerStore.isOpen(index)">
-        <td colspan="6">
+        <td :colspan="tableColumns">
           <div class="lg:hidden flex justify-between px-2 pt-2 pb-1 text-xs">
             <div class="flex-1"><span class="font-semibold">Datetime:</span> {{ log.datetime }}</div>
             <div>
@@ -151,6 +151,7 @@ import TabContainer from "./TabContainer.vue";
 import TabContent from "./TabContent.vue";
 import MailHtmlPreview from "./MailHtmlPreview.vue";
 import MailTextPreview from "./MailTextPreview.vue";
+import {computed} from "vue";
 
 const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
@@ -209,4 +210,9 @@ const prepareContextForOutput = (context) => {
     return value;
   }, 2);
 }
+
+const tableColumns = computed(() => {
+  // the extra two columns are for the expand/collapse and log index columns
+  return logViewerStore.columns.length + 2;
+});
 </script>

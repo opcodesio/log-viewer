@@ -23,30 +23,20 @@
         </div>
       </div>
 
+      <div v-if="!inlinePaginationSettingsIntoTableHeader" class="flex justify-end md:px-4 my-1 mx-2">
+        <pagination-options />
+      </div>
+
       <div v-if="displayLogs" class="relative overflow-hidden h-full text-sm">
         <!-- pagination settings -->
-        <div class="mx-2 mt-1 mb-2 text-right lg:mx-0 lg:mt-0 lg:mb-0 lg:absolute lg:top-2 lg:right-6 z-20 text-sm text-gray-500 dark:text-gray-400">
-          <label for="log-sort-direction" class="sr-only">Sort direction</label>
-          <select id="log-sort-direction" v-model="logViewerStore.direction" class="select mr-4">
-            <option value="desc">Newest first</option>
-            <option value="asc">Oldest first</option>
-          </select>
-          <label for="items-per-page" class="sr-only">Items per page</label>
-          <select id="items-per-page" v-model="logViewerStore.resultsPerPage" class="select">
-            <option value="10">10 items per page</option>
-            <option value="25">25 items per page</option>
-            <option value="50">50 items per page</option>
-            <option value="100">100 items per page</option>
-            <option value="250">250 items per page</option>
-            <option value="500">500 items per page</option>
-          </select>
-        </div>
+        <pagination-options
+          v-if="inlinePaginationSettingsIntoTableHeader"
+          class="mx-2 mt-1 mb-2 text-right lg:mx-0 lg:mt-0 lg:mb-0 lg:absolute lg:top-2 lg:right-6 z-20"
+        />
 
         <div class="log-item-container h-full overflow-y-auto md:px-4" @scroll="(event) => logViewerStore.onScroll(event)">
           <div class="inline-block min-w-full max-w-full align-middle">
-
             <base-log-table />
-
           </div>
         </div>
 
@@ -77,9 +67,8 @@
 </template>
 
 <script setup>
-import { computed, watch } from 'vue';
+import {computed, ref, watch} from 'vue';
 import { useRouter } from 'vue-router';
-import { replaceQuery } from '../helpers.js';
 import { ArrowPathIcon, Bars3Icon } from '@heroicons/vue/24/solid';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { useSearchStore } from '../stores/search.js';
@@ -91,14 +80,13 @@ import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import BaseLogTable from './BaseLogTable.vue';
-import { useSeverityStore } from '../stores/severity.js';
+import PaginationOptions from './PaginationOptions.vue';
 
 const router = useRouter();
 const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
 const searchStore = useSearchStore();
 const paginationStore = usePaginationStore();
-const severityStore = useSeverityStore();
 
 const showLevelsDropdown = computed(() => {
   return fileStore.selectedFile || String(searchStore.query || '').trim().length > 0;
@@ -108,14 +96,6 @@ const displayLogs = computed(() => {
   return logViewerStore.logs && (logViewerStore.logs.length > 0 || !logViewerStore.hasMoreResults) && (logViewerStore.selectedFile || searchStore.hasQuery);
 });
 
-const clearSelectedFile = () => {
-  replaceQuery(router, 'file', null);
-}
-
-const clearQuery = () => {
-  replaceQuery(router, 'query', null);
-}
-
 watch(
   [
     () => logViewerStore.direction,
@@ -123,4 +103,13 @@ watch(
   ],
   () => logViewerStore.loadLogs()
 )
+
+const inlinePaginationSettingsIntoTableHeader = ref(true);
+
+watch(() => logViewerStore.columns, () => {
+  // only if the last column is the message column, which is usually a wide column
+  // and leaves space for the pagination settings to be displayed in the table's header.
+  inlinePaginationSettingsIntoTableHeader.value =
+    logViewerStore.columns[logViewerStore.columns.length - 1].data_path === 'message';
+});
 </script>
