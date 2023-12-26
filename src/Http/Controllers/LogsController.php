@@ -22,8 +22,8 @@ class LogsController
         $query = $request->query('query', '');
         $direction = $request->query('direction', 'desc');
         $log = $request->query('log', null);
-        $excludedLevels = $request->query('exclude_levels', []);
-        $excludedFileTypes = $request->query('exclude_file_types', []);
+        $excludedLevels = array_filter((array) $request->query('exclude_levels'));
+        $excludedFileTypes = array_filter((array) $request->query('exclude_file_types'));
         $perPage = $request->query('per_page', 25);
         session()->put('log-viewer:shorter-stack-traces', $request->boolean('shorter_stack_traces', false));
         $hasMoreResults = false;
