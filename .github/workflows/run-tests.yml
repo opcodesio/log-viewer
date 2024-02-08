@@ -2,8 +2,7 @@ name: run-tests
 
 on:
   push:
-    branches:
-      - "**"
+    branches: [feat/laravel11]
 
 jobs:
   test:
