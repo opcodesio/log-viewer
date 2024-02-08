@@ -1,11 +1,10 @@
-name: Tests
+name: run-tests
 
 on:
   push:
-    branches:
-      - "**"
+    branches: [main, 1.x, 2.x]
   pull_request:
-    types: [ready_for_review, synchronize, opened]
+    branches: [main, 1.x, 2.x]
 
 jobs:
   build:
