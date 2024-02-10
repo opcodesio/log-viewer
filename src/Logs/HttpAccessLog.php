@@ -34,9 +34,7 @@ class HttpAccessLog extends Log
             'user_agent' => $matches['user_agent'] ?? null,
         ];
 
-        $this->datetime = static::parseDateTime($matches['datetime'] ?? null)?->tz(
-            config('log-viewer.timezone', config('app.timezone', 'UTC'))
-        );
+        $this->datetime = static::parseDateTime($matches['datetime'] ?? null);
         $this->level = $matches['status_code'] ?? null;
         $this->message = sprintf(
             '%s %s',
@@ -47,6 +45,8 @@ class HttpAccessLog extends Log
 
     public static function parseDatetime(?string $datetime): ?CarbonInterface
     {
-        return $datetime ? Carbon::createFromFormat('d/M/Y:H:i:s O', $datetime) : null;
+        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
+
+        return $datetime ? Carbon::createFromFormat('d/M/Y:H:i:s O', $datetime, $timezone) : null;
     }
 }

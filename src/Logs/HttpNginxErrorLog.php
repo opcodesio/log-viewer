@@ -14,9 +14,7 @@ class HttpNginxErrorLog extends Log
 
     protected function fillMatches(array $matches = []): void
     {
-        $this->datetime = static::parseDateTime($matches['datetime'] ?? null)?->tz(
-            config('log-viewer.timezone', config('app.timezone', 'UTC'))
-        );
+        $this->datetime = static::parseDateTime($matches['datetime'] ?? null);
         $this->level = $matches['level'] ?? null;
         $this->message = $matches['errormessage'] ?? null;
 
@@ -30,6 +28,8 @@ class HttpNginxErrorLog extends Log
 
     public static function parseDateTime(?string $datetime): ?CarbonInterface
     {
-        return $datetime ? Carbon::createFromFormat('Y/m/d H:i:s', $datetime) : null;
+        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
+
+        return $datetime ? Carbon::createFromFormat('Y/m/d H:i:s', $datetime, $timezone) : null;
     }
 }

@@ -80,7 +80,13 @@ class Log
 
     public static function parseDatetime(?string $datetime): ?CarbonInterface
     {
-        return $datetime ? Carbon::parse($datetime) : null;
+        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
+
+        if (is_string($datetime)) {
+            return Carbon::parse($datetime, $timezone);
+        }
+
+        return $datetime ? Carbon::parse($datetime, $timezone) : null;
     }
 
     /**
@@ -104,9 +110,7 @@ class Log
 
     protected function fillMatches(array $matches = []): void
     {
-        $this->datetime = static::parseDatetime($matches[static::$regexDatetimeKey] ?? null)?->tz(
-            config('log-viewer.timezone', config('app.timezone'))
-        );
+        $this->datetime = static::parseDatetime($matches[static::$regexDatetimeKey] ?? null);
         $this->level = $matches[static::$regexLevelKey] ?? null;
         $this->message = trim($matches[static::$regexMessageKey] ?? null);
         $this->context = [];

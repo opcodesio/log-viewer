@@ -14,6 +14,8 @@ class SupervisorLog extends Log
 
     public static function parseDatetime(?string $datetime): ?CarbonInterface
     {
-        return $datetime ? Carbon::createFromFormat('Y-m-d H:i:s,u', $datetime) : null;
+        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
+
+        return $datetime ? Carbon::createFromFormat('Y-m-d H:i:s,u', $datetime, $timezone) : null;
     }
 }
