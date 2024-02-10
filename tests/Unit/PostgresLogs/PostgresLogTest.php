@@ -31,15 +31,15 @@ LOG);
     $logReader = $file->logs()->scan();
 
     expect($logs = $logReader->get())->toHaveCount(9)
-        ->and($logs[0]->datetime->toDateTimeString())->toBe('2022-11-26 13:30:59')
+        ->and($logs[0]->datetime->toDateTimeString())->toBe('2022-11-26 15:30:59')
         ->and($logs[0]->level)->toBe('CONTEXT')
         ->and($logs[0]->message)->toBe('PL/pgSQL function inline_code_block line 16 at RAISE')
         ->and($logs[0]->context['pid'])->toBe(20532)
-        ->and($logs[1]->datetime->toDateTimeString())->toBe('2022-11-26 13:32:04')
+        ->and($logs[1]->datetime->toDateTimeString())->toBe('2022-11-26 15:32:04')
         ->and($logs[1]->level)->toBe('WARNING')
         ->and($logs[1]->message)->toBe('WELCOME TO')
         ->and($logs[1]->context['pid'])->toBe(18913)
-        ->and($logs[2]->datetime->toDateTimeString())->toBe('2022-11-26 13:32:04')
+        ->and($logs[2]->datetime->toDateTimeString())->toBe('2022-11-26 15:32:04')
         ->and($logs[2]->level)->toBe('CONTEXT')
         ->and($logs[2]->message)->toBe('PL/pgSQL function inline_code_block line 16 at RAISE')
         ->and($logs[2]->context['pid'])->toBe(18913);

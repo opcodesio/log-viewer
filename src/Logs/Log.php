@@ -80,13 +80,7 @@ class Log
 
     public static function parseDatetime(?string $datetime): ?CarbonInterface
     {
-        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
-
-        if (is_string($datetime)) {
-            return Carbon::parse($datetime, $timezone);
-        }
-
-        return $datetime ? Carbon::parse($datetime, $timezone) : null;
+        return $datetime ? Carbon::parse($datetime) : null;
     }
 
     /**
