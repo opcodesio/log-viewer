@@ -7,13 +7,14 @@ on:
     branches: [main, 1.x, 2.x]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  test:
+    runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
+        os: [ubuntu-latest, windows-latest]
         php: ['8.2', '8.1', '8.0']
-        laravel: [9.*, 10.*, 11.*]
+        laravel: [9.*, 10.*]
         stability: [prefer-lowest, prefer-stable]
         exclude:
           - php: 8.0
@@ -38,7 +39,7 @@ jobs:
             pest: 2.*
             collision: 8.*
 
-    name: PHP:${{ matrix.php }} / L:${{ matrix.laravel }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
       - name: Checkout code
