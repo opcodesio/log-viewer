@@ -14,7 +14,10 @@ class HttpApacheErrorLog extends Log
 
     protected function fillMatches(array $matches = []): void
     {
-        $this->datetime = static::parseDateTime($matches['datetime'] ?? null);
+        $datetime = static::parseDateTime($matches['datetime'] ?? null);
+        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
+        $this->datetime = $timezone ? $datetime->setTimezone($timezone) : $datetime;
+
         $this->level = $matches['level'] ?? null;
         $this->message = $matches['message'] ?? null;
 
@@ -27,8 +30,6 @@ class HttpApacheErrorLog extends Log
 
     public static function parseDateTime(?string $datetime): ?CarbonInterface
     {
-        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
-
-        return $datetime ? Carbon::createFromFormat('D M d H:i:s.u Y', $datetime, $timezone) : null;
+        return $datetime ? Carbon::createFromFormat('D M d H:i:s.u Y', $datetime) : null;
     }
 }

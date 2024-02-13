@@ -21,8 +21,6 @@ class PostgresLog extends Log
 
     public static function parseDatetime(?string $datetime): ?CarbonInterface
     {
-        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
-
-        return isset($datetime) ? Carbon::createFromFormat('Y-m-d H:i:s.u T', $datetime, $timezone) : null;
+        return isset($datetime) ? Carbon::createFromFormat('Y-m-d H:i:s.u T', $datetime) : null;
     }
 }
