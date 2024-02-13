@@ -34,7 +34,7 @@ class LaravelLog extends Log
 
         // sometimes, even the first line will have a HUGE exception with tons of debug data all in one line,
         // so in order to properly match, we must have a smaller first line...
-        $firstLineSplit = str_split($firstLine, 1000);
+        $firstLineSplit = mb_str_split($firstLine, 1000);
 
         preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches);
 
