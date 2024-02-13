@@ -53,7 +53,7 @@ class LaravelLogLevel implements LevelInterface
     {
         return match ($this->value) {
             self::Debug, self::Info => LevelClass::info(),
-            self::Notice =>LevelClass::notice(),
+            self::Notice => LevelClass::notice(),
             self::Warning => LevelClass::warning(),
             self::Error, self::Critical, self::Alert, self::Emergency => LevelClass::danger(),
             default => LevelClass::none(),
