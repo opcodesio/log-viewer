@@ -34,7 +34,7 @@ html.dark {
         .log-level {
             @apply font-semibold;
 
-            &.success {
+            &.success, &.notice {
                 @apply text-emerald-700 dark:text-emerald-500;
             }
             &.info {
@@ -57,7 +57,7 @@ html.dark {
 
         button.active {
             .log-level {
-                &.success {
+                &.success, &.notice {
                     @apply text-emerald-100;
                 }
                 &.info {
@@ -87,7 +87,7 @@ html.dark {
 .log-item {
     @apply bg-white dark:bg-gray-800 transition duration-200 cursor-pointer;
 
-    &.success {
+    &.success, &.notice {
         &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-emerald-50 dark:bg-emerald-800 dark:bg-opacity-40;
         }
@@ -156,7 +156,7 @@ html.dark {
 .badge {
     @apply inline-flex items-center text-sm cursor-pointer px-3 py-1 rounded-md mr-2 mt-1 transition duration-200;
 
-    &.success {
+    &.success, &.notice {
         @apply border border-emerald-200 bg-emerald-50 text-gray-600
           dark:border-emerald-800 dark:bg-emerald-900 dark:bg-opacity-40 dark:text-gray-400;
 

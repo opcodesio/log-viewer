@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer\LogLevels;
 class LevelClass
 {
     const SUCCESS = 'success';
+    const NOTICE = 'notice';
     const INFO = 'info';
     const WARNING = 'warning';
     const DANGER = 'danger';
@@ -24,6 +25,7 @@ class LevelClass
     {
         return [
             static::SUCCESS,
+            static::NOTICE,
             static::INFO,
             static::WARNING,
             static::DANGER,
@@ -34,6 +36,11 @@ class LevelClass
     public static function success(): static
     {
         return new static(static::SUCCESS);
+    }
+
+    public static function notice(): static
+    {
+        return new static(static::NOTICE);
     }
 
     public static function info(): static
