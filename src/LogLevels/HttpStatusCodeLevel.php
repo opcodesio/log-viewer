@@ -28,7 +28,9 @@ class HttpStatusCodeLevel implements LevelInterface
     {
         $value = intval($this->value);
 
-        if ($value < 300) {
+        if ($value < 250) {
+            return LevelClass::notice();
+        } elseif ($value < 300) {
             return LevelClass::success();
         } elseif ($value < 400) {
             return LevelClass::info();
