@@ -105,7 +105,7 @@ class Log
     protected function fillMatches(array $matches = []): void
     {
         $datetime = static::parseDateTime($matches['datetime'] ?? null);
-        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
+        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC')) ?? 'UTC';
         $this->datetime = $datetime?->setTimezone($timezone);
 
         $this->level = $matches[static::$regexLevelKey] ?? null;
