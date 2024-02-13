@@ -21,7 +21,8 @@ class HorizonLog extends Log
     {
         $datetime = $this->parseDateTime($matches['datetime'] ?? null);
         $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC'));
-        $this->datetime = $timezone ? $datetime->setTimezone($timezone) : $datetime;
+        $this->datetime = $datetime?->setTimezone($timezone);
+
         $this->level = $matches['level'];
         $this->message = $matches['message'];
         $this->context = array_filter([
