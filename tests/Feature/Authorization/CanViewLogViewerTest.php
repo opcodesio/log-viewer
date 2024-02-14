@@ -36,3 +36,11 @@ test('can define a "viewLogViewer" gate as an alternative', function () {
     Gate::define('viewLogViewer', fn ($user = null) => true);
     get(route('log-viewer.index'))->assertOk();
 });
+
+test('can fake environment to production', function () {
+    app()->detectEnvironment(fn () => 'production');
+    expect(app()->isProduction())->toBeTrue();
+    (new \Opcodes\LogViewer\LogViewerServiceProvider(app()))->boot();
+
+    get(route('log-viewer.index'))->assertForbidden();
+});
