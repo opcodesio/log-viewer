@@ -219,6 +219,11 @@ class LogViewerService
         }
     }
 
+    public function hasAuthCallback(): bool
+    {
+        return isset($this->authCallback);
+    }
+
     public function lazyScanChunkSize(): int
     {
         return intval(config('log-viewer.lazy_scan_chunk_size_in_mb', 100)) * 1024 * 1024;
