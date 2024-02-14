@@ -67,7 +67,10 @@ class Log
 
         if ($result) {
             try {
-                $timestamp = static::parseDateTime($matches[static::$regexDatetimeKey] ?? null)?->timestamp;
+                $datetime = static::parseDateTime($matches[static::$regexDatetimeKey] ?? null);
+                $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC')) ?? 'UTC';
+                $timestamp = $datetime?->setTimezone($timezone)->timestamp;
+
                 $level = $matches[static::$regexLevelKey] ?? '';
             } catch (\Exception $exception) {
                 // not a valid datetime, so we can't match this log. Perhaps it's a different but similar log type.
