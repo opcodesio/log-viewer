@@ -40,7 +40,6 @@ test('can define a "viewLogViewer" gate as an alternative', function () {
 test('local environment can use Log Viewer by default', function () {
     app()->detectEnvironment(fn () => 'local');
     expect(app()->isProduction())->toBeFalse();
-    (new \Opcodes\LogViewer\LogViewerServiceProvider(app()))->boot();
 
     get(route('log-viewer.index'))->assertOk();
 });
@@ -48,7 +47,20 @@ test('local environment can use Log Viewer by default', function () {
 test('Log Viewer is blocked in production environment by default', function () {
     app()->detectEnvironment(fn () => 'production');
     expect(app()->isProduction())->toBeTrue();
-    (new \Opcodes\LogViewer\LogViewerServiceProvider(app()))->boot();
 
     get(route('log-viewer.index'))->assertForbidden();
+
+    // but if configuration allows...
+    config(['log-viewer.require_auth_in_production' => false]);
+    get(route('log-viewer.index'))->assertOk();
+});
+
+test('Log Viewer is not blocked if the Log Viewer auth middleware is not used', function () {
+    config(['log-viewer.middleware' => ['web']]);
+    app()->detectEnvironment(fn () => 'production');
+    expect(app()->isProduction())->toBeTrue();
+    // need to reload the routes in order for the new middleware to take place.
+    (new \Opcodes\LogViewer\LogViewerServiceProvider(app()))->boot();
+
+    get(route('log-viewer.index'))->assertOk();
 });

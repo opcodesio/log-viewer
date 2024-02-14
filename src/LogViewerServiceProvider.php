@@ -134,12 +134,6 @@ class LogViewerServiceProvider extends ServiceProvider
         if (! Gate::has('deleteLogFolder')) {
             Gate::define('deleteLogFolder', fn (mixed $user, LogFolder $folder) => true);
         }
-
-        if ($this->app->isProduction() && ! Gate::has('viewLogViewer') && ! LogViewer::hasAuthCallback()) {
-            // Disable Log Viewer in production by default. In order to allow access,
-            // developers will have to define a "viewLogViewer" gate or an "auth" callback.
-            LogViewer::auth(fn ($request) => false);
-        }
     }
 
     /**
