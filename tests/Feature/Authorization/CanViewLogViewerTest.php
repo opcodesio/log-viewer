@@ -37,7 +37,15 @@ test('can define a "viewLogViewer" gate as an alternative', function () {
     get(route('log-viewer.index'))->assertOk();
 });
 
-test('can fake environment to production', function () {
+test('local environment can use Log Viewer by default', function () {
+    app()->detectEnvironment(fn () => 'local');
+    expect(app()->isProduction())->toBeFalse();
+    (new \Opcodes\LogViewer\LogViewerServiceProvider(app()))->boot();
+
+    get(route('log-viewer.index'))->assertOk();
+});
+
+test('Log Viewer is blocked in production environment by default', function () {
     app()->detectEnvironment(fn () => 'production');
     expect(app()->isProduction())->toBeTrue();
     (new \Opcodes\LogViewer\LogViewerServiceProvider(app()))->boot();
