@@ -4,6 +4,9 @@ on:
   push:
     branches-ignore:
       - 'main'
+      - '1.x'
+      - '2.x'
+      - '3.x'
 
 jobs:
   php-code-styling:
