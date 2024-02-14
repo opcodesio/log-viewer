@@ -18,9 +18,10 @@ class HorizonOldLog extends Log
 
     protected function fillMatches(array $matches = []): void
     {
-        $this->datetime = $this->parseDatetime($matches['datetime'])?->tz(
-            config('log-viewer.timezone', config('app.timezone', 'UTC'))
-        );
+        $datetime = static::parseDateTime($matches['datetime'] ?? null);
+        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC')) ?? 'UTC';
+        $this->datetime = $datetime?->setTimezone($timezone);
+
         $this->level = $matches['level'];
         $this->message = $matches['message'];
         $this->context = [

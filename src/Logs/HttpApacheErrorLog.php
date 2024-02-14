@@ -14,9 +14,10 @@ class HttpApacheErrorLog extends Log
 
     protected function fillMatches(array $matches = []): void
     {
-        $this->datetime = static::parseDateTime($matches['datetime'] ?? null)?->tz(
-            config('log-viewer.timezone', config('app.timezone', 'UTC'))
-        );
+        $datetime = static::parseDateTime($matches['datetime'] ?? null);
+        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC')) ?? 'UTC';
+        $this->datetime = $datetime?->setTimezone($timezone);
+
         $this->level = $matches['level'] ?? null;
         $this->message = $matches['message'] ?? null;
 

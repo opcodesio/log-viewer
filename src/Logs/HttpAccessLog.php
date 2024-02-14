@@ -34,9 +34,10 @@ class HttpAccessLog extends Log
             'user_agent' => $matches['user_agent'] ?? null,
         ];
 
-        $this->datetime = static::parseDateTime($matches['datetime'] ?? null)?->tz(
-            config('log-viewer.timezone', config('app.timezone', 'UTC'))
-        );
+        $datetime = static::parseDateTime($matches['datetime'] ?? null);
+        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC')) ?? 'UTC';
+        $this->datetime = $datetime?->setTimezone($timezone);
+
         $this->level = $matches['status_code'] ?? null;
         $this->message = sprintf(
             '%s %s',
