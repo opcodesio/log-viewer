@@ -96,6 +96,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
             $lvl = null;
 
             try {
+                // first, let's see if it matches the new log entry. Does not take search query into account yet.
                 $lineMatches = $this->logClass::matches(trim($line), $ts, $lvl);
             } catch (SkipLineException $exception) {
                 continue;
@@ -103,6 +104,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
 
             if ($lineMatches) {
                 if ($currentLog !== '') {
+                    // Now, let's see if it matches the search query if set.
                     if (is_null($this->query) || preg_match($this->query, $currentLog)) {
                         $logIndex->addToIndex($currentLogPosition, $currentTimestamp ?? 0, $currentLogLevel, $currentIndex);
                     }
