@@ -90,7 +90,7 @@ trait CanFilterUsingIndex
             $this->only(null);
             $this->onlyShowIndex = intval(explode(':', $query)[1]);
         } elseif (! empty($query)) {
-            $query = '~'.$query.'~i';
+            $query = '~'.$query.'~iu';
 
             Utils::validateRegex($query);
 
