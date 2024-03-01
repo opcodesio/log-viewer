@@ -4,6 +4,7 @@ namespace Opcodes\LogViewer\Logs;
 
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
+use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogLevels\HttpStatusCodeLevel;
 
 class HttpAccessLog extends Log
@@ -35,8 +36,7 @@ class HttpAccessLog extends Log
         ];
 
         $datetime = static::parseDateTime($matches['datetime'] ?? null);
-        $timezone = config('log-viewer.timezone', config('app.timezone', 'UTC')) ?? 'UTC';
-        $this->datetime = $datetime?->setTimezone($timezone);
+        $this->datetime = $datetime?->setTimezone(LogViewer::timezone());
 
         $this->level = $matches['status_code'] ?? null;
         $this->message = sprintf(

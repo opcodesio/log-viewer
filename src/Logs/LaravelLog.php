@@ -38,9 +38,7 @@ class LaravelLog extends Log
 
         preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches);
 
-        $this->datetime = Carbon::parse($matches[1])?->setTimezone(
-            config('log-viewer.timezone', config('app.timezone', 'UTC')) ?? 'UTC'
-        );
+        $this->datetime = Carbon::parse($matches[1])?->setTimezone(LogViewer::timezone());
 
         // $matches[2] contains microseconds, which is already handled
         // $matches[3] contains timezone offset, which is already handled
