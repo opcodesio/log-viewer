@@ -15,6 +15,7 @@ use Opcodes\LogViewer\Readers\LogReaderInterface;
  * @see \Opcodes\LogViewer\LogViewerService
  *
  * @method static string version()
+ * @method static string timezone()
  * @method static bool assetsAreCurrent()
  * @method static bool supportsHostsFeature()
  * @method static void resolveHostsUsing(callable $callback)

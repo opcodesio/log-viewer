@@ -35,3 +35,22 @@ it('hides unknown log files', function () {
     assertContains('laravel.log', $fileNames);
     assertContains('other.log', $fileNames);
 });
+
+it('can get the timezone', function () {
+    config()->set('log-viewer.timezone', 'Europe/Vilnius');
+
+    expect(LogViewer::timezone())->toBe('Europe/Vilnius');
+});
+
+it('defaults to the app timezone', function () {
+    config()->set('app.timezone', 'Europe/Vilnius');
+
+    expect(LogViewer::timezone())->toBe('Europe/Vilnius');
+});
+
+it('defaults to UTC if no timezone is set anywhere', function () {
+    config()->set('app.timezone', null);
+    config()->set('log-viewer.timezone', null);
+
+    expect(LogViewer::timezone())->toBe('UTC');
+});
