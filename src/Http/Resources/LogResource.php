@@ -9,6 +9,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class LogResource extends JsonResource
 {
+    public bool $preserveKeys = true;
+
     public function toArray($request): array
     {
         $level = $this->getLevel();
