@@ -1,6 +1,7 @@
 <?php
 
 use Opcodes\LogViewer\Logs\LaravelLog;
+
 use function PHPUnit\Framework\assertEquals;
 
 it('can set a custom timezone of the log entry', function () {
