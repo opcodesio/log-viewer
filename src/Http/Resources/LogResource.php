@@ -7,6 +7,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class LogResource extends JsonResource
 {
+    public bool $preserveKeys = true;
+
     /**
      * @param  Request  $request
      * @return array
