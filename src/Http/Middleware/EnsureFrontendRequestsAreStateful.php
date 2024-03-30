@@ -70,7 +70,7 @@ class EnsureFrontendRequestsAreStateful
         $domain = Str::replaceFirst('http://', '', $domain);
         $domain = Str::endsWith($domain, '/') ? $domain : "{$domain}/";
 
-        $stateful = array_filter(config('sanctum.stateful', self::defaultStatefulDomains()));
+        $stateful = array_filter(config('log-viewer.api_stateful_domains') ?? config('sanctum.stateful') ?? self::defaultStatefulDomains());
 
         return Str::is(Collection::make($stateful)->map(function ($uri) {
             return trim($uri).'/*';

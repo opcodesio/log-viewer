@@ -88,6 +88,8 @@ return [
         \Opcodes\LogViewer\Http\Middleware\AuthorizeLogViewer::class,
     ],
 
+    'api_stateful_domains' => null,
+
     /*
     |--------------------------------------------------------------------------
     | Log Viewer Remote hosts.
