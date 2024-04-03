@@ -11,6 +11,7 @@ use Opcodes\LogViewer\Tests\TestCase;
 uses(TestCase::class)->in(__DIR__);
 uses()->afterEach(fn () => clearGeneratedLogFiles())->in('Feature', 'Unit');
 uses()->beforeEach(fn () => Artisan::call('log-viewer:publish'))->in('Feature');
+uses()->beforeEach(fn () => Artisan::call('config:cache'))->in('Feature');
 uses()->beforeEach(function () {
     // let's not include any of the default mac logs or similar
     config(['log-viewer.include_files' => ['*.log', '**/*.log']]);

@@ -95,6 +95,10 @@ class LogViewerServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(self::basePath('/routes/api.php'));
         });
 
+        if (config('log-viewer.api_only', false)) {
+            return;
+        }
+
         Route::group([
             'domain' => config('log-viewer.route_domain', null),
             'prefix' => config('log-viewer.route_path'),
