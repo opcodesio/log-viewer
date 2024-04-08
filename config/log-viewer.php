@@ -88,6 +88,8 @@ return [
         \Opcodes\LogViewer\Http\Middleware\AuthorizeLogViewer::class,
     ],
 
+    'api_stateful_domains' => env('LOG_VIEWER_API_STATEFUL_DOMAINS') ? explode(',', env('LOG_VIEWER_API_STATEFUL_DOMAINS')) : null,
+
     /*
     |--------------------------------------------------------------------------
     | Log Viewer Remote hosts.
