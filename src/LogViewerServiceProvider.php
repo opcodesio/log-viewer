@@ -114,7 +114,7 @@ class LogViewerServiceProvider extends ServiceProvider
     {
         $this->publishes([
             self::basePath('/public') => public_path('vendor/log-viewer'),
-        ], ['log-viewer-assets', 'laravel-assets']);
+        ], 'log-viewer-assets');
     }
 
     protected function defineDefaultGates()
