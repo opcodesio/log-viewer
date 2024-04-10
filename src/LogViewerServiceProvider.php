@@ -95,14 +95,16 @@ class LogViewerServiceProvider extends ServiceProvider
             $this->loadRoutesFrom(self::basePath('/routes/api.php'));
         });
 
-        Route::group([
-            'domain' => config('log-viewer.route_domain', null),
-            'prefix' => config('log-viewer.route_path'),
-            'namespace' => 'Opcodes\LogViewer\Http\Controllers',
-            'middleware' => config('log-viewer.middleware', null),
-        ], function () {
-            $this->loadRoutesFrom(self::basePath('/routes/web.php'));
-        });
+        if (! config('log-viewer.api_only', false)) {
+            Route::group([
+                'domain' => config('log-viewer.route_domain', null),
+                'prefix' => config('log-viewer.route_path'),
+                'namespace' => 'Opcodes\LogViewer\Http\Controllers',
+                'middleware' => config('log-viewer.middleware', null),
+            ], function () {
+                $this->loadRoutesFrom(self::basePath('/routes/web.php'));
+            });
+        }
     }
 
     protected function registerResources()
