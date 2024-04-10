@@ -7,14 +7,29 @@ use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogIndex;
 use Opcodes\LogViewer\Logs\LogType;
 use Opcodes\LogViewer\Tests\TestCase;
+use Symfony\Component\Finder\Finder;
 
-uses(TestCase::class)->in(__DIR__);
+$finder = new Finder();
+
+$useTestCases = [];
+foreach ($finder->files()->in(__DIR__)->notName('OnlyApiRoutesTest.php')->name('*.php') as $file) {
+    $useTestCases[] = $file->getRealPath();
+}
+
+$callingPublishTestCases = [];
+foreach ($finder->files()->in(__DIR__ . '/Feature')->notName('OnlyApiRoutesTest.php')->name('*.php') as $file) {
+    $callingPublishTestCases[] = $file->getRealPath();
+}
+
+uses(TestCase::class)->in(...$useTestCases);
 uses()->afterEach(fn () => clearGeneratedLogFiles())->in('Feature', 'Unit');
-uses()->beforeEach(fn () => Artisan::call('log-viewer:publish'))->in('Feature');
-uses()->beforeEach(fn () => Artisan::call('config:cache'))->in('Feature');
+uses()->beforeEach(fn () => Artisan::call('log-viewer:publish'))->in(...$callingPublishTestCases);
 uses()->beforeEach(function () {
     // let's not include any of the default mac logs or similar
-    config(['log-viewer.include_files' => ['*.log', '**/*.log']]);
+    config([
+        'log-viewer.api_only' => false,
+        'log-viewer.include_files' => ['*.log', '**/*.log']
+    ]);
 })->in('Unit', 'Feature');
 
 /*
