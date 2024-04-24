@@ -9,6 +9,10 @@ class IndexController
 {
     public function __invoke()
     {
+        if (config('log-viewer.api_only')) {
+            abort(404);
+        }
+
         return view(LogViewer::getViewLayout(), [
             'logViewerScriptVariables' => [
                 'headers' => (object) [],

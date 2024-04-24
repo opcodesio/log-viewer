@@ -1,6 +1,6 @@
 <?php
 
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use function Pest\Laravel\get;
 
 test('the default url can be changed', function () {
     config()->set('log-viewer.route_path', 'new-log-route');
@@ -32,8 +32,8 @@ test('only use api', function () {
 
     reloadRoutes();
 
-    route('log-viewer.index');
-})->throws(RouteNotFoundException::class);
+    get(route('log-viewer.index'))->assertStatus(404);
+});
 
 test('only both api and web', function () {
     config()->set('log-viewer.api_only', false);
@@ -41,6 +41,7 @@ test('only both api and web', function () {
     reloadRoutes();
 
     expect(route('log-viewer.index'))->toBe('http://localhost/log-viewer');
+    get(route('log-viewer.index'))->assertStatus(200);
 });
 
 /*
