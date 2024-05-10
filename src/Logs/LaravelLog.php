@@ -106,19 +106,17 @@ class LaravelLog extends Log
 
     protected function extractContextsFromFullText(): void
     {
-        // The regex pattern to find JSON strings.
-        $pattern = '/(\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\])/';
         $contexts = [];
 
         // Find matches.
-        preg_match_all($pattern, $this->text, $matches);
+        $json_strings = $this->getJsonStrings();
 
-        if (! isset($matches[0])) {
+        if (empty($json_strings)) {
             return;
         }
 
         // Loop through the matches.
-        foreach ($matches[0] as $json_string) {
+        foreach ($json_strings as $json_string) {
             // Try to decode the JSON string. If it fails, json_last_error() will return a non-zero value.
             $json_data = json_decode(trim($json_string), true);
 
@@ -180,5 +178,29 @@ class LaravelLog extends Log
             'text' => $message->getTextPart()?->getContent(),
             'size_formatted' => Utils::bytesForHumans($message->getSize()),
         ];
+    }
+
+    protected function getJsonStrings(): array
+    {
+        $json = '';
+        $json_strings = [];
+        $in = 0;
+        foreach (str_split($this->text) as $char) {
+            if ($char == '{' || $char == '[') {
+                $in++;
+            }
+            if ($in) {
+                $json .= $char;
+            }
+            if ($char == '}' || $char == ']') {
+                $in--;
+                if ($in == 0) {
+                    $json_strings[] = $json;
+                    $json = '';
+                }
+            }
+        }
+
+        return $json_strings;
     }
 }
