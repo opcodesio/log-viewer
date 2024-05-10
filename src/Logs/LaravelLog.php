@@ -109,7 +109,7 @@ class LaravelLog extends Log
         $contexts = [];
 
         // Find matches.
-        $json_strings = $this->getJsonStrings();
+        $json_strings = $this->getJsonStringsFromFullText();
 
         if (empty($json_strings)) {
             return;
@@ -180,7 +180,7 @@ class LaravelLog extends Log
         ];
     }
 
-    protected function getJsonStrings(): array
+    protected function getJsonStringsFromFullText(): array
     {
         $json = '';
         $json_strings = [];
