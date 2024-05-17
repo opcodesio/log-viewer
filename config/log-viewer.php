@@ -206,6 +206,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Cache key prefix
+    |--------------------------------------------------------------------------
+    | Log Viewer prefixes all the cache keys created with this value. If for
+    | some reason you would like to change this prefix, you can do so here.
+    | The format of Log Viewer cache keys is:
+    | {prefix}:{version}:{rest-of-the-key}
+    |
+    */
+
+    'cache_key_prefix' => 'lv',
+
+    /*
+    |--------------------------------------------------------------------------
     | Chunk size when scanning log files lazily
     |--------------------------------------------------------------------------
     | The size in MB of files to scan before updating the progress bar when searching across all files.

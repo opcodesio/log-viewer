@@ -33,6 +33,6 @@ class GenerateCacheKey
 
     protected static function baseKey(): string
     {
-        return 'lv:'.LogViewer::version();
+        return config('log-viewer.cache_key_prefix', 'lv').':'.LogViewer::version();
     }
 }
