@@ -35,7 +35,7 @@
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/vue/24/outline';
 import { usePaginationStore } from '../stores/pagination.js';
 import { useRoute, useRouter } from 'vue-router';
-import { computed } from 'vue';
+import {computed, onBeforeUnmount, onMounted} from 'vue';
 import { replaceQuery } from '../helpers.js';
 
 const props = defineProps({
@@ -69,4 +69,14 @@ const gotoPage = (page) => {
 
 const nextPage = () => gotoPage(paginationStore.page + 1);
 const previousPage = () => gotoPage(paginationStore.page - 1);
+
+onMounted(() => {
+  document.addEventListener('goToNextPage', nextPage);
+  document.addEventListener('goToPreviousPage', previousPage);
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('goToNextPage', nextPage);
+  document.removeEventListener('goToPreviousPage', previousPage);
+})
 </script>

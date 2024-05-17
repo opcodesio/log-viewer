@@ -42,6 +42,22 @@
                       <span class="description">Jump to logs</span>
                     </div>
                     <div class="keyboard-shortcut">
+                      <span class="shortcut">{{ KeyShortcuts.NextLog }}</span>
+                      <span class="description">Open next log</span>
+                    </div>
+                    <div class="keyboard-shortcut">
+                      <span class="shortcut">{{ KeyShortcuts.PreviousLog }}</span>
+                      <span class="description">Open previous log</span>
+                    </div>
+                    <div class="keyboard-shortcut">
+                      <span class="shortcut">{{ KeyShortcuts.Next }}</span>
+                      <span class="description">Next (file or log)</span>
+                    </div>
+                    <div class="keyboard-shortcut">
+                      <span class="shortcut">{{ KeyShortcuts.Previous }}</span>
+                      <span class="description">Previous (file or log)</span>
+                    </div>
+                    <div class="keyboard-shortcut">
                       <span class="shortcut">{{ KeyShortcuts.Severity }}</span>
                       <span class="description">Severity selection</span>
                     </div>

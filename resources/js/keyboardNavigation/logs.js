@@ -31,7 +31,7 @@ export const handleLogToggleKeyboardNavigation = (event) => {
       nextElement.focus();
     }
   }
-};
+}
 
 export const handleLogLinkKeyboardNavigation = (event) => {
   if (event.key === 'ArrowLeft') {

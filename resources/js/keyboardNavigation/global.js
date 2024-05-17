@@ -1,9 +1,15 @@
 import {
-  KeyShortcuts,
+  ensureIsExpanded,
+  fileItemClass,
+  focusActiveOrFirstFile,
   focusFirstLogEntry,
-  focusActiveOrFirstFile
+  focusLastLogEntry, focusNextFile, focusPreviousFile,
+  KeyShortcuts,
+  logToggleButtonClass,
+  openNextLogEntry,
+  openPreviousLogEntry
 } from './shared.js';
-import { useLogViewerStore } from '../stores/logViewer.js';
+import {useLogViewerStore} from '../stores/logViewer.js';
 
 const globalKeyboardEventHandler = (event) => {
   // if event.target is an <input> element, we don't want to handle the keyboard shortcuts
@@ -40,8 +46,42 @@ const globalKeyboardEventHandler = (event) => {
     event.preventDefault();
     const refreshButton = document.getElementById('reload-logs-button');
     refreshButton?.click();
+  } else if (event.key === KeyShortcuts.NextLog) {
+    event.preventDefault();
+    if (!document.activeElement.classList.contains(logToggleButtonClass)) {
+      focusFirstLogEntry();
+      ensureIsExpanded(document.activeElement);
+      return;
+    }
+    openNextLogEntry();
+  } else if (event.key === KeyShortcuts.PreviousLog) {
+    event.preventDefault();
+    if (!document.activeElement.classList.contains(logToggleButtonClass)) {
+      focusLastLogEntry();
+      ensureIsExpanded(document.activeElement);
+      return;
+    }
+    openPreviousLogEntry();
+  } else if (event.key === KeyShortcuts.Next) {
+    event.preventDefault();
+    const isLogEntry = document.activeElement.classList.contains(logToggleButtonClass);
+    const isFile = document.activeElement.classList.contains(fileItemClass);
+    if (isLogEntry) {
+      openNextLogEntry();
+    } else if (isFile) {
+      focusNextFile();
+    }
+  } else if (event.key === KeyShortcuts.Previous) {
+    event.preventDefault();
+    const isLogEntry = document.activeElement.classList.contains(logToggleButtonClass);
+    const isFile = document.activeElement.classList.contains(fileItemClass);
+    if (isLogEntry) {
+      openPreviousLogEntry();
+    } else if (isFile) {
+      focusPreviousFile();
+    }
   }
-};
+}
 
 export const registerGlobalShortcuts = () => {
   document.addEventListener('keydown', globalKeyboardEventHandler);
