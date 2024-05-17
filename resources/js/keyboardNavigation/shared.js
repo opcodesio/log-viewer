@@ -50,8 +50,16 @@ export const openNextLogEntry = () => {
   const el = document.activeElement;
   const nextElement = getNextElementWithClass(el, logToggleButtonClass);
   if (!nextElement) {
+    const onNextPageLoad = () => {
+      setTimeout(() => {
+        focusFirstLogEntry();
+        ensureIsExpanded(document.activeElement);
+      }, 50)
+      document.removeEventListener('logsPageLoaded', onNextPageLoad);
+    };
+    document.addEventListener('logsPageLoaded', onNextPageLoad);
+    document.dispatchEvent(new Event('goToNextPage'));
     return;
-    // TODO: check if there's a next pagination page to load and open the next log entry.
   }
   ensureIsCollapsed(el);
   nextElement.focus();
@@ -62,8 +70,16 @@ export const openPreviousLogEntry = () => {
   const el = document.activeElement;
   const previousElement = getPreviousElementWithClass(el, logToggleButtonClass);
   if (!previousElement) {
+    const onPreviousPageLoad = () => {
+      setTimeout(() => {
+        focusLastLogEntry();
+        ensureIsExpanded(document.activeElement);
+      }, 50)
+      document.removeEventListener('logsPageLoaded', onPreviousPageLoad);
+    };
+    document.addEventListener('logsPageLoaded', onPreviousPageLoad);
+    document.dispatchEvent(new Event('goToPreviousPage'));
     return;
-    // TODO: check if there's a previous pagination page to load and open the previous log entry.
   }
   ensureIsCollapsed(el);
   previousElement.focus();

@@ -234,11 +234,14 @@ export const useLogViewerStore = defineStore({
 
           if (!silently) {
             nextTick(() => {
+              document.dispatchEvent(new Event('logsPageLoaded'));
               this.reset();
               if (data.expandAutomatically) {
                 this.stacksOpen.push(0);
               }
             });
+          } else {
+            document.dispatchEvent(new Event('logsPageLoadedSilently'));
           }
 
           if (this.hasMoreResults) {
