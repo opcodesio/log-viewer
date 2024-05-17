@@ -14,6 +14,18 @@ it('can generate a cache key for a LogFile', function () {
     );
 });
 
+it('can configure the cache key prefix', function () {
+    config(['log-viewer.cache_key_prefix' => $customPrefix = 'lvCustom']);
+
+    $file = new LogFile('test.log');
+
+    $result = GenerateCacheKey::for($file);
+
+    expect($result)->toBe(
+        $customPrefix.':'.LogViewer::version().':file:'.$file->identifier
+    );
+});
+
 it('can pass a namespace for a more specific cache key', function () {
     $file = new LogFile('test.log');
 
