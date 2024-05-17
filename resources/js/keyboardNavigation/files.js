@@ -1,23 +1,12 @@
-import {
-  getPreviousElementWithClass,
-  getNextElementWithClass,
-  logToggleButtonClass,
-  fileItemClass,
-} from './shared.js';
+import {focusNextFile, focusPreviousFile, logToggleButtonClass} from './shared.js';
 
 export const handleKeyboardFileNavigation = (event) => {
   if (event.key === 'ArrowUp') {
-    const previousElement = getPreviousElementWithClass(document.activeElement, fileItemClass);
-    if (previousElement) {
-      event.preventDefault();
-      previousElement.focus();
-    }
+    event.preventDefault();
+    focusPreviousFile();
   } else if (event.key === 'ArrowDown') {
-    const nextElement = getNextElementWithClass(document.activeElement, fileItemClass);
-    if (nextElement) {
-      event.preventDefault();
-      nextElement.focus();
-    }
+    event.preventDefault();
+    focusNextFile();
   } else if (event.key === 'ArrowRight') {
     event.preventDefault();
     document.activeElement.nextElementSibling.focus();

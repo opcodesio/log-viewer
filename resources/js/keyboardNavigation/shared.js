@@ -6,6 +6,10 @@ export const logLinkClass = 'log-link.large-screen';
 export const KeyShortcuts = {
   Files: 'f',
   Logs: 'l',
+  Next: 'j',
+  Previous: 'k',
+  NextLog: 'n',
+  PreviousLog: 'p',
   Hosts: 'h',
   Severity: 's',
   Settings: 'g',
@@ -19,6 +23,51 @@ export const focusFirstLogEntry = () => {
   if (logToggleButtons.length > 0) {
     logToggleButtons[0].focus();
   }
+}
+
+export const focusLastLogEntry = () => {
+  const logToggleButtons = Array.from(document.querySelectorAll(`.${logToggleButtonClass}`));
+  if (logToggleButtons.length > 0) {
+    logToggleButtons[logToggleButtons.length - 1].focus();
+  }
+}
+
+export const ensureIsExpanded = (element) => {
+  const isExpanded = element.getAttribute('aria-expanded') === 'true';
+  if (!isExpanded) {
+    element.click();
+  }
+}
+
+export const ensureIsCollapsed = (element) => {
+  const isExpanded = element.getAttribute('aria-expanded') === 'true';
+  if (isExpanded) {
+    element.click();
+  }
+}
+
+export const openNextLogEntry = () => {
+  const el = document.activeElement;
+  const nextElement = getNextElementWithClass(el, logToggleButtonClass);
+  if (!nextElement) {
+    return;
+    // TODO: check if there's a next pagination page to load and open the next log entry.
+  }
+  ensureIsCollapsed(el);
+  nextElement.focus();
+  ensureIsExpanded(nextElement);
+}
+
+export const openPreviousLogEntry = () => {
+  const el = document.activeElement;
+  const previousElement = getPreviousElementWithClass(el, logToggleButtonClass);
+  if (!previousElement) {
+    return;
+    // TODO: check if there's a previous pagination page to load and open the previous log entry.
+  }
+  ensureIsCollapsed(el);
+  previousElement.focus();
+  ensureIsExpanded(previousElement);
 }
 
 export const focusActiveOrFirstFile = () => {
@@ -40,6 +89,20 @@ export const focusActiveOrFirstFileSettings = () => {
     firstFile?.nextElementSibling?.focus();
   }
 };
+
+export const focusNextFile = () => {
+  const nextElement = getNextElementWithClass(document.activeElement, fileItemClass);
+  if (nextElement) {
+    nextElement.focus();
+  }
+}
+
+export const focusPreviousFile = () => {
+  const previousElement = getPreviousElementWithClass(document.activeElement, fileItemClass);
+  if (previousElement) {
+    previousElement.focus();
+  }
+}
 
 export const getPreviousElementWithClass = (element, className) => {
   const elements = Array.from(document.querySelectorAll(`.${className}`));
