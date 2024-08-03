@@ -16,7 +16,7 @@
               leave-to="translate-x-full"
             >
               <DialogPanel class="pointer-events-auto w-screen max-w-md">
-                <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
+                <div class="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl dark:bg-gray-700">
                   <div class="px-4 sm:px-6">
                     <div class="flex items-start justify-between">
                       <DialogTitle class="text-base font-semibold leading-6 text-gray-900">Keyboard Shortcuts</DialogTitle>
