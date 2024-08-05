@@ -71,7 +71,11 @@ class FoldersController
 
         $folder->files()->each(function (LogFile $file) {
             if (Gate::check('deleteLogFile', $file)) {
-                $file->delete();
+                try {
+                    $file->delete();
+                } catch (Throwable $throwable) {
+                    // ignore
+                }
             }
         });
 
