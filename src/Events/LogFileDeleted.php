@@ -11,6 +11,5 @@ class LogFileDeleted
 
     public function __construct(
         public LogFile $file
-    ) {
-    }
+    ) {}
 }

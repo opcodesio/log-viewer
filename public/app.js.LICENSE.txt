@@ -5,6 +5,12 @@
  * @license  MIT
  */
 
+/*!
+ * pinia v2.2.2
+ * (c) 2024 Eduardo San Martin Morote
+ * @license MIT
+ */
+
 /*! #__NO_SIDE_EFFECTS__ */
 
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
@@ -19,3 +25,9 @@
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
  * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
  */
+
+/**
+* @vue/shared v3.4.38
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/

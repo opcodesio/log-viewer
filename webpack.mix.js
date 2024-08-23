@@ -23,6 +23,9 @@ mix.options({
                 '@': path.resolve(__dirname, 'resources/js/'),
             },
         },
+        // stats: {
+        //     children: true,
+        // }
     });
 
 mix.disableSuccessNotifications();

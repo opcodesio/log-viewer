@@ -10,6 +10,5 @@ class LevelCount
         public LevelInterface $level,
         public int $count = 0,
         public bool $selected = false,
-    ) {
-    }
+    ) {}
 }

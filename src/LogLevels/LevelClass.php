@@ -13,8 +13,7 @@ class LevelClass
 
     public function __construct(
         public string $value,
-    ) {
-    }
+    ) {}
 
     public static function from(?string $value = null): LevelClass
     {

@@ -39,7 +39,7 @@ class LogViewerServiceProvider extends ServiceProvider
 
         if (! $this->app->bound(LogTypeRegistrar::class)) {
             $this->app->singleton(LogTypeRegistrar::class, function () {
-                return new LogTypeRegistrar();
+                return new LogTypeRegistrar;
             });
         }
     }

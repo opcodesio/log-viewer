@@ -113,7 +113,7 @@ class LogFolder
         // just in case we have created it before.
         @unlink($zipPath);
 
-        $zip = new \ZipArchive();
+        $zip = new \ZipArchive;
 
         if ($zip->open($zipPath, \ZipArchive::CREATE) !== true) {
             throw new \Exception('Could not open '.$zipPath.' for writing.');

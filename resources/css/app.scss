@@ -522,7 +522,9 @@ html.dark {
         @apply outline-none ring-1 ring-brand-500 ring-opacity-50 dark:ring-brand-700 dark:ring-opacity-50;
     }
 
-    transform-origin: top right !important;
+    & {
+        transform-origin: top right !important;
+    }
 
     &.up {
         transform-origin: bottom right !important;
@@ -534,7 +536,9 @@ html.dark {
 
     &.left {
         @apply left-1 right-auto;
-        transform-origin: top left !important;
+        & {
+            transform-origin: top left !important;
+        }
 
         &.up {
             transform-origin: bottom left !important;
@@ -684,9 +688,9 @@ button.button:hover, a.button:hover {
 }
 
 .keyboard-shortcut {
-    @apply text-sm flex items-center justify-start mb-3 w-full text-gray-600 dark:text-gray-400;
+    @apply text-sm flex items-center justify-start mb-3 w-full text-gray-600 dark:text-gray-300;
 
     .shortcut {
-        @apply font-mono text-base inline-flex w-6 h-6 mr-2 items-center justify-center rounded border border-gray-400 dark:border-gray-600 ring-1 ring-gray-100 dark:ring-gray-900;
+        @apply font-mono text-base dark:text-gray-300 inline-flex w-6 h-6 mr-2 items-center justify-center rounded border border-gray-400 dark:border-gray-500 ring-1 ring-gray-100 dark:ring-gray-900;
     }
 }
