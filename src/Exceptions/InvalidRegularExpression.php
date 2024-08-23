@@ -4,6 +4,4 @@ namespace Opcodes\LogViewer\Exceptions;
 
 use Exception;
 
-class InvalidRegularExpression extends Exception
-{
-}
+class InvalidRegularExpression extends Exception {}

@@ -2,6 +2,4 @@
 
 namespace Opcodes\LogViewer\Exceptions;
 
-class SkipLineException extends \Exception
-{
-}
+class SkipLineException extends \Exception {}

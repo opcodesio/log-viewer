@@ -12,8 +12,7 @@ class LogIndexChunk
         public array $data,
         public int $index,
         public int $size,
-    ) {
-    }
+    ) {}
 
     public static function fromDefinitionArray(array $definition): LogIndexChunk
     {
