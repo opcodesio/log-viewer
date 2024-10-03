@@ -64,7 +64,7 @@ class LogsController
 
                 $logQuery->scan();
                 $logQuery->exceptLevels($excludedLevels);
-                $logs = $logQuery->paginate($perPage);
+                $logs = $logQuery->paginate((int) $perPage);
                 $levels = array_values($logQuery->getLevelCounts());
 
                 if ($logs->lastPage() < $request->input('page', 1)) {
