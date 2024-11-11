@@ -111,7 +111,7 @@ class Log
         $this->datetime = $datetime?->setTimezone(LogViewer::timezone());
 
         $this->level = $matches[static::$regexLevelKey] ?? null;
-        $this->message = trim($matches[static::$regexMessageKey] ?? null);
+        $this->message = trim($matches[static::$regexMessageKey] ?? '');
         $this->context = [];
     }
 
