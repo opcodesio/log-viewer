@@ -36,6 +36,10 @@ class ForwardRequestToHostMiddleware
                 $proxyRequest = $proxyRequest->withDigestAuth($host->auth['username'], $host->auth['password']);
             }
 
+            if (! $host->verifyServerCertificate) {
+                $proxyRequest = $proxyRequest->withoutVerifying();
+            }
+
             $response = $proxyRequest->send($request->method(), $url);
 
             return response(

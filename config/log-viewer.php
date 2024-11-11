@@ -114,6 +114,7 @@ return [
         //         'username' => 'username',
         //         'password' => 'password',
         //     ],
+        //     'verify_server_certificate' => true,
         // ],
         //
         // 'production' => [
@@ -125,6 +126,7 @@ return [
         //     'headers' => [
         //         'X-Foo' => 'Bar',
         //     ],
+        //     'verify_server_certificate' => true,
         // ],
     ],
 
