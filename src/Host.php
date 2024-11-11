@@ -14,6 +14,7 @@ class Host
         public ?string $host = null,
         public ?array $headers = null,
         public ?array $auth = null,
+        public ?bool $verifyServerCertificate = true,
     ) {
         $this->is_remote = $this->isRemote();
     }
@@ -26,6 +27,7 @@ class Host
             $config['host'] ?? null,
             $config['headers'] ?? [],
             $config['auth'] ?? [],
+            $config['verify_server_certificate'] ?? true,
         );
     }
 
