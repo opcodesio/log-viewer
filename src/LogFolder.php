@@ -16,7 +16,7 @@ class LogFolder
         public string $path,
         mixed $files,
     ) {
-        $this->identifier = Utils::shortMd5($path);
+        $this->identifier = Utils::shortMd5(Utils::getLocalIP().':'.$path);
         $this->files = new LogFileCollection($files);
     }
 

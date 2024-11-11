@@ -28,7 +28,7 @@ class LogFile
     {
         $this->path = $path;
         $this->name = basename($path);
-        $this->identifier = Utils::shortMd5($path).'-'.$this->name;
+        $this->identifier = Utils::shortMd5(Utils::getLocalIP().':'.$path).'-'.$this->name;
         $this->type = $type;
 
         // Let's remove the file name because we already know it.
@@ -94,7 +94,7 @@ class LogFile
 
     public function subFolderIdentifier(): string
     {
-        return Utils::shortMd5($this->subFolder);
+        return Utils::shortMd5(Utils::getLocalIP().':'.$this->subFolder);
     }
 
     public function downloadUrl(): string
