@@ -34,8 +34,8 @@ test('log file identifier is based on server address', function () {
     $logFile = new LogFile($path);
 
     expect($logFile->identifier)->toBe(
-        Utils::shortMd5($serverIp . ':' . $path) . '-laravel.log'
+        Utils::shortMd5($serverIp.':'.$path).'-laravel.log'
     )->and($logFile->subFolderIdentifier())->toBe(
-        Utils::shortMd5($serverIp . ':' . $logFile->subFolder)
+        Utils::shortMd5($serverIp.':'.$logFile->subFolder)
     );
 });

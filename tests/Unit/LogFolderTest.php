@@ -31,6 +31,6 @@ test('log folder identifier is based on server address', function () {
     $folder = new LogFolder('folder', []);
 
     expect($folder->identifier)->toBe(
-        Utils::shortMd5($serverIp . ':' . $folder->path)
+        Utils::shortMd5($serverIp.':'.$folder->path)
     );
 });
