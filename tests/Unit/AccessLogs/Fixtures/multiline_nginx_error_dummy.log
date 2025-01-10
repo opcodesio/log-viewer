@@ -1,0 +1,6 @@
+2024/08/21 09:08:18 [error] 2761052#2761052: *84719 upstream sent too big header while reading response header from upstream, client: 123.123.123.123, server: xxx, request: "GET /api/xx/yy/zz?lang=de HTTP/2.0", upstream: "fastcgi://unix:/var/run/php/php8.1-fpm.sock:", host: "xxx", referrer: "http://some-ip:3000/"
+2024/08/21 09:08:19 [error] 2761052#2761052: *84719 FastCGI sent in stderr: "PHP message: [2024-08-21 11:08:18] develop.DEBUG: ActivityService: some message
+PHP message: [2024-08-21 11:08:18] develop.DEBUG: ActivityService: another message
+PHP message: [2024-08-21 11:08:18] develop.DEBUG: ActivityService: blabla:  [{"id":308363,"lat":"xx","lng":"yy"}]
+PHP message: [2024-08-21 11:08:18] develop.INFO: provider Payload:  {"attr1":"t","attr2":14400,"sources":[{"id":"source","lat":xx,"lng":yy,"tm":{"t":{"maxT":2},"c":{"":""}}}],"t":[{"id":308363,"lat":"xx","lng":"yy"}],"g_s_client":false,"reversed":false,"polygon":{"id":4326},"pathSerializer":"g"}
+PHP message: [2024-08-21 11:08:18] develop.DEBUG: Sending request to final Url (V1) https://someurl/path/v1/endpoint?param=***

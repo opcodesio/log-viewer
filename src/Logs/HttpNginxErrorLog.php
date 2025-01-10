@@ -10,7 +10,7 @@ use Opcodes\LogViewer\LogLevels\NginxStatusLevel;
 class HttpNginxErrorLog extends Log
 {
     public static string $name = 'HTTP Errors (Nginx)';
-    public static string $regex = '/^(?P<datetime>[\d+\/ :]+) \[(?P<level>.+)\] .*?: (?P<errormessage>.+?)(?:, client: (?P<client>.+?))?(?:, server: (?P<server>.+?))?(?:, request: "?(?P<request>.+?)"?)?(?:, host: "?(?P<host>.+?)"?)?$/';
+    public static string $regex = '~^(?P<datetime>[\d+\/ :]+) \[(?P<level>.+?)\] .*?: (?P<errormessage>(?:(?!, client: |, server: |, request: |, upstream: |, host: |, referrer: ).)*(?:\n(?![\d/]|\Z).*)*?)(?:, client: (?P<client>.+?))?(?:, server: (?P<server>.+?))?(?:, request: "?(?P<request>.+?)"?)?(?:, upstream: "?(?P<upstream>.+?)"?)?(?:, host: "?(?P<host>.+?)"?)?(?:, referrer: "?(?P<referrer>.+?)"?)?$~ms';
     public static string $levelClass = NginxStatusLevel::class;
 
     protected function fillMatches(array $matches = []): void
@@ -26,6 +26,8 @@ class HttpNginxErrorLog extends Log
             'server' => $matches['server'] ?? null,
             'request' => $matches['request'] ?? null,
             'host' => $matches['host'] ?? null,
+            'upstream' => $matches['upstream'] ?? null,
+            'referrer' => $matches['referrer'] ?? null,
         ];
     }
 

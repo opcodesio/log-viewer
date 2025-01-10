@@ -43,3 +43,45 @@ it('can parse a minimal log entry', function () {
         ->and($log->context['request'])->toBe(null)
         ->and($log->context['host'])->toBe(null);
 });
+
+it('can parse multiline nginx log entries', function () {
+    $file = new \Opcodes\LogViewer\LogFile(__DIR__.'/Fixtures/multiline_nginx_error_dummy.log');
+    $file->logs()->scan();
+
+    $logs = $file->logs()->get();
+
+    expect($logs)->toHaveCount(2);
+
+    /** @var HttpNginxErrorLog $firstLog */
+    $firstLog = $logs[0];
+
+    // 2024/08/21 09:08:18 [error] 2761052#2761052: *84719 upstream sent too big header while reading response header from upstream,
+    // client: 123.123.123.123, server: xxx, request: "GET /api/xx/yy/zz?lang=de HTTP/2.0",
+    // upstream: "fastcgi://unix:/var/run/php/php8.1-fpm.sock:", host: "xxx", referrer: "http://some-ip:3000/"
+    expect($firstLog->index)->toBe(0)
+        ->and($firstLog)->toBeInstanceOf(HttpNginxErrorLog::class)
+        ->and($firstLog->datetime->toDateTimeString())->toBe('2024-08-21 09:08:18')
+        ->and($firstLog->level)->toBe('error')
+        ->and($firstLog->message)->toBe('*84719 upstream sent too big header while reading response header from upstream')
+        ->and($firstLog->context['client'])->toBe('123.123.123.123')
+        ->and($firstLog->context['server'])->toBe('xxx')
+        ->and($firstLog->context['request'])->toBe('GET /api/xx/yy/zz?lang=de HTTP/2.0')
+        ->and($firstLog->context['upstream'])->toBe('fastcgi://unix:/var/run/php/php8.1-fpm.sock:')
+        ->and($firstLog->context['host'])->toBe('xxx')
+        ->and($firstLog->context['referrer'])->toBe('http://some-ip:3000/');
+
+    $secondLog = $logs[1];
+
+    expect($secondLog->index)->toBe(1)
+        ->and($secondLog)->toBeInstanceOf(HttpNginxErrorLog::class)
+        ->and($secondLog->datetime->toDateTimeString())->toBe('2024-08-21 09:08:19')
+        ->and($secondLog->level)->toBe('error')
+        ->and($secondLog->message)->toBe(<<<'EOF'
+*84719 FastCGI sent in stderr: "PHP message: [2024-08-21 11:08:18] develop.DEBUG: ActivityService: some message
+PHP message: [2024-08-21 11:08:18] develop.DEBUG: ActivityService: another message
+PHP message: [2024-08-21 11:08:18] develop.DEBUG: ActivityService: blabla:  [{"id":308363,"lat":"xx","lng":"yy"}]
+PHP message: [2024-08-21 11:08:18] develop.INFO: provider Payload:  {"attr1":"t","attr2":14400,"sources":[{"id":"source","lat":xx,"lng":yy,"tm":{"t":{"maxT":2},"c":{"":""}}}],"t":[{"id":308363,"lat":"xx","lng":"yy"}],"g_s_client":false,"reversed":false,"polygon":{"id":4326},"pathSerializer":"g"}
+PHP message: [2024-08-21 11:08:18] develop.DEBUG: Sending request to final Url (V1) https://someurl/path/v1/endpoint?param=***
+EOF);
+
+});
