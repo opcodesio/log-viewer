@@ -33,7 +33,7 @@ class LogFile
         $this->type = $type;
         $this->displayPath = empty($pathAlias)
             ? $path
-            : $pathAlias . DIRECTORY_SEPARATOR . $this->name;
+            : $pathAlias.DIRECTORY_SEPARATOR.$this->name;
 
         // Let's remove the file name because we already know it.
         $this->subFolder = str_replace($this->name, '', $path);
