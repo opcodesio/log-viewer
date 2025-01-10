@@ -20,8 +20,8 @@ function assertCanDownloadFile(string $fileName): void
 
 function assertCannotDownloadFile(string $fileName): void
 {
-    get(route('log-viewer.files.request-download', $fileName))
-        ->assertForbidden();
+get(route('log-viewer.files.request-download', $fileName))
+->assertForbidden();
 }
 
 test('can download every file by default', function () {
@@ -31,9 +31,9 @@ test('can download every file by default', function () {
 });
 
 test('cannot download a file that\'s not found', function () {
-    get(route('log-viewer.files.request-download', 'notfound.log'))
-        ->assertNotFound();
-});
+get(route('log-viewer.files.request-download', 'notfound.log'))
+->assertNotFound();
+    });
 
 test('"downloadLogFile" gate can prevent file download', function () {
     generateLogFiles([$fileName = 'laravel.log']);
