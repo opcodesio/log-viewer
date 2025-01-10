@@ -142,8 +142,9 @@ return [
         '**/*.log',
 
         // You can include paths to other log types as well, such as apache, nginx, and more.
-        '/var/log/httpd/*',
-        '/var/log/nginx/*',
+        // This key => value pair can be used to rename and group multiple paths into one folder in the UI.
+        '/var/log/httpd/*' => 'Apache',
+        '/var/log/nginx/*' => 'Nginx',
 
         // MacOS Apple Silicon logs
         '/opt/homebrew/var/log/nginx/*',
