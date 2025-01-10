@@ -108,3 +108,34 @@ test('does not get nested logs with a single-asterisk wildcard', function () {
         ->and($files->contains('name', $second->name))->toBeFalse()
         ->and(file_exists($files[0]->path))->toBeTrue();
 });
+
+test('can set aliases for paths', function () {
+    config(['log-viewer.include_files' => [
+        'alias/folder/*.log' => 'TestPath',    // equals to "storage/logs/alias/folder/*.log"
+    ]]);
+    $originalFile = generateLogFile('alias/folder/first.log');
+
+    $files = LogViewer::getFiles();
+
+    expect($files)->toHaveCount(1);
+    $file = $files[0];
+    expect($file->path)->toBe($originalFile->path)
+        ->and($file->displayPath)->toBe('TestPath/first.log')
+        ->and($file->subFolder)->toBe('TestPath');
+});
+
+test('shows unique files even with aliases used for paths', function () {
+    config(['log-viewer.include_files' => [
+        'alias/folder/*.log' => 'TestPath',    // equals to "storage/logs/alias/folder/*.log"
+        'alias/**/*.log',
+    ]]);
+    $originalFile = generateLogFile('alias/folder/first.log');
+
+    $files = LogViewer::getFiles();
+
+    expect($files)->toHaveCount(1);
+    $file = $files[0];
+    expect($file->path)->toBe($originalFile->path)
+        ->and($file->displayPath)->toBe('TestPath/first.log')
+        ->and($file->subFolder)->toBe('TestPath');
+});

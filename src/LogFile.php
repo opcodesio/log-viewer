@@ -21,19 +21,27 @@ class LogFile
     public string $name;
     public string $identifier;
     public string $subFolder = '';
+    public string $displayPath;
     private ?string $type = null;
     private array $_logIndexCache;
 
-    public function __construct(string $path, ?string $type = null)
+    public function __construct(string $path, ?string $type = null, ?string $pathAlias = null)
     {
         $this->path = $path;
         $this->name = basename($path);
         $this->identifier = Utils::shortMd5(Utils::getLocalIP().':'.$path).'-'.$this->name;
         $this->type = $type;
+        $this->displayPath = empty($pathAlias)
+            ? $path
+            : $pathAlias.DIRECTORY_SEPARATOR.$this->name;
 
         // Let's remove the file name because we already know it.
         $this->subFolder = str_replace($this->name, '', $path);
         $this->subFolder = rtrim($this->subFolder, DIRECTORY_SEPARATOR);
+
+        if (! empty($pathAlias)) {
+            $this->subFolder = $pathAlias;
+        }
 
         $this->loadMetadata();
     }
