@@ -39,6 +39,8 @@ function generateLogFile(?string $fileName = null, ?string $content = null, bool
         $fileName = \Illuminate\Support\Str::random().'.log';
     }
 
+    $fileName = str_replace('/', DIRECTORY_SEPARATOR, $fileName);
+
     $path = storage_path('logs'.DIRECTORY_SEPARATOR.$fileName);
     $folder = dirname($path);
 
