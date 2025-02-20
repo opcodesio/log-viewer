@@ -120,7 +120,7 @@ test('can set aliases for paths', function () {
     expect($files)->toHaveCount(1);
     $file = $files[0];
     expect($file->path)->toBe($originalFile->path)
-        ->and($file->displayPath)->toBe('TestPath/first.log')
+        ->and($file->displayPath)->toBe('TestPath'.DIRECTORY_SEPARATOR.'first.log')
         ->and($file->subFolder)->toBe('TestPath');
 });
 
@@ -136,6 +136,6 @@ test('shows unique files even with aliases used for paths', function () {
     expect($files)->toHaveCount(1);
     $file = $files[0];
     expect($file->path)->toBe($originalFile->path)
-        ->and($file->displayPath)->toBe('TestPath/first.log')
+        ->and($file->displayPath)->toBe('TestPath'.DIRECTORY_SEPARATOR.'first.log')
         ->and($file->subFolder)->toBe('TestPath');
 });
