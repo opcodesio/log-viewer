@@ -7,6 +7,10 @@
         <div>{{ column.label }}</div>
       </th>
       <th scope="col" class="hidden lg:table-cell"><span class="sr-only">Log index</span></th>
+      <th v-if="logViewerStore.logs.length == 1" scope="col" class=" lg:table-cell">
+        <span class="sr-only">Log index</span>
+      </th>
+
     </tr>
     </thead>
 
@@ -68,6 +72,13 @@
         <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs hidden lg:table-cell">
           <LogCopyButton :log="log" class="pr-2 large-screen" />
         </td>
+
+
+        <td v-if="logViewerStore.logs.length == 1" class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs hidden lg:table-cell">
+          <button  @click.stop.prevent="searchFromHere()">
+            <span class="text-green-600 dark:text-green-500 hidden md:inline">Search From Here</span>
+          </button>
+        </td>
       </tr>
       <tr v-show="logViewerStore.isOpen(index)">
         <td :colspan="tableColumns">
@@ -102,6 +113,7 @@
           </tab-container>
         </td>
       </tr>
+
       </tbody>
     </template>
 
@@ -140,7 +152,7 @@ import {
   CheckCircleIcon,
   InformationCircleIcon,
 } from '@heroicons/vue/24/solid';
-import { highlightSearchResult } from '../helpers.js';
+import {highlightSearchResult, replaceQuery} from '../helpers.js';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { useSearchStore } from '../stores/search.js';
 import { useFileStore } from '../stores/files.js';
@@ -152,6 +164,7 @@ import TabContent from "./TabContent.vue";
 import MailHtmlPreview from "./MailHtmlPreview.vue";
 import MailTextPreview from "./MailTextPreview.vue";
 import {computed} from "vue";
+import {  useRouter } from 'vue-router';
 
 const fileStore = useFileStore();
 const logViewerStore = useLogViewerStore();
@@ -174,6 +187,39 @@ const getDataAtPath = (obj, path) => {
 
 const hasContext = (log) => {
   return log.context && Object.keys(log.context).length > 0;
+}
+
+const router = useRouter();
+
+const searchFromHere = () => {
+  if (logViewerStore.logs.length >1 ){
+    return;
+  }
+
+  // Added Plus 1 cause logs start from 0
+  const logIndex = logViewerStore.logs[0].index + 1;
+  const numberPerPage = logViewerStore.resultsPerPage;
+
+  const page = round(Math.ceil(logIndex/numberPerPage));// gets the page the log should be on
+
+  // Get current query parameters
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // Remove the 'query' parameter
+  urlParams.delete('query');
+
+  // Update the router with the new query parameters
+  const updatedQueryString = urlParams.toString();
+
+  const newUrl = `${window.location.pathname}?${updatedQueryString}`;
+
+
+  // Preserve the current history state
+  const currentState = history.state; // Get existing history state
+  window.history.replaceState(currentState, '', newUrl);
+
+  replaceQuery(router, 'page', page);
+
 }
 
 const getExtraTabsForLog = (log) => {
@@ -213,6 +259,6 @@ const prepareContextForOutput = (context) => {
 
 const tableColumns = computed(() => {
   // the extra two columns are for the expand/collapse and log index columns
-  return logViewerStore.columns.length + 2;
+  return logViewerStore.columns.length + 3;
 });
 </script>
