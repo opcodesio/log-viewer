@@ -56,7 +56,8 @@ export const replaceQuery = (router, key, value) => {
   const query = {
     host: route.query.host || undefined,
     file: route.query.file || undefined,
-    query: route.query.query || undefined,
+    // Explicitly set query to undefined unless it's being set
+    ...(key === 'query' ? {} : { query: undefined }),
     page: route.query.page || undefined,
   };
 
