@@ -27,6 +27,7 @@ class IndexController
 
                 'supports_hosts' => LogViewer::supportsHostsFeature(),
                 'hosts' => LogViewer::getHosts(),
+                'per_page_options' => config('log-viewer.per_page_options') ?? [10, 25, 50, 100, 250, 500],
             ],
         ]);
     }
