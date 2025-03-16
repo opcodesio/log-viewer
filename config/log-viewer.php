@@ -231,4 +231,14 @@ return [
     'lazy_scan_chunk_size_in_mb' => 50,
 
     'strip_extracted_context' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Per page options
+    |--------------------------------------------------------------------------
+    | Define the available options for number of results per page
+    |
+    */
+
+    'per_page_options' => [10, 25, 50, 100, 250, 500],
 ];
