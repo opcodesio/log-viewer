@@ -2,7 +2,6 @@
 import {useLogViewerStore} from "../stores/logViewer";
 
 const logViewerStore = useLogViewerStore();
-const paginationOptions = window.LogViewer.per_page_options || [10, 25, 50, 100, 250, 500];
 </script>
 
 <template>
@@ -14,7 +13,7 @@ const paginationOptions = window.LogViewer.per_page_options || [10, 25, 50, 100,
   </select>
   <label for="items-per-page" class="sr-only">Items per page</label>
   <select id="items-per-page" v-model="logViewerStore.resultsPerPage" class="select">
-    <option v-for="option in paginationOptions" :key="option" :value="option">{{ option }} items per page</option>
+    <option v-for="option in logViewerStore.perPageOptions" :key="option" :value="option">{{ option }} items per page</option>
   </select>
 </div>
 </template>
