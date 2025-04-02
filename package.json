@@ -20,7 +20,7 @@
         "@heroicons/vue": "^2.0.15",
         "@vueuse/core": "^9.12.0",
         "autoprefixer": "^10.4.7",
-        "axios": "^1.3.2",
+        "axios": "^1.8.2",
         "laravel-mix": "^6.0.49",
         "loader-utils": ">=2.0.3",
         "lodash": "^4.17.21",
