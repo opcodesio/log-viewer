@@ -61,26 +61,13 @@ class LaravelLog extends Log
         $text = $firstLineText.($matches[8] ?? '').implode('', $firstLineSplit)."\n".$theRestOfIt;
 
         if (session()->get('log-viewer:shorter-stack-traces', false)) {
-            $excludes = config('log-viewer.shorter_stack_trace_excludes', []);
-            $emptyLineCharacter = '    ...';
-            $lines = explode("\n", $text);
-            $filteredLines = [];
-            foreach ($lines as $line) {
-                $shouldExclude = false;
-                foreach ($excludes as $excludePattern) {
-                    if (str_starts_with($line, '#') && str_contains($line, $excludePattern)) {
-                        $shouldExclude = true;
-                        break;
-                    }
-                }
-
-                if ($shouldExclude && end($filteredLines) !== $emptyLineCharacter) {
-                    $filteredLines[] = $emptyLineCharacter;
-                } elseif (! $shouldExclude) {
-                    $filteredLines[] = $line;
+            // Filter stack traces in text and context.
+            $text = $this->filterStackTrace($text);
+            foreach ($this->context as $key => $value) {
+                if (is_string($value)) {
+                    $this->context[$key] = $this->filterStackTrace($value);
                 }
             }
-            $text = implode("\n", $filteredLines);
         }
 
         if (strlen($text) > LogViewer::maxLogSize()) {
@@ -202,5 +189,30 @@ class LaravelLog extends Log
         }
 
         return $json_strings;
+    }
+
+    protected function filterStackTrace(string $text): string
+    {
+        $lines = explode("\n", $text);
+        $filteredLines = [];
+        $emptyLineCharacter = '    ...';
+        $excludes = config('log-viewer.shorter_stack_trace_excludes', []);
+        foreach ($lines as $line) {
+            $shouldExclude = false;
+            foreach ($excludes as $excludePattern) {
+                if (str_starts_with($line, '#') && str_contains($line, $excludePattern)) {
+                    $shouldExclude = true;
+                    break;
+                }
+            }
+
+            if ($shouldExclude && end($filteredLines) !== $emptyLineCharacter) {
+                $filteredLines[] = $emptyLineCharacter;
+            } elseif (! $shouldExclude) {
+                $filteredLines[] = $line;
+            }
+        }
+
+        return implode("\n", $filteredLines);
     }
 }
