@@ -21,11 +21,9 @@ mix.options({
             symlinks: false,
             alias: {
                 '@': path.resolve(__dirname, 'resources/js/'),
-            },
+                'vue$': 'vue/dist/vue.runtime.esm-bundler.js', // ✅ ADD THIS LINE
+              },
         },
-        // stats: {
-        //     children: true,
-        // }
     });
 
 mix.disableSuccessNotifications();

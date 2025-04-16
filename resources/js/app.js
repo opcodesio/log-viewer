@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 import axios from 'axios';
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from './pages/Home.vue';
+import Root from './Root.vue'; // ✅ new root component
 
 let token = document.head.querySelector('meta[name="csrf-token"]');
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -39,9 +40,7 @@ const router = createRouter({
 });
 const pinia = createPinia();
 
-const app = createApp({
-  router,
-});
+const app = createApp(Root);
 
 app.use(router);
 app.use(pinia);
