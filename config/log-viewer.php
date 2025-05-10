@@ -246,23 +246,35 @@ return [
 
     'per_page_options' => [10, 25, 50, 100, 250, 500],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Default settings for Log Viewer
+    |--------------------------------------------------------------------------
+    | These settings determine the default behaviour of Log Viewer.
+    | Many of these can be persisted for the user in their browser's localStorage,
+    | if the `use_local_storage` option is set to true.
+    |
+    */
+
     'defaults' => [
 
-        'store_defaults_in_local_storage' => true,
+        // Whether to use browser's localStorage to store user preferences.
+        // If true, user preferences saved in the browser will take precedence over the defaults below.
+        'use_local_storage' => true,
 
-        // Other options: `Alphabetical`, `ModifiedTime`
+        // Method to sort the folders. Other options: `Alphabetical`, `ModifiedTime`
         'folder_sorting_method' => FolderSortingMethod::ModifiedTime,
 
-        // Other options: `Ascending`, `Descending`
+        // Order to sort the folders. Other options: `Ascending`, `Descending`
         'folder_sorting_order' => SortingOrder::Descending,
 
-        // Must be one of the above `per_page_options` values
+        // Number of results per page. Must be one of the above `per_page_options` values
         'per_page' => 25,
 
-        // Other options: `System`, `Light`, `Dark`
+        // Color scheme for the Log Viewer. Other options: `System`, `Light`, `Dark`
         'theme' => Theme::System,
 
-        // Whether to enable `shorter_stack_traces` by default
+        // Whether to enable `Shorter Stack Traces` option by default
         'shorter_stack_traces' => false,
 
     ],

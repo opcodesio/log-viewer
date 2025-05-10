@@ -21,7 +21,7 @@ const defaultColumns = [
   { label: 'Message', data_key: 'message' },
 ]
 
-const shouldUseLocalStorage = window.LogViewer?.defaults?.store_defaults_in_local_storage ?? true;
+const shouldUseLocalStorage = window.LogViewer?.defaults?.use_local_storage ?? true;
 
 export const useLogViewerStore = defineStore({
   id: 'logViewer',
