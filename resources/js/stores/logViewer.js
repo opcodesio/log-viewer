@@ -37,8 +37,8 @@ export const useLogViewerStore = defineStore({
       ? useLocalStorage('logViewerResultsPerPage', window.LogViewer?.defaults?.per_page ?? 25) 
       : (window.LogViewer?.defaults?.per_page ?? 25),
     direction: shouldUseLocalStorage
-      ? useLocalStorage('logViewerDirection', window.LogViewer?.defaults?.file_sorting_order || 'desc') 
-      : (window.LogViewer?.defaults?.file_sorting_order || 'desc'),
+      ? useLocalStorage('logViewerDirection', window.LogViewer?.defaults?.log_sorting_order || 'desc') 
+      : (window.LogViewer?.defaults?.log_sorting_order || 'desc'),
     helpSlideOverOpen: false,
 
     // Log data

@@ -268,8 +268,8 @@ return [
         // Order to sort the folders. Other options: `Ascending`, `Descending`
         'folder_sorting_order' => SortingOrder::Descending,
 
-        // Order to sort the files. Other options: `Ascending`, `Descending`
-        'file_sorting_order' => SortingOrder::Descending,
+        // Order to sort the logs. Other options: `Ascending`, `Descending`
+        'log_sorting_order' => SortingOrder::Descending,
 
         // Number of results per page. Must be one of the above `per_page_options` values
         'per_page' => 25,
@@ -281,4 +281,16 @@ return [
         'shorter_stack_traces' => false,
 
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Root folder prefix
+    |--------------------------------------------------------------------------
+    | The prefix for log files inside Laravel's `storage/logs` folder.
+    | Log Viewer does not show the full path to these files in the UI, 
+    | but only the filename prefixed with this value.
+    |
+    */
+
+    'root_folder_prefix' => 'root',
 ];

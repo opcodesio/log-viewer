@@ -98,8 +98,8 @@
                     <ChevronRightIcon :class="[fileStore.isOpen(folder) ? 'rotate-90' : '', 'transition duration-100']" />
                   </span>
                   <span class="file-name">
-                    <span v-if="String(folder.clean_path || '').startsWith('root')">
-                      <span class="text-gray-500 dark:text-gray-400">root</span>{{ String(folder.clean_path).substring(4) }}
+                    <span v-if="String(folder.clean_path || '').startsWith(rootFolderPrefix)">
+                      <span class="text-gray-500 dark:text-gray-400">{{ rootFolderPrefix }}</span>{{ String(folder.clean_path).substring(rootFolderPrefix.length) }}
                     </span>
                     <span v-else>{{ folder.clean_path }}</span>
                   </span>
@@ -254,6 +254,8 @@ const selectFile = (fileIdentifier) => {
     replaceQuery(router, 'file', fileIdentifier);
   }
 };
+
+const rootFolderPrefix = window.LogViewer?.root_folder_prefix || 'root';
 
 onMounted(async () => {
   hostStore.selectHost(route.query.host || null);

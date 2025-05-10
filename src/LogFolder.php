@@ -11,6 +11,7 @@ class LogFolder
 {
     public string $identifier;
     protected mixed $files;
+    protected static string $rootPrefix;
 
     public function __construct(
         public string $path,
@@ -38,15 +39,27 @@ class LogFolder
             || $this->path === rtrim(LogViewer::basePathForLogs(), DIRECTORY_SEPARATOR);
     }
 
+    /**
+     * Returns the prefix string used to represent the root folder.
+     */
+    public static function rootPrefix(): string
+    {
+        if (! isset(self::$rootPrefix)) {
+            self::$rootPrefix = config('log-viewer.root_folder_prefix', 'root');
+        }
+
+        return self::$rootPrefix;
+    }
+
     public function cleanPath(): string
     {
         if ($this->isRoot()) {
-            return 'root';
+            return self::rootPrefix();
         }
 
         $folder = $this->path;
 
-        $folder = str_replace(LogViewer::basePathForLogs(), 'root'.DIRECTORY_SEPARATOR, $folder);
+        $folder = str_replace(LogViewer::basePathForLogs(), self::rootPrefix().DIRECTORY_SEPARATOR, $folder);
 
         if ($unixHomePath = getenv('HOME')) {
             $folder = str_replace($unixHomePath, '~', $folder);

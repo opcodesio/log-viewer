@@ -3,6 +3,7 @@
 namespace Opcodes\LogViewer\Http\Controllers;
 
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\Utils\Utils;
 
 class IndexController
@@ -30,11 +31,12 @@ class IndexController
                 'per_page_options' => config('log-viewer.per_page_options') ?? [10, 25, 50, 100, 250, 500],
                 'defaults' => [
                     'use_local_storage' => config('log-viewer.defaults.use_local_storage'),
-                    'file_sorting_order' => config('log-viewer.defaults.file_sorting_order'),
+                    'log_sorting_order' => config('log-viewer.defaults.log_sorting_order'),
                     'per_page' => config('log-viewer.defaults.per_page'),
                     'theme' => config('log-viewer.defaults.theme'),
                     'shorter_stack_traces' => config('log-viewer.defaults.shorter_stack_traces'),
                 ],
+                'root_folder_prefix' => LogFolder::rootPrefix(),
             ],
         ]);
     }

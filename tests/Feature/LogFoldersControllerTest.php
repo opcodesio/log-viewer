@@ -2,6 +2,7 @@
 
 use Opcodes\LogViewer\Enums\FolderSortingMethod;
 use Opcodes\LogViewer\Enums\SortingOrder;
+use Opcodes\LogViewer\LogFolder;
 
 use function Pest\Laravel\getJson;
 
@@ -23,8 +24,8 @@ it('can get the log files', function () {
 
     expect($response->json())->not->toHaveKey('data');
     $response->assertJsonCount(2)
-        ->assertJsonFragment(['clean_path' => 'root'.DIRECTORY_SEPARATOR.'one'])
-        ->assertJsonFragment(['clean_path' => 'root'.DIRECTORY_SEPARATOR.'two']);
+        ->assertJsonFragment(['clean_path' => LogFolder::rootPrefix().DIRECTORY_SEPARATOR.'one'])
+        ->assertJsonFragment(['clean_path' => LogFolder::rootPrefix().DIRECTORY_SEPARATOR.'two']);
 });
 
 it('folders are sorted alphabetically descending when configured', function () {
@@ -44,8 +45,8 @@ it('folders are sorted alphabetically descending when configured', function () {
     $folders = $response->json();
     // Should be sorted: 'root', 'alpha', 'one', 'two'
     $response->assertJsonCount(4);
-    expect($folders[0]['clean_path'])->toBe('root');
-    expect($folders[1]['clean_path'])->toBe('root'.DIRECTORY_SEPARATOR.'alpha');
-    expect($folders[2]['clean_path'])->toBe('root'.DIRECTORY_SEPARATOR.'one');
-    expect($folders[3]['clean_path'])->toBe('root'.DIRECTORY_SEPARATOR.'two');
+    expect($folders[0]['clean_path'])->toBe(LogFolder::rootPrefix());
+    expect($folders[1]['clean_path'])->toBe(LogFolder::rootPrefix().DIRECTORY_SEPARATOR.'alpha');
+    expect($folders[2]['clean_path'])->toBe(LogFolder::rootPrefix().DIRECTORY_SEPARATOR.'one');
+    expect($folders[3]['clean_path'])->toBe(LogFolder::rootPrefix().DIRECTORY_SEPARATOR.'two');
 });
