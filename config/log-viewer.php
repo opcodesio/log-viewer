@@ -287,7 +287,7 @@ return [
     | Root folder prefix
     |--------------------------------------------------------------------------
     | The prefix for log files inside Laravel's `storage/logs` folder.
-    | Log Viewer does not show the full path to these files in the UI, 
+    | Log Viewer does not show the full path to these files in the UI,
     | but only the filename prefixed with this value.
     |
     */
