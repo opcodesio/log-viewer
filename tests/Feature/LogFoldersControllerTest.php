@@ -28,6 +28,7 @@ it('can get the log files', function () {
 });
 
 it('folders are sorted alphabetically descending when configured', function () {
+    config(['log-viewer.include_files' => ['*.log', '*/**.log']]);
     config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::Alphabetical]);
     config(['log-viewer.defaults.folder_sorting_order' => SortingOrder::Ascending]);
 
