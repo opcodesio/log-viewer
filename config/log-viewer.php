@@ -1,8 +1,8 @@
 <?php
 
-use Opcodes\LogViewer\Enums\Theme;
 use Opcodes\LogViewer\Enums\FolderSortingMethod;
 use Opcodes\LogViewer\Enums\SortingOrder;
+use Opcodes\LogViewer\Enums\Theme;
 
 return [
 
@@ -258,10 +258,10 @@ return [
         'per_page' => 25,
 
         // Other options: `System`, `Light`, `Dark`
-        'theme' => Theme::System, 
+        'theme' => Theme::System,
 
         // Whether to enable `shorter_stack_traces` by default
         'shorter_stack_traces' => true,
 
-    ]
+    ],
 ];

@@ -50,16 +50,18 @@ class LogFolderCollection extends Collection
     {
         $this->items = collect($this->items)
             ->sort(function (LogFolder $a, LogFolder $b) {
-                if ($a->isRoot() && !$b->isRoot()) {
+                if ($a->isRoot() && ! $b->isRoot()) {
                     return -1;
                 }
-                if (!$a->isRoot() && $b->isRoot()) {
+                if (! $a->isRoot() && $b->isRoot()) {
                     return 1;
                 }
+
                 return strcmp($a->cleanPath(), $b->cleanPath());
             })
             ->values()
             ->toArray();
+
         return $this;
     }
 
@@ -67,16 +69,18 @@ class LogFolderCollection extends Collection
     {
         $this->items = collect($this->items)
             ->sort(function (LogFolder $a, LogFolder $b) {
-                if ($a->isRoot() && !$b->isRoot()) {
+                if ($a->isRoot() && ! $b->isRoot()) {
                     return -1;
                 }
-                if (!$a->isRoot() && $b->isRoot()) {
+                if (! $a->isRoot() && $b->isRoot()) {
                     return 1;
                 }
+
                 return strcmp($b->cleanPath(), $a->cleanPath());
             })
             ->values()
             ->toArray();
+
         return $this;
     }
 }
