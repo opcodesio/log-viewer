@@ -69,6 +69,16 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Log Viewer datetime format.
+    |--------------------------------------------------------------------------
+    | The format used to display timestamps in the UI.
+    |
+    */
+
+    'datetime_format' => 'Y-m-d H:i:s',
+
+    /*
+    |--------------------------------------------------------------------------
     | Log Viewer route middleware.
     |--------------------------------------------------------------------------
     | Optional middleware to use when loading the initial Log Viewer page.
