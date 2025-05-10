@@ -25,10 +25,10 @@ export const useLogViewerStore = defineStore({
   id: 'logViewer',
 
   state: () => ({
-    theme: useLocalStorage('logViewerTheme', Theme.System),
-    shorterStackTraces: useLocalStorage('logViewerShorterStackTraces', false),
+    theme: useLocalStorage('logViewerTheme', window.LogViewer?.defaults?.theme || Theme.System),
+    shorterStackTraces: useLocalStorage('logViewerShorterStackTraces', window.LogViewer?.defaults?.shorter_stack_traces ?? false),
     direction: useLocalStorage('logViewerDirection', 'desc'),
-    resultsPerPage: useLocalStorage('logViewerResultsPerPage', 25),
+    resultsPerPage: useLocalStorage('logViewerResultsPerPage', window.LogViewer?.defaults?.per_page ?? 25),
     helpSlideOverOpen: false,
 
     // Log data

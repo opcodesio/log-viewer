@@ -248,14 +248,14 @@ return [
 
     'defaults' => [
 
-        // Must be one of the above `per_page_options` values
-        'per_page' => 10,
-
         // Other options: `Alphabetical`, `ModifiedTime`
         'folder_sorting_method' => FolderSortingMethod::Alphabetical,
 
         // Other options: `Ascending`, `Descending`
         'folder_sorting_order' => SortingOrder::Descending,
+
+        // Must be one of the above `per_page_options` values
+        'per_page' => 25,
 
         // Other options: `System`, `Light`, `Dark`
         'theme' => Theme::System, 

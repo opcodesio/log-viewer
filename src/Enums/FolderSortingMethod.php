@@ -4,6 +4,6 @@ namespace Opcodes\LogViewer\Enums;
 
 enum FolderSortingMethod: string
 {
-    case Alphabetical = 'alphabetical';
-    case ModifiedTime = 'modified-time';
+    case Alphabetical = 'Alphabetical';
+    case ModifiedTime = 'ModifiedTime';
 }
