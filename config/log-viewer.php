@@ -248,8 +248,10 @@ return [
 
     'defaults' => [
 
+        'store_defaults_in_local_storage' => true,
+
         // Other options: `Alphabetical`, `ModifiedTime`
-        'folder_sorting_method' => FolderSortingMethod::Alphabetical,
+        'folder_sorting_method' => FolderSortingMethod::ModifiedTime,
 
         // Other options: `Ascending`, `Descending`
         'folder_sorting_order' => SortingOrder::Descending,
@@ -261,7 +263,7 @@ return [
         'theme' => Theme::System,
 
         // Whether to enable `shorter_stack_traces` by default
-        'shorter_stack_traces' => true,
+        'shorter_stack_traces' => false,
 
     ],
 ];

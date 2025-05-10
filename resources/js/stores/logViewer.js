@@ -21,14 +21,22 @@ const defaultColumns = [
   { label: 'Message', data_key: 'message' },
 ]
 
+const shouldUseLocalStorage = window.LogViewer?.defaults?.store_defaults_in_local_storage ?? true;
+
 export const useLogViewerStore = defineStore({
   id: 'logViewer',
 
   state: () => ({
-    theme: useLocalStorage('logViewerTheme', window.LogViewer?.defaults?.theme || Theme.System),
-    shorterStackTraces: useLocalStorage('logViewerShorterStackTraces', window.LogViewer?.defaults?.shorter_stack_traces ?? false),
+    theme: shouldUseLocalStorage 
+      ? useLocalStorage('logViewerTheme', window.LogViewer?.defaults?.theme || Theme.System) 
+      : (window.LogViewer?.defaults?.theme || Theme.System),
+    shorterStackTraces: shouldUseLocalStorage 
+      ? useLocalStorage('logViewerShorterStackTraces', window.LogViewer?.defaults?.shorter_stack_traces ?? false) 
+      : (window.LogViewer?.defaults?.shorter_stack_traces ?? false),
+    resultsPerPage: shouldUseLocalStorage 
+      ? useLocalStorage('logViewerResultsPerPage', window.LogViewer?.defaults?.per_page ?? 25) 
+      : (window.LogViewer?.defaults?.per_page ?? 25),
     direction: useLocalStorage('logViewerDirection', 'desc'),
-    resultsPerPage: useLocalStorage('logViewerResultsPerPage', window.LogViewer?.defaults?.per_page ?? 25),
     helpSlideOverOpen: false,
 
     // Log data
