@@ -268,6 +268,9 @@ return [
         // Order to sort the folders. Other options: `Ascending`, `Descending`
         'folder_sorting_order' => SortingOrder::Descending,
 
+        // Order to sort the files. Other options: `Ascending`, `Descending`
+        'file_sorting_order' => SortingOrder::Descending,
+
         // Number of results per page. Must be one of the above `per_page_options` values
         'per_page' => 25,
 

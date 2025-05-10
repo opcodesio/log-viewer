@@ -28,7 +28,13 @@ class IndexController
                 'supports_hosts' => LogViewer::supportsHostsFeature(),
                 'hosts' => LogViewer::getHosts(),
                 'per_page_options' => config('log-viewer.per_page_options') ?? [10, 25, 50, 100, 250, 500],
-                'defaults' => config('log-viewer.defaults'),
+                'defaults' => [
+                    'use_local_storage' => config('log-viewer.defaults.use_local_storage'),
+                    'file_sorting_order' => config('log-viewer.defaults.file_sorting_order'),
+                    'per_page' => config('log-viewer.defaults.per_page'),
+                    'theme' => config('log-viewer.defaults.theme'),
+                    'shorter_stack_traces' => config('log-viewer.defaults.shorter_stack_traces'),
+                ],
             ],
         ]);
     }
