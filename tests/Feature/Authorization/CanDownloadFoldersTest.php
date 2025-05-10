@@ -29,7 +29,7 @@ test('can download every folder by default', function () {
     generateLogFiles([$fileName = 'laravel.log']);
     $folder = LogViewer::getFolder('');
 
-    assertCanDownloadFolder($folder->identifier, 'root.zip');
+    assertCanDownloadFolder($folder->identifier, LogFolder::rootPrefix().'.zip');
 });
 
 test('cannot download a folder that\'s not found', function () {
@@ -47,7 +47,7 @@ test('"downloadLogFolder" gate can prevent folder download', function () {
     // now let's allow access again
     Gate::define('downloadLogFolder', fn (mixed $user) => true);
 
-    assertCanDownloadFolder($folder->identifier, 'root.zip');
+    assertCanDownloadFolder($folder->identifier, LogFolder::rootPrefix().'.zip');
 });
 
 test('"downloadLogFolder" gate is supplied with a log folder object', function () {
@@ -63,7 +63,7 @@ test('"downloadLogFolder" gate is supplied with a log folder object', function (
         return true;
     });
 
-    assertCanDownloadFolder($expectedFolder->identifier, 'root.zip');
+    assertCanDownloadFolder($expectedFolder->identifier, LogFolder::rootPrefix().'.zip');
 
     expect($gateChecked)->toBeTrue();
 });

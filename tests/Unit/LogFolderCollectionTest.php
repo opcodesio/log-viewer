@@ -121,3 +121,33 @@ test('LogFolderCollection can sort its folders by latest first, including its fi
     expect($folderFiles[0])->toBe($secondFile)
         ->and($folderFiles[1])->toBe($firstFile);
 });
+
+test('LogFolderCollection can sort its folders alphabetically ascending, with root always on top', function () {
+    $rootFolder = Mockery::mock(new LogFolder('', []))->allows(['isRoot' => true, 'cleanPath' => LogFolder::rootPrefix()]);
+    $bFolder = Mockery::mock(new LogFolder('b', []))->allows(['isRoot' => false, 'cleanPath' => 'b']);
+    $aFolder = Mockery::mock(new LogFolder('a', []))->allows(['isRoot' => false, 'cleanPath' => 'a']);
+    $zFolder = Mockery::mock(new LogFolder('z', []))->allows(['isRoot' => false, 'cleanPath' => 'z']);
+    $collection = new LogFolderCollection([$zFolder, $rootFolder, $bFolder, $aFolder]);
+
+    $collection->sortAlphabeticallyAsc();
+
+    expect($collection[0])->toBe($rootFolder)
+        ->and($collection[1])->toBe($aFolder)
+        ->and($collection[2])->toBe($bFolder)
+        ->and($collection[3])->toBe($zFolder);
+});
+
+test('LogFolderCollection can sort its folders alphabetically descending, with root always on top', function () {
+    $rootFolder = Mockery::mock(new LogFolder('', []))->allows(['isRoot' => true, 'cleanPath' => LogFolder::rootPrefix()]);
+    $bFolder = Mockery::mock(new LogFolder('b', []))->allows(['isRoot' => false, 'cleanPath' => 'b']);
+    $aFolder = Mockery::mock(new LogFolder('a', []))->allows(['isRoot' => false, 'cleanPath' => 'a']);
+    $zFolder = Mockery::mock(new LogFolder('z', []))->allows(['isRoot' => false, 'cleanPath' => 'z']);
+    $collection = new LogFolderCollection([$aFolder, $zFolder, $rootFolder, $bFolder]);
+
+    $collection->sortAlphabeticallyDesc();
+
+    expect($collection[0])->toBe($rootFolder)
+        ->and($collection[1])->toBe($zFolder)
+        ->and($collection[2])->toBe($bFolder)
+        ->and($collection[3])->toBe($aFolder);
+});
