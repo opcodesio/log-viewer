@@ -2,8 +2,8 @@
 
 namespace Opcodes\LogViewer\Enums;
 
-enum SortingOrder: string
+class SortingOrder
 {
-    case Ascending = 'asc';
-    case Descending = 'desc';
+    public const Ascending = 'asc';
+    public const Descending = 'desc';
 }

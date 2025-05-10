@@ -2,9 +2,9 @@
 
 namespace Opcodes\LogViewer\Enums;
 
-enum Theme: string
+class Theme
 {
-    case System = 'System';
-    case Light = 'Light';
-    case Dark = 'Dark';
+    public const System = 'System';
+    public const Light = 'Light';
+    public const Dark = 'Dark';
 }

@@ -2,8 +2,8 @@
 
 namespace Opcodes\LogViewer\Enums;
 
-enum FolderSortingMethod: string
+class FolderSortingMethod
 {
-    case Alphabetical = 'Alphabetical';
-    case ModifiedTime = 'ModifiedTime';
+    public const Alphabetical = 'Alphabetical';
+    public const ModifiedTime = 'ModifiedTime';
 }
