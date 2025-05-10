@@ -1,5 +1,9 @@
 <?php
 
+use Opcodes\LogViewer\Enums\Theme;
+use Opcodes\LogViewer\Enums\FolderSortingMethod;
+use Opcodes\LogViewer\Enums\SortingOrder;
+
 return [
 
     /*
@@ -241,4 +245,23 @@ return [
     */
 
     'per_page_options' => [10, 25, 50, 100, 250, 500],
+
+    'defaults' => [
+
+        // Must be one of the above `per_page_options` values
+        'per_page' => 10,
+
+        // Other options: `Alphabetical`, `ModifiedTime`
+        'folder_sorting_method' => FolderSortingMethod::Alphabetical,
+
+        // Other options: `Ascending`, `Descending`
+        'folder_sorting_order' => SortingOrder::Descending,
+
+        // Other options: `System`, `Light`, `Dark`
+        'theme' => Theme::System, 
+
+        // Whether to enable `shorter_stack_traces` by default
+        'shorter_stack_traces' => true,
+
+    ]
 ];

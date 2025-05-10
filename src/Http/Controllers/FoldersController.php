@@ -5,6 +5,8 @@ namespace Opcodes\LogViewer\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
+use Opcodes\LogViewer\Enums\FolderSortingMethod;
+use Opcodes\LogViewer\Enums\SortingOrder;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LogFolderResource;
 use Opcodes\LogViewer\LogFile;
@@ -15,10 +17,32 @@ class FoldersController
     {
         $folders = LogViewer::getFilesGroupedByFolder();
 
-        if ($request->query('direction', 'desc') === 'asc') {
-            $folders = $folders->sortByEarliestFirstIncludingFiles();
-        } else {
-            $folders = $folders->sortByLatestFirstIncludingFiles();
+        $sortingMethod = config('log-viewer.defaults.folder_sorting_method', FolderSortingMethod::ModifiedTime);
+        $sortingOrder = config('log-viewer.defaults.folder_sorting_order', SortingOrder::Descending);
+
+        $fileSortingOrder = $request->query('direction', 'desc');
+
+        if ($sortingMethod === FolderSortingMethod::Alphabetical) {
+            if ($sortingOrder === SortingOrder::Ascending) {
+                $folders = $folders->sortAlphabeticallyAsc();
+            } else {
+                $folders = $folders->sortAlphabeticallyDesc();
+            }
+
+            // Still sort files inside folders by direction param
+            $folders->each(function ($folder) use ($fileSortingOrder) {
+                if ($fileSortingOrder === 'asc') {
+                    $folder->files()->sortByEarliestFirst();
+                } else {
+                    $folder->files()->sortByLatestFirst();
+                }
+            });
+        } else { // ModifiedTime
+            if ($fileSortingOrder === 'asc') {
+                $folders = $folders->sortByEarliestFirstIncludingFiles();
+            } else {
+                $folders = $folders->sortByLatestFirstIncludingFiles();
+            }
         }
 
         return LogFolderResource::collection($folders->values());
