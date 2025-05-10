@@ -250,8 +250,8 @@ return [
     |--------------------------------------------------------------------------
     | Default settings for Log Viewer
     |--------------------------------------------------------------------------
-    | These settings determine the default behaviour of Log Viewer.
-    | Many of these can be persisted for the user in their browser's localStorage,
+    | These settings determine the default behaviour of Log Viewer. Many of
+    | these can be persisted for the user in their browser's localStorage,
     | if the `use_local_storage` option is set to true.
     |
     */
