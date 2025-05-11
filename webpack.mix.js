@@ -20,6 +20,7 @@ mix.options({
         resolve: {
             symlinks: false,
             alias: {
+                'vue$': 'vue/dist/vue.runtime.esm-bundler.js',
                 '@': path.resolve(__dirname, 'resources/js/'),
             },
         },
