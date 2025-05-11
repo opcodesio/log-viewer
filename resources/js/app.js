@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import axios from 'axios';
 import { createRouter, createWebHistory } from 'vue-router';
+import App from './App.vue';
 import Home from './pages/Home.vue';
 
 let token = document.head.querySelector('meta[name="csrf-token"]');
@@ -30,7 +31,7 @@ if (window.LogViewer.path === '' || window.LogViewer.path === '/') {
 
 const router = createRouter({
   routes: [{
-    path: LogViewer.basePath,
+    path: window.LogViewer.basePath,
     name: 'home',
     component: Home,
   }],
@@ -39,9 +40,7 @@ const router = createRouter({
 });
 const pinia = createPinia();
 
-const app = createApp({
-  router,
-});
+const app = createApp(App);
 
 app.use(router);
 app.use(pinia);
