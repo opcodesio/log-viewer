@@ -236,9 +236,9 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
     {
         $page = $page ?: Paginator::resolveCurrentPage('page');
 
-        if (! is_null($this->onlyShowIndex)) {
+        if (! is_null($this->onlyShowIndex) && $index = $this->reset()->getLogAtIndex($this->onlyShowIndex)) {
             return new LengthAwarePaginator(
-                [$this->reset()->getLogAtIndex($this->onlyShowIndex)],
+                [$index],
                 1,
                 $perPage,
                 $page
@@ -291,7 +291,9 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
 
     protected function getLogAtIndex(int $index): ?Log
     {
-        $position = $this->index()->getPositionForIndex($index);
+        if (! $position = $this->index()->getPositionForIndex($index)) {
+            return null;
+        }
 
         $text = $this->getLogTextAtPosition($position);
 
