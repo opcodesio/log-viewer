@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Opcodes\LogViewer\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +15,7 @@ class LogSummaryCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'log:summary';
+    protected $signature = 'log-viewer:summary';
 
     /**
      * The console command description.
@@ -68,7 +68,7 @@ class LogSummaryCommand extends Command
                 if (! isset($summary[$message])) {
                     $summary[$message] = [
                         'first' => $ts,
-                        'last'  => $ts,
+                        'last' => $ts,
                         'count' => 1,
                         'level' => $level,
                         'context' => $context,
@@ -98,7 +98,7 @@ class LogSummaryCommand extends Command
                 $data['level'],
                 $data['count'],
                 $message,
-                count($data['context']) > 0 ? Str::replace('\\n', "\n", '\n' . json_encode($data['context'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) : ''
+                count($data['context']) > 0 ? Str::replace('\\n', "\n", '\n'.json_encode($data['context'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) : ''
             ));
 
         }

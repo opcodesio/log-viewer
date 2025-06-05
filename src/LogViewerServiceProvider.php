@@ -14,6 +14,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Octane\Events\RequestTerminated;
 use Opcodes\LogViewer\Console\Commands\GenerateDummyLogsCommand;
+use Opcodes\LogViewer\Console\Commands\LogSummaryCommand;
 use Opcodes\LogViewer\Console\Commands\PublishCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Facades\LogViewer;
@@ -60,6 +61,7 @@ class LogViewerServiceProvider extends ServiceProvider
             $this->commands([
                 PublishCommand::class,
                 GenerateDummyLogsCommand::class,
+                LogSummaryCommand::class,
             ]);
         }
 

@@ -1,18 +1,15 @@
 <?php
 
-namespace App\Logs;
+namespace Opcodes\LogViewer\Logs;
 
 use Carbon\Carbon;
 use Opcodes\LogViewer\Facades\LogViewer;
-use Opcodes\LogViewer\Logs\Log;
 use Str;
 
 class LogSummary extends Log
 {
     public static string $name = 'Log Summary';
-
     public static string $regex = '/^\[(?P<first_datetime>[^\]]+)\]\s*-\s*\[(?P<datetime>[^\]]+)\]\s+(?P<environment>\S+)\.(?P<level>\S+):\s+(?P<count>\d+)\s*\|\s*(?<message>.*)/x';
-
     public static array $columns = [
         ['label' => 'Severity', 'data_path' => 'level'],
         ['label' => 'First', 'data_path' => 'extra.first_datetime'],
@@ -21,7 +18,6 @@ class LogSummary extends Log
         ['label' => 'Count', 'data_path' => 'extra.count'],
         ['label' => 'Message', 'data_path' => 'message'],
     ];
-
     public static string $regexFirstDatetimeKey = 'first_datetime';
     public static string $regexCountKey = 'count';
     public static string $regexEnvironmentKey = 'environment';
@@ -38,7 +34,6 @@ class LogSummary extends Log
                 ->setTimezone(LogViewer::timezone())
                 ->format("Y\u{2011}m\u{2011}d\u{00A0}H:i:s"),
         ];
-
 
         $raw = $this->text;
 
