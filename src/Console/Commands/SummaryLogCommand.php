@@ -1,6 +1,6 @@
 <?php
 
-namespace Opcodes\LogViewer\Console\Commands;
+namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
@@ -8,14 +8,15 @@ use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFileCollection;
 
-class LogSummaryCommand extends Command
+class SummaryLogCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'log-viewer:summary';
+    protected $signature = 'log-viewer:summary
+        {--l|logs=1000 : Number of logs to summarize }';
 
     /**
      * The console command description.
@@ -29,20 +30,22 @@ class LogSummaryCommand extends Command
      */
     public function handle(): void
     {
+        $number = $this->option('logs');
+
         static::deleteSummaryFile();
         $this->comment('Deleted error log summary file');
         $this->comment('Generating error log summary file');
-        static::generateSummaryFile();
+        static::generateSummaryFile($number);
         $this->comment('Done');
     }
 
     protected static function deleteSummaryFile(): void
     {
         Storage::disk('logs')
-            ->delete('log-summary.log');
+            ->delete('summary.log');
     }
 
-    protected static function generateSummaryFile(): void
+    protected static function generateSummaryFile(int $number): void
     {
         $summary = [];
 
@@ -50,60 +53,55 @@ class LogSummaryCommand extends Command
         $files = LogViewer::getFiles();
 
         foreach ($files as $file) {
-            if ($file->name === 'log-summary.log') {
+            if (!Str::endsWith($file->name, 'laravel.log')) {
                 continue;
             }
 
-            $paginator = $file
-                ->logs()
-                ->paginate(1000);
+            $logs = collect($file->logs()->get())
+                ->reverse()
+                ->take($number);
 
-            foreach ($paginator->items() as $log) {
-                $level = strtoupper($log->level);
-                $message = $log->getOriginalText();
+            foreach ($logs as $log) {
+                $level = $log->level;
+                $message = $log->message;
                 $context = $log->context;
                 $env = $log->extra['environment'];
                 $ts = $log->datetime->format('Y-m-d H:i:s');
 
-                if (! isset($summary[$message])) {
+                if (! isset($summary[trim($message)])) {
                     $summary[$message] = [
                         'first' => $ts,
-                        'last' => $ts,
+                        'last'  => $ts,
                         'count' => 1,
                         'level' => $level,
-                        'context' => $context,
                         'env' => $env,
+                        'message' => $message,
+                        'context' => $context,
                     ];
                 } else {
-                    $summary[$message]['count']++;
-                    $summary[$message]['last'] = max(
+                    $summary[trim($message)]['count']++;
+                    $summary[trim($message)]['last'] = max(
                         $ts,
-                        $summary[$message]['last']
+                        $summary[trim($message)]['last']
                     );
-                    $summary[$message]['first'] = min(
+                    $summary[trim($message)]['first'] = min(
                         $ts,
-                        $summary[$message]['first']
+                        $summary[trim($message)]['first']
                     );
                 }
             }
         }
 
-        $lines = [];
-        foreach ($summary as $message => $data) {
-            $lines[] = trim(sprintf(
-                '[%s] - [%s] %s.%s: %d | %s %s',
-                $data['first'],
-                $data['last'],
-                $data['env'],
-                $data['level'],
-                $data['count'],
-                $message,
-                count($data['context']) > 0 ? Str::replace('\\n', "\n", '\n'.json_encode($data['context'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) : ''
-            ));
+        $lines = array_map(function(array $data) {
+            return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }, array_values($summary));
 
+        $uniqueLines = [];
+        foreach ($lines as $json) {
+            $uniqueLines[$json] = true;
         }
 
         Storage::disk('logs')
-            ->put('log-summary.log', implode("\n", $lines));
+            ->put('summary.log', implode("\n", array_reverse(array_keys($uniqueLines))));
     }
 }
