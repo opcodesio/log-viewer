@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Logs;
+namespace Opcodes\LogViewer\Logs;
 
 use Carbon\Carbon;
 use Opcodes\LogViewer\Facades\LogViewer;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Opcodes\LogViewer\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
@@ -53,7 +53,7 @@ class SummaryLogCommand extends Command
         $files = LogViewer::getFiles();
 
         foreach ($files as $file) {
-            if (!Str::endsWith($file->name, 'laravel.log')) {
+            if (! Str::endsWith($file->name, 'laravel.log')) {
                 continue;
             }
 
@@ -71,7 +71,7 @@ class SummaryLogCommand extends Command
                 if (! isset($summary[trim($message)])) {
                     $summary[$message] = [
                         'first' => $ts,
-                        'last'  => $ts,
+                        'last' => $ts,
                         'count' => 1,
                         'level' => $level,
                         'env' => $env,
@@ -92,7 +92,7 @@ class SummaryLogCommand extends Command
             }
         }
 
-        $lines = array_map(function(array $data) {
+        $lines = array_map(function (array $data) {
             return json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         }, array_values($summary));
 
