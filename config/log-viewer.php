@@ -294,6 +294,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Exclude IP from identifiers
+    |--------------------------------------------------------------------------
+    | By default, file and folder identifiers include the server's IP address
+    | to ensure uniqueness. In load-balanced environments with shared storage,
+    | this can cause "No results" errors. Set to true to exclude IP addresses
+    | from identifier generation for consistent results across servers.
+    |
+    */
+
+    'exclude_ip_from_identifiers' => env('LOG_VIEWER_EXCLUDE_IP_FROM_IDENTIFIERS', false),
+
+    /*
+    |--------------------------------------------------------------------------
     | Root folder prefix
     |--------------------------------------------------------------------------
     | The prefix for log files inside Laravel's `storage/logs` folder.

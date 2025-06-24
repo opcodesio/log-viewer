@@ -39,3 +39,24 @@ test('log file identifier is based on server address', function () {
         Utils::shortMd5($serverIp.':'.$logFile->subFolder)
     );
 });
+
+test('log file identifier excludes IP when config is enabled', function () {
+    $path = storage_path('logs/laravel.log');
+    file_put_contents($path, str_repeat('0', 10));  // 10 bytes
+    // Set the cached local IP to a known value:
+    Utils::setCachedLocalIP($serverIp = '123.123.123.123');
+
+    // Enable the config to exclude IP from identifiers
+    config(['log-viewer.exclude_ip_from_identifiers' => true]);
+
+    $logFile = new LogFile($path);
+
+    expect($logFile->identifier)->toBe(
+        Utils::shortMd5($path).'-laravel.log'
+    )->and($logFile->subFolderIdentifier())->toBe(
+        Utils::shortMd5($logFile->subFolder)
+    );
+
+    // Reset config for other tests
+    config(['log-viewer.exclude_ip_from_identifiers' => false]);
+});

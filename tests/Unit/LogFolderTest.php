@@ -34,3 +34,20 @@ test('log folder identifier is based on server address', function () {
         Utils::shortMd5($serverIp.':'.$folder->path)
     );
 });
+
+test('log folder identifier excludes IP when config is enabled', function () {
+    // Set the cached local IP to a known value:
+    Utils::setCachedLocalIP($serverIp = '123.123.123.123');
+
+    // Enable the config to exclude IP from identifiers
+    config(['log-viewer.exclude_ip_from_identifiers' => true]);
+
+    $folder = new LogFolder('folder', []);
+
+    expect($folder->identifier)->toBe(
+        Utils::shortMd5($folder->path)
+    );
+
+    // Reset config for other tests
+    config(['log-viewer.exclude_ip_from_identifiers' => false]);
+});
