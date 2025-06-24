@@ -17,7 +17,12 @@ class LogFolder
         public string $path,
         mixed $files,
     ) {
-        $this->identifier = Utils::shortMd5(Utils::getLocalIP().':'.$path);
+        if (config('log-viewer.exclude_ip_from_identifiers', false)) {
+            $this->identifier = Utils::shortMd5($path);
+        } else {
+            $this->identifier = Utils::shortMd5(Utils::getLocalIP().':'.$path);
+        }
+
         $this->files = new LogFileCollection($files);
     }
 
