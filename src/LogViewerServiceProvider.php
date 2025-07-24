@@ -113,7 +113,7 @@ class LogViewerServiceProvider extends ServiceProvider
     protected function defineAssetPublishing()
     {
         $this->publishes([
-            self::basePath('/public') => public_path('vendor/log-viewer'),
+            self::basePath('/public') => public_path(config('log-viewer.assets_path')),
         ], 'log-viewer-assets');
     }
 
