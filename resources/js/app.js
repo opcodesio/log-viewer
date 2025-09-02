@@ -51,3 +51,15 @@ app.mixin({
 });
 
 app.mount('#log-viewer');
+
+// Load AI providers only once at startup
+// This avoids multiple requests when there are many logs on the screen
+// Only loads if the feature is enabled
+if (window.LogViewer?.ai_export_enabled) {
+  import('./stores/aiProviders').then(({ useAiProvidersStore }) => {
+    const aiProvidersStore = useAiProvidersStore(pinia);
+    aiProvidersStore.fetchProviders().catch(error => {
+      console.warn('Failed to preload AI providers:', error);
+    });
+  });
+}

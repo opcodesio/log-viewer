@@ -37,6 +37,7 @@ class IndexController
                     'shorter_stack_traces' => config('log-viewer.defaults.shorter_stack_traces'),
                 ],
                 'root_folder_prefix' => LogFolder::rootPrefix(),
+                'ai_export_enabled' => config('log-viewer.ai_export.enabled', false),
             ],
         ]);
     }

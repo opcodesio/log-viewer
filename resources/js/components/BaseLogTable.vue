@@ -66,15 +66,19 @@
         </template>
 
         <td class="whitespace-nowrap text-gray-500 dark:text-gray-300 dark:opacity-90 text-xs hidden lg:table-cell">
-          <LogCopyButton :log="log" class="pr-2 large-screen" />
+          <div class="flex items-center space-x-1 pr-2">
+            <LogCopyButton :log="log" class="large-screen" />
+            <AskAiButton v-if="LogViewer.ai_export_enabled && (log.level_class === 'danger' || log.level_class === 'warning')" :log="log" :log-index="log.index" />
+          </div>
         </td>
       </tr>
       <tr v-show="logViewerStore.isOpen(index)">
         <td :colspan="tableColumns">
           <div class="lg:hidden flex justify-between px-2 pt-2 pb-1 text-xs">
             <div class="flex-1"><span class="font-semibold">Datetime:</span> {{ log.datetime }}</div>
-            <div>
+            <div class="flex items-center space-x-1">
               <LogCopyButton :log="log" />
+              <AskAiButton v-if="LogViewer.ai_export_enabled && (log.level_class === 'danger' || log.level_class === 'warning')" :log="log" :log-index="log.index" />
             </div>
           </div>
 
@@ -145,6 +149,7 @@ import { useLogViewerStore } from '../stores/logViewer.js';
 import { useSearchStore } from '../stores/search.js';
 import { useFileStore } from '../stores/files.js';
 import LogCopyButton from './LogCopyButton.vue';
+import AskAiButton from './AskAiButton.vue';
 import { handleLogToggleKeyboardNavigation } from '../keyboardNavigation';
 import { useSeverityStore } from '../stores/severity.js';
 import TabContainer from "./TabContainer.vue";

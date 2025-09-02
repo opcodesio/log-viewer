@@ -18,6 +18,7 @@ use Opcodes\LogViewer\Console\Commands\PublishCommand;
 use Opcodes\LogViewer\Events\LogFileDeleted;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Opcodes\LogViewer\Services\AiExport\AiExportService;
 
 class LogViewerServiceProvider extends ServiceProvider
 {
@@ -42,6 +43,10 @@ class LogViewerServiceProvider extends ServiceProvider
                 return new LogTypeRegistrar;
             });
         }
+
+        $this->app->singleton(AiExportService::class, function () {
+            return new AiExportService;
+        });
     }
 
     public function boot()

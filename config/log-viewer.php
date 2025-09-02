@@ -326,4 +326,40 @@ return [
     */
 
     'root_folder_prefix' => 'root',
+
+    /*
+    |--------------------------------------------------------------------------
+    | AI Export Configuration
+    |--------------------------------------------------------------------------
+    | Configuration for exporting logs to AI providers for analysis.
+    | This feature allows users to send log errors to ChatGPT or Claude
+    | for automated troubleshooting assistance.
+    |
+    */
+
+    'ai_export' => [
+        'enabled' => env('LOG_VIEWER_AI_EXPORT_ENABLED', true),
+
+        'providers' => [
+            'chatgpt' => [
+                'enabled' => true,
+                'url' => 'https://chat.openai.com/',
+                'max_characters' => 6950,
+            ],
+            'claude' => [
+                'enabled' => true,
+                'url' => 'https://claude.ai/new',
+                'max_characters' => 10000,
+            ],
+        ],
+
+        // Maximum number of context lines to include in the export
+        'max_context_lines' => 50,
+
+        // Patterns to sanitize sensitive data before sending to AI
+        'sanitize_patterns' => [
+            // Add custom patterns here
+            // '/custom_pattern/i' => 'replacement',
+        ],
+    ],
 ];

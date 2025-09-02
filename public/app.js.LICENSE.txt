@@ -1,4 +1,10 @@
 /*!
+  * vue-router v4.4.3
+  * (c) 2024 Eduardo San Martin Morote
+  * @license MIT
+  */
+
+/*!
  * The buffer module from node.js, for the browser.
  *
  * @author   Feross Aboukhadijeh <http://feross.org>
@@ -6,8 +12,8 @@
  */
 
 /*!
- * pinia v2.2.2
- * (c) 2024 Eduardo San Martin Morote
+ * pinia v2.3.1
+ * (c) 2025 Eduardo San Martin Morote
  * @license MIT
  */
 
@@ -27,7 +33,19 @@
  */
 
 /**
-* @vue/shared v3.4.38
+* @vue/reactivity v3.5.21
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/runtime-dom v3.5.21
+* (c) 2018-present Yuxi (Evan) You and Vue contributors
+* @license MIT
+**/
+
+/**
+* @vue/shared v3.5.21
 * (c) 2018-present Yuxi (Evan) You and Vue contributors
 * @license MIT
 **/
