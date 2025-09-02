@@ -25,6 +25,10 @@ Route::middleware([
     Route::post('delete-multiple-files', 'FilesController@deleteMultipleFiles')->name('log-viewer.files.delete-multiple-files');
 
     Route::get('logs', 'LogsController@index')->name('log-viewer.logs');
+
+    Route::get('ai/providers', 'AiExportController@providers')->name('log-viewer.ai.providers');
+    Route::post('ai/export', 'AiExportController@export')->name('log-viewer.ai.export');
+    Route::post('ai/copy-markdown', 'AiExportController@copyAsMarkdown')->name('log-viewer.ai.copy-markdown');
 });
 
 Route::get('folders/{folderIdentifier}/download', 'FoldersController@download')
