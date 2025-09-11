@@ -20,6 +20,7 @@ class FoldersController
         $sortingMethod = config('log-viewer.defaults.folder_sorting_method', FolderSortingMethod::ModifiedTime);
         $sortingOrder = config('log-viewer.defaults.folder_sorting_order', SortingOrder::Descending);
 
+        $fileSortingMethod = config('log-viewer.defaults.log_sorting_method', FolderSortingMethod::ModifiedTime);
         $fileSortingOrder = $request->query('direction', 'desc');
 
         if ($sortingMethod === FolderSortingMethod::Alphabetical) {
@@ -30,11 +31,20 @@ class FoldersController
             }
 
             // Still sort files inside folders by direction param
-            $folders->each(function ($folder) use ($fileSortingOrder) {
-                if ($fileSortingOrder === 'asc') {
-                    $folder->files()->sortByEarliestFirst();
+            $folders->each(function ($folder) use ($fileSortingMethod, $fileSortingOrder) {
+                if ($fileSortingMethod === FolderSortingMethod::ModifiedTime) {
+                    if ($fileSortingOrder === 'asc') {
+                        $folder->files()->sortByEarliestFirst();
+                    } else {
+                        $folder->files()->sortByLatestFirst();
+                    }
+
                 } else {
-                    $folder->files()->sortByLatestFirst();
+                    if ($fileSortingOrder === 'asc') {
+                        $folder->files()->sortAlphabeticallyAsc();
+                    } else {
+                        $folder->files()->sortAlphabeticallyDesc();
+                    }
                 }
             });
         } else { // ModifiedTime

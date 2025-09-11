@@ -45,8 +45,10 @@
         <div class="text-sm text-gray-500 dark:text-gray-400">
           <label for="file-sort-direction" class="sr-only">Sort direction</label>
           <select id="file-sort-direction" class="select" v-model="fileStore.direction">
-            <option value="desc">Newest first</option>
-            <option value="asc">Oldest first</option>
+            <option v-if="!LogViewer.log_sort_by_time" value="asc">From A to Z</option>
+            <option v-if="!LogViewer.log_sort_by_time" value="desc">From Z to A</option>
+            <option v-if="LogViewer.log_sort_by_time" value="desc">Newest first</option>
+            <option v-if="LogViewer.log_sort_by_time" value="asc">Oldest first</option>
           </select>
         </div>
       </div>

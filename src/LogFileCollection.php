@@ -28,6 +28,20 @@ class LogFileCollection extends Collection
         return $this;
     }
 
+    public function sortAlphabeticallyAsc(): self
+    {
+        $this->items = $this->sortBy('name')->values()->toArray();
+
+        return $this;
+    }
+
+    public function sortAlphabeticallyDesc(): self
+    {
+        $this->items = $this->sortByDesc('name')->values()->toArray();
+
+        return $this;
+    }
+
     public function latest(): ?LogFile
     {
         return $this->sortByDesc->latestTimestamp()->first();

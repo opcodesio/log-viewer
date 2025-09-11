@@ -5,6 +5,7 @@ namespace Opcodes\LogViewer\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
+use Opcodes\LogViewer\Enums\FolderSortingMethod;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LogFileResource;
 
@@ -13,11 +14,21 @@ class FilesController
     public function index(Request $request)
     {
         $files = LogViewer::getFiles();
+        $sortingMethod = config('log-viewer.defaults.log_sorting_method', FolderSortingMethod::ModifiedTime);
 
-        if ($request->query('direction', 'desc') === 'asc') {
-            $files = $files->sortByEarliestFirst();
+        if ($sortingMethod === FolderSortingMethod::ModifiedTime) {
+            if ($request->query('direction', 'desc') === 'asc') {
+                $files = $files->sortByEarliestFirst();
+            } else {
+                $files = $files->sortByLatestFirst();
+            }
+
         } else {
-            $files = $files->sortByLatestFirst();
+            if ($request->query('direction', 'desc') === 'asc') {
+                $files = $files->sortAlphabeticallyAsc();
+            } else {
+                $files = $files->sortAlphabeticallyDesc();
+            }
         }
 
         return LogFileResource::collection($files);
