@@ -15,7 +15,7 @@ class IndexController
             abort(404);
         }
 
-        $log_sort_by_time = config('log-viewer.defaults.log_sorting_method') === FolderSortingMethod::ModifiedTime;
+        $files_sort_by_time = config('log-viewer.defaults.file_sorting_method') === FolderSortingMethod::ModifiedTime;
 
         return view(LogViewer::getViewLayout(), [
             'logViewerScriptVariables' => [
@@ -26,7 +26,7 @@ class IndexController
                 'path' => config('log-viewer.route_path'),
                 'back_to_system_url' => config('log-viewer.back_to_system_url'),
                 'back_to_system_label' => config('log-viewer.back_to_system_label'),
-                'log_sort_by_time' => $log_sort_by_time,
+                'files_sort_by_time' => $files_sort_by_time,
                 'max_log_size_formatted' => Utils::bytesForHumans(LogViewer::maxLogSize()),
                 'show_support_link' => config('log-viewer.show_support_link', true),
 

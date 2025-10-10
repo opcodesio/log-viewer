@@ -10,7 +10,7 @@ beforeEach(function () {
 });
 
 it('you can get time sorted default desc logs folders controller', function () {
-    config(['log-viewer.defaults.log_sorting_method' => FolderSortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::ModifiedTime]);
 
     $names = [
         'sub/one.log',
@@ -34,7 +34,7 @@ it('you can get time sorted default desc logs folders controller', function () {
 });
 
 it('you can get time sorted desc logs folders controller', function () {
-    config(['log-viewer.defaults.log_sorting_method' => FolderSortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::ModifiedTime]);
 
     $names = [
         'sub/one.log',
@@ -58,7 +58,7 @@ it('you can get time sorted desc logs folders controller', function () {
 });
 
 it('you can get time sorted asc logs folders controller', function () {
-    config(['log-viewer.defaults.log_sorting_method' => FolderSortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::ModifiedTime]);
 
     $names = [
         'sub/one.log',

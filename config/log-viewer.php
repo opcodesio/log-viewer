@@ -288,8 +288,8 @@ return [
         // Order to sort the folders. Other options: `Ascending`, `Descending`
         'folder_sorting_order' => SortingOrder::Descending,
 
-        // Method for sorting logs into directories. Other options: `Alphabetical`, `ModifiedTime`
-        'log_sorting_method' => FolderSortingMethod::ModifiedTime,
+        // Method for sorting log-files into directories. Other options: `Alphabetical`, `ModifiedTime`
+        'file_sorting_method' => FolderSortingMethod::ModifiedTime,
 
         // Order to sort the logs. Other options: `Ascending`, `Descending`
         'log_sorting_order' => SortingOrder::Descending,

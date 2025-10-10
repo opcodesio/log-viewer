@@ -14,7 +14,7 @@ class FilesController
     public function index(Request $request)
     {
         $files = LogViewer::getFiles();
-        $sortingMethod = config('log-viewer.defaults.log_sorting_method', FolderSortingMethod::ModifiedTime);
+        $sortingMethod = config('log-viewer.defaults.file_sorting_method', FolderSortingMethod::ModifiedTime);
 
         if ($sortingMethod === FolderSortingMethod::ModifiedTime) {
             if ($request->query('direction', 'desc') === 'asc') {

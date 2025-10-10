@@ -20,7 +20,7 @@ class FoldersController
         $sortingMethod = config('log-viewer.defaults.folder_sorting_method', FolderSortingMethod::ModifiedTime);
         $sortingOrder = config('log-viewer.defaults.folder_sorting_order', SortingOrder::Descending);
 
-        $fileSortingMethod = config('log-viewer.defaults.log_sorting_method', FolderSortingMethod::ModifiedTime);
+        $fileSortingMethod = config('log-viewer.defaults.file_sorting_method', FolderSortingMethod::ModifiedTime);
         $fileSortingOrder = $request->query('direction', 'desc');
 
         if ($sortingMethod === FolderSortingMethod::Alphabetical) {

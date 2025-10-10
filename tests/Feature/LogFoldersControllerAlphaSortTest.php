@@ -10,7 +10,7 @@ beforeEach(function () {
 });
 
 it('you can get alphabetically sorted default desc logs folders controller', function () {
-    config(['log-viewer.defaults.log_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
 
     generateLogFiles([
         'sub/one.log',
@@ -30,7 +30,7 @@ it('you can get alphabetically sorted default desc logs folders controller', fun
 });
 
 it('you can get alphabetically sorted asc logs folders controller', function () {
-    config(['log-viewer.defaults.log_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
 
     generateLogFiles([
         'sub/one.log',
@@ -50,7 +50,7 @@ it('you can get alphabetically sorted asc logs folders controller', function () 
 });
 
 it('you can get alphabetically sorted desc logs folders controller', function () {
-    config(['log-viewer.defaults.log_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
 
     generateLogFiles([
         'sub/one.log',
