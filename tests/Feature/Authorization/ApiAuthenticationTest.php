@@ -25,12 +25,21 @@ test('auth callback denies access to API routes when it returns false', function
 });
 
 test('authentication works when APP_URL is empty using same-domain fallback', function () {
-    config(['app.url' => '']);
+    config([
+        'app.url' => '',
+        'log-viewer.api_stateful_domains' => [], // Override to exclude localhost
+    ]);
 
-    LogViewer::auth(fn ($request) => true);
+    // Auth callback that requires session to be started (proving session middleware was applied)
+    LogViewer::auth(function ($request) {
+        if (! $request->hasSession() || ! $request->session()->isStarted()) {
+            return false;
+        }
+        return true;
+    });
 
-    $response = getJson(route('log-viewer.folders'), [
-        'referer' => 'http://localhost/',
+    $response = getJson('http://production.example.com/log-viewer/api/folders', [
+        'referer' => 'http://production.example.com/',
     ]);
 
     $response->assertOk();
@@ -72,9 +81,18 @@ test('authentication fails when APP_URL is set but referer does not match', func
 });
 
 test('same-domain requests work without APP_URL configured', function () {
-    config(['app.url' => null]);
+    config([
+        'app.url' => null,
+        'log-viewer.api_stateful_domains' => [], // Override to exclude localhost
+    ]);
 
-    LogViewer::auth(fn ($request) => true);
+    // Auth callback that requires session to be started (proving session middleware was applied)
+    LogViewer::auth(function ($request) {
+        if (! $request->hasSession() || ! $request->session()->isStarted()) {
+            return false;
+        }
+        return true;
+    });
 
     // Simulate request from same domain
     $response = getJson('http://production.example.com/log-viewer/api/folders', [
@@ -85,13 +103,22 @@ test('same-domain requests work without APP_URL configured', function () {
 });
 
 test('same-domain requests with custom port work without APP_URL', function () {
-    config(['app.url' => null]);
+    config([
+        'app.url' => null,
+        'log-viewer.api_stateful_domains' => [], // Override to exclude localhost
+    ]);
 
-    LogViewer::auth(fn ($request) => true);
+    // Auth callback that requires session to be started (proving session middleware was applied)
+    LogViewer::auth(function ($request) {
+        if (! $request->hasSession() || ! $request->session()->isStarted()) {
+            return false;
+        }
+        return true;
+    });
 
     // Simulate request from same domain with custom port
-    $response = getJson('http://localhost:8080/log-viewer/api/folders', [
-        'referer' => 'http://localhost:8080/log-viewer',
+    $response = getJson('http://production.example.com:8080/log-viewer/api/folders', [
+        'referer' => 'http://production.example.com:8080/log-viewer',
     ]);
 
     $response->assertOk();
