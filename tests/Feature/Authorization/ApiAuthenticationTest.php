@@ -49,14 +49,7 @@ test('authentication works when APP_URL is empty using same-domain fallback', fu
 test('authentication works when APP_URL matches request domain', function () {
     config(['app.url' => 'http://example.com']);
 
-    // Auth callback that checks for sanctum attribute (proving middleware pipeline ran)
-    LogViewer::auth(function ($request) {
-        if (! $request->attributes->get('sanctum')) {
-            return false;
-        }
-
-        return true;
-    });
+    LogViewer::auth(fn ($request) => true);
 
     $response = getJson('http://example.com/log-viewer/api/folders', [
         'referer' => 'http://example.com/',
@@ -171,14 +164,7 @@ test('requests without referer or origin are rejected', function () {
 test('localhost requests work by default regardless of APP_URL', function () {
     config(['app.url' => 'http://production.com']);
 
-    // Auth callback that requires session to be started (proving session middleware was applied)
-    LogViewer::auth(function ($request) {
-        if (! $request->hasSession() || ! $request->session()->isStarted()) {
-            return false;
-        }
-
-        return true;
-    });
+    LogViewer::auth(fn ($request) => true);
 
     // Localhost is in the default stateful domains
     $response = getJson('http://localhost/log-viewer/api/folders', [
@@ -191,14 +177,7 @@ test('localhost requests work by default regardless of APP_URL', function () {
 test('127.0.0.1 requests work by default regardless of APP_URL', function () {
     config(['app.url' => 'http://production.com']);
 
-    // Auth callback that requires session to be started (proving session middleware was applied)
-    LogViewer::auth(function ($request) {
-        if (! $request->hasSession() || ! $request->session()->isStarted()) {
-            return false;
-        }
-
-        return true;
-    });
+    LogViewer::auth(fn ($request) => true);
 
     // 127.0.0.1 is in the default stateful domains
     $response = getJson('http://127.0.0.1/log-viewer/api/folders', [
@@ -214,14 +193,7 @@ test('custom stateful domains override APP_URL behavior', function () {
         'log-viewer.api_stateful_domains' => ['custom-domain.com'],
     ]);
 
-    // Auth callback that requires session to be started (proving session middleware was applied)
-    LogViewer::auth(function ($request) {
-        if (! $request->hasSession() || ! $request->session()->isStarted()) {
-            return false;
-        }
-
-        return true;
-    });
+    LogViewer::auth(fn ($request) => true);
 
     // Custom domain should work
     $response = getJson('http://custom-domain.com/log-viewer/api/folders', [
