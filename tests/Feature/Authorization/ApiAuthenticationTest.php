@@ -2,7 +2,6 @@
 
 use Opcodes\LogViewer\Facades\LogViewer;
 
-use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
 
 test('auth callback is called for API routes', function () {

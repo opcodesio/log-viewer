@@ -114,10 +114,6 @@ class EnsureFrontendRequestsAreStateful
 
     /**
      * Resolve middleware class from config with fallback.
-     *
-     * @param  string  $configKey
-     * @param  string  $default
-     * @return string
      */
     protected static function resolveMiddleware(string $configKey, string $default): string
     {
