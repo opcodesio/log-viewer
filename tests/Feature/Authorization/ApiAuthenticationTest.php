@@ -82,10 +82,7 @@ test('authentication fails when APP_URL is set but referer does not match', func
 });
 
 test('same-domain requests work without APP_URL configured', function () {
-    config([
-        'app.url' => null,
-        'log-viewer.api_stateful_domains' => [], // Override to exclude localhost
-    ]);
+    config(['app.url' => null]);
 
     // Auth callback that requires session to be started (proving session middleware was applied)
     LogViewer::auth(function ($request) {
