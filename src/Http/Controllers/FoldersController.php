@@ -20,6 +20,7 @@ class FoldersController
         $sortingMethod = config('log-viewer.defaults.folder_sorting_method', FolderSortingMethod::ModifiedTime);
         $sortingOrder = config('log-viewer.defaults.folder_sorting_order', SortingOrder::Descending);
 
+        $fileSortingMethod = config('log-viewer.defaults.file_sorting_method', FolderSortingMethod::ModifiedTime);
         $fileSortingOrder = $request->query('direction', 'desc');
 
         if ($sortingMethod === FolderSortingMethod::Alphabetical) {
@@ -28,15 +29,6 @@ class FoldersController
             } else {
                 $folders = $folders->sortAlphabeticallyDesc();
             }
-
-            // Still sort files inside folders by direction param
-            $folders->each(function ($folder) use ($fileSortingOrder) {
-                if ($fileSortingOrder === 'asc') {
-                    $folder->files()->sortByEarliestFirst();
-                } else {
-                    $folder->files()->sortByLatestFirst();
-                }
-            });
         } else { // ModifiedTime
             if ($fileSortingOrder === 'asc') {
                 $folders = $folders->sortByEarliestFirstIncludingFiles();
@@ -44,6 +36,24 @@ class FoldersController
                 $folders = $folders->sortByLatestFirstIncludingFiles();
             }
         }
+
+        // Sort files within folders after sorting folders
+        $folders->each(function ($folder) use ($fileSortingMethod, $fileSortingOrder) {
+            if ($fileSortingMethod === FolderSortingMethod::ModifiedTime) {
+                if ($fileSortingOrder === 'asc') {
+                    $folder->files()->sortByEarliestFirst();
+                } else {
+                    $folder->files()->sortByLatestFirst();
+                }
+
+            } else {
+                if ($fileSortingOrder === 'asc') {
+                    $folder->files()->sortAlphabeticallyAsc();
+                } else {
+                    $folder->files()->sortAlphabeticallyDesc();
+                }
+            }
+        });
 
         return LogFolderResource::collection($folders->values());
     }
