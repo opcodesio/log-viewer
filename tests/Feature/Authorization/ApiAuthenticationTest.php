@@ -35,6 +35,7 @@ test('authentication works when APP_URL is empty using same-domain fallback', fu
         if (! $request->hasSession() || ! $request->session()->isStarted()) {
             return false;
         }
+
         return true;
     });
 
@@ -91,6 +92,7 @@ test('same-domain requests work without APP_URL configured', function () {
         if (! $request->hasSession() || ! $request->session()->isStarted()) {
             return false;
         }
+
         return true;
     });
 
@@ -113,6 +115,7 @@ test('same-domain requests with custom port work without APP_URL', function () {
         if (! $request->hasSession() || ! $request->session()->isStarted()) {
             return false;
         }
+
         return true;
     });
 
