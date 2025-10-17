@@ -1,6 +1,6 @@
 <?php
 
-use Opcodes\LogViewer\Enums\FolderSortingMethod;
+use Opcodes\LogViewer\Enums\SortingMethod;
 
 use function Pest\Laravel\getJson;
 
@@ -10,8 +10,8 @@ beforeEach(function () {
 });
 
 it('you can get alphabetically sorted default desc logs folders controller 1', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::Alphabetical]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
     $names = [
         'sub/one.log',
         'sub/two.log',
@@ -35,8 +35,8 @@ it('you can get alphabetically sorted default desc logs folders controller 1', f
 });
 
 it('you can get alphabetically sorted asc logs folders controller 1', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::Alphabetical]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
     $names = [
         'sub/one.log',
         'sub/two.log',
@@ -60,8 +60,8 @@ it('you can get alphabetically sorted asc logs folders controller 1', function (
 });
 
 it('you can get alphabetically sorted desc logs folders controller 1', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::Alphabetical]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
     $names = [
         'sub/one.log',
         'sub/two.log',
@@ -84,10 +84,10 @@ it('you can get alphabetically sorted desc logs folders controller 1', function 
     ]);
 });
 
-// не работает сортировка файлов при config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::ModifiedTime])
+// не работает сортировка файлов при config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::ModifiedTime])
 it('you can get alphabetically sorted default desc logs folders controller 2', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::ModifiedTime]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
     $names = [
         'sub/one.log',
         'sub/two.log',
@@ -111,8 +111,8 @@ it('you can get alphabetically sorted default desc logs folders controller 2', f
 });
 
 it('you can get alphabetically sorted asc logs folders controller 2', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::ModifiedTime]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
     $names = [
         'sub/one.log',
         'sub/two.log',
@@ -136,8 +136,8 @@ it('you can get alphabetically sorted asc logs folders controller 2', function (
 });
 
 it('you can get alphabetically sorted desc logs folders controller 2', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::ModifiedTime]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
     $names = [
         'sub/one.log',
         'sub/two.log',

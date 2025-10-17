@@ -5,7 +5,7 @@ namespace Opcodes\LogViewer\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
-use Opcodes\LogViewer\Enums\FolderSortingMethod;
+use Opcodes\LogViewer\Enums\SortingMethod;
 use Opcodes\LogViewer\Enums\SortingOrder;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\Http\Resources\LogFolderResource;
@@ -17,20 +17,20 @@ class FoldersController
     {
         $folders = LogViewer::getFilesGroupedByFolder();
 
-        $sortingMethod = config('log-viewer.defaults.folder_sorting_method', FolderSortingMethod::ModifiedTime);
+        $sortingMethod = config('log-viewer.defaults.folder_sorting_method', SortingMethod::ModifiedTime);
         $sortingOrder = config('log-viewer.defaults.folder_sorting_order', SortingOrder::Descending);
 
-        $fileSortingMethod = config('log-viewer.defaults.file_sorting_method', FolderSortingMethod::ModifiedTime);
-        $fileSortingOrder = $request->query('direction', 'desc');
+        $fileSortingMethod = config('log-viewer.defaults.file_sorting_method', SortingMethod::ModifiedTime);
+        $fileSortingOrder = $this->validateDirection($request->query('direction'));
 
-        if ($sortingMethod === FolderSortingMethod::Alphabetical) {
+        if ($sortingMethod === SortingMethod::Alphabetical) {
             if ($sortingOrder === SortingOrder::Ascending) {
                 $folders = $folders->sortAlphabeticallyAsc();
             } else {
                 $folders = $folders->sortAlphabeticallyDesc();
             }
         } else { // ModifiedTime
-            if ($fileSortingOrder === 'asc') {
+            if ($fileSortingOrder === SortingOrder::Ascending) {
                 $folders = $folders->sortByEarliestFirstIncludingFiles();
             } else {
                 $folders = $folders->sortByLatestFirstIncludingFiles();
@@ -39,15 +39,15 @@ class FoldersController
 
         // Sort files within folders after sorting folders
         $folders->each(function ($folder) use ($fileSortingMethod, $fileSortingOrder) {
-            if ($fileSortingMethod === FolderSortingMethod::ModifiedTime) {
-                if ($fileSortingOrder === 'asc') {
+            if ($fileSortingMethod === SortingMethod::ModifiedTime) {
+                if ($fileSortingOrder === SortingOrder::Ascending) {
                     $folder->files()->sortByEarliestFirst();
                 } else {
                     $folder->files()->sortByLatestFirst();
                 }
 
             } else {
-                if ($fileSortingOrder === 'asc') {
+                if ($fileSortingOrder === SortingOrder::Ascending) {
                     $folder->files()->sortAlphabeticallyAsc();
                 } else {
                     $folder->files()->sortAlphabeticallyDesc();
@@ -56,6 +56,15 @@ class FoldersController
         });
 
         return LogFolderResource::collection($folders->values());
+    }
+
+    private function validateDirection(?string $direction): string
+    {
+        if ($direction === SortingOrder::Ascending) {
+            return SortingOrder::Ascending;
+        }
+
+        return SortingOrder::Descending;
     }
 
     public function requestDownload(Request $request, string $folderIdentifier)

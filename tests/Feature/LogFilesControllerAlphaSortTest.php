@@ -1,6 +1,6 @@
 <?php
 
-use Opcodes\LogViewer\Enums\FolderSortingMethod;
+use Opcodes\LogViewer\Enums\SortingMethod;
 
 use function Pest\Laravel\getJson;
 
@@ -9,8 +9,8 @@ beforeEach(function () {
 });
 
 it('you can get alphabetically sorted default desc logs files controller 1', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::Alphabetical]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
 
     generateLogFiles([
         'one.log',
@@ -30,8 +30,8 @@ it('you can get alphabetically sorted default desc logs files controller 1', fun
 });
 
 it('you can get alphabetically sorted asc logs files controller 1', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::Alphabetical]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
 
     generateLogFiles([
         'one.log',
@@ -51,8 +51,8 @@ it('you can get alphabetically sorted asc logs files controller 1', function () 
 });
 
 it('you can get alphabetically sorted desc logs files controller 1', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::Alphabetical]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
 
     generateLogFiles([
         'one.log',
@@ -72,8 +72,8 @@ it('you can get alphabetically sorted desc logs files controller 1', function ()
 });
 
 it('you can get alphabetically sorted default desc logs files controller 2', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::ModifiedTime]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
 
     generateLogFiles([
         'one.log',
@@ -93,8 +93,8 @@ it('you can get alphabetically sorted default desc logs files controller 2', fun
 });
 
 it('you can get alphabetically sorted asc logs files controller 2', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::ModifiedTime]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
 
     generateLogFiles([
         'one.log',
@@ -114,8 +114,8 @@ it('you can get alphabetically sorted asc logs files controller 2', function () 
 });
 
 it('you can get alphabetically sorted desc logs files controller 2', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::ModifiedTime]);
-    config(['log-viewer.defaults.file_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.file_sorting_method' => SortingMethod::Alphabetical]);
 
     generateLogFiles([
         'one.log',
