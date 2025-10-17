@@ -31,9 +31,9 @@ class FoldersController
             }
         } else { // ModifiedTime
             if ($fileSortingOrder === SortingOrder::Ascending) {
-                $folders = $folders->sortByEarliestFirstIncludingFiles();
+                $folders = $folders->sortByEarliestFirst();
             } else {
-                $folders = $folders->sortByLatestFirstIncludingFiles();
+                $folders = $folders->sortByLatestFirst();
             }
         }
 
