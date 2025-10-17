@@ -23,37 +23,9 @@ class FoldersController
         $fileSortingMethod = config('log-viewer.defaults.file_sorting_method', SortingMethod::ModifiedTime);
         $fileSortingOrder = $this->validateDirection($request->query('direction'));
 
-        if ($sortingMethod === SortingMethod::Alphabetical) {
-            if ($sortingOrder === SortingOrder::Ascending) {
-                $folders = $folders->sortAlphabeticallyAsc();
-            } else {
-                $folders = $folders->sortAlphabeticallyDesc();
-            }
-        } else { // ModifiedTime
-            if ($fileSortingOrder === SortingOrder::Ascending) {
-                $folders = $folders->sortByEarliestFirst();
-            } else {
-                $folders = $folders->sortByLatestFirst();
-            }
-        }
+        $folders->sortUsing($sortingMethod, $sortingOrder);
 
-        // Sort files within folders after sorting folders
-        $folders->each(function ($folder) use ($fileSortingMethod, $fileSortingOrder) {
-            if ($fileSortingMethod === SortingMethod::ModifiedTime) {
-                if ($fileSortingOrder === SortingOrder::Ascending) {
-                    $folder->files()->sortByEarliestFirst();
-                } else {
-                    $folder->files()->sortByLatestFirst();
-                }
-
-            } else {
-                if ($fileSortingOrder === SortingOrder::Ascending) {
-                    $folder->files()->sortAlphabeticallyAsc();
-                } else {
-                    $folder->files()->sortAlphabeticallyDesc();
-                }
-            }
-        });
+        $folders->each(fn ($folder) => $folder->files()->sortUsing($fileSortingMethod, $fileSortingOrder));
 
         return LogFolderResource::collection($folders->values());
     }
