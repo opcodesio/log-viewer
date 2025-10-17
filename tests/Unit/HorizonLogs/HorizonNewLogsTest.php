@@ -150,6 +150,6 @@ EOF);
         ->and(count($logs))->toBeGreaterThanOrEqual(4);
 
     // Check that at least some valid logs were parsed
-    $validLogs = array_filter($logs, fn($log) => $log->datetime !== null);
+    $validLogs = array_filter($logs, fn ($log) => $log->datetime !== null);
     expect(count($validLogs))->toBeGreaterThanOrEqual(4);
 });
