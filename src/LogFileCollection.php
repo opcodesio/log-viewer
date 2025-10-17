@@ -14,7 +14,7 @@ class LogFileCollection extends Collection
     {
         $this->items = $this->sortBy(function (LogFile $file) {
             return $file->earliestTimestamp().($file->name ?? '');
-        }, SORT_NATURAL)->values()->toArray();
+        }, SORT_NATURAL)->values()->all();
 
         return $this;
     }
@@ -23,7 +23,7 @@ class LogFileCollection extends Collection
     {
         $this->items = $this->sortByDesc(function (LogFile $file) {
             return $file->latestTimestamp().($file->name ?? '');
-        }, SORT_NATURAL)->values()->toArray();
+        }, SORT_NATURAL)->values()->all();
 
         return $this;
     }
