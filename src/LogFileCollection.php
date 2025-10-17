@@ -30,14 +30,14 @@ class LogFileCollection extends Collection
 
     public function sortAlphabeticallyAsc(): self
     {
-        $this->items = $this->sortBy('name')->values()->toArray();
+        $this->items = $this->sortBy('name')->values()->all();
 
         return $this;
     }
 
     public function sortAlphabeticallyDesc(): self
     {
-        $this->items = $this->sortByDesc('name')->values()->toArray();
+        $this->items = $this->sortByDesc('name')->values()->all();
 
         return $this;
     }

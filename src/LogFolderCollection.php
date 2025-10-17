@@ -18,14 +18,14 @@ class LogFolderCollection extends Collection
 
     public function sortByEarliestFirst(): self
     {
-        $this->items = $this->sortBy->earliestTimestamp()->values()->toArray();
+        $this->items = $this->sortBy->earliestTimestamp()->values()->all();
 
         return $this;
     }
 
     public function sortByLatestFirst(): self
     {
-        $this->items = $this->sortByDesc->latestTimestamp()->values()->toArray();
+        $this->items = $this->sortByDesc->latestTimestamp()->values()->all();
 
         return $this;
     }
@@ -60,7 +60,7 @@ class LogFolderCollection extends Collection
                 return strcmp($a->cleanPath(), $b->cleanPath());
             })
             ->values()
-            ->toArray();
+            ->all();
 
         return $this;
     }
@@ -79,7 +79,7 @@ class LogFolderCollection extends Collection
                 return strcmp($b->cleanPath(), $a->cleanPath());
             })
             ->values()
-            ->toArray();
+            ->all();
 
         return $this;
     }
