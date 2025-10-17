@@ -49,9 +49,9 @@ test('authentication works when APP_URL is empty using same-domain fallback', fu
 test('authentication works when APP_URL matches request domain', function () {
     config(['app.url' => 'http://example.com']);
 
-    // Auth callback that requires session to be started (proving session middleware was applied)
+    // Auth callback that checks for sanctum attribute (proving middleware pipeline ran)
     LogViewer::auth(function ($request) {
-        if (! $request->hasSession() || ! $request->session()->isStarted()) {
+        if (! $request->attributes->get('sanctum')) {
             return false;
         }
 
