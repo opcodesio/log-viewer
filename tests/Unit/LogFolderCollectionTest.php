@@ -1,5 +1,7 @@
 <?php
 
+use Opcodes\LogViewer\Enums\SortingMethod;
+use Opcodes\LogViewer\Enums\SortingOrder;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFileCollection;
@@ -145,6 +147,62 @@ test('LogFolderCollection can sort its folders alphabetically descending, with r
     $collection = new LogFolderCollection([$aFolder, $zFolder, $rootFolder, $bFolder]);
 
     $collection->sortAlphabeticallyDesc();
+
+    expect($collection[0])->toBe($rootFolder)
+        ->and($collection[1])->toBe($zFolder)
+        ->and($collection[2])->toBe($bFolder)
+        ->and($collection[3])->toBe($aFolder);
+});
+
+test('LogFolderCollection can sort by ModifiedTime ascending using sortUsing method', function () {
+    $firstFolder = Mockery::mock(new LogFolder('folder', []))
+        ->allows(['earliestTimestamp' => now()->subDay()->timestamp]);
+    $secondFolder = Mockery::mock(new LogFolder('folder2', []))
+        ->allows(['earliestTimestamp' => now()->subDays(2)->timestamp]);
+    $collection = new LogFolderCollection([$firstFolder, $secondFolder]);
+
+    $collection->sortUsing(SortingMethod::ModifiedTime, SortingOrder::Ascending);
+
+    expect($collection[0])->toBe($secondFolder)
+        ->and($collection[1])->toBe($firstFolder);
+});
+
+test('LogFolderCollection can sort by ModifiedTime descending using sortUsing method', function () {
+    $firstFolder = Mockery::mock(new LogFolder('folder', []))
+        ->allows(['latestTimestamp' => now()->subDays(2)->timestamp]);
+    $secondFolder = Mockery::mock(new LogFolder('folder2', []))
+        ->allows(['latestTimestamp' => now()->subDay()->timestamp]);
+    $collection = new LogFolderCollection([$firstFolder, $secondFolder]);
+
+    $collection->sortUsing(SortingMethod::ModifiedTime, SortingOrder::Descending);
+
+    expect($collection[0])->toBe($secondFolder)
+        ->and($collection[1])->toBe($firstFolder);
+});
+
+test('LogFolderCollection can sort alphabetically ascending using sortUsing method, with root always on top', function () {
+    $rootFolder = Mockery::mock(new LogFolder('', []))->allows(['isRoot' => true, 'cleanPath' => LogFolder::rootPrefix()]);
+    $bFolder = Mockery::mock(new LogFolder('b', []))->allows(['isRoot' => false, 'cleanPath' => 'b']);
+    $aFolder = Mockery::mock(new LogFolder('a', []))->allows(['isRoot' => false, 'cleanPath' => 'a']);
+    $zFolder = Mockery::mock(new LogFolder('z', []))->allows(['isRoot' => false, 'cleanPath' => 'z']);
+    $collection = new LogFolderCollection([$zFolder, $rootFolder, $bFolder, $aFolder]);
+
+    $collection->sortUsing(SortingMethod::Alphabetical, SortingOrder::Ascending);
+
+    expect($collection[0])->toBe($rootFolder)
+        ->and($collection[1])->toBe($aFolder)
+        ->and($collection[2])->toBe($bFolder)
+        ->and($collection[3])->toBe($zFolder);
+});
+
+test('LogFolderCollection can sort alphabetically descending using sortUsing method, with root always on top', function () {
+    $rootFolder = Mockery::mock(new LogFolder('', []))->allows(['isRoot' => true, 'cleanPath' => LogFolder::rootPrefix()]);
+    $bFolder = Mockery::mock(new LogFolder('b', []))->allows(['isRoot' => false, 'cleanPath' => 'b']);
+    $aFolder = Mockery::mock(new LogFolder('a', []))->allows(['isRoot' => false, 'cleanPath' => 'a']);
+    $zFolder = Mockery::mock(new LogFolder('z', []))->allows(['isRoot' => false, 'cleanPath' => 'z']);
+    $collection = new LogFolderCollection([$aFolder, $zFolder, $rootFolder, $bFolder]);
+
+    $collection->sortUsing(SortingMethod::Alphabetical, SortingOrder::Descending);
 
     expect($collection[0])->toBe($rootFolder)
         ->and($collection[1])->toBe($zFolder)

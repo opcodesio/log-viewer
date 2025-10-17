@@ -3,6 +3,8 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Collection;
+use Opcodes\LogViewer\Enums\SortingMethod;
+use Opcodes\LogViewer\Enums\SortingOrder;
 use Opcodes\LogViewer\Readers\MultipleLogReader;
 
 /**
@@ -10,36 +12,47 @@ use Opcodes\LogViewer\Readers\MultipleLogReader;
  */
 class LogFileCollection extends Collection
 {
-    public function sortByEarliestFirst(): self
+    public function sortUsing(string $method, string $order): self
     {
-        $this->items = $this->sortBy(function (LogFile $file) {
-            return $file->earliestTimestamp().($file->name ?? '');
-        }, SORT_NATURAL)->values()->all();
+        if ($method === SortingMethod::ModifiedTime) {
+            if ($order === SortingOrder::Ascending) {
+                $this->items = $this->sortBy(function (LogFile $file) {
+                    return $file->earliestTimestamp().($file->name ?? '');
+                }, SORT_NATURAL)->values()->all();
+            } else {
+                $this->items = $this->sortByDesc(function (LogFile $file) {
+                    return $file->latestTimestamp().($file->name ?? '');
+                }, SORT_NATURAL)->values()->all();
+            }
+        } else {
+            if ($order === SortingOrder::Ascending) {
+                $this->items = $this->sortBy('name')->values()->all();
+            } else {
+                $this->items = $this->sortByDesc('name')->values()->all();
+            }
+        }
 
         return $this;
+    }
+
+    public function sortByEarliestFirst(): self
+    {
+        return $this->sortUsing(SortingMethod::ModifiedTime, SortingOrder::Ascending);
     }
 
     public function sortByLatestFirst(): self
     {
-        $this->items = $this->sortByDesc(function (LogFile $file) {
-            return $file->latestTimestamp().($file->name ?? '');
-        }, SORT_NATURAL)->values()->all();
-
-        return $this;
+        return $this->sortUsing(SortingMethod::ModifiedTime, SortingOrder::Descending);
     }
 
     public function sortAlphabeticallyAsc(): self
     {
-        $this->items = $this->sortBy('name')->values()->all();
-
-        return $this;
+        return $this->sortUsing(SortingMethod::Alphabetical, SortingOrder::Ascending);
     }
 
     public function sortAlphabeticallyDesc(): self
     {
-        $this->items = $this->sortByDesc('name')->values()->all();
-
-        return $this;
+        return $this->sortUsing(SortingMethod::Alphabetical, SortingOrder::Descending);
     }
 
     public function latest(): ?LogFile

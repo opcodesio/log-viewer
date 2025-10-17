@@ -18,20 +18,7 @@ class FilesController
         $sortingMethod = config('log-viewer.defaults.file_sorting_method', SortingMethod::ModifiedTime);
         $direction = $this->validateDirection($request->query('direction'));
 
-        if ($sortingMethod === SortingMethod::ModifiedTime) {
-            if ($direction === SortingOrder::Ascending) {
-                $files = $files->sortByEarliestFirst();
-            } else {
-                $files = $files->sortByLatestFirst();
-            }
-
-        } else {
-            if ($direction === SortingOrder::Ascending) {
-                $files = $files->sortAlphabeticallyAsc();
-            } else {
-                $files = $files->sortAlphabeticallyDesc();
-            }
-        }
+        $files->sortUsing($sortingMethod, $direction);
 
         return LogFileResource::collection($files);
     }
