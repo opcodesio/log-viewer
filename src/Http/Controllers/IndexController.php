@@ -2,7 +2,7 @@
 
 namespace Opcodes\LogViewer\Http\Controllers;
 
-use Opcodes\LogViewer\Enums\FolderSortingMethod;
+use Opcodes\LogViewer\Enums\SortingMethod;
 use Opcodes\LogViewer\Facades\LogViewer;
 use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\Utils\Utils;
@@ -15,7 +15,7 @@ class IndexController
             abort(404);
         }
 
-        $files_sort_by_time = config('log-viewer.defaults.file_sorting_method') === FolderSortingMethod::ModifiedTime;
+        $files_sort_by_time = config('log-viewer.defaults.file_sorting_method') === SortingMethod::ModifiedTime;
 
         return view(LogViewer::getViewLayout(), [
             'logViewerScriptVariables' => [
