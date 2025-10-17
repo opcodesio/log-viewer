@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
 
 use function Pest\Laravel\get;
+use function Pest\Laravel\getJson;
 
 test('can define an "auth" callback for authorization', function () {
     get(route('log-viewer.index'))->assertOk();
@@ -63,4 +64,27 @@ test('Log Viewer is not blocked if the Log Viewer auth middleware is not used', 
     (new \Opcodes\LogViewer\LogViewerServiceProvider(app()))->boot();
 
     get(route('log-viewer.index'))->assertOk();
+});
+
+test('auth callback works consistently for both web and API routes', function () {
+    $webCalls = 0;
+    $apiCalls = 0;
+
+    LogViewer::auth(function ($request) use (&$webCalls, &$apiCalls) {
+        if ($request->is('log-viewer/api/*')) {
+            $apiCalls++;
+        } else {
+            $webCalls++;
+        }
+
+        return true;
+    });
+
+    // Access web route
+    get(route('log-viewer.index'))->assertOk();
+    expect($webCalls)->toBe(1);
+
+    // Access API route
+    getJson(route('log-viewer.folders'), ['referer' => 'http://localhost/'])->assertOk();
+    expect($apiCalls)->toBe(1);
 });
