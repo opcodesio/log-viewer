@@ -87,43 +87,8 @@
               <mail-text-preview :mail="log.extra.mail_preview" />
             </tab-content>
 
-            <tab-content v-if="hasLaravelStackTrace(log)" tab-value="stack_trace">
-              <div class="p-4 lg:p-8">
-                <!-- Exception Header -->
-                <div v-if="getStackTraceData(log).header" class="mb-6 pb-4 border-b border-gray-200 dark:border-gray-600">
-                  <div class="text-red-600 dark:text-red-400 font-semibold text-lg mb-2">
-                    {{ getStackTraceData(log).header.type }}
-                  </div>
-                  <div class="text-gray-800 dark:text-gray-200 text-base mb-2">
-                    {{ getStackTraceData(log).header.message }}
-                  </div>
-                  <div class="text-sm text-gray-600 dark:text-gray-400 font-mono">
-                    in {{ getStackTraceData(log).header.file }}:{{ getStackTraceData(log).header.line }}
-                  </div>
-                </div>
-
-                <!-- Stack Trace Frames -->
-                <div class="space-y-2">
-                  <div v-for="(frame, frameIndex) in getStackTraceData(log).frames" :key="frameIndex"
-                       class="mb-2 border-b border-gray-100 dark:border-gray-700 pb-2 last:border-b-0">
-                    <div class="flex items-start gap-3">
-                      <div class="text-xs text-gray-500 dark:text-gray-400 font-mono w-8 flex-shrink-0 pt-1">
-                        #{{ frame.number }}
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div v-if="frame.file" class="text-sm mb-1">
-                          <span class="font-mono text-blue-600 dark:text-blue-400 break-all">{{ frame.file }}</span>
-                          <span class="text-gray-500 dark:text-gray-400">:</span>
-                          <span class="font-mono text-orange-600 dark:text-orange-400">{{ frame.line }}</span>
-                        </div>
-                        <div class="text-sm text-gray-800 dark:text-gray-200 font-mono break-all">
-                          {{ frame.call }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+            <tab-content v-if="hasLaravelStackTrace(log)" tab-value="laravel_stack_trace">
+              <LaravelStackTraceDisplay :log="log" />
             </tab-content>
 
             <tab-content tab-value="raw">
@@ -190,6 +155,7 @@ import TabContainer from "./TabContainer.vue";
 import TabContent from "./TabContent.vue";
 import MailHtmlPreview from "./MailHtmlPreview.vue";
 import MailTextPreview from "./MailTextPreview.vue";
+import LaravelStackTraceDisplay from "./LaravelStackTraceDisplay.vue";
 import {computed} from "vue";
 
 const fileStore = useFileStore();
@@ -218,6 +184,10 @@ const hasContext = (log) => {
 const getExtraTabsForLog = (log) => {
   let tabs = [];
 
+  if (hasLaravelStackTrace(log)) {
+    tabs.push({ name: 'Stack Trace', value: 'laravel_stack_trace' });
+  }
+
   if (! log.extra || ! log.extra.mail_preview) {
     return tabs;
   }
@@ -238,11 +208,6 @@ const getTabsForLog = (log) => {
 
   tabs.push({ name: 'Raw', value: 'raw' });
 
-  // Add Stack Trace tab for Laravel logs with stack traces
-  if (hasLaravelStackTrace(log)) {
-    tabs.push({ name: 'Stack Trace', value: 'stack_trace' });
-  }
-
   return tabs.filter(Boolean);
 }
 
@@ -261,50 +226,6 @@ const hasLaravelStackTrace = (log) => {
     ? log.context.find(item => item.exception)?.exception
     : log.context.exception;
   return exception && typeof exception === 'string' && exception.includes('[stacktrace]');
-}
-
-const getStackTraceData = (log) => {
-  const exception = Array.isArray(log.context)
-    ? log.context.find(item => item.exception)?.exception
-    : log.context.exception;
-
-  if (!exception || typeof exception !== 'string') {
-    return { header: null, frames: [] };
-  }
-
-  // Parse exception header
-  const headerMatch = exception.match(/^\[object\]\s*\(([^(]+)\(code:\s*\d+\):\s*(.+?)\s+at\s+(.+?):(\d+)\)/);
-  const header = headerMatch ? {
-    type: headerMatch[1].trim(),
-    message: headerMatch[2].trim(),
-    file: headerMatch[3].trim(),
-    line: parseInt(headerMatch[4])
-  } : null;
-
-  // Parse stack trace frames
-  const stacktraceMatch = exception.match(/\[stacktrace\]([\s\S]*?)(?:\n\n|\n$|$)/);
-  const frames = [];
-  if (stacktraceMatch) {
-    const frameRegex = /#(\d+)\s+(.+?)(?:\n|$)/g;
-    let match;
-    while ((match = frameRegex.exec(stacktraceMatch[1])) !== null) {
-      const frameLine = match[2].trim();
-      const fileMatch = frameLine.match(/^(.+?)\((\d+)\):\s*(.+)$/);
-      frames.push(fileMatch ? {
-        number: parseInt(match[1]),
-        file: fileMatch[1],
-        line: parseInt(fileMatch[2]),
-        call: fileMatch[3]
-      } : {
-        number: parseInt(match[1]),
-        file: '',
-        line: 0,
-        call: frameLine
-      });
-    }
-  }
-
-  return { header, frames };
 }
 
 const tableColumns = computed(() => {
