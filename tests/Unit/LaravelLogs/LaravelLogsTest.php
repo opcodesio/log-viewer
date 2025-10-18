@@ -311,8 +311,11 @@ EOF;
 
     $log = new LaravelLog($logText);
 
+    // Normalize expected value for cross-platform comparison (heredocs may have platform line endings)
+    $expectedStackTrace = str_replace(["\r\n", "\r"], "\n", $stackTrace);
+
     expect($log->context)->toHaveKey('exception')
-        ->and($log->context['exception'])->toBe($stackTrace)
+        ->and($log->context['exception'])->toBe($expectedStackTrace)
         ->and($log->context['exception'])->toContain('/vendor/symfony/http-kernel/')
         ->and($log->context['exception'])->toContain('/vendor/laravel/framework/');
 });
