@@ -1,6 +1,6 @@
 <?php
 
-use Opcodes\LogViewer\Enums\FolderSortingMethod;
+use Opcodes\LogViewer\Enums\SortingMethod;
 use Opcodes\LogViewer\Enums\SortingOrder;
 use Opcodes\LogViewer\LogFolder;
 
@@ -11,7 +11,7 @@ beforeEach(function () {
 });
 
 it('can get the log files', function () {
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::ModifiedTime]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::ModifiedTime]);
     config(['log-viewer.defaults.folder_sorting_order' => SortingOrder::Descending]);
 
     generateLogFiles([
@@ -30,7 +30,7 @@ it('can get the log files', function () {
 
 it('folders are sorted alphabetically descending when configured', function () {
     config(['log-viewer.include_files' => ['*.log', '*/**.log']]);
-    config(['log-viewer.defaults.folder_sorting_method' => FolderSortingMethod::Alphabetical]);
+    config(['log-viewer.defaults.folder_sorting_method' => SortingMethod::Alphabetical]);
     config(['log-viewer.defaults.folder_sorting_order' => SortingOrder::Ascending]);
 
     generateLogFiles([

@@ -3,9 +3,40 @@
 namespace Opcodes\LogViewer;
 
 use Illuminate\Support\Collection;
+use Opcodes\LogViewer\Enums\SortingMethod;
+use Opcodes\LogViewer\Enums\SortingOrder;
 
 class LogFolderCollection extends Collection
 {
+    public function sortUsing(string $method, string $order): self
+    {
+        if ($method === SortingMethod::ModifiedTime) {
+            if ($order === SortingOrder::Ascending) {
+                $this->items = $this->sortBy->earliestTimestamp()->values()->all();
+            } else {
+                $this->items = $this->sortByDesc->latestTimestamp()->values()->all();
+            }
+        } else {
+            $this->items = collect($this->items)
+                ->sort(function (LogFolder $a, LogFolder $b) use ($order) {
+                    if ($a->isRoot() && ! $b->isRoot()) {
+                        return -1;
+                    }
+                    if (! $a->isRoot() && $b->isRoot()) {
+                        return 1;
+                    }
+
+                    return $order === SortingOrder::Ascending
+                        ? strcmp($a->cleanPath(), $b->cleanPath())
+                        : strcmp($b->cleanPath(), $a->cleanPath());
+                })
+                ->values()
+                ->all();
+        }
+
+        return $this;
+    }
+
     public static function fromFiles($files = []): LogFolderCollection
     {
         return new LogFolderCollection(
@@ -18,16 +49,12 @@ class LogFolderCollection extends Collection
 
     public function sortByEarliestFirst(): self
     {
-        $this->items = $this->sortBy->earliestTimestamp()->values()->toArray();
-
-        return $this;
+        return $this->sortUsing(SortingMethod::ModifiedTime, SortingOrder::Ascending);
     }
 
     public function sortByLatestFirst(): self
     {
-        $this->items = $this->sortByDesc->latestTimestamp()->values()->toArray();
-
-        return $this;
+        return $this->sortUsing(SortingMethod::ModifiedTime, SortingOrder::Descending);
     }
 
     public function sortByEarliestFirstIncludingFiles(): self
@@ -48,39 +75,11 @@ class LogFolderCollection extends Collection
 
     public function sortAlphabeticallyAsc(): self
     {
-        $this->items = collect($this->items)
-            ->sort(function (LogFolder $a, LogFolder $b) {
-                if ($a->isRoot() && ! $b->isRoot()) {
-                    return -1;
-                }
-                if (! $a->isRoot() && $b->isRoot()) {
-                    return 1;
-                }
-
-                return strcmp($a->cleanPath(), $b->cleanPath());
-            })
-            ->values()
-            ->toArray();
-
-        return $this;
+        return $this->sortUsing(SortingMethod::Alphabetical, SortingOrder::Ascending);
     }
 
     public function sortAlphabeticallyDesc(): self
     {
-        $this->items = collect($this->items)
-            ->sort(function (LogFolder $a, LogFolder $b) {
-                if ($a->isRoot() && ! $b->isRoot()) {
-                    return -1;
-                }
-                if (! $a->isRoot() && $b->isRoot()) {
-                    return 1;
-                }
-
-                return strcmp($b->cleanPath(), $a->cleanPath());
-            })
-            ->values()
-            ->toArray();
-
-        return $this;
+        return $this->sortUsing(SortingMethod::Alphabetical, SortingOrder::Descending);
     }
 }

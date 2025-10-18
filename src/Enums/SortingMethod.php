@@ -2,10 +2,7 @@
 
 namespace Opcodes\LogViewer\Enums;
 
-/**
- * @deprecated Use SortingMethod instead
- */
-class FolderSortingMethod
+class SortingMethod
 {
     public const Alphabetical = 'Alphabetical';
     public const ModifiedTime = 'ModifiedTime';
