@@ -311,11 +311,8 @@ EOF;
 
     $log = new LaravelLog($logText);
 
-    // Normalize line endings for cross-platform comparison
-    $normalizedContext = str_replace(["\r\n", "\r"], "\n", $log->context['exception']);
-
     expect($log->context)->toHaveKey('exception')
-        ->and($normalizedContext)->toBe($stackTrace)
+        ->and($log->context['exception'])->toBe($stackTrace)
         ->and($log->context['exception'])->toContain('/vendor/symfony/http-kernel/')
         ->and($log->context['exception'])->toContain('/vendor/laravel/framework/');
 });

@@ -26,6 +26,7 @@ class LaravelLog extends Log
         $length = strlen($this->text);
 
         $this->extractContextsFromFullText();
+        $this->normalizeContextLineEndings();
 
         $this->extra['log_size'] = $length;
         $this->extra['log_size_formatted'] = Utils::bytesForHumans($length);
@@ -189,6 +190,19 @@ class LaravelLog extends Log
         }
 
         return $json_strings;
+    }
+
+    protected function normalizeContextLineEndings(): void
+    {
+        if (empty($this->context)) {
+            return;
+        }
+
+        foreach ($this->context as $key => $value) {
+            if (is_string($value)) {
+                $this->context[$key] = str_replace(["\r\n", "\r"], "\n", $value);
+            }
+        }
     }
 
     protected function filterStackTrace(string $text): string
