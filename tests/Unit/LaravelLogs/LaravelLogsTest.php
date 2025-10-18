@@ -255,3 +255,64 @@ EOF,
             'size_formatted' => Utils::bytesForHumans(strlen($messageString) - strlen('[2023-08-24 15:51:14] local.DEBUG: ')),
         ]);
 });
+
+it('filters stack traces in context when shorter stack traces is enabled', function () {
+    session(['log-viewer:shorter-stack-traces' => true]);
+    config([
+        'log-viewer.shorter_stack_trace_excludes' => [
+            '/vendor/symfony/',
+            '/vendor/laravel/framework/',
+        ],
+    ]);
+
+    $stackTrace = <<<'EOF'
+#0 /app/Controllers/UserController.php(25): someFunction()
+#1 /vendor/symfony/http-kernel/HttpKernel.php(158): handle()
+#2 /vendor/laravel/framework/Illuminate/Pipeline/Pipeline.php(128): process()
+#3 /app/Middleware/CustomMiddleware.php(42): handle()
+#4 /vendor/symfony/routing/Router.php(89): route()
+#5 /app/bootstrap/app.php(15): bootstrap()
+EOF;
+
+    $logText = <<<EOF
+[2024-10-18 12:00:00] production.ERROR: Exception occurred {"exception":"$stackTrace"}
+EOF;
+
+    $log = new LaravelLog($logText);
+
+    expect($log->context)->toHaveKey('exception')
+        ->and($log->context['exception'])->toContain('#0 /app/Controllers/UserController.php(25): someFunction()')
+        ->and($log->context['exception'])->toContain('#3 /app/Middleware/CustomMiddleware.php(42): handle()')
+        ->and($log->context['exception'])->toContain('#5 /app/bootstrap/app.php(15): bootstrap()')
+        ->and($log->context['exception'])->toContain('    ...')
+        ->and($log->context['exception'])->not->toContain('/vendor/symfony/http-kernel/')
+        ->and($log->context['exception'])->not->toContain('/vendor/laravel/framework/')
+        ->and($log->context['exception'])->not->toContain('/vendor/symfony/routing/');
+});
+
+it('does not filter context when shorter stack traces is disabled', function () {
+    session(['log-viewer:shorter-stack-traces' => false]);
+    config([
+        'log-viewer.shorter_stack_trace_excludes' => [
+            '/vendor/symfony/',
+            '/vendor/laravel/framework/',
+        ],
+    ]);
+
+    $stackTrace = <<<'EOF'
+#0 /app/Controllers/UserController.php(25): someFunction()
+#1 /vendor/symfony/http-kernel/HttpKernel.php(158): handle()
+#2 /vendor/laravel/framework/Illuminate/Pipeline/Pipeline.php(128): process()
+EOF;
+
+    $logText = <<<EOF
+[2024-10-18 12:00:00] production.ERROR: Exception occurred {"exception":"$stackTrace"}
+EOF;
+
+    $log = new LaravelLog($logText);
+
+    expect($log->context)->toHaveKey('exception')
+        ->and($log->context['exception'])->toBe($stackTrace)
+        ->and($log->context['exception'])->toContain('/vendor/symfony/http-kernel/')
+        ->and($log->context['exception'])->toContain('/vendor/laravel/framework/');
+});
