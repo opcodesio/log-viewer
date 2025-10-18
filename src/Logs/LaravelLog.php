@@ -193,6 +193,10 @@ class LaravelLog extends Log
 
     protected function filterStackTrace(string $text): string
     {
+        // Normalize line endings for cross-platform compatibility
+        $text = str_replace("\r\n", "\n", $text);
+        $text = str_replace("\r", "\n", $text);
+
         $lines = explode("\n", $text);
         $filteredLines = [];
         $emptyLineCharacter = '    ...';
