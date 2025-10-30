@@ -19,7 +19,7 @@ it('preserves file metadata timestamps when scanning with a search query', funct
     // Initially scan without query to establish baseline metadata
     $logReader = $logFile->logs();
     $logReader->scan();
-    
+
     $initialEarliest = $logFile->earliestTimestamp();
     $initialLatest = $logFile->latestTimestamp();
 
@@ -86,5 +86,3 @@ it('does not overwrite file metadata with filtered timestamps when query matches
     expect($logFile->earliestTimestamp())->toBe($date1->timestamp)
         ->and($logFile->latestTimestamp())->toBe($date4->timestamp);
 });
-
-
