@@ -146,8 +146,14 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
         $this->file->setMetadata('name', $this->file->name);
         $this->file->setMetadata('path', $this->file->path);
         $this->file->setMetadata('size', $this->file->size());
-        $this->file->setMetadata('earliest_timestamp', $this->index()->getEarliestTimestamp());
-        $this->file->setMetadata('latest_timestamp', $this->index()->getLatestTimestamp());
+        // Use the local variables that track ALL logs scanned, not just those matching the query
+        // This ensures file-level metadata represents the entire file, not filtered results
+        if (isset($earliest_timestamp)) {
+            $this->file->setMetadata('earliest_timestamp', $earliest_timestamp);
+        }
+        if (isset($latest_timestamp)) {
+            $this->file->setMetadata('latest_timestamp', $latest_timestamp);
+        }
         $this->file->setMetadata('last_scanned_file_position', ftell($this->fileHandle));
         $this->file->addRelatedIndex($logIndex);
 
