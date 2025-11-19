@@ -108,6 +108,96 @@ class LogsController
         ]);
     }
 
+    public function levelStats(Request $request)
+    {
+        $excludedFileTypes = $request->query('exclude_file_types', []);
+
+        // Get all files
+        $fileCollection = LogViewer::getFiles();
+
+        // Filter out excluded file types if provided
+        if (! empty($excludedFileTypes)) {
+            $fileCollection = $fileCollection->filter(function ($file) use ($excludedFileTypes) {
+                return ! in_array($file->type()->value, $excludedFileTypes);
+            })->values();
+        }
+
+        // Initialize aggregated level counts
+        $aggregatedLevels = [];
+        $totalCount = 0;
+
+        // Get all possible levels from config
+        $allLevels = config('log-viewer.levels', [
+            'debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency',
+        ]);
+
+        // Initialize all levels with zero count
+        foreach ($allLevels as $level) {
+            $aggregatedLevels[$level] = 0;
+        }
+
+        // Aggregate level counts from all files
+        foreach ($fileCollection as $file) {
+            try {
+                $logQuery = $file->logs();
+                $logQuery->scan();
+                $levelCounts = $logQuery->getLevelCounts();
+
+                foreach ($levelCounts as $levelCount) {
+                    $levelName = $levelCount->level->getName();
+
+                    if (isset($aggregatedLevels[$levelName])) {
+                        $aggregatedLevels[$levelName] += $levelCount->count;
+                    } else {
+                        $aggregatedLevels[$levelName] = $levelCount->count;
+                    }
+                    $totalCount += $levelCount->count;
+                }
+            } catch (\Exception $e) {
+                // Skip files that can't be read
+                continue;
+            }
+        }
+
+        // Format the results similar to LevelCountResource
+        $results = [];
+        $results[] = [
+            'level' => 'all',
+            'level_name' => 'All',
+            'level_class' => 'none',
+            'count' => $totalCount,
+            'percentage' => 100,
+            'selected' => true,
+        ];
+
+        foreach ($aggregatedLevels as $level => $count) {
+            if ($count > 0) {
+                // Map level to the correct level class
+                $levelClass = match (strtolower($level)) {
+                    'debug', 'info' => 'info',
+                    'notice' => 'notice',
+                    'warning' => 'warning',
+                    'error', 'critical', 'alert', 'emergency' => 'danger',
+                    default => 'none',
+                };
+
+                $results[] = [
+                    'level' => $level,
+                    'level_name' => ucfirst($level),
+                    'level_class' => $levelClass,
+                    'count' => $count,
+                    'percentage' => $totalCount > 0 ? round(($count / $totalCount) * 100, 2) : 0,
+                    'selected' => true,
+                ];
+            }
+        }
+
+        return response()->json([
+            'levelCounts' => $results,
+            'totalCount' => $totalCount,
+        ]);
+    }
+
     protected function getRequestPerformanceInfo(): array
     {
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : request()->server('REQUEST_TIME_FLOAT');

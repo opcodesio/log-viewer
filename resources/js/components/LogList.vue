@@ -1,11 +1,14 @@
 <template>
   <div class="h-full w-full py-5 log-list">
     <div class="flex flex-col h-full w-full md:mx-3 mb-4">
-      <div class="md:px-4 mb-4 flex flex-col-reverse lg:flex-row items-start">
-        <div class="flex items-center mr-5 mt-3 md:mt-0" v-if="showLevelsDropdown">
-          <LevelButtons />
+      <div class="md:px-4 mb-4" :class="logViewerStore.verboseLogCount ? 'flex flex-col items-start' : 'flex flex-col-reverse lg:flex-row items-start'">
+        <!-- Level buttons - to the left in normal mode, separate row when verbose mode -->
+        <div class="flex items-center mt-3 md:mt-0" :class="logViewerStore.verboseLogCount ? 'w-full order-2' : 'mr-5'" v-if="showLevelsDropdown">
+          <LevelButtons :verbose="logViewerStore.verboseLogCount" />
         </div>
-        <div class="w-full lg:w-auto flex-1 flex justify-end min-h-[38px]">
+
+        <!-- Search bar and controls - shares row with dropdown in normal mode, full width when verbose mode -->
+        <div class="flex justify-end min-h-[38px]" :class="logViewerStore.verboseLogCount ? 'w-full order-1 mb-3' : 'w-full lg:w-auto flex-1'">
           <SearchInput />
           <div class="hidden md:block ml-5">
             <button @click="logViewerStore.loadLogs()" id="reload-logs-button" title="Reload current results" class="menu-button">
