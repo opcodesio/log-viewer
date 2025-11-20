@@ -36,6 +36,8 @@
         <host-selector class="mb-8 mt-6" />
       </template>
 
+      <severity-stats-cards class="mt-6" />
+
       <template v-if="fileStore.fileTypesAvailable && fileStore.fileTypesAvailable.length > 1">
         <file-type-selector class="mb-8 mt-6" />
       </template>
@@ -218,6 +220,7 @@ import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
 import HostSelector from './HostSelector.vue';
 import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation';
 import FileTypeSelector from './FileTypeSelector.vue';
+import SeverityStatsCards from './SeverityStatsCards.vue';
 import DownloadLink from "./DownloadLink.vue";
 
 const router = useRouter();
