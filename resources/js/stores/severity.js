@@ -58,5 +58,15 @@ export const useSeverityStore = defineStore({
         levelCount.selected = false;
       }
     },
+
+    selectOnlyLevel(level) {
+      // Set excluded levels to all levels except the selected one
+      this.excludedLevels = this.allLevels.filter(l => l !== level);
+
+      // Update selected state for all levels
+      this.levelCounts.forEach(levelCount => {
+        levelCount.selected = levelCount.level === level;
+      });
+    },
   },
 })

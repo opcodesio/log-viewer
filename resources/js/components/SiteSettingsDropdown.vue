@@ -24,6 +24,20 @@
             </button>
           </MenuItem>
 
+          <MenuItem v-slot="{ active }">
+            <button :class="[active ? 'active' : '']" @click.stop.prevent="logViewerStore.verboseLogCount = !logViewerStore.verboseLogCount">
+              <Checkmark :checked="logViewerStore.verboseLogCount" />
+              <span class="ml-3">Verbose log count</span>
+            </button>
+          </MenuItem>
+
+          <MenuItem v-slot="{ active }">
+            <button :class="[active ? 'active' : '']" @click.stop.prevent="logViewerStore.showSeverityStats = !logViewerStore.showSeverityStats">
+              <Checkmark :checked="logViewerStore.showSeverityStats" />
+              <span class="ml-3">Show aggregate statistics</span>
+            </button>
+          </MenuItem>
+
           <div class="divider"></div>
           <div class="label">Actions</div>
 

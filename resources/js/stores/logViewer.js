@@ -27,17 +27,23 @@ export const useLogViewerStore = defineStore({
   id: 'logViewer',
 
   state: () => ({
-    theme: shouldUseLocalStorage 
-      ? useLocalStorage('logViewerTheme', window.LogViewer?.defaults?.theme || Theme.System) 
+    theme: shouldUseLocalStorage
+      ? useLocalStorage('logViewerTheme', window.LogViewer?.defaults?.theme || Theme.System)
       : (window.LogViewer?.defaults?.theme || Theme.System),
-    shorterStackTraces: shouldUseLocalStorage 
-      ? useLocalStorage('logViewerShorterStackTraces', window.LogViewer?.defaults?.shorter_stack_traces ?? false) 
+    shorterStackTraces: shouldUseLocalStorage
+      ? useLocalStorage('logViewerShorterStackTraces', window.LogViewer?.defaults?.shorter_stack_traces ?? false)
       : (window.LogViewer?.defaults?.shorter_stack_traces ?? false),
-    resultsPerPage: shouldUseLocalStorage 
-      ? useLocalStorage('logViewerResultsPerPage', window.LogViewer?.defaults?.per_page ?? 25) 
+    verboseLogCount: shouldUseLocalStorage
+      ? useLocalStorage('logViewerVerboseLogCount', window.LogViewer?.defaults?.verbose_log_count ?? true)
+      : (window.LogViewer?.defaults?.verbose_log_count ?? true),
+    showSeverityStats: shouldUseLocalStorage
+      ? useLocalStorage('logViewerShowSeverityStats', window.LogViewer?.defaults?.show_severity_stats ?? true)
+      : (window.LogViewer?.defaults?.show_severity_stats ?? true),
+    resultsPerPage: shouldUseLocalStorage
+      ? useLocalStorage('logViewerResultsPerPage', window.LogViewer?.defaults?.per_page ?? 25)
       : (window.LogViewer?.defaults?.per_page ?? 25),
     direction: shouldUseLocalStorage
-      ? useLocalStorage('logViewerDirection', window.LogViewer?.defaults?.log_sorting_order || 'desc') 
+      ? useLocalStorage('logViewerDirection', window.LogViewer?.defaults?.log_sorting_order || 'desc')
       : (window.LogViewer?.defaults?.log_sorting_order || 'desc'),
     helpSlideOverOpen: false,
 

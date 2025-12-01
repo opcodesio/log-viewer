@@ -1,6 +1,32 @@
 <template>
-  <div class="flex items-center">
-    <Menu as="div" class="mr-5 relative log-levels-selector">
+  <div class="flex items-center" :class="verbose ? 'flex-wrap w-full' : ''">
+    <!-- Verbose mode: Individual buttons -->
+    <template v-if="verbose">
+      <!-- All button -->
+      <button
+        @click.stop.prevent="severityStore.selectAllLevels()"
+        class="badge none"
+        :class="severityStore.levelsSelected.length === severityStore.levelsFound.length ? 'active' : ''"
+      >
+        <span class="font-semibold">All</span>
+        <span class="ml-2 opacity-90">{{ severityStore.totalResults.toLocaleString() + (logViewerStore.hasMoreResults ? '+' : '') }}</span>
+      </button>
+
+      <!-- Individual level buttons -->
+      <button
+        v-for="levelCount in severityStore.levelsFound"
+        :key="levelCount.level"
+        @click.stop.prevent="severityStore.selectOnlyLevel(levelCount.level)"
+        class="badge"
+        :class="[levelCount.level_class, levelCount.selected ? 'active' : '']"
+      >
+        <span class="font-semibold">{{ levelCount.level_name }}</span>
+        <span class="ml-2 opacity-90">{{ Number(levelCount.count).toLocaleString() + (logViewerStore.hasMoreResults ? '+' : '') }}</span>
+      </button>
+    </template>
+
+    <!-- Compact mode: Dropdown -->
+    <Menu v-else as="div" class="relative log-levels-selector">
 
       <MenuButton as="button" id="severity-dropdown-toggle" class="dropdown-toggle badge none" :class="severityStore.levelsSelected.length > 0 ? 'active' : ''">
         <template v-if="severityStore.levelsSelected.length > 2">
@@ -75,6 +101,13 @@ import Checkmark from './Checkmark.vue';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { useSeverityStore } from '../stores/severity.js';
 import { watch } from 'vue';
+
+const props = defineProps({
+  verbose: {
+    type: Boolean,
+    default: false
+  }
+});
 
 const logViewerStore = useLogViewerStore();
 const severityStore = useSeverityStore();
