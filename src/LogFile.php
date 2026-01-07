@@ -75,6 +75,7 @@ class LogFile
 
     public function index(?string $query = null): LogIndex
     {
+        $query = $query ?? '';
         if (! isset($this->_logIndexCache[$query])) {
             $this->_logIndexCache[$query] = new LogIndex($this, $query);
         }
