@@ -114,6 +114,6 @@ class LogTypeRegistrar
     protected function isPossiblyLaravelLogFile(string $fileName): bool
     {
         return $fileName === 'laravel.log'
-            || preg_match('/laravel-\d{4}-\d{2}-\d{2}\.log/', $fileName);
+            || preg_match('/^laravel-.+\.log$/', $fileName);
     }
 }
