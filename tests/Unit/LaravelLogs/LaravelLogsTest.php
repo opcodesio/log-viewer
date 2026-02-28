@@ -243,7 +243,7 @@ EOF;
                     'size_formatted' => Utils::bytesForHumans(strlen('Example attachment content')),
                 ],
             ],
-            'html' => <<<'EOF'
+            'html' => str_replace("\r\n", "\n", <<<'EOF'
 <html>
 <head>
 <title>This is an HTML email</title>
@@ -252,7 +252,7 @@ EOF;
 <h1>This is the HTML version of the email</h1>
 </body>
 </html>
-EOF,
+EOF),
             'text' => 'This is the text version of the email.',
             'size_formatted' => Utils::bytesForHumans(strlen($messageString) - strlen('[2023-08-24 15:51:14] local.DEBUG: ')),
         ]);
