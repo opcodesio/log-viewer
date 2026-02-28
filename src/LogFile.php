@@ -78,7 +78,7 @@ class LogFile
         $cacheKey = $query ?? '';
 
         if (! isset($this->_logIndexCache[$cacheKey])) {
-            $this->_logIndexCache[$cacheKey] = new LogIndex($this, $query);
+            $this->_logIndexCache[$cacheKey] = new LogIndex($this, $cacheKey);
         }
 
         return $this->_logIndexCache[$cacheKey];
