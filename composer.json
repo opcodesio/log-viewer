@@ -28,7 +28,7 @@
         "itsgoingd/clockwork": "^5.1",
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^7.0|^8.0",
-        "orchestra/testbench": "^7.6|^8.0|^9.0|^10.0",
+        "orchestra/testbench": "^7.6|^8.0|^9.5|^10.0",
         "pestphp/pest": "^2.0|^3.7",
         "pestphp/pest-plugin-laravel": "^2.0|^3.1",
         "spatie/test-time": "^1.3"
