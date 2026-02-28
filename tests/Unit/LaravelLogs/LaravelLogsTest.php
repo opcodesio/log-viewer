@@ -222,7 +222,9 @@ Example attachment content
 
 ------=_Part_1_1234567890--
 EOF;
-    // The email string (as per RFC 5322) actually needs to use \r\n sequence instead of \n
+    // The email string (as per RFC 5322) actually needs to use \r\n sequence instead of \n.
+    // First normalise to \n to avoid doubling \r on Windows where the heredoc may already use \r\n.
+    $messageString = str_replace("\r\n", "\n", $messageString);
     $messageString = str_replace("\n", "\r\n", $messageString);
 
     $log = new LaravelLog($messageString);
@@ -241,7 +243,7 @@ EOF;
                     'size_formatted' => Utils::bytesForHumans(strlen('Example attachment content')),
                 ],
             ],
-            'html' => <<<'EOF'
+            'html' => str_replace("\r\n", "\n", <<<'EOF'
 <html>
 <head>
 <title>This is an HTML email</title>
@@ -250,7 +252,7 @@ EOF;
 <h1>This is the HTML version of the email</h1>
 </body>
 </html>
-EOF,
+EOF),
             'text' => 'This is the text version of the email.',
             'size_formatted' => Utils::bytesForHumans(strlen($messageString) - strlen('[2023-08-24 15:51:14] local.DEBUG: ')),
         ]);

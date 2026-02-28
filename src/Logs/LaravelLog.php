@@ -60,6 +60,8 @@ class LaravelLog extends Log
         $this->message = trim($firstLineText);
         $text = $firstLineText.($matches[8] ?? '').implode('', $firstLineSplit)."\n".$theRestOfIt;
 
+        $contentBeforeFiltering = trim($text);
+
         if (session()->get('log-viewer:shorter-stack-traces', false)) {
             // Filter stack traces in text and context.
             $text = $this->filterStackTrace($text);
@@ -76,7 +78,7 @@ class LaravelLog extends Log
         }
 
         $this->text = trim($text);
-        $this->extractMailPreview();
+        $this->extractMailPreview($contentBeforeFiltering);
     }
 
     protected function fillMatches(array $matches = []): void
@@ -128,16 +130,16 @@ class LaravelLog extends Log
         }
     }
 
-    protected function extractMailPreview(): void
+    protected function extractMailPreview(string $originalText): void
     {
-        $possibleParts = preg_split('/[^\r]\n/', $this->text);
+        $possibleParts = preg_split('/[^\r]\n/', $originalText);
         $part = null;
 
         foreach ($possibleParts as $possiblePart) {
             if (
-                Str::contains($this->text, 'To:')
-                && Str::contains($this->text, 'From:')
-                && Str::contains($this->text, 'MIME-Version: 1.0')
+                Str::contains($possiblePart, 'To:')
+                && Str::contains($possiblePart, 'From:')
+                && Str::contains($possiblePart, 'MIME-Version: 1.0')
             ) {
                 $part = $possiblePart;
                 break;
@@ -147,6 +149,14 @@ class LaravelLog extends Log
         if (! $part) {
             return;
         }
+
+        // Normalise line endings to \r\n (RFC 5322) before parsing.
+        // On Windows, the log text may pass through heredoc/file reads that
+        // produce \r\n, and subsequent str_replace("\n","\r\n") can double
+        // them into \r\r\n which the mail parser cannot handle.
+        $part = str_replace("\r\n", "\n", $part);
+        $part = str_replace("\r", "\n", $part);
+        $part = str_replace("\n", "\r\n", $part);
 
         $message = Message::fromString($part);
 
@@ -159,11 +169,11 @@ class LaravelLog extends Log
                 'content' => base64_encode($attachment->getContent()),
                 'content_type' => $attachment->getContentType(),
                 'filename' => $attachment->getFilename(),
-                'size_formatted' => Utils::bytesForHumans($attachment->getSize()),
+                'size_formatted' => Utils::bytesForHumans(strlen($attachment->getContent())),
             ], $message->getAttachments()),
             'html' => $message->getHtmlPart()?->getContent(),
             'text' => $message->getTextPart()?->getContent(),
-            'size_formatted' => Utils::bytesForHumans($message->getSize()),
+            'size_formatted' => Utils::bytesForHumans(strlen($part)),
         ];
     }
 
