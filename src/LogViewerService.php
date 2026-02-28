@@ -7,6 +7,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Readers\IndexedLogReader;
 use Opcodes\LogViewer\Readers\LogReaderInterface;
@@ -340,16 +341,65 @@ class LogViewerService
     }
 
     /**
+     * Get the CSS for the Log Viewer dashboard.
+     */
+    public function css(): HtmlString
+    {
+        if (($css = @file_get_contents(__DIR__.'/../public/app.css')) === false) {
+            throw new \RuntimeException('Unable to load the Log Viewer CSS.');
+        }
+
+        return new HtmlString('<style>'.$css.'</style>');
+    }
+
+    /**
+     * Get the JS for the Log Viewer dashboard.
+     */
+    public function js(): HtmlString
+    {
+        if (($js = @file_get_contents(__DIR__.'/../public/app.js')) === false) {
+            throw new \RuntimeException('Unable to load the Log Viewer JavaScript.');
+        }
+
+        return new HtmlString('<script>'.$js.'</script>');
+    }
+
+    /**
+     * Get the favicon for the Log Viewer dashboard as a base64 data URI.
+     */
+    public function favicon(): HtmlString
+    {
+        if (($icon = @file_get_contents(__DIR__.'/../public/img/log-viewer-32.png')) === false) {
+            throw new \RuntimeException('Unable to load the Log Viewer favicon.');
+        }
+
+        return new HtmlString('<link rel="shortcut icon" href="data:image/png;base64,'.base64_encode($icon).'">');
+    }
+
+    /**
+     * Determine if Log Viewer's assets have been published.
+     */
+    public function assetsArePublished(): bool
+    {
+        $publishedPath = public_path(Str::finish(config('log-viewer.assets_path'), '/').'mix-manifest.json');
+
+        return File::exists($publishedPath);
+    }
+
+    /**
      * Determine if Log Viewer's published assets are up-to-date.
      *
      * @throws \RuntimeException
+     *
+     * @deprecated Publishing assets is no longer required. Assets are now served directly from the vendor directory.
+     *             This method will be removed in the next major version.
      */
     public function assetsAreCurrent(): bool
     {
         $publishedPath = public_path(Str::finish(config('log-viewer.assets_path'), '/').'mix-manifest.json');
 
         if (! File::exists($publishedPath)) {
-            throw new \RuntimeException('Log Viewer assets are not published. Please run: php artisan vendor:publish --tag=log-viewer-assets --force');
+            return false;
         }
 
         return File::get($publishedPath) === File::get(__DIR__.'/../public/mix-manifest.json');

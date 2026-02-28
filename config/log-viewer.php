@@ -43,9 +43,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Log Viewer Assets Path
+    | Log Viewer Assets Path (Deprecated)
     |--------------------------------------------------------------------------
-    | The path to the Log Viewer assets.
+    | The path to the published Log Viewer assets.
+    |
+    | Note: Publishing assets is no longer required. Assets are now served
+    | directly from the vendor directory. This option only applies if you
+    | have published assets using `php artisan log-viewer:publish`.
+    | This option will be removed in the next major version.
     |
     */
 

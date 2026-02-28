@@ -14,6 +14,11 @@ class PublishCommand extends Command
 
     public function handle()
     {
+        $this->components->warn(
+            'Publishing Log Viewer assets is deprecated and will be removed in the next major version. '
+            .'Assets are now served directly without publishing.'
+        );
+
         $this->call('vendor:publish', [
             '--tag' => 'log-viewer-assets',
             '--force' => true,

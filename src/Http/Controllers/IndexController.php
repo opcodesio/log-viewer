@@ -16,11 +16,13 @@ class IndexController
         }
 
         $files_sort_by_time = config('log-viewer.defaults.file_sorting_method') === SortingMethod::ModifiedTime;
+        $assetsPublished = LogViewer::assetsArePublished();
 
         return view(LogViewer::getViewLayout(), [
+            'assetsPublished' => $assetsPublished,
             'logViewerScriptVariables' => [
                 'headers' => (object) [],
-                'assets_outdated' => ! LogViewer::assetsAreCurrent(),
+                'assets_outdated' => $assetsPublished && ! LogViewer::assetsAreCurrent(),
                 'version' => LogViewer::version(),
                 'app_name' => config('app.name'),
                 'path' => config('log-viewer.route_path'),
