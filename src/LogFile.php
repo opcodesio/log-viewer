@@ -75,11 +75,13 @@ class LogFile
 
     public function index(?string $query = null): LogIndex
     {
-        if (! isset($this->_logIndexCache[$query])) {
-            $this->_logIndexCache[$query] = new LogIndex($this, $query);
+        $cacheKey = $query ?? '';
+
+        if (! isset($this->_logIndexCache[$cacheKey])) {
+            $this->_logIndexCache[$cacheKey] = new LogIndex($this, $cacheKey);
         }
 
-        return $this->_logIndexCache[$query];
+        return $this->_logIndexCache[$cacheKey];
     }
 
     public function logs(): LogReaderInterface
