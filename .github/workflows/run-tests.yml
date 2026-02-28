@@ -36,10 +36,10 @@ jobs:
             collision: 6.*
           - laravel: 10.*
             testbench: 8.*
-            pest: 2.*
-            collision: 7.*
+            pest: 1.*
+            collision: 6.*
           - laravel: 11.*
-            testbench: 9.*
+            testbench: ^9.5
             pest: 2.*
             collision: 8.*
           - laravel: 12.*
