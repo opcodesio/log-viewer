@@ -150,6 +150,14 @@ class LaravelLog extends Log
             return;
         }
 
+        // Normalise line endings to \r\n (RFC 5322) before parsing.
+        // On Windows, the log text may pass through heredoc/file reads that
+        // produce \r\n, and subsequent str_replace("\n","\r\n") can double
+        // them into \r\r\n which the mail parser cannot handle.
+        $part = str_replace("\r\n", "\n", $part);
+        $part = str_replace("\r", "\n", $part);
+        $part = str_replace("\n", "\r\n", $part);
+
         $message = Message::fromString($part);
 
         $this->extra['mail_preview'] = [
@@ -161,11 +169,11 @@ class LaravelLog extends Log
                 'content' => base64_encode($attachment->getContent()),
                 'content_type' => $attachment->getContentType(),
                 'filename' => $attachment->getFilename(),
-                'size_formatted' => Utils::bytesForHumans($attachment->getSize()),
+                'size_formatted' => Utils::bytesForHumans(strlen($attachment->getContent())),
             ], $message->getAttachments()),
             'html' => $message->getHtmlPart()?->getContent(),
             'text' => $message->getTextPart()?->getContent(),
-            'size_formatted' => Utils::bytesForHumans($message->getSize()),
+            'size_formatted' => Utils::bytesForHumans(strlen($part)),
         ];
     }
 
