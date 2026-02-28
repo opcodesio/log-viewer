@@ -110,6 +110,10 @@ class LogViewerServiceProvider extends ServiceProvider
         $this->loadViewsFrom(self::basePath('/resources/views'), 'log-viewer');
     }
 
+    /**
+     * @deprecated Publishing assets is no longer required. Assets are now served directly from the vendor directory.
+     *             This method will be removed in the next major version.
+     */
     protected function defineAssetPublishing()
     {
         $this->publishes([

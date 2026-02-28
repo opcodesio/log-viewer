@@ -3,6 +3,7 @@
 namespace Opcodes\LogViewer\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\HtmlString;
 use Opcodes\LogViewer\Host;
 use Opcodes\LogViewer\HostCollection;
 use Opcodes\LogViewer\LogFile;
@@ -16,6 +17,10 @@ use Opcodes\LogViewer\Readers\LogReaderInterface;
  *
  * @method static string version()
  * @method static string timezone()
+ * @method static HtmlString css()
+ * @method static HtmlString js()
+ * @method static HtmlString favicon()
+ * @method static bool assetsArePublished()
  * @method static bool assetsAreCurrent()
  * @method static bool supportsHostsFeature()
  * @method static void resolveHostsUsing(callable $callback)
