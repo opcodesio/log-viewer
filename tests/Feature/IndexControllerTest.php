@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\File;
-
 use function Pest\Laravel\get;
 
 test('default per page options are passed to the view', function () {
@@ -96,11 +95,10 @@ test('page loads successfully with published assets using external file mode', f
     $response->assertStatus(200);
     $response->assertViewHas('assetsPublished', true);
 
-    // Should contain external file references
+    // Should contain external stylesheet and script references
     $content = $response->getContent();
-    expect($content)->toContain('href="');
-    expect($content)->toContain('src="');
-    expect($content)->toContain(config('log-viewer.assets_path'));
+    expect($content)->toMatch('/link href="[^"]*app\.css[^"]*" rel="stylesheet"/');
+    expect($content)->toMatch('/script src="[^"]*app\.js[^"]*"/');
 });
 
 test('assets_outdated is true when assets are published but stale', function () {
@@ -139,6 +137,7 @@ test('published mode does not contain inline style or script blocks from assets'
     expect($content)->not->toContain('<style>');
     // Should NOT contain base64 favicon
     expect($content)->not->toContain('data:image/png;base64,');
-    // Should contain external references
-    expect($content)->toContain(config('log-viewer.assets_path'));
+    // Should contain external stylesheet and script references
+    expect($content)->toMatch('/link href="[^"]*app\.css[^"]*" rel="stylesheet"/');
+    expect($content)->toMatch('/script src="[^"]*app\.js[^"]*"/');
 });
