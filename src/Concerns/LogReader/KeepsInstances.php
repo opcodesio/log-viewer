@@ -23,12 +23,22 @@ trait KeepsInstances
     public static function clearInstance(LogFile $file): void
     {
         if (isset(static::$_instances[$file->path])) {
+            if (method_exists(static::$_instances[$file->path], 'closeFile')) {
+                static::$_instances[$file->path]->closeFile();
+            }
+
             unset(static::$_instances[$file->path]);
         }
     }
 
     public static function clearInstances(): void
     {
+        foreach (static::$_instances as $instance) {
+            if (method_exists($instance, 'closeFile')) {
+                $instance->closeFile();
+            }
+        }
+
         static::$_instances = [];
     }
 }
