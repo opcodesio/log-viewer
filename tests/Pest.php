@@ -79,6 +79,9 @@ function dummyLogData(?int $lines = null, string $type = LogType::LARAVEL): stri
 
 function clearGeneratedLogFiles(): void
 {
+    $logReaderClass = \Opcodes\LogViewer\Facades\LogViewer::logReaderClass();
+    $logReaderClass::clearInstances();
+
     File::cleanDirectory(storage_path('logs'));
     clearstatcache();
 }
