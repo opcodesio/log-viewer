@@ -28,7 +28,7 @@ class Log
     /** @var string The regular expression group key, which contains the message */
     public static string $regexMessageKey = 'message';
 
-    /** @var array|\string[][] The columns displayed on the frontend, and which data they should display */
+    /** @var array|string[][] The columns displayed on the frontend, and which data they should display */
     public static array $columns = [
         ['label' => 'Datetime', 'data_path' => 'datetime'],
         ['label' => 'Severity', 'data_path' => 'level'],

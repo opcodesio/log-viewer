@@ -3,6 +3,7 @@
 namespace Opcodes\LogViewer;
 
 use Composer\InstalledVersions;
+use GuzzleHttp\Client;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -202,7 +203,7 @@ class LogViewerService
 
     public function supportsHostsFeature(): bool
     {
-        return class_exists(\GuzzleHttp\Client::class);
+        return class_exists(Client::class);
     }
 
     public function resolveHostsUsing(callable $callback): void

@@ -21,7 +21,7 @@ test('Can be made from a LogFileCollection and grouped automatically', function 
     $logFileCollection = new LogFileCollection([
         $debugFile1 = new LogFile($debugFolder.'/debug1.log'),
         $infoFile1 = new LogFile($infoFolder.'/info1.log'),
-        $debugFile2 = new Logfile($debugFolder.'/debug2.log'),
+        $debugFile2 = new LogFile($debugFolder.'/debug2.log'),
         $infoFile2 = new LogFile($infoFolder.'/info2.log'),
     ]);
 

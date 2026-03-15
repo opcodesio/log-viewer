@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\HtmlString;
 use Opcodes\LogViewer\Facades\LogViewer;
 
 beforeEach(function () {
@@ -97,7 +98,7 @@ test('assetsArePublished respects custom assets_path config', function () {
 test('css() returns an HtmlString containing a style tag', function () {
     $result = LogViewer::css();
 
-    expect($result)->toBeInstanceOf(\Illuminate\Support\HtmlString::class);
+    expect($result)->toBeInstanceOf(HtmlString::class);
     expect((string) $result)->toStartWith('<style>');
     expect((string) $result)->toEndWith('</style>');
     expect(strlen((string) $result))->toBeGreaterThan(100);
@@ -106,7 +107,7 @@ test('css() returns an HtmlString containing a style tag', function () {
 test('js() returns an HtmlString containing a script tag', function () {
     $result = LogViewer::js();
 
-    expect($result)->toBeInstanceOf(\Illuminate\Support\HtmlString::class);
+    expect($result)->toBeInstanceOf(HtmlString::class);
     expect((string) $result)->toStartWith('<script>');
     expect((string) $result)->toEndWith('</script>');
     expect(strlen((string) $result))->toBeGreaterThan(100);
@@ -115,7 +116,7 @@ test('js() returns an HtmlString containing a script tag', function () {
 test('favicon() returns an HtmlString containing a base64 data URI', function () {
     $result = LogViewer::favicon();
 
-    expect($result)->toBeInstanceOf(\Illuminate\Support\HtmlString::class);
+    expect($result)->toBeInstanceOf(HtmlString::class);
     expect((string) $result)->toContain('data:image/png;base64,');
     expect((string) $result)->toStartWith('<link rel="shortcut icon"');
     expect((string) $result)->toEndWith('">');

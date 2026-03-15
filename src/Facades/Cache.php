@@ -2,12 +2,13 @@
 
 namespace Opcodes\LogViewer\Facades;
 
+use Illuminate\Cache\Repository;
 use Illuminate\Support\Facades\Facade;
 
 /**
  * @mixin \Illuminate\Contracts\Cache\Repository
  *
- * @see \Illuminate\Cache\Repository
+ * @see Repository
  */
 class Cache extends Facade
 {

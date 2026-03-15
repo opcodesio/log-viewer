@@ -3,9 +3,10 @@
 namespace Opcodes\LogViewer\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Opcodes\LogViewer\Logs\Log;
 
 /**
- * @mixin \Opcodes\LogViewer\Logs\Log
+ * @mixin Log
  */
 class LogResource extends JsonResource
 {

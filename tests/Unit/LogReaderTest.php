@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\File;
 use Opcodes\LogViewer\Exceptions\CannotOpenFileException;
 use Opcodes\LogViewer\Readers\IndexedLogReader;
+use Spatie\TestTime\TestTime;
 
 beforeEach(function () {
     $this->file = generateLogFile();
@@ -25,7 +26,7 @@ it('can re-scan the file after a new entry has been added', function () {
     $logReader = $this->file->logs();
     $logReader->scan();
 
-    \Spatie\TestTime\TestTime::addMinute();
+    TestTime::addMinute();
 
     File::append($this->file->path, PHP_EOL.makeLaravelLogEntry());
 

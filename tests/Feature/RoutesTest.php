@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Routing\RouteCollection;
+use Opcodes\LogViewer\LogViewerServiceProvider;
+
 use function Pest\Laravel\get;
 
 test('the default url can be changed', function () {
@@ -53,8 +56,8 @@ test('only both api and web', function () {
 function reloadRoutes(): void
 {
     // unset any routes that were set previously
-    app('router')->setRoutes(new \Illuminate\Routing\RouteCollection);
+    app('router')->setRoutes(new RouteCollection);
 
     // boot the service provider to register the routes again
-    (new \Opcodes\LogViewer\LogViewerServiceProvider(app()))->boot();
+    (new LogViewerServiceProvider(app()))->boot();
 }

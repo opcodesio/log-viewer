@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\Host;
 
 beforeEach(function () {
     config(['log-viewer.hosts' => [
@@ -14,7 +16,7 @@ beforeEach(function () {
     $this->remoteHost = LogViewer::getHosts()->remote()->first();
 });
 
-function expectedNewUrl($originalUrl, Opcodes\LogViewer\Host $host): string
+function expectedNewUrl($originalUrl, Host $host): string
 {
     $newUrl = Str::replaceFirst(
         route('log-viewer.index'), // http://localhost/log-viewer
@@ -47,7 +49,7 @@ it('can forward request to a different host', function ($method, $routeName, $ro
         ->assertOk()
         ->assertJson($proxiedResponseBody);
 
-    Http::assertSent(function (Illuminate\Http\Client\Request $request) use ($newUrl, $method) {
+    Http::assertSent(function (Request $request) use ($newUrl, $method) {
         return $request->url() === expectedNewUrl($newUrl, $this->remoteHost)
             && $request->method() === strtoupper($method)
             && collect($this->remoteHost->headers)->every(fn ($value, $key) => $request->hasHeader($key, $value));
