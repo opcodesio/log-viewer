@@ -1,6 +1,7 @@
 <?php
 
 use Opcodes\LogViewer\Facades\Cache;
+use Opcodes\LogViewer\LogFile;
 
 it('can skip a number of entries in the index', function () {
     $timestamp = now()->subHour()->timestamp;
@@ -64,7 +65,7 @@ it('works across multiple chunks', function () {
 test('get() skips unnecessary chunks by not loading them into memory', function () {
     $timestamp = now()->subHour()->timestamp;
     $logIndex = Mockery::mock('Opcodes\LogViewer\LogIndex[getChunk]', [
-        new \Opcodes\LogViewer\LogFile('laravel.log', 'laravel.log'),
+        new LogFile('laravel.log', 'laravel.log'),
     ])->makePartial();
     $logIndex->setMaxChunkSize(2);
     $idx1 = $logIndex->addToIndex($pos1 = 0, $timestamp, 'info');
@@ -94,7 +95,7 @@ test('get() skips unnecessary chunks by not loading them into memory', function 
 test('getFlatIndex() skips unnecessary chunks by not loading them into memory', function () {
     $timestamp = now()->subHour()->timestamp;
     $logIndex = Mockery::mock('Opcodes\LogViewer\LogIndex[getChunk]', [
-        new \Opcodes\LogViewer\LogFile('laravel.log', 'laravel.log'),
+        new LogFile('laravel.log', 'laravel.log'),
     ])->makePartial();
     $logIndex->setMaxChunkSize(2);
     $idx1 = $logIndex->addToIndex($pos1 = 0, $timestamp, 'info');

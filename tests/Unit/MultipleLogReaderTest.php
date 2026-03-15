@@ -22,7 +22,7 @@ it('continues reading when one file cannot be read', function () {
         $filesFound->logs()->scan();
 
         $this->assertTrue(true);
-    } catch (\Exception $exception) {
+    } catch (Exception $exception) {
         $this->fail('Exception thrown: '.$exception->getMessage());
     }
 });

@@ -2,6 +2,7 @@
 
 use Illuminate\Cache\FileStore;
 use Illuminate\Cache\RedisStore;
+use Opcodes\LogViewer\Facades\Cache;
 
 beforeEach(function () {
     config(['log-viewer.cache_driver' => null]);
@@ -10,7 +11,7 @@ beforeEach(function () {
 it('it defaults to the app\'s default cache driver', function ($cacheType, $cacheStoreClass) {
     config(['cache.default' => $cacheType]);
 
-    expect(\Opcodes\LogViewer\Facades\Cache::getStore())
+    expect(Cache::getStore())
         ->toBeInstanceOf($cacheStoreClass);
 })->with([
     ['file', FileStore::class],
@@ -21,6 +22,6 @@ it('can provide a different cache driver for the log viewer', function () {
     config(['cache.default' => 'redis']);
     config(['log-viewer.cache_driver' => 'file']);
 
-    expect(\Opcodes\LogViewer\Facades\Cache::getStore())
+    expect(Cache::getStore())
         ->toBeInstanceOf(FileStore::class);
 });

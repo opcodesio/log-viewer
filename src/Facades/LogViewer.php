@@ -10,10 +10,11 @@ use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\LogFileCollection;
 use Opcodes\LogViewer\LogFolder;
 use Opcodes\LogViewer\LogFolderCollection;
+use Opcodes\LogViewer\LogViewerService;
 use Opcodes\LogViewer\Readers\LogReaderInterface;
 
 /**
- * @see \Opcodes\LogViewer\LogViewerService
+ * @see LogViewerService
  *
  * @method static string version()
  * @method static string timezone()

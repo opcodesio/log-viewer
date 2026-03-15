@@ -1,7 +1,9 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Opcodes\LogViewer\Facades\LogViewer;
+use Opcodes\LogViewer\LogViewerServiceProvider;
 
 use function Pest\Laravel\get;
 use function Pest\Laravel\getJson;
@@ -20,7 +22,7 @@ test('can define an "auth" callback for authorization', function () {
 
 test('the "auth" callback is given with a Request object to check against', function () {
     LogViewer::auth(function ($request) {
-        expect($request)->toBeInstanceOf(\Illuminate\Http\Request::class);
+        expect($request)->toBeInstanceOf(Request::class);
 
         return true;
     });
@@ -61,7 +63,7 @@ test('Log Viewer is not blocked if the Log Viewer auth middleware is not used', 
     app()->detectEnvironment(fn () => 'production');
     expect(app()->isProduction())->toBeTrue();
     // need to reload the routes in order for the new middleware to take place.
-    (new \Opcodes\LogViewer\LogViewerServiceProvider(app()))->boot();
+    (new LogViewerServiceProvider(app()))->boot();
 
     get(route('log-viewer.index'))->assertOk();
 });

@@ -1,5 +1,6 @@
 <?php
 
+use Opcodes\LogViewer\LogFile;
 use Opcodes\LogViewer\Logs\HttpNginxErrorLog;
 
 it('can parse a full Nginx error log entry', function () {
@@ -45,7 +46,7 @@ it('can parse a minimal log entry', function () {
 });
 
 it('can parse multiline nginx log entries', function () {
-    $file = new \Opcodes\LogViewer\LogFile(__DIR__.'/Fixtures/multiline_nginx_error_dummy.log');
+    $file = new LogFile(__DIR__.'/Fixtures/multiline_nginx_error_dummy.log');
     $file->logs()->scan();
 
     $logs = $file->logs()->get();

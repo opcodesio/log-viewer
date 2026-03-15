@@ -2,7 +2,13 @@
 
 namespace Opcodes\LogViewer\Http\Middleware;
 
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Pipeline;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -16,9 +22,9 @@ class EnsureFrontendRequestsAreStateful
     /**
      * Handle the incoming requests.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  callable  $next
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function handle($request, $next)
     {
@@ -30,10 +36,10 @@ class EnsureFrontendRequestsAreStateful
 
                 return $next($request);
             },
-            static::resolveMiddleware('sanctum.middleware.encrypt_cookies', \Illuminate\Cookie\Middleware\EncryptCookies::class),
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            static::resolveMiddleware('sanctum.middleware.verify_csrf_token', \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class),
+            static::resolveMiddleware('sanctum.middleware.encrypt_cookies', EncryptCookies::class),
+            AddQueuedCookiesToResponse::class,
+            StartSession::class,
+            static::resolveMiddleware('sanctum.middleware.verify_csrf_token', VerifyCsrfToken::class),
         ] : [])->then(function ($request) use ($next) {
             return $next($request);
         });
@@ -55,7 +61,7 @@ class EnsureFrontendRequestsAreStateful
     /**
      * Determine if the given request is from the first-party application frontend.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return bool
      */
     public static function fromFrontend($request)
@@ -91,7 +97,7 @@ class EnsureFrontendRequestsAreStateful
     /**
      * Check if the referer/origin domain matches the current request's domain.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  string  $refererDomain
      * @return bool
      */
