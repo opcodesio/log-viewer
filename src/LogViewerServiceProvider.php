@@ -32,13 +32,15 @@ class LogViewerServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(self::basePath("/config/{$this->name}.php"), $this->name);
 
-        $this->app->scoped('log-viewer', LogViewerService::class);
-        $this->app->scoped('log-viewer-cache', function () {
+        $bindMethod = method_exists($this->app, 'scoped') ? 'scoped' : 'singleton';
+
+        $this->app->$bindMethod('log-viewer', LogViewerService::class);
+        $this->app->$bindMethod('log-viewer-cache', function () {
             return Cache::driver(config('log-viewer.cache_driver'));
         });
 
         if (! $this->app->bound(LogTypeRegistrar::class)) {
-            $this->app->scoped(LogTypeRegistrar::class, function () {
+            $this->app->$bindMethod(LogTypeRegistrar::class, function () {
                 return new LogTypeRegistrar;
             });
         }
