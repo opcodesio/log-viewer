@@ -58,7 +58,7 @@ jobs:
             collision: 8.*
           - laravel: 13.*
             testbench: 11.*
-            pest: 3.*
+            pest: 4.*
             collision: 8.*
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
