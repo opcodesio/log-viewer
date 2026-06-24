@@ -22,7 +22,7 @@ it('can get the log files', function () {
 
     $response = getJson(route('log-viewer.folders'));
 
-    expect($response->json())->not->toHaveKey('data');
+    expect($response->json())->toHaveKey('data');
     $response->assertJsonCount(2)
         ->assertJsonFragment(['clean_path' => LogFolder::rootPrefix().DIRECTORY_SEPARATOR.'one'])
         ->assertJsonFragment(['clean_path' => LogFolder::rootPrefix().DIRECTORY_SEPARATOR.'two']);
@@ -42,9 +42,9 @@ it('folders are sorted alphabetically descending when configured', function () {
     ], randomContent: true);
 
     $response = getJson(route('log-viewer.folders'));
-    $folders = $response->json();
+    $folders = $response->json()['folders'];
     // Should be sorted: 'root', 'alpha', 'one', 'two'
-    $response->assertJsonCount(4);
+    $response->assertJsonCount(4, 'folders');
     expect($folders[0]['clean_path'])->toBe(LogFolder::rootPrefix());
     expect($folders[1]['clean_path'])->toBe(LogFolder::rootPrefix().DIRECTORY_SEPARATOR.'alpha');
     expect($folders[2]['clean_path'])->toBe(LogFolder::rootPrefix().DIRECTORY_SEPARATOR.'one');

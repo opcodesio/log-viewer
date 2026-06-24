@@ -23,7 +23,7 @@ it('files controller returns default desc order when invalid direction is provid
 
     $response = getJson(route('log-viewer.files', ['direction' => 'invalid']));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -42,7 +42,7 @@ it('files controller returns default desc order when empty direction is provided
 
     $response = getJson(route('log-viewer.files', ['direction' => '']));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['folders'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -61,7 +61,7 @@ it('files controller returns default desc order when direction is null', functio
 
     $response = getJson(route('log-viewer.files'));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -74,7 +74,7 @@ it('files controller returns alphabetical sorting with default desc when invalid
 
     $response = getJson(route('log-viewer.files', ['direction' => 'invalid']));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'two.log',
         'three.log',
         'one.log',
@@ -88,7 +88,7 @@ it('files controller returns correct order with valid asc direction and alphabet
 
     $response = getJson(route('log-viewer.files', ['direction' => SortingOrder::Ascending]));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'four.log',
         'one.log',
         'three.log',
@@ -112,7 +112,7 @@ it('folders controller returns default desc order when invalid direction is prov
 
     $response = getJson(route('log-viewer.folders', ['direction' => 'invalid']));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -133,7 +133,7 @@ it('folders controller returns default desc order when empty direction is provid
 
     $response = getJson(route('log-viewer.folders', ['direction' => '']));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -154,7 +154,7 @@ it('folders controller returns default desc order when direction is null', funct
 
     $response = getJson(route('log-viewer.folders'));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -169,7 +169,7 @@ it('folders controller returns correct order with valid asc direction and alphab
 
     $response = getJson(route('log-viewer.folders', ['direction' => SortingOrder::Ascending]));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'four.log',
         'one.log',
         'three.log',

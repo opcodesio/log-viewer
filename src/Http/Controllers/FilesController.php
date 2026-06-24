@@ -20,7 +20,10 @@ class FilesController
 
         $files->sortUsing($sortingMethod, $direction);
 
-        return LogFileResource::collection($files);
+        return response()->json([
+            'data' => LogFileResource::collection($files),
+            'folders' => LogFileResource::collection($files),
+        ]);
     }
 
     private function validateDirection(?string $direction): string
@@ -41,10 +44,12 @@ class FilesController
         Gate::authorize('downloadLogFile', $file);
 
         return response()->json([
+
             'url' => URL::temporarySignedRoute(
                 'log-viewer.files.download',
                 now()->addMinute(),
-                ['fileIdentifier' => $fileIdentifier]
+                ['fileIdentifier' => $fileIdentifier],
+
             ),
         ]);
     }

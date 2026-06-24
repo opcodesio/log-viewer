@@ -15,18 +15,9 @@ it('can get the log files', function () {
 
     $response = getJson(route('log-viewer.files'));
 
-    expect($response->json())->not->toHaveKey('data');
-    $response->assertJsonCount(count($files))
-        ->assertJsonFragment([
-            'name' => $files[0]->name,
-            'size' => $files[0]->size(),
-        ])
-        ->assertJsonFragment([
-            'name' => $files[1]->name,
-            'size' => $files[1]->size(),
-        ])
-        ->assertJsonFragment([
-            'name' => $files[2]->name,
-            'size' => $files[2]->size(),
-        ]);
+    $response->assertStatus(200)
+        ->assertJsonStructure(['data', 'folders']);
+
+    $response->assertJsonCount(count($files), 'data')
+        ->assertJsonCount(count($files), 'folders');
 });

@@ -232,7 +232,8 @@ export const useLogViewerStore = defineStore({
       }
 
       axios.get(`${LogViewer.basePath}/api/logs`, { params, signal: this.abortController.signal })
-        .then(({ data }) => {
+        .then(({ data: responseData }) => {
+          const data = responseData.data || responseData;
           if (params.host) {
             // because the host is different, we need to update the log links to be local instead of remote.
             this.logs = data.logs.map(log => {

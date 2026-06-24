@@ -27,7 +27,10 @@ class FoldersController
 
         $folders->each(fn ($folder) => $folder->files()->sortUsing($fileSortingMethod, $fileSortingOrder));
 
-        return LogFolderResource::collection($folders->values());
+        return response()->json([
+            'data' => LogFolderResource::collection($folders->values()),
+            'folders' => LogFolderResource::collection($folders->values()),
+        ]);
     }
 
     private function validateDirection(?string $direction): string

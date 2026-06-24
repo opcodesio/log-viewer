@@ -80,6 +80,7 @@ watch(
 watch(
   () => route.query.host,
   async (newHost) => {
+  
     hostStore.selectHost(newHost || null);
 
     if (newHost && !hostStore.selectedHostIdentifier) {

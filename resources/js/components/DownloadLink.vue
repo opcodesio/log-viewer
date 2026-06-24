@@ -7,7 +7,7 @@ const props = defineProps(['url']);
 const requestFileDownload = () => {
   axios.get(`${props.url}/request`)
     .then((response) => {
-      downloadFromUrl(response.data.url);
+      downloadFromUrl(response.data.url || response.data.data.url);
     }).catch((error) => {
       console.log(error);
 

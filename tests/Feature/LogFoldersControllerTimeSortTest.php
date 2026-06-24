@@ -26,7 +26,7 @@ it('you can get time sorted default desc logs folders controller 1', function ()
     $response = getJson(route('log-viewer.folders'));
     // dd($response->json()[0]['files']);
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -50,7 +50,7 @@ it('you can get time sorted desc logs folders controller 1', function () {
     $response = getJson(route('log-viewer.folders', ['direction' => 'desc']));
     // dd($response->json()[0]['files']);
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -73,7 +73,7 @@ it('you can get time sorted asc logs folders controller 1', function () {
 
     $response = getJson(route('log-viewer.folders', ['direction' => 'asc']));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'one.log',
         'two.log',
         'three.log',
@@ -96,7 +96,7 @@ it('you can get time sorted default desc logs folders controller 2', function ()
 
     $response = getJson(route('log-viewer.folders'));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -119,7 +119,7 @@ it('you can get time sorted desc logs folders controller 2', function () {
 
     $response = getJson(route('log-viewer.folders', ['direction' => 'desc']));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'three.log',
         'two.log',
         'one.log',
@@ -142,7 +142,7 @@ it('you can get time sorted asc logs folders controller 2', function () {
 
     $response = getJson(route('log-viewer.folders', ['direction' => 'asc']));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'one.log',
         'two.log',
         'three.log',

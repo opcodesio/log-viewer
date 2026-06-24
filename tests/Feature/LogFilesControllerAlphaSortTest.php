@@ -21,7 +21,7 @@ it('you can get alphabetically sorted default desc logs files controller 1', fun
 
     $response = getJson(route('log-viewer.files'));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'two.log',
         'three.log',
         'one.log',
@@ -42,7 +42,7 @@ it('you can get alphabetically sorted asc logs files controller 1', function () 
 
     $response = getJson(route('log-viewer.files', ['direction' => 'asc']));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'four.log',
         'one.log',
         'three.log',
@@ -63,7 +63,7 @@ it('you can get alphabetically sorted desc logs files controller 1', function ()
 
     $response = getJson(route('log-viewer.files', ['direction' => 'desc']));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'two.log',
         'three.log',
         'one.log',
@@ -84,7 +84,7 @@ it('you can get alphabetically sorted default desc logs files controller 2', fun
 
     $response = getJson(route('log-viewer.files'));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'two.log',
         'three.log',
         'one.log',
@@ -105,7 +105,7 @@ it('you can get alphabetically sorted asc logs files controller 2', function () 
 
     $response = getJson(route('log-viewer.files', ['direction' => 'asc']));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'four.log',
         'one.log',
         'three.log',
@@ -126,7 +126,7 @@ it('you can get alphabetically sorted desc logs files controller 2', function ()
 
     $response = getJson(route('log-viewer.files', ['direction' => 'desc']));
 
-    expect(array_column($response->json(), 'name'))->toBe([
+    expect(array_column($response->json()['data'], 'name'))->toBe([
         'two.log',
         'three.log',
         'one.log',

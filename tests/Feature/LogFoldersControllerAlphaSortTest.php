@@ -26,7 +26,7 @@ it('you can get alphabetically sorted default desc logs folders controller 1', f
 
     $response = getJson(route('log-viewer.folders'));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'two.log',
         'three.log',
         'one.log',
@@ -51,7 +51,7 @@ it('you can get alphabetically sorted asc logs folders controller 1', function (
 
     $response = getJson(route('log-viewer.folders', ['direction' => 'asc']));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'four.log',
         'one.log',
         'three.log',
@@ -76,7 +76,7 @@ it('you can get alphabetically sorted desc logs folders controller 1', function 
 
     $response = getJson(route('log-viewer.folders', ['direction' => 'desc']));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'two.log',
         'three.log',
         'one.log',
@@ -102,7 +102,7 @@ it('you can get alphabetically sorted default desc logs folders controller 2', f
 
     $response = getJson(route('log-viewer.folders'));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'two.log',
         'three.log',
         'one.log',
@@ -127,7 +127,7 @@ it('you can get alphabetically sorted asc logs folders controller 2', function (
 
     $response = getJson(route('log-viewer.folders', ['direction' => 'asc']));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'four.log',
         'one.log',
         'three.log',
@@ -152,7 +152,7 @@ it('you can get alphabetically sorted desc logs folders controller 2', function 
 
     $response = getJson(route('log-viewer.folders', ['direction' => 'desc']));
 
-    expect(array_column($response->json()[0]['files'], 'name'))->toBe([
+    expect(array_column($response->json()['folders'][0]['files'], 'name'))->toBe([
         'two.log',
         'three.log',
         'one.log',

@@ -261,7 +261,15 @@ const rootFolderPrefix = window.LogViewer?.root_folder_prefix || 'root';
 
 onMounted(async () => {
   hostStore.selectHost(route.query.host || null);
+  await fileStore.loadFolders();
 });
+watch(
+  () => route.query.host,
+  async (newHost) => {
+    hostStore.selectHost(newHost || null);
+    await fileStore.loadFolders();
+  }
+);
 
 watch(
   () => fileStore.direction,
