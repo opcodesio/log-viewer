@@ -1,6 +1,6 @@
 <template>
   <Menu as="div" class="relative">
-    <MenuButton as="button" class="menu-button">
+    <MenuButton as="button" class="menu-button has-tooltip tooltip-right-aligned" data-tooltip="Settings">
       <span class="sr-only">Settings dropdown</span>
       <Cog8ToothIcon class="w-5 h-5" />
     </MenuButton>

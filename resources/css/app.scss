@@ -511,6 +511,30 @@ html.dark {
     }
 }
 
+.file-filter {
+    @apply relative bg-white border rounded-md text-sm w-full flex items-center dark:bg-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-100 transition duration-200;
+
+    .prefix-icon {
+        @apply ml-2 mr-1 text-gray-400 dark:text-gray-500;
+    }
+
+    input {
+        @apply w-full pl-1 pr-7 py-1 rounded flex-1 bg-inherit ring-2 ring-transparent transition duration-200;
+        &:focus {
+            @apply outline-none ring-brand-500 dark:ring-brand-700 border-transparent;
+        }
+        &::placeholder {
+            @apply text-gray-400 dark:text-gray-500;
+        }
+    }
+
+    .clear-file-filter {
+        @apply absolute right-1 rounded text-gray-400 dark:text-gray-500 p-1 transition duration-200;
+        &:hover { @apply text-gray-600 dark:text-gray-400; }
+        &:focus { @apply outline-none ring-2 ring-brand-500 dark:ring-brand-700; }
+    }
+}
+
 .search-progress-bar {
     @apply absolute top-1 bg-brand-500 dark:bg-brand-600 h-0.5 rounded transition-width ease-linear duration-300;
 }
@@ -645,6 +669,31 @@ html.dark {
 
     .folder-container:first-child > .folder-item-container {
         @apply mt-0;
+    }
+}
+
+// Shows the value of `data-tooltip` under the element on hover or keyboard focus.
+// The element it's on must not sit inside an `overflow: hidden` container, or the
+// tooltip gets clipped - use a plain `title` attribute in those places instead.
+.has-tooltip {
+    @apply relative;
+
+    &::after {
+        content: attr(data-tooltip);
+        @apply pointer-events-none absolute z-50 top-full left-1/2 mt-1 -translate-x-1/2 whitespace-nowrap;
+        @apply rounded px-2 py-1 text-xs font-normal shadow-md;
+        @apply bg-gray-700 text-gray-100 dark:bg-gray-700 dark:text-gray-100;
+        @apply opacity-0 transition-opacity duration-150;
+    }
+
+    &:hover::after,
+    &:focus-visible::after {
+        @apply opacity-100;
+    }
+
+    // Keep the tooltip on screen for the buttons that sit against the right edge.
+    &.tooltip-right-aligned::after {
+        @apply left-auto right-0 translate-x-0;
     }
 }
 

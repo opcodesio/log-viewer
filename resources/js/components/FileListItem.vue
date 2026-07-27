@@ -20,6 +20,7 @@
                     :data-toggle-id="logFile.identifier"
                     @keydown="handleKeyboardFileSettingsNavigation"
                     @click.stop="calculateDropdownDirection($event.target)">
+          <span class="sr-only">Open file options</span>
           <EllipsisVerticalIcon class="w-4 h-4 pointer-events-none" />
         </MenuButton>
       </div>
