@@ -8,7 +8,9 @@
         <div class="w-full lg:w-auto flex-1 flex justify-end min-h-[38px]">
           <SearchInput />
           <div class="hidden md:block ml-5">
-            <button @click="logViewerStore.loadLogs()" id="reload-logs-button" title="Reload current results" class="menu-button">
+            <button @click="logViewerStore.loadLogs()" id="reload-logs-button"
+                    data-tooltip="Reload current results" class="menu-button has-tooltip">
+              <span class="sr-only">Reload current results</span>
               <ArrowPathIcon class="w-5 h-5" />
             </button>
           </div>
@@ -16,8 +18,10 @@
             <SiteSettingsDropdown class="ml-2" id="desktop-site-settings" />
           </div>
           <div class="md:hidden">
-            <button type="button" class="menu-button">
-              <Bars3Icon class="w-5 h-5 ml-2" @click="fileStore.toggleSidebar" />
+            <button type="button" class="menu-button has-tooltip tooltip-right-aligned"
+                    data-tooltip="Open the file list" @click="fileStore.toggleSidebar">
+              <span class="sr-only">Open the file list</span>
+              <Bars3Icon class="w-5 h-5 ml-2" />
             </button>
           </div>
         </div>

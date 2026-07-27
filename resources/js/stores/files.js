@@ -14,6 +14,7 @@ export const useFileStore = defineStore({
     selectedFileIdentifier: null,
     fileTypesAvailable: [],
     selectedFileTypes: useLocalStorage('selectedFileTypes', []),
+    fileNameQuery: '',
 
     error: null,
     clearingCache: {},
@@ -43,14 +44,23 @@ export const useFileStore = defineStore({
     },
 
     filteredFolders: (state) => {
-      // filter the folders based on the selected file types.
+      // filter the folders based on the selected file types and the file name query.
+      // A folder whose own path matches the query keeps all of its files.
       // If a particular folder is now empty, filter it out.
+      const query = state.fileNameQuery.trim().toLowerCase();
 
-      return state.folders.map(folder => ({
-        ...folder,
-        files: folder.files.filter(file => state.selectedFileTypes.includes(file.type.value)),
-      })).filter(folder => folder.files.length > 0);
+      return state.folders.map(folder => {
+        const folderMatches = query === '' || String(folder.clean_path || '').toLowerCase().includes(query);
+
+        return {
+          ...folder,
+          files: folder.files.filter(file => state.selectedFileTypes.includes(file.type.value)
+            && (folderMatches || String(file.name || '').toLowerCase().includes(query))),
+        };
+      }).filter(folder => folder.files.length > 0);
     },
+
+    hasFileNameQuery: (state) => state.fileNameQuery.trim() !== '',
 
     files: (state) => state.folders.flatMap((folder) => folder.files),
 
@@ -62,6 +72,12 @@ export const useFileStore = defineStore({
 
     isOpen() {
       return (folder) => this.foldersOpen.map(f => f.identifier).includes(folder.identifier);
+    },
+
+    isExpanded() {
+      // While filtering by name, every folder left in the list holds a match,
+      // so they're all expanded - otherwise you'd have to open each one to see the results.
+      return (folder) => this.hasFileNameQuery || this.isOpen(folder);
     },
 
     isChecked: (state) => (file) => state.filesChecked.includes(
@@ -112,6 +128,10 @@ export const useFileStore = defineStore({
   actions: {
     setDirection(direction) {
       this.direction = direction;
+    },
+
+    clearFileNameQuery() {
+      this.fileNameQuery = '';
     },
 
     selectFile(logFileIdentifier) {
