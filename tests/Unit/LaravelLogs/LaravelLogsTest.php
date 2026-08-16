@@ -161,6 +161,17 @@ it('handles missing message', function () {
     assertEquals('', $log->getOriginalText());
 });
 
+it('does not crash on text that does not match the Laravel format', function () {
+    $text = str_repeat("\0", 20)."\n[2022-11-07 17:51:33] production.ERROR: this belongs to a later entry";
+
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
+
+    assertEquals(null, $log->datetime);
+    assertEquals(LaravelLogLevel::None, $log->level);
+    assertEquals('', $log->message);
+    assertEquals(null, $log->extra['environment']);
+});
+
 it('strips extracted context when there\'s multiple contexts available', function () {
     config(['log-viewer.strip_extracted_context' => true]);
     $logText = <<<'EOF'

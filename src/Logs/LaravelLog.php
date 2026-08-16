@@ -36,7 +36,15 @@ class LaravelLog extends Log
         // so in order to properly match, we must have a smaller first line...
         $firstLineSplit = mb_str_split($firstLine, 1000);
 
-        preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches);
+        if (preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches) !== 1) {
+            // corrupt or foreign chunk, e.g. a run of null bytes from a truncated write
+            $this->datetime = null;
+            $this->level = LaravelLogLevel::None;
+            $this->message = trim($firstLine);
+            $this->extra['environment'] = null;
+
+            return;
+        }
 
         $this->datetime = Carbon::parse($matches[1])?->setTimezone(LogViewer::timezone());
 
