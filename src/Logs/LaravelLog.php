@@ -36,25 +36,27 @@ class LaravelLog extends Log
         // so in order to properly match, we must have a smaller first line...
         $firstLineSplit = mb_str_split($firstLine, 1000);
 
-        preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches);
+        if (preg_match(static::regexPattern(), array_shift($firstLineSplit) ?? '', $matches) === 1) {
+            $this->datetime = Carbon::parse($matches[1])?->setTimezone(LogViewer::timezone());
 
-        $this->datetime = Carbon::parse($matches[1])?->setTimezone(LogViewer::timezone());
+            // $matches[2] contains microseconds, which is already handled
+            // $matches[3] contains timezone offset, which is already handled
 
-        // $matches[2] contains microseconds, which is already handled
-        // $matches[3] contains timezone offset, which is already handled
+            $this->extra['environment'] = $matches[5] ?? null;
 
-        $this->extra['environment'] = $matches[5] ?? null;
+            // There might be something in the middle between the timestamp
+            // and the environment/level. Let's put that at the beginning of the first line.
+            $middle = trim(rtrim($matches[4] ?? '', $this->extra['environment'].'.'));
 
-        // There might be something in the middle between the timestamp
-        // and the environment/level. Let's put that at the beginning of the first line.
-        $middle = trim(rtrim($matches[4] ?? '', $this->extra['environment'].'.'));
+            $this->level = strtoupper($matches[6] ?? '');
 
-        $this->level = strtoupper($matches[6] ?? '');
+            $firstLineText = $matches[7];
 
-        $firstLineText = $matches[7];
-
-        if (! empty($middle)) {
-            $firstLineText = $middle.' '.$firstLineText;
+            if (! empty($middle)) {
+                $firstLineText = $middle.' '.$firstLineText;
+            }
+        } else {
+            $firstLineText = $this->parseFirstLineLoosely($firstLine);
         }
 
         $this->message = trim($firstLineText);
@@ -84,6 +86,57 @@ class LaravelLog extends Log
     protected function fillMatches(array $matches = []): void
     {
         //
+    }
+
+    /**
+     * Called when the strict pattern did not match, which previously left
+     * $matches empty and made $matches[1] an undefined key - an ErrorException
+     * that failed the whole request rather than the one entry.
+     *
+     * Fall back to static::$regex, the looser expression the indexer already
+     * used to accept this entry, so a line with millisecond precision or
+     * something in front of the timestamp keeps its datetime, level and
+     * environment. Content that matches neither is kept with no severity.
+     *
+     * @return string The first line's message text.
+     */
+    protected function parseFirstLineLoosely(string $firstLine): string
+    {
+        if (preg_match(static::$regex, $firstLine, $matches) === 1) {
+            try {
+                $this->datetime = static::parseDateTime($matches['datetime'] ?? null)
+                    ?->setTimezone(LogViewer::timezone());
+            } catch (\Exception) {
+                $this->datetime = null;
+            }
+
+            if (! is_null($this->datetime)) {
+                $this->extra['environment'] = $matches['environment'] ?? null;
+                $this->level = strtoupper($matches['level'] ?? '');
+
+                return $matches['message'] ?? '';
+            }
+        }
+
+        $this->datetime = null;
+        $this->level = LaravelLogLevel::None;
+        $this->extra['unparseable'] = true;
+
+        return $this->printableText($firstLine);
+    }
+
+    /**
+     * Control characters reach the JSON response and the UI as raw bytes, so
+     * keep only what can be displayed. Falls back to a byte-level strip when
+     * the text is not valid UTF-8, rather than discarding it entirely.
+     */
+    protected function printableText(string $text): string
+    {
+        return trim(
+            preg_replace('/[^\P{C}\n\t]+/u', '', $text)
+                ?? preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/', '', $text)
+                ?? ''
+        );
     }
 
     protected static function regexPattern(): string
