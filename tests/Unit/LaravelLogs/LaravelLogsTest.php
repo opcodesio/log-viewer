@@ -321,3 +321,85 @@ EOF;
         ->and($log->context['exception'])->toContain('/vendor/symfony/http-kernel/')
         ->and($log->context['exception'])->toContain('/vendor/laravel/framework/');
 });
+
+it('does not fail on an entry it cannot parse', function (string $text) {
+    $log = new LaravelLog($text, 'laravel.log', 512608, 0);
+
+    assertEquals(null, $log->datetime);
+    assertEquals(LaravelLogLevel::None, $log->level);
+    assertEquals(true, $log->extra['unparseable']);
+})->with([
+    'null bytes' => str_repeat("\x00", 328),
+    'binary noise' => "\x01\x02\x03\x04",
+    'a plain line' => 'not a laravel log line at all',
+    'a truncated entry' => '[2022-08-25 11:16:17',
+    'empty' => '',
+]);
+
+it('does not fail on a timestamp Carbon cannot read', function (string $text) {
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
+
+    assertEquals(null, $log->datetime);
+    assertEquals(true, $log->extra['unparseable']);
+})->with([
+    'month 13' => '[2022-13-45 11:16:17] local.ERROR: x',
+    'hour 25' => '[2022-08-25 25:99:99] local.ERROR: x',
+]);
+
+it('falls back to the looser pattern the indexer used', function (string $text) {
+    $log = new LaravelLog($text, 'laravel.log', 0, 0);
+
+    assertEquals(LaravelLogLevel::Error, $log->level);
+    assertEquals('local', $log->extra['environment']);
+    assertEquals('2022-08-25 11:16:17', $log->datetime->toDateTimeString());
+    assertEquals('boom', $log->message);
+    assertEquals(false, isset($log->extra['unparseable']));
+})->with([
+    'millisecond precision' => '[2022-08-25 11:16:17.123] local.ERROR: boom',
+    'something before the timestamp' => ' [2022-08-25 11:16:17] local.ERROR: boom',
+]);
+
+it('does not duplicate the tail of a long unparseable first line', function () {
+    $firstLine = str_repeat('A', 1000).str_repeat('B', 1500);
+
+    $log = new LaravelLog($firstLine, 'laravel.log', 0, 0);
+    $text = $log->getOriginalText();
+
+    assertEquals(1000, substr_count($text, 'A'));
+    assertEquals(1500, substr_count($text, 'B'));
+});
+
+it('bounds the message of an entry whose first line is huge', function () {
+    $log = new LaravelLog(str_repeat('x', 600000), 'laravel.log', 0, 0);
+
+    assertEquals(true, strlen($log->message) <= 1000);
+});
+
+it('keeps bidi marks and joiners in an unparseable entry', function () {
+    $arabic = "طلب \u{200F}العميل مكتمل";
+
+    $log = new LaravelLog("\x00".$arabic, 'laravel.log', 0, 0);
+
+    assertEquals(true, str_contains($log->message, "\u{200F}"));
+});
+
+it('keeps only the printable part of an unparseable entry', function () {
+    $log = new LaravelLog("\x00\x01some readable text", 'laravel.log', 0, 0);
+
+    assertEquals('some readable text', $log->message);
+});
+
+it('still limits the size of an unparseable entry', function () {
+    $log = new LaravelLog("no timestamp here\n".str_repeat('x', 600000), 'laravel.log', 0, 0);
+
+    assertEquals(true, $log->extra['log_text_incomplete']);
+    assertEquals(true, strlen($log->getOriginalText()) < 600000);
+});
+
+it('does not mark a valid entry as unparseable', function () {
+    $log = new LaravelLog('[2022-08-25 11:16:17] local.DEBUG: Example log entry', 'laravel.log', 0, 0);
+
+    assertEquals(LaravelLogLevel::Debug, $log->level);
+    assertEquals('Example log entry', $log->message);
+    assertEquals(false, isset($log->extra['unparseable']));
+});

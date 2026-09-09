@@ -36,25 +36,45 @@ class LaravelLog extends Log
         // so in order to properly match, we must have a smaller first line...
         $firstLineSplit = mb_str_split($firstLine, 1000);
 
-        preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches);
+        // Only this first chunk is matched against, and the rest is appended back
+        // further down, so every path below must work from the chunk rather than
+        // from $firstLine - otherwise the tail past 1000 chars is written twice.
+        $firstChunk = array_shift($firstLineSplit) ?? '';
 
-        $this->datetime = Carbon::parse($matches[1])?->setTimezone(LogViewer::timezone());
+        $firstLineText = null;
 
-        // $matches[2] contains microseconds, which is already handled
-        // $matches[3] contains timezone offset, which is already handled
+        if (preg_match(static::regexPattern(), $firstChunk, $matches) === 1) {
+            // The pattern accepts any two digits for month, day and hour, so a
+            // malformed timestamp reaches Carbon and throws. That crash is the
+            // one this guard exists to prevent, so fall back rather than fail.
+            try {
+                $this->datetime = Carbon::parse($matches[1])?->setTimezone(LogViewer::timezone());
+            } catch (\Exception) {
+                $this->datetime = null;
+            }
 
-        $this->extra['environment'] = $matches[5] ?? null;
+            if (! is_null($this->datetime)) {
+                // $matches[2] contains microseconds, which is already handled
+                // $matches[3] contains timezone offset, which is already handled
 
-        // There might be something in the middle between the timestamp
-        // and the environment/level. Let's put that at the beginning of the first line.
-        $middle = trim(rtrim($matches[4] ?? '', $this->extra['environment'].'.'));
+                $this->extra['environment'] = $matches[5] ?? null;
 
-        $this->level = strtoupper($matches[6] ?? '');
+                // There might be something in the middle between the timestamp
+                // and the environment/level. Let's put that at the beginning of the first line.
+                $middle = trim(rtrim($matches[4] ?? '', $this->extra['environment'].'.'));
 
-        $firstLineText = $matches[7];
+                $this->level = strtoupper($matches[6] ?? '');
 
-        if (! empty($middle)) {
-            $firstLineText = $middle.' '.$firstLineText;
+                $firstLineText = $matches[7];
+
+                if (! empty($middle)) {
+                    $firstLineText = $middle.' '.$firstLineText;
+                }
+            }
+        }
+
+        if (is_null($firstLineText)) {
+            $firstLineText = $this->parseFirstLineLoosely($firstChunk);
         }
 
         $this->message = trim($firstLineText);
@@ -84,6 +104,60 @@ class LaravelLog extends Log
     protected function fillMatches(array $matches = []): void
     {
         //
+    }
+
+    /**
+     * Called when the strict pattern did not match, or matched a timestamp
+     * Carbon could not read. Previously $matches was left empty and $matches[1]
+     * became an undefined key, an ErrorException that failed the whole request
+     * instead of the one entry.
+     *
+     * Falls back to static::$regex, the looser expression the indexer already
+     * used to accept this entry, so a line with millisecond precision or
+     * something in front of the timestamp keeps its datetime, level and
+     * environment. Content matching neither is kept with no severity.
+     *
+     * @return string The first line's message text.
+     */
+    protected function parseFirstLineLoosely(string $firstChunk): string
+    {
+        if (preg_match(static::$regex, $firstChunk, $matches) === 1) {
+            try {
+                $this->datetime = static::parseDateTime($matches['datetime'] ?? null)
+                    ?->setTimezone(LogViewer::timezone());
+            } catch (\Exception) {
+                $this->datetime = null;
+            }
+
+            if (! is_null($this->datetime)) {
+                $this->extra['environment'] = $matches['environment'] ?? null;
+                $this->level = strtoupper($matches['level'] ?? '');
+
+                return $matches['message'] ?? '';
+            }
+        }
+
+        $this->datetime = null;
+        $this->level = LaravelLogLevel::None;
+        $this->extra['unparseable'] = true;
+
+        return $this->printableText($firstChunk);
+    }
+
+    /**
+     * Raw control bytes would reach the JSON response and the UI, so drop them.
+     *
+     * Only the Cc class: \p{C} would also take Cf, which includes the bidi
+     * marks that keep mixed Arabic and Latin log lines in the right order, and
+     * the zero-width joiner that holds emoji sequences together.
+     */
+    protected function printableText(string $text): string
+    {
+        return trim(
+            preg_replace('/[^\P{Cc}\n\t]+/u', '', $text)
+                ?? preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/', '', $text)
+                ?? ''
+        );
     }
 
     protected static function regexPattern(): string
