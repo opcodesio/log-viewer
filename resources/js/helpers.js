@@ -51,6 +51,44 @@ export const copyToClipboard = (str) => {
   }
 };
 
+/**
+ * Formats a log entry the way it is displayed in the UI, but prefixed with the
+ * datetime, environment and severity of the log - just like in the log file.
+ * Meant for copying a complete log entry out of the viewer.
+ */
+export const logToText = (log) => {
+  let text = log.full_text || log.message || '';
+
+  // Laravel logs have their `[datetime] env.LEVEL:` prefix stripped while parsing,
+  // in which case the text starts with the message. Other log types keep their
+  // original first line, and must not get a second timestamp in front of it.
+  if (log.message && text.startsWith(log.message)) {
+    text = logHeader(log) + text;
+  }
+
+  if (log.context && Object.keys(log.context).length > 0) {
+    text += "\n\nContext:\n" + formatContext(log.context);
+  }
+
+  return text;
+};
+
+const logHeader = (log) => {
+  // The datetime as written in the log file, rather than the one displayed in the
+  // UI, which has been reformatted and converted to the configured timezone.
+  const datetime = log.original_datetime || log.datetime;
+  const environment = log.extra?.environment;
+  const level = [environment, log.level].filter(Boolean).join('.');
+
+  return ['[' + datetime + ']', level ? level + ':' : null].filter(Boolean).join(' ') + ' ';
+};
+
+const formatContext = (context) => {
+  // Stack traces inside the context are a lot easier to read with actual line
+  // breaks instead of the escaped ones JSON.stringify() leaves behind.
+  return JSON.stringify(context, null, 2).replace(/\\n/g, "\n");
+};
+
 export const replaceQuery = (router, key, value) => {
   const route = router.currentRoute.value;
   const query = {

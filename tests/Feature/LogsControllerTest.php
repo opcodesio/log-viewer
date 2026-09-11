@@ -76,6 +76,19 @@ test('logs include full_text property by default', function () {
     expect($response->json('logs.0'))->toHaveKey('full_text');
 });
 
+test('logs include the datetime as written in the log file', function () {
+    config()->set('log-viewer.timezone', 'Europe/Vilnius');
+    config()->set('log-viewer.datetime_format', 'd/m/Y H:i');
+    $file = generateLogFile('log_with_original_datetime.log', '[2023-01-17 08:16:44] local.ERROR: Test message');
+
+    $response = getJson(route('log-viewer.logs', ['file' => $file->identifier]));
+
+    // The displayed datetime is reformatted and converted to the configured timezone,
+    // while `original_datetime` stays untouched.
+    expect($response->json('logs.0.datetime'))->toBe('17/01/2023 10:16');
+    expect($response->json('logs.0.original_datetime'))->toBe('2023-01-17 08:16:44');
+});
+
 test('logs can exclude full_text property when requested', function () {
     $logEntries = [
         makeLaravelLogEntry(message: 'Test message'),

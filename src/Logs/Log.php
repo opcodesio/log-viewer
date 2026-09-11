@@ -39,6 +39,10 @@ class Log
     protected ?string $text;
 
     public ?CarbonInterface $datetime;
+
+    /** @var string|null The datetime exactly as written in the log file, before parsing and timezone conversion */
+    public ?string $originalDatetime = null;
+
     public ?string $level;
     public ?string $message;
     public array $context = [];
@@ -107,7 +111,8 @@ class Log
 
     protected function fillMatches(array $matches = []): void
     {
-        $datetime = static::parseDateTime($matches[static::$regexDatetimeKey] ?? null);
+        $this->originalDatetime = $matches[static::$regexDatetimeKey] ?? null;
+        $datetime = static::parseDateTime($this->originalDatetime);
         $this->datetime = $datetime?->setTimezone(LogViewer::timezone());
 
         $this->level = $matches[static::$regexLevelKey] ?? null;

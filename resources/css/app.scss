@@ -397,15 +397,20 @@ html.dark {
             @apply border-gray-200 dark:border-gray-700 text-[10px] leading-3 lg:text-xs lg:leading-4 whitespace-pre-wrap break-all;
         }
 
-        .log-link {
-            @apply flex items-center justify-end w-full -my-0.5 py-0.5 pl-1 rounded;
+        // The subtle background makes both of them recognisable as buttons. It is
+        // translucent, so that it works on top of every severity's row colour.
+        .log-index {
+            @apply tabular-nums text-gray-400 dark:text-gray-500 mr-1;
+        }
 
-            @screen sm {
-                min-width: 64px;
-            }
+        // The subtle background makes both of them recognisable as buttons. It is
+        // translucent, so that it works on top of every severity's row colour.
+        .log-link, .log-text-copy {
+            @apply flex items-center justify-center p-1 -my-0.5 rounded
+              bg-gray-900/5 hover:bg-gray-900/10 dark:bg-white/10 dark:hover:bg-white/20;
 
             & > svg {
-                @apply h-4 w-4 ml-1 transition duration-200;
+                @apply h-4 w-4 transition duration-200;
             }
 
             &:focus {

@@ -27,6 +27,7 @@ class LogResource extends JsonResource
             'level_class' => $level->getClass()->value,
 
             'datetime' => $this->datetime?->format(config('log-viewer.datetime_format', 'Y-m-d H:i:s')),
+            'original_datetime' => $this->originalDatetime,
             'time' => $this->datetime?->format('H:i:s'),
             'message' => $this->message,
             'context' => $this->context,
