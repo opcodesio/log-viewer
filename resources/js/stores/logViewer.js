@@ -23,6 +23,11 @@ const defaultColumns = [
 
 const shouldUseLocalStorage = window.LogViewer?.defaults?.use_local_storage ?? true;
 
+// identifies a log entry across reloads. The index is the position within its file,
+// so it stays the same for existing entries when new ones get appended.
+const logKey = (log) => `${log.file_identifier}:${log.index}`;
+let newLogsTimeout = null;
+
 export const useLogViewerStore = defineStore({
   id: 'logViewer',
 
@@ -39,14 +44,20 @@ export const useLogViewerStore = defineStore({
     direction: shouldUseLocalStorage
       ? useLocalStorage('logViewerDirection', window.LogViewer?.defaults?.log_sorting_order || 'desc') 
       : (window.LogViewer?.defaults?.log_sorting_order || 'desc'),
+    // auto-reload interval in seconds, 0 = disabled
+    autoReloadInterval: shouldUseLocalStorage
+      ? useLocalStorage('logViewerAutoReloadInterval', 0)
+      : 0,
     helpSlideOverOpen: false,
 
     // Log data
     loading: false,
+    reloading: false,
     error: null,
     logs: [],
     columns: defaultColumns,
     levelCounts: [],
+    newLogKeys: [],
     performance: {},
     hasMoreResults: false,
     percentScanned: 100,
@@ -69,6 +80,8 @@ export const useLogViewerStore = defineStore({
     },
 
     isOpen: (state) => (index) => state.stacksOpen.includes(index),
+
+    isNewLog: (state) => (log) => state.newLogKeys.includes(logKey(log)),
 
     isMobile: (state) => state.viewportWidth <= 1023,
 
@@ -195,7 +208,13 @@ export const useLogViewerStore = defineStore({
       container.scrollTo(0, 0);
     },
 
-    loadLogs: debounce(function ({ silently = false } = {}) {
+    highlightNewLogs(keys) {
+      clearTimeout(newLogsTimeout);
+      this.newLogKeys = keys;
+      newLogsTimeout = setTimeout(() => this.newLogKeys = [], 2500);
+    },
+
+    loadLogs: debounce(function ({ silently = false, highlightNew = false } = {}) {
       const hostStore = useHostStore();
       const fileStore = useFileStore();
       const searchStore = useSearchStore();
@@ -213,7 +232,8 @@ export const useLogViewerStore = defineStore({
       // abort if there's no selected file and no query
       if (!this.selectedFile && !searchStore.hasQuery) return;
 
-      this.abortController = new AbortController();
+      const abortController = new AbortController();
+      this.abortController = abortController;
 
       const params = {
         host: hostStore.hostQueryParam,
@@ -230,9 +250,12 @@ export const useLogViewerStore = defineStore({
       if (!silently) {
         this.loading = true;
       }
+      this.reloading = true;
 
-      axios.get(`${LogViewer.basePath}/api/logs`, { params, signal: this.abortController.signal })
+      axios.get(`${LogViewer.basePath}/api/logs`, { params, signal: abortController.signal })
         .then(({ data }) => {
+          const previousLogKeys = new Set(this.logs.map(logKey));
+
           if (params.host) {
             // because the host is different, we need to update the log links to be local instead of remote.
             this.logs = data.logs.map(log => {
@@ -243,6 +266,10 @@ export const useLogViewerStore = defineStore({
           } else {
             this.logs = data.logs;
           }
+          if (highlightNew && previousLogKeys.size > 0) {
+            this.highlightNewLogs(this.logs.filter(log => !previousLogKeys.has(logKey(log))).map(logKey));
+          }
+
           this.columns = data.columns || defaultColumns;
           this.hasMoreResults = data.hasMoreResults;
           this.percentScanned = data.percentScanned;
@@ -252,6 +279,9 @@ export const useLogViewerStore = defineStore({
           paginationStore.setPagination(data.pagination);
 
           this.loading = false;
+          if (this.abortController === abortController) {
+            this.reloading = false;
+          }
 
           if (!silently) {
             nextTick(() => {
@@ -278,6 +308,9 @@ export const useLogViewerStore = defineStore({
           }
 
           this.loading = false;
+          if (this.abortController === abortController) {
+            this.reloading = false;
+          }
           this.error = error.message;
 
           if (error.response?.data?.message) {

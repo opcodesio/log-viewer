@@ -16,7 +16,7 @@
              :id="`tbody-${index}`" :data-index="index"
       >
       <tr @click="logViewerStore.toggle(index)"
-          :class="['log-item group', log.level_class, logViewerStore.isOpen(index) ? 'active' : '', logViewerStore.shouldBeSticky(index) ? 'sticky z-2' : '']"
+          :class="['log-item group', log.level_class, logViewerStore.isOpen(index) ? 'active' : '', logViewerStore.isNewLog(log) ? 'new' : '', logViewerStore.shouldBeSticky(index) ? 'sticky z-2' : '']"
           :style="{ top: logViewerStore.stackTops[index] || 0 }"
       >
         <td class="log-level hidden lg:table-cell">
