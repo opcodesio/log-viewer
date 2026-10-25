@@ -87,6 +87,11 @@ html.dark {
 .log-item {
     @apply bg-white dark:bg-gray-800 transition duration-200 cursor-pointer;
 
+    // freshly auto-reloaded entries briefly light up and fade back to normal
+    &.new > td {
+        animation: log-item-new 2.5s ease-out;
+    }
+
     &.success, &.notice {
         &:hover > td, &.active > td, &:focus-within > td {
             @apply bg-emerald-50 dark:bg-emerald-800 dark:bg-opacity-40;
@@ -692,5 +697,57 @@ button.button:hover, a.button:hover {
 
     .shortcut {
         @apply font-mono text-base dark:text-gray-300 inline-flex w-6 h-6 mr-2 items-center justify-center rounded border border-gray-400 dark:border-gray-500 ring-1 ring-gray-100 dark:ring-gray-900;
+    }
+}
+
+@keyframes log-item-new {
+    from {
+        background-color: theme('colors.brand.100');
+    }
+}
+
+html.dark .log-item.new > td {
+    animation-name: log-item-new-dark;
+}
+
+@keyframes log-item-new-dark {
+    from {
+        background-color: theme('colors.brand.900');
+    }
+}
+
+.auto-reload-ring {
+    @apply absolute inset-0 w-full h-full -rotate-90 pointer-events-none transition-opacity duration-200;
+
+    circle {
+        @apply fill-none;
+        stroke-width: 2;
+    }
+
+    .track {
+        @apply stroke-gray-200 dark:stroke-gray-700;
+    }
+
+    .progress {
+        @apply stroke-brand-500 dark:stroke-brand-400;
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        animation-name: auto-reload-countdown;
+        animation-timing-function: linear;
+        animation-fill-mode: forwards;
+    }
+
+    &.paused {
+        @apply opacity-40;
+
+        .progress {
+            animation-play-state: paused;
+        }
+    }
+}
+
+@keyframes auto-reload-countdown {
+    to {
+        stroke-dashoffset: 0;
     }
 }

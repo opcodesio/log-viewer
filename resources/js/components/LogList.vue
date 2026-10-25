@@ -8,10 +8,7 @@
         <div class="w-full lg:w-auto flex-1 flex justify-end min-h-[38px]">
           <SearchInput />
           <div class="hidden md:flex items-center ml-5">
-            <button @click="logViewerStore.loadLogs()" id="reload-logs-button" title="Reload current results" class="menu-button">
-              <ArrowPathIcon class="w-5 h-5" />
-            </button>
-            <AutoReloadDropdown />
+            <ReloadControls />
           </div>
           <div class="hidden md:block">
             <SiteSettingsDropdown class="ml-2" id="desktop-site-settings" />
@@ -70,7 +67,7 @@
 <script setup>
 import {computed, ref, watch} from 'vue';
 import { useRouter } from 'vue-router';
-import { ArrowPathIcon, Bars3Icon } from '@heroicons/vue/24/solid';
+import { Bars3Icon } from '@heroicons/vue/24/solid';
 import { useLogViewerStore } from '../stores/logViewer.js';
 import { useSearchStore } from '../stores/search.js';
 import { useFileStore } from '../stores/files.js';
@@ -79,7 +76,7 @@ import Pagination from './Pagination.vue';
 import LevelButtons from './LevelButtons.vue';
 import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
-import AutoReloadDropdown from './AutoReloadDropdown.vue';
+import ReloadControls from './ReloadControls.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import BaseLogTable from './BaseLogTable.vue';
 import PaginationOptions from './PaginationOptions.vue';
