@@ -39,6 +39,10 @@ export const useLogViewerStore = defineStore({
     direction: shouldUseLocalStorage
       ? useLocalStorage('logViewerDirection', window.LogViewer?.defaults?.log_sorting_order || 'desc') 
       : (window.LogViewer?.defaults?.log_sorting_order || 'desc'),
+    // auto-reload interval in seconds, 0 = disabled
+    autoReloadInterval: shouldUseLocalStorage
+      ? useLocalStorage('logViewerAutoReloadInterval', 0)
+      : 0,
     helpSlideOverOpen: false,
 
     // Log data

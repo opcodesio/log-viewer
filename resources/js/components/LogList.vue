@@ -7,10 +7,11 @@
         </div>
         <div class="w-full lg:w-auto flex-1 flex justify-end min-h-[38px]">
           <SearchInput />
-          <div class="hidden md:block ml-5">
+          <div class="hidden md:flex items-center ml-5">
             <button @click="logViewerStore.loadLogs()" id="reload-logs-button" title="Reload current results" class="menu-button">
               <ArrowPathIcon class="w-5 h-5" />
             </button>
+            <AutoReloadDropdown />
           </div>
           <div class="hidden md:block">
             <SiteSettingsDropdown class="ml-2" id="desktop-site-settings" />
@@ -78,6 +79,7 @@ import Pagination from './Pagination.vue';
 import LevelButtons from './LevelButtons.vue';
 import SearchInput from './SearchInput.vue';
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue';
+import AutoReloadDropdown from './AutoReloadDropdown.vue';
 import SpinnerIcon from './SpinnerIcon.vue';
 import BaseLogTable from './BaseLogTable.vue';
 import PaginationOptions from './PaginationOptions.vue';
